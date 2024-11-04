@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class AppColors {
   // Light Mode Colors
   static const Color primary = Color(0xFF026A40);
+  static const Color darkGreen = Color(0xFF022213);
   static const Color accent = Color(0xFFFF9000);
   static const Color scaffoldBackground = Color(0xFFF8F7F2);
   static const Color card = Colors.white;

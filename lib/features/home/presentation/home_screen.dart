@@ -1,6 +1,7 @@
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/features/home/presentation/menu_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:get/get.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -19,8 +20,26 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xff022213),
-      drawer: CustomDrawer(),
+      // drawer: CustomDrawer(),
       appBar: AppBar(
+        leading: InkWell(
+          onTap: () =>
+              ZoomDrawer.of(context)!.toggle(),
+          child: Row(
+            children: [
+              Icon(Icons.menu)
+              // SvgPicture.asset(
+              //   'assets/svg/menu.svg',
+              //   height: 15,
+              //   width: 20,
+              //   fit: BoxFit.contain,
+              //   color: context.isDarkMode
+              //       ? ConstantColors.kC0C0C4
+              //       : ConstantColors.kLightText,
+              // ),
+            ],
+          ),
+        ),
         title: Text("H O M E"),
         actions: [
           IconButton(onPressed: (){
