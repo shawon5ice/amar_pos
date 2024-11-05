@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:amar_pos/core/constants/app_colors.dart';
+import 'package:amar_pos/features/drawer/main_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -65,7 +66,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void navigate() {
-    Future.delayed(Duration(milliseconds: 1000), () => Get.offAllNamed(DrawerSetup.routeName),);
+    Future.delayed(Duration(milliseconds: 1000), () => Get.to(MainPage()));
     // userItems = Boxes.getUserItems();
     // if (userItems.isNotEmpty) {
     //   // generate a new uuid each time

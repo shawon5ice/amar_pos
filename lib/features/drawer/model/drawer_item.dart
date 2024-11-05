@@ -1,0 +1,9 @@
+import 'package:flutter/cupertino.dart';
+
+class DrawerItem{
+  final String title;
+  final String icon;
+
+  DrawerItem({required this.title, required this.icon});
+
+}
