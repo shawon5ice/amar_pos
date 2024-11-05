@@ -4,6 +4,7 @@ class AppColors {
   // Light Mode Colors
   static const Color primary = Color(0xFF026A40);
   static const Color darkGreen = Color(0xFF022213);
+  static const Color lightGreen = Color(0xFF93B7A7);
   static const Color accent = Color(0xFFFF9000);
   static const Color scaffoldBackground = Color(0xFFF8F7F2);
   static const Color card = Colors.white;
@@ -19,7 +20,7 @@ class AppColors {
   static const Color textDarkSecondary = Colors.white54;
 
   // Semantic Colors
-  static const Color error = Colors.red;
+  static const Color error = Color(0xffFF0000);
   static const Color success = Color(0xFF4CAF50);
   static const Color warning = Color(0xFFFFC107);
   static const Color info = Color(0xFF2196F3);

@@ -4,11 +4,11 @@ import 'package:get/get.dart';
 
 class AppRoutes {
   static List<GetPage<dynamic>> allRoutes = [
-    GetPage(
-      name: DrawerSetup.routeName,
-      page: () => const DrawerSetup(),
-      // binding: InitialBinding(),
-    ),
+    // GetPage(
+    //   name: DrawerSetup.routeName,
+    //   page: () => const DrawerSetup(),
+    //   // binding: InitialBinding(),
+    // ),
 
     GetPage(
       name: SplashScreen.routeName,

@@ -1,45 +1,22 @@
+import 'package:amar_pos/core/constants/app_colors.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/features/home/presentation/menu_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:get/get.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key,required this.openDrawer});
 
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-
-  bool isExpanded = false;
-
+  final VoidCallback openDrawer;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xff022213),
+      backgroundColor: AppColors.scaffoldBackground,
       // drawer: CustomDrawer(),
       appBar: AppBar(
-        leading: InkWell(
-          onTap: () =>
-              ZoomDrawer.of(context)!.toggle(),
-          child: Row(
-            children: [
-              Icon(Icons.menu)
-              // SvgPicture.asset(
-              //   'assets/svg/menu.svg',
-              //   height: 15,
-              //   width: 20,
-              //   fit: BoxFit.contain,
-              //   color: context.isDarkMode
-              //       ? ConstantColors.kC0C0C4
-              //       : ConstantColors.kLightText,
-              // ),
-            ],
-          ),
-        ),
+        leading: DrawerMenuWidget(onClicked: openDrawer),
         title: Text("H O M E"),
         actions: [
           IconButton(onPressed: (){
@@ -49,44 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Column(
         children: [
-          InkWell(
-            onTap: (){
-              setState(() {
-                isExpanded = !isExpanded;
-              });
-            },
-            child: Container(
-              height: 36.ph(context),
-              color: isExpanded? Color(0xff93B7A74D) : Colors.transparent,
-              padding: EdgeInsets.all(8.0.ph(context)),
-              child: Row(
-                children: [
-                  Icon(Icons.shopping_cart),
-                  Text('Sales', style: context.textTheme.bodyLarge?.copyWith(),),
-                ],
-              ),
-            ),
-          ),
-          if(isExpanded)
-            AnimatedContainer(duration: Duration(milliseconds: 500,), child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Container(
-                  margin: EdgeInsets.only(left: 24),
-                  height: 60,
-                  width: 1,
-                  color: Colors.orange,
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SubMenuWidget(title: 'Recurring Sales', icon: Icons.qr_code,),
-                    SubMenuWidget(title: 'Flicking Tut', icon: Icons.ac_unit,),
-                  ],
-                ),
-              ],
-            ),)
+
         ],
       ),
     );
@@ -94,36 +34,14 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 
-class SubMenuWidget extends StatelessWidget {
-  const SubMenuWidget({super.key, required this.title, required this.icon});
+class DrawerMenuWidget extends StatelessWidget {
+  const DrawerMenuWidget({Key? key, required this.onClicked}) : super(key: key);
 
-  final String title;
-  final IconData icon;
-
+  final VoidCallback onClicked;
+  
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Container(
-          margin: const EdgeInsets.only(top: 12),
-          width: 20,
-          height: 1,
-          color: Colors.orange,
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 12, left: 5),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Icon(icon),
-              Text(title, style: const TextStyle(color: Colors.black),),
-            ],
-          ),
-        )
-      ],
-    );
+    return IconButton(onPressed: onClicked, icon: Icon(Icons.menu));
   }
 }
