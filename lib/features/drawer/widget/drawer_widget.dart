@@ -8,8 +8,11 @@ import '../model/drawer_item.dart';
 import '../model/drawer_items.dart';
 
 class DrawerWidget extends StatefulWidget {
-  final ValueChanged<DrawerItem> onSelectedItem;
-  const DrawerWidget({super.key, required this.onSelectedItem});
+  final ValueChanged<DrawerItem?> onSelectedItem;
+  final ValueChanged<String?> onSelectedChildItem;
+
+  const DrawerWidget(
+      {super.key, required this.onSelectedItem,required this.onSelectedChildItem});
 
   @override
   State<DrawerWidget> createState() => _DrawerWidgetState();
@@ -20,27 +23,42 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   String? selectedChildItem;
   bool isExpanded = false;
 
+  bool parentItemChanged = false;
+  bool childItemChanged = false;
+
   void onParentTap(DrawerItem item) {
-    setState(() {
-      // Toggle the expanded state if the same parent item is tapped again
-      if (selectedParentItem == item && isExpanded) {
-        isExpanded = false;
-        selectedParentItem = null;
-      } else {
-        isExpanded = true;
+    // Only update if the selection has actually changed
+    if (selectedParentItem != item) {
+      setState(() {
         selectedParentItem = item;
-        selectedChildItem = null; // Clear child selection when a new parent is selected
+        selectedChildItem = null; // Reset child selection on parent change
+        isExpanded = true; // Parent item should always expand when selected
+      });
+
+      // Update callbacks only when the parent item changes
+      if (!parentItemChanged) {
+        widget.onSelectedItem(selectedParentItem);
+        widget.onSelectedChildItem(selectedChildItem);
+        parentItemChanged = true; // Flag set to prevent redundant callback calls
       }
-    });
-    // Navigate to the corresponding page based on `item`, if needed
+    }
   }
 
   void onChildTap(DrawerItem parent, String child) {
-    setState(() {
-      selectedParentItem = parent;
-      selectedChildItem = child;
-    });
-    // Navigate to the unique page based on `parent` and `child`
+    // Update only if the child item has changed
+    if (selectedChildItem != child) {
+      setState(() {
+        selectedParentItem = parent;
+        selectedChildItem = child;
+      });
+
+      // Update callback only when child selection changes
+      if (!childItemChanged) {
+        widget.onSelectedItem(selectedParentItem);
+        widget.onSelectedChildItem(selectedChildItem);
+        childItemChanged = true; // Prevent redundant callback calls
+      }
+    }
   }
 
   @override
@@ -48,76 +66,114 @@ class _DrawerWidgetState extends State<DrawerWidget> {
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.only(left: 16, top: 100),
-        child: Column(
-          children: [
-            Row(children: [
-              CircleAvatar(backgroundColor: Colors.white, radius: 25,),
-              SizedBox(width: 12,),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
+        child: SizedBox(
+          width: context.width * .55,
+          child: Column(
+            children: [
+              Row(
                 children: [
-                  Text("Arman Ahmed Shawon", style: context.textTheme.titleSmall?.copyWith(color: Colors.white, fontWeight: FontWeight.bold),),
-                  Text("Manager", style: context.textTheme.titleSmall?.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),)
+                  const CircleAvatar(
+                    backgroundColor: Colors.white,
+                    radius: 25,
+                  ),
+                  const SizedBox(
+                    width: 12,
+                  ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "Arman Ahmed Shawon",
+                          style: context.textTheme.titleSmall?.copyWith(
+                              color: Colors.white, fontWeight: FontWeight.bold),
+                          maxLines: 1,
+                        ),
+                        Text(
+                          "Manager",
+                          style: context.textTheme.titleSmall?.copyWith(
+                              color: AppColors.accent,
+                              fontWeight: FontWeight.bold),
+                          maxLines: 1,
+                        )
+                      ],
+                    ),
+                  )
                 ],
-              )
-            ],),
-            SizedBox(height: 18,),
-            Divider(
-              color: AppColors.lightGreen,
-              indent: 20,
-              endIndent: 20,
-            ),
-            buildDrawerItems(context, DrawerItems.overview),
-            buildDrawerItems(context, DrawerItems.inventory),
-            ExpandableDrawerWidget(
-              item: DrawerItems.sales,
-              children: ["Retail Sale", "Whole Sale"],
-              expanded: (bool isExpanded) {
-                setState(() {
-                  if (isExpanded) selectedParentItem = DrawerItems.sales;
-                });
-              },
-              isExpanded: isExpanded && selectedParentItem == DrawerItems.sales,
-              selectedChild: selectedChildItem,
-              onParentTap: () => onParentTap(DrawerItems.sales),
-              onChildTap: (child) => onChildTap(DrawerItems.sales, child),
-            ),
-            buildDrawerItems(context, DrawerItems.returnAndExchange),
-            buildDrawerItems(context, DrawerItems.purchase),
-            buildDrawerItems(context, DrawerItems.accounting),
-            buildDrawerItems(context, DrawerItems.reports),
-            buildDrawerItems(context, DrawerItems.config),
-            Divider(
-              color: AppColors.lightGreen,
-              indent: 20,
-              endIndent: 20,
-            ),
-
-            buildDrawerItems(context, DrawerItems.feedback),
-            buildDrawerItems(context, DrawerItems.trainingSession),
-            buildDrawerItems(context, DrawerItems.joinCommunity),
-            buildDrawerItems(context, DrawerItems.subscription),
-            buildDrawerItems(context, DrawerItems.helpAndSupport),
-            SizedBox(height: 32,),
-            ListTile(
-              leading: SvgPicture.asset(AppAssets.logoutMenuIcon),
-              title: Text('Log Out', style: context.textTheme.titleSmall?.copyWith(color: AppColors.error, fontWeight: FontWeight.bold),),
-            ),
-            SizedBox(height: 32,),
-          ],
+              ),
+              const SizedBox(
+                height: 18,
+              ),
+              const Divider(
+                color: AppColors.lightGreen,
+                indent: 20,
+                // endIndent: 20,
+              ),
+              buildDrawerItems(context, DrawerItems.overview),
+              buildDrawerItems(context, DrawerItems.inventory),
+              ExpandableDrawerWidget(
+                item: DrawerItems.sales,
+                children: const ["Retail Sale", "Whole Sale",],
+                expanded: (bool isExpanded) {
+                  setState(() {
+                    if (isExpanded) selectedParentItem = DrawerItems.sales;
+                  });
+                },
+                isExpanded:
+                    isExpanded && selectedParentItem == DrawerItems.sales,
+                selectedChild: selectedChildItem,
+                onParentTap: () => onParentTap(DrawerItems.sales),
+                onChildTap: (child) => onChildTap(DrawerItems.sales, child),
+              ),
+              buildDrawerItems(context, DrawerItems.returnAndExchange),
+              buildDrawerItems(context, DrawerItems.purchase),
+              buildDrawerItems(context, DrawerItems.accounting),
+              buildDrawerItems(context, DrawerItems.reports),
+              buildDrawerItems(context, DrawerItems.config),
+              const SizedBox(
+                height: 16,
+              ),
+              const Divider(
+                color: AppColors.lightGreen,
+                indent: 20,
+                // endIndent: 20,
+              ),
+              const SizedBox(
+                height: 16,
+              ),
+              buildDrawerItems(context, DrawerItems.feedback),
+              buildDrawerItems(context, DrawerItems.trainingSession),
+              buildDrawerItems(context, DrawerItems.joinCommunity),
+              buildDrawerItems(context, DrawerItems.subscription),
+              buildDrawerItems(context, DrawerItems.helpAndSupport),
+              const SizedBox(
+                height: 32,
+              ),
+              ListTile(
+                leading: SvgPicture.asset(AppAssets.logoutMenuIcon),
+                title: Text(
+                  'Log Out',
+                  style: context.textTheme.titleSmall?.copyWith(
+                      color: AppColors.error, fontWeight: FontWeight.bold),
+                ),
+              ),
+              SizedBox(
+                height: 32,
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
-
 
   Widget buildDrawerItems(BuildContext context, DrawerItem item) {
     bool isSelected = selectedParentItem == item;
     return ListTile(
       selected: isSelected,
       selectedTileColor: AppColors.lightGreen.withOpacity(.3),
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(12)),
       ),
       onTap: () => onParentTap(item),
@@ -139,7 +195,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
 
 class ExpandableDrawerWidget extends StatefulWidget {
   const ExpandableDrawerWidget({
-    Key? key,
+    super.key,
     required this.expanded,
     required this.item,
     required this.children,
@@ -147,7 +203,7 @@ class ExpandableDrawerWidget extends StatefulWidget {
     required this.onParentTap,
     required this.onChildTap,
     this.selectedChild,
-  }) : super(key: key);
+  });
 
   final Function(bool isExpanded) expanded;
   final DrawerItem item;
@@ -175,14 +231,18 @@ class _ExpandableDrawerWidgetState extends State<ExpandableDrawerWidget> {
           ),
           selected: widget.isExpanded,
           selectedTileColor: AppColors.lightGreen.withOpacity(.3),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(12))),
           dense: true,
           title: Text(
             widget.item.title,
             style: TextStyle(
-              color: widget.isExpanded ? AppColors.accent : AppColors.textDarkPrimary,
+              color: widget.isExpanded
+                  ? AppColors.accent
+                  : AppColors.textDarkPrimary,
               fontSize: widget.isExpanded ? 14 : 12,
-              fontWeight: widget.isExpanded ? FontWeight.bold : FontWeight.normal,
+              fontWeight:
+                  widget.isExpanded ? FontWeight.bold : FontWeight.normal,
             ),
           ),
           horizontalTitleGap: 8,
@@ -191,60 +251,64 @@ class _ExpandableDrawerWidgetState extends State<ExpandableDrawerWidget> {
         ),
         AnimatedCrossFade(
           duration: const Duration(milliseconds: 300),
-          crossFadeState: widget.isExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+          crossFadeState: widget.isExpanded
+              ? CrossFadeState.showSecond
+              : CrossFadeState.showFirst,
           firstChild: const SizedBox.shrink(),
           secondChild: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 48),
-            child: IntrinsicHeight( // Ensure the row height adapts to its children
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Vertical line with flexible height
-                  Container(
-                    width: 1,
-                    color: AppColors.accent,
-                    height: 36 * widget.children.length.toDouble(),
-                  ),
-                  // Column with child items
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: widget.children
-                          .map((child) => ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
-                        dense: true,
-                        title: Row(
-                          children: [
-                            // Small horizontal line for each child
-                            Container(
-                              width: 20,
-                              height: 1,
-                              color: AppColors.accent,
-                              margin: const EdgeInsets.only(right: 4),
-                            ),
-                            Text(
-                              child,
-                              style: TextStyle(
-                                color: widget.selectedChild == child
-                                    ? AppColors.accent
-                                    : AppColors.textDarkPrimary,
-                                fontSize: 12,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Vertical line with flexible height
+                Container(
+                  width: 1,
+                  color: AppColors.accent,
+                  height: 48 * widget.children.length.toDouble() - 24,
+                ),
+                // Column with child items
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: widget.children
+                        .map((child) => SizedBox(
+                              height: 48,
+                              child: ListTile(
+                                contentPadding: EdgeInsets.zero,
+                                shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(12))),
+                                dense: true,
+                                title: Row(
+                                  children: [
+                                    // Small horizontal line for each child
+                                    Container(
+                                      width: 20,
+                                      height: 1,
+                                      color: AppColors.accent,
+                                      margin: const EdgeInsets.only(right: 4),
+                                    ),
+                                    Text(
+                                      child,
+                                      style: TextStyle(
+                                        color: widget.selectedChild == child
+                                            ? AppColors.accent
+                                            : AppColors.textDarkPrimary,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                selected: widget.selectedChild == child,
+                                onTap: () => widget.onChildTap(child),
                               ),
-                            ),
-                          ],
-                        ),
-                        selected: widget.selectedChild == child,
-                        onTap: () => widget.onChildTap(child),
-                      ))
-                          .toList(),
-                    ),
+                            ))
+                        .toList(),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-
         ),
       ],
     );
