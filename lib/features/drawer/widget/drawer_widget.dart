@@ -1,4 +1,5 @@
 import 'package:amar_pos/core/constants/app_assets.dart';
+import 'package:amar_pos/features/drawer/model/menu_selection.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -8,11 +9,10 @@ import '../model/drawer_item.dart';
 import '../model/drawer_items.dart';
 
 class DrawerWidget extends StatefulWidget {
-  final ValueChanged<DrawerItem?> onSelectedItem;
-  final ValueChanged<String?> onSelectedChildItem;
+  final ValueChanged<MenuSelection?> onSelectedItem;
 
   const DrawerWidget(
-      {super.key, required this.onSelectedItem,required this.onSelectedChildItem});
+      {super.key, required this.onSelectedItem,});
 
   @override
   State<DrawerWidget> createState() => _DrawerWidgetState();
@@ -23,8 +23,8 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   String? selectedChildItem;
   bool isExpanded = false;
 
-  bool parentItemChanged = false;
-  bool childItemChanged = false;
+  // bool parentItemChanged = false;
+  // bool childItemChanged = false;
 
   void onParentTap(DrawerItem item) {
     // Only update if the selection has actually changed
@@ -36,11 +36,12 @@ class _DrawerWidgetState extends State<DrawerWidget> {
       });
 
       // Update callbacks only when the parent item changes
-      if (!parentItemChanged) {
-        widget.onSelectedItem(selectedParentItem);
-        widget.onSelectedChildItem(selectedChildItem);
-        parentItemChanged = true; // Flag set to prevent redundant callback calls
-      }
+      // if (!parentItemChanged) {
+      //   widget.onSelectedItem(selectedParentItem);
+      //   widget.onSelectedChildItem(selectedChildItem);
+      //   parentItemChanged = true; // Flag set to prevent redundant callback calls
+      // }
+      widget.onSelectedItem(MenuSelection(parent: selectedParentItem!, child: selectedChildItem));
     }
   }
 
@@ -53,11 +54,12 @@ class _DrawerWidgetState extends State<DrawerWidget> {
       });
 
       // Update callback only when child selection changes
-      if (!childItemChanged) {
-        widget.onSelectedItem(selectedParentItem);
-        widget.onSelectedChildItem(selectedChildItem);
-        childItemChanged = true; // Prevent redundant callback calls
-      }
+      // if (!childItemChanged) {
+      //   widget.onSelectedItem(selectedParentItem);
+      //   widget.onSelectedChildItem(selectedChildItem);
+      //   childItemChanged = true; // Prevent redundant callback calls
+      // }
+      widget.onSelectedItem(MenuSelection(parent: selectedParentItem!, child: selectedChildItem));
     }
   }
 
