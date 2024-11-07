@@ -1,4 +1,5 @@
 import 'package:amar_pos/core/constants/app_colors.dart';
+import 'package:amar_pos/features/category/presentation/category_screen.dart';
 import 'package:amar_pos/features/drawer/model/drawer_items.dart';
 import 'package:amar_pos/features/drawer/model/menu_selection.dart';
 import 'package:amar_pos/features/drawer/widget/drawer_widget.dart';
@@ -99,6 +100,8 @@ class _MainPageState extends State<MainPage> {
           backgroundColor: AppColors.error,
           body: Center(child: Text('${selectedMenuItem!.parent.title} ${selectedMenuItem!.child!}')),
         );
+      case DrawerItems.config:
+        return CategoryScreen();
     }
     return Container(); // Fallback if no valid selection is made
   }

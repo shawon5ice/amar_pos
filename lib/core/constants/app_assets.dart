@@ -27,7 +27,7 @@ class AppAssets {
   static const String clientIcon = "assets/configuration/client.svg";
   static const String customerIcon = "assets/configuration/customer.svg";
 
-  List<String> get configurationAssets => [
+  static List<String> get configurationAssets => [
     brandsIcon,
     categoryIcon,
     unitIcon,
