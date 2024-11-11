@@ -10,6 +10,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final DrawerMenuController drawerMenuController = Get.find();
+
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
       // drawer: CustomDrawer(),

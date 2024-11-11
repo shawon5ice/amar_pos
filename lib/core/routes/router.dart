@@ -34,7 +34,7 @@ class AppRoutes {
 
     GetPage(
       name: MainPage.routeName,
-      page: () => const MainPage(),
+      page: () => MainPage(),
       binding: MainBinding(),
     ),
 
