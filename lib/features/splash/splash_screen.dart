@@ -66,7 +66,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void navigate() {
-    Future.delayed(Duration(milliseconds: 1000), () => Get.to(MainPage()));
+    Future.delayed(const Duration(milliseconds: 1000), () => Get.offNamed(MainPage.routeName));
     // userItems = Boxes.getUserItems();
     // if (userItems.isNotEmpty) {
     //   // generate a new uuid each time

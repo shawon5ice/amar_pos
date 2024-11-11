@@ -17,9 +17,7 @@ class ConfigCard extends StatelessWidget {
         side: BorderSide(color: Colors.orangeAccent),
       ),
       child: InkWell(
-        onTap: () {
-          // Add navigation or functionality here
-        },
+        onTap: item.onPress,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Row(

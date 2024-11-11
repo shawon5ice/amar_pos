@@ -1,30 +1,28 @@
 import 'package:amar_pos/core/constants/app_colors.dart';
-import 'package:amar_pos/core/responsive/pixel_perfect.dart';
-import 'package:amar_pos/features/home/presentation/menu_screen.dart';
+import 'package:amar_pos/features/drawer/drawer_menu_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_zoom_drawer/flutter_zoom_drawer.dart';
 import 'package:get/get.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key,required this.openDrawer});
-
-  final VoidCallback openDrawer;
+  static const String routeName = "/home_screen";
+  const HomeScreen({super.key,});
 
   @override
   Widget build(BuildContext context) {
+    final DrawerMenuController drawerMenuController = Get.find();
     return Scaffold(
       backgroundColor: AppColors.scaffoldBackground,
       // drawer: CustomDrawer(),
       appBar: AppBar(
-        leading: DrawerMenuWidget(onClicked: openDrawer),
-        title: Text("H O M E"),
+        leading: DrawerMenuWidget(onClicked: drawerMenuController.openDrawer),
+        title: const Text("H O M E"),
         actions: [
           IconButton(onPressed: (){
             Get.changeThemeMode(Get.isDarkMode? ThemeMode.light : ThemeMode.dark);
           }, icon: Get.isDarkMode? Icon(Icons.sunny): Icon(Icons.nightlight))
         ],
       ),
-      body: Column(
+      body: const Column(
         children: [
 
         ],
@@ -35,13 +33,13 @@ class HomeScreen extends StatelessWidget {
 
 
 class DrawerMenuWidget extends StatelessWidget {
-  const DrawerMenuWidget({Key? key, required this.onClicked}) : super(key: key);
+  const DrawerMenuWidget({super.key, required this.onClicked});
 
   final VoidCallback onClicked;
   
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(onPressed: onClicked, icon: Icon(Icons.menu));
+    return IconButton(onPressed: onClicked, icon: const Icon(Icons.menu));
   }
 }

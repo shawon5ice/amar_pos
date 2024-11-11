@@ -69,7 +69,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
       child: Padding(
         padding: const EdgeInsets.only(left: 16, top: 100),
         child: SizedBox(
-          width: context.width * .55,
+          width: context.width * .65,
           child: Column(
             children: [
               Row(

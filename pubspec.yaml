@@ -39,6 +39,8 @@ dependencies:
   flutter_easyloading:
   flutter_zoom_drawer:
   flutter_svg:
+  auto_size_text:
+  file_picker:
 
 dev_dependencies:
   flutter_test:

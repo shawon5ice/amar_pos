@@ -1,5 +1,6 @@
 class AppAssets {
 
+
   //Menu Icons
   static const String accountingMenuIcon = "assets/menu_icons/accounting.svg";
   static const String configMenuIcon = "assets/menu_icons/config.svg";
@@ -15,8 +16,10 @@ class AppAssets {
   static const String salesMenuIcon = "assets/menu_icons/sales.svg";
   static const String subscriptionMenuIcon = "assets/menu_icons/subscription.svg";
   static const String trainingSessionMenuIcon = "assets/menu_icons/training_session.svg";
+  static const String menuIcon = "assets/configuration/menu.svg";
 
 
+  //Configuration
   static const String brandsIcon = "assets/configuration/brands.svg";
   static const String categoryIcon = "assets/configuration/category.svg";
   static const String unitIcon = "assets/configuration/unit.svg";
@@ -26,6 +29,10 @@ class AppAssets {
   static const String employeeIcon = "assets/configuration/employee.svg";
   static const String clientIcon = "assets/configuration/client.svg";
   static const String customerIcon = "assets/configuration/customer.svg";
+
+  static const String deleteIcon = "assets/configuration/delete_icon.svg";
+  static const String editIcon = "assets/configuration/edit_icon.svg";
+
 
   static List<String> get configurationAssets => [
     brandsIcon,

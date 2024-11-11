@@ -171,32 +171,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
     );
   }
 
-  Widget _buildExpandableItem(
-      BuildContext context, {
-        required IconData icon,
-        required String title,
-        required List<Widget> children,
-      }) {
-    final isExpanded = selectedParent == title;
-    return ExpansionTile(
-      leading: Icon(icon, color: isExpanded ? Colors.orange : null),
-      title: Text(
-        title,
-        style: TextStyle(color: isExpanded ? Colors.orange : null),
-      ),
-      children: children,
-      dense: true,
-
-      visualDensity: VisualDensity.compact,
-      childrenPadding: EdgeInsets.symmetric(horizontal: 20),
-      onExpansionChanged: (isExpanded) {
-        setState(() {
-          selectedParent = isExpanded ? title : null;
-          selectedChild = null;
-        });
-      },
-    );
-  }
 
   Widget _buildCustomExpandableItem(
       BuildContext context, {

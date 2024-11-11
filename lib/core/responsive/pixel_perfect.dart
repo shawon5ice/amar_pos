@@ -5,3 +5,6 @@ extension PixelPerfect on num {
   double pw(BuildContext context) => this * (MediaQuery.of(context).size.width / 428);
   double get px => toDouble(); // No scaling if an absolute size is needed
 }
+
+SizedBox addH(num height) => SizedBox(height: height.toDouble(),);
+SizedBox addW(num width) => SizedBox(width: width.toDouble(),);
