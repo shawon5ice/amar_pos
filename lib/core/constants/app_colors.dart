@@ -33,4 +33,12 @@ class AppColors {
 
   //App bar bg
   static const Color appBarBgColor = Color(0xffF9F9F9);
+
+
+
+  static Color k0F1113 = const Color(0xFF0F1113);
+  static Color k1F2225 = const Color(0xFF1F2225);
+  static Color k292E32 = const Color(0xFF292E32);
+  static Color k595E63 = const Color(0xFF595E63);
+  static Color kC0C0C4 = const Color(0xFFC0C0C4);
 }

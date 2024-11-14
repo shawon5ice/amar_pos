@@ -15,7 +15,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text("Inventory"),
+        title: Text("Safety"),
         centerTitle: true,
       ),
       body: FallClearanceForm()
@@ -61,7 +61,7 @@ class _FallClearanceFormState extends State<FallClearanceForm> {
                           });
                         },
                         child: Image.asset(
-                          'assets/safety_guide.png', // Make sure this path is correct
+                          'assets/app_logo.png', // Make sure this path is correct
                           height: MediaQuery.of(context).size.height/1.5,
                           fit: BoxFit.contain,
                           errorBuilder: (context, error, stackTrace) {

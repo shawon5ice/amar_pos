@@ -41,6 +41,13 @@ dependencies:
   flutter_svg:
   auto_size_text:
   file_picker:
+  get_storage:
+  dio:
+  awesome_dialog:
+  intl:
+  photo_view:
+  image_picker:
+  pinput:
 
 dev_dependencies:
   flutter_test:
@@ -52,6 +59,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^4.0.0
+  logger:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

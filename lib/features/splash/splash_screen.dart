@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:amar_pos/core/constants/app_colors.dart';
+import 'package:amar_pos/features/auth/presentation/ui/login_screen.dart';
 import 'package:amar_pos/features/drawer/main_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -68,7 +69,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void navigate() {
     Future.delayed(
       const Duration(milliseconds: 1000),
-          () => Get.offNamed(MainPage.routeName),
+          () => Get.offNamed(LoginScreen.routeName),
     );
     // userItems = Boxes.getUserItems();
     // if (userItems.isNotEmpty) {

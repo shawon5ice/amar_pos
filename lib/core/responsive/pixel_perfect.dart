@@ -1,4 +1,10 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+double get scaleWidth => Get.width / 428;
+double get scaleHeight => Get.height / 926;
 
 extension PixelPerfect on num {
   double ph(BuildContext context) => this * (MediaQuery.of(context).size.height / 926);
@@ -8,3 +14,13 @@ extension PixelPerfect on num {
 
 SizedBox addH(num height) => SizedBox(height: height.toDouble(),);
 SizedBox addW(num width) => SizedBox(width: width.toDouble(),);
+
+extension NumExtension on num{
+  double get h => this * scaleHeight;
+
+  double get w => this * scaleWidth;
+
+  double get sp => this * scaleWidth;
+
+  double get r => this * min(scaleWidth, scaleHeight);
+}
