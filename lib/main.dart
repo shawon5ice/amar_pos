@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
       initialRoute: SplashScreen.routeName,
       // initialBinding: InitialBinding(),
       theme: AppTheme(context).getLightTheme(),
-      darkTheme: AppTheme(context).getDarkTheme(),
+      // darkTheme: AppTheme(context).getDarkTheme(),
       builder: EasyLoading.init(),
       // home: DrawerSetup(),
     );

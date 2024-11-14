@@ -101,7 +101,7 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const AuthHeader(title: "Sign In"),
+                Obx(() => AuthHeader(title: "Sign In", error: _authCon.message.value,),),
                 Form(
                   key: _formKey,
                   child: Padding(

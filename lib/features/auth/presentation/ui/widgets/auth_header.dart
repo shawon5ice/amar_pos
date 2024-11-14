@@ -6,10 +6,12 @@ import '../../../../../core/constants/app_colors.dart';
 
 class AuthHeader extends StatelessWidget {
   final String title;
+  final String? error;
 
   const AuthHeader({
     super.key,
     required this.title,
+    this.error,
   });
 
   @override
@@ -72,6 +74,8 @@ class AuthHeader extends StatelessWidget {
                   fontWeight: FontWeight.w900,
                 ),
               ),
+              addH(32.h),
+              Center(child: Text(error??'', style: context.textTheme.bodyMedium?.copyWith(color: AppColors.error,),)),
             ],
           ),
           Positioned(

@@ -16,7 +16,7 @@ class BaseClient {
     bool? noDealer,
     bool? fullUrlGiven,
   }) async {
-    String url = fullUrlGiven != null? api :'${AppStrings.kBaseUrl}technician/$api';
+    String url = fullUrlGiven != null? api :'${AppStrings.kBaseUrl}/$api';
 
     if (noDealer != null) {
       url = AppStrings.kBaseUrl + api;
@@ -64,7 +64,7 @@ class BaseClient {
   }) async {
     // String apiV = apiVersion ?? ConstantStrings.kAPIVersion;
     // String url = ConstantStrings.kBaseUrl + apiV + api;
-    String url = fullUrlGiven!= null? api: '${AppStrings.kBaseUrl}technician/$api';
+    String url = fullUrlGiven!= null? api: '${AppStrings.kBaseUrl}/$api';
     if (noDealer != null) {
       url = AppStrings.kBaseUrl + api;
     }
@@ -111,7 +111,7 @@ class BaseClient {
   }) async {
     // String apiV = apiVersion ?? ConstantStrings.kAPIVersion;
     // String url = ConstantStrings.kBaseUrl + apiV + api;
-    String url = fullUrlGiven != null? api :'${AppStrings.kBaseUrl}technician/$api';
+    String url = fullUrlGiven != null? api :'${AppStrings.kBaseUrl}/$api';
     if (noDealer != null) {
       url = AppStrings.kBaseUrl + api;
     }

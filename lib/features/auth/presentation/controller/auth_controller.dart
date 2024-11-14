@@ -1,3 +1,7 @@
+import 'dart:convert';
+
+import 'package:amar_pos/features/auth/data/model/sign_in_response.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
@@ -11,8 +15,10 @@ import '../../data/services/auth_remote_data_service.dart';
 class AuthController extends GetxController{
   RxBool isLoggedIn = false.obs;
   RxBool loading = false.obs;
+
+  SignInResponse? signInResponse;
   // UserInfo? userInfo;
-  String message = '';
+  RxString message = ''.obs;
   RxBool isLoggingIn = true.obs;
   final TextEditingController phoneCon = TextEditingController();
   RxBool otpSend = false.obs;
@@ -32,7 +38,7 @@ class AuthController extends GetxController{
     required String email,
     required String password,
   }) async {
-    message = '';
+    message.value = '';
     loading(true);
     Methods.showLoading();
     try {
@@ -42,20 +48,42 @@ class AuthController extends GetxController{
       );
       logger.i(response);
       if(response != null){
-        message = response['message'];
+        message.value = response['message'];
       }
       if (response['success']) {
+        signInResponse = _processData(response);
         // userInfo = SignInResponseModel.fromJson(response).userInfo;
         isLoggedIn(true);
         Preference.setLoggedInFlag(true);
         // Preference.setUserInfo(userInfo!);
       }
     } finally {
-      if(message.isNotEmpty){
-        Methods.showSnackbar(msg: message, isSuccess: isLoggedIn.value?true:null);
+      if(message.isNotEmpty && isLoggedIn.value){
+        Methods.showSnackbar(msg: message.value, isSuccess: isLoggedIn.value?true:null);
       }
       loading(false);
       Methods.hideLoading();
+    }
+  }
+
+  // Function to process Map data in the background
+  Future<SignInResponse> processDataInBackground(Map<String, dynamic> data) async {
+    return compute(_processData, data);
+  }
+
+// The actual processing logic
+  SignInResponse _processData(Map<String, dynamic> data) {
+    return SignInResponse.fromJson(data);
+  }
+
+// Example Usage
+  void processLoginResponse(Map<String, dynamic> jsonResponse) async {
+    try {
+      SignInResponse userData = _processData(jsonResponse);
+      print("User Token: ${userData.loginData.token}");
+      print("Permissions Count: ${userData.loginData.permissions.length}");
+    } catch (e) {
+      print("Error parsing user data: $e");
     }
   }
 
