@@ -1,4 +1,7 @@
 import 'package:amar_pos/core/constants/app_assets.dart';
+import 'package:amar_pos/core/responsive/pixel_perfect.dart';
+import 'package:amar_pos/features/auth/data/model/hive/login_data_helper.dart';
+import 'package:amar_pos/features/drawer/drawer_menu_controller.dart';
 import 'package:amar_pos/features/drawer/model/menu_selection.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +25,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   DrawerItem? selectedParentItem;
   String? selectedChildItem;
   bool isExpanded = false;
+  final DrawerMenuController  controller = Get.find();
 
   // bool parentItemChanged = false;
   // bool childItemChanged = false;
@@ -74,9 +78,10 @@ class _DrawerWidgetState extends State<DrawerWidget> {
             children: [
               Row(
                 children: [
-                  const CircleAvatar(
+                  CircleAvatar(
                     backgroundColor: Colors.white,
                     radius: 25,
+                    child: (controller.loginData?.business.logo != null) ?Image.network(controller.loginData!.business.logo!):Icon(Icons.broken_image),
                   ),
                   const SizedBox(
                     width: 12,
@@ -87,16 +92,16 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          "Arman Ahmed Shawon",
+                          controller.loginData?.name ?? '--',
                           style: context.textTheme.titleSmall?.copyWith(
                               color: Colors.white, fontWeight: FontWeight.bold),
                           maxLines: 1,
                         ),
                         Text(
-                          "Manager",
-                          style: context.textTheme.titleSmall?.copyWith(
+                          controller.loginData?.email ?? "--",
+                          style: context.textTheme.bodyLarge?.copyWith(
                               color: AppColors.accent,
-                              fontWeight: FontWeight.bold),
+                              fontWeight: FontWeight.normal),
                           maxLines: 1,
                         )
                       ],

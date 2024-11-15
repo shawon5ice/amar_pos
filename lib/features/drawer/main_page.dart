@@ -11,6 +11,8 @@ class MainPage extends StatelessWidget {
   static const String routeName = "/main";
   final DrawerMenuController menuController = Get.put(DrawerMenuController());
 
+  MainPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);

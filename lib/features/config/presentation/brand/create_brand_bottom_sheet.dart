@@ -6,7 +6,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../data/model/brand/brand_model.dart';
+import '../../data/model/brand/brand_model_response.dart';
 import 'brand_controller.dart';
 
 class CreateBrandBottomSheet extends StatefulWidget {
@@ -26,8 +26,8 @@ class _CreateBrandBottomSheetState extends State<CreateBrandBottomSheet> {
   void initState() {
     _textEditingController = TextEditingController();
     if(widget.brand != null){
-      _textEditingController.text = widget.brand!.brandName;
-      fileName = widget.brand!.brandLogo;
+      _textEditingController.text = widget.brand!.name;
+      fileName = widget.brand!.logo;
     }
     super.initState();
   }
@@ -117,7 +117,7 @@ class _CreateBrandBottomSheetState extends State<CreateBrandBottomSheet> {
                                 )
                               : Padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: Image.file(
+                                child: widget.brand != null ? Image.network(widget.brand!.logo): Image.file(
                                   fit: BoxFit.cover,
                                     File(fileName!),
                                   ),
@@ -139,7 +139,7 @@ class _CreateBrandBottomSheetState extends State<CreateBrandBottomSheet> {
                   _brandController.addNewBrand(brandName: _textEditingController.text, brandLogo: fileName??"");
                 },
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
             ],
           ),
         ),

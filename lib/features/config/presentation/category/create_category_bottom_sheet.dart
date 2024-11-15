@@ -1,5 +1,5 @@
 import 'package:amar_pos/core/widgets/custom_button.dart';
-import 'package:amar_pos/features/category/data/model/category/category_model.dart';
+import 'package:amar_pos/features/config/data/model/category/category_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'category_controller.dart';

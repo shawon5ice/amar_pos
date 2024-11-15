@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:amar_pos/core/constants/app_assets.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
-import 'package:amar_pos/features/category/presentation/brand/brand_controller.dart';
+import 'package:amar_pos/features/config/presentation/brand/brand_controller.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
@@ -11,10 +11,21 @@ import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/search_widget.dart';
 import 'create_brand_bottom_sheet.dart';
 
-class BrandScreen extends StatelessWidget {
+class BrandScreen extends StatefulWidget {
   BrandScreen({super.key});
 
+  @override
+  State<BrandScreen> createState() => _BrandScreenState();
+}
+
+class _BrandScreenState extends State<BrandScreen> {
   final BrandController _brandController = Get.put(BrandController());
+
+  @override
+  void initState() {
+    _brandController.getAllBrand();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +41,7 @@ class BrandScreen extends StatelessWidget {
             children: [
               SearchWidget(
                 onChanged: (value){
-
+                  _brandController.searchBrand(search: value);
                 },
               ),
               addH(16.px),
@@ -42,9 +53,13 @@ class BrandScreen extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20, vertical: 20),
                     child: GetBuilder<BrandController>(
-                        id: "new_brand_list",
+                        id: "brand_list",
                         builder: (controller) {
-                          if (_brandController.brands.isEmpty) {
+                          if(_brandController.branListLoading){
+                            return const Center(child: CircularProgressIndicator(),);
+                          }else if(_brandController.brandModelResponse == null){
+                            return const Center(child: Text("Something went wrong"));
+                          }else if (_brandController.brandList.isEmpty) {
                             return Center(
                               child: Text(
                                 "No Brand Added",
@@ -53,9 +68,9 @@ class BrandScreen extends StatelessWidget {
                             );
                           }
                           return ListView.separated(
-                            itemCount: _brandController.brands.length,
+                            itemCount: _brandController.brandList.length,
                             separatorBuilder: (context, index) {
-                              if (index == _brandController.brands.length - 1) {
+                              if (index == _brandController.brandList.length - 1) {
                                 return const SizedBox.shrink();
                               } else {
                                 return const Divider(
@@ -65,21 +80,14 @@ class BrandScreen extends StatelessWidget {
                             },
                             itemBuilder: (context, index) => ListTile(
                               contentPadding: EdgeInsets.zero,
-                              leading: Container(
-                                width: 40,
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  color: Colors.grey.withOpacity(.25),
-                                  borderRadius: const BorderRadius.all(
-                                    Radius.circular(8),
-                                  ),
-                                  // border: Border.all(color: Colors.grey)
+                              leading: ClipRRect(
+                                borderRadius: const BorderRadius.all(
+                                  Radius.circular(8),
                                 ),
-                                child: Image.file(
-                                    File(controller.brands[index].brandLogo)),
+                                child:Image.network(controller.brandList[index].logo,fit: BoxFit.cover, width: 40, height: 40,),
                               ),
                               title: Text(
-                                controller.brands[index].brandName,
+                                controller.brandList[index].name,
                                 style: context.textTheme.titleSmall?.copyWith(
                                     color: Colors.black,
                                     fontWeight: FontWeight.w500,
@@ -101,7 +109,7 @@ class BrandScreen extends StatelessWidget {
                                         builder: (context) {
                                           return CreateBrandBottomSheet(
                                             brand:
-                                                _brandController.brands[index],
+                                                _brandController.brandList[index],
                                           );
                                         },
                                       );
@@ -115,7 +123,7 @@ class BrandScreen extends StatelessWidget {
                                     onTap: () {
                                       _brandController.deleteBrand(
                                           brand:
-                                              _brandController.brands[index]);
+                                              _brandController.brandList[index]);
                                     },
                                     child:
                                         SvgPicture.asset(AppAssets.deleteIcon),

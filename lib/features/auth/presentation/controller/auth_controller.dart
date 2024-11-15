@@ -1,22 +1,24 @@
 import 'dart:convert';
 
-import 'package:amar_pos/features/auth/data/model/sign_in_response.dart';
+import 'package:amar_pos/features/auth/data/model/sign_in_response.dart' as network;
+import 'package:amar_pos/features/drawer/main_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../../../core/constants/app_strings.dart';
 import '../../../../core/constants/logger/logger.dart';
 import '../../../../core/data/preference.dart';
 import '../../../../core/widgets/methods/helper_methods.dart';
+import '../../data/model/hive/login_data.dart';
+import '../../data/model/hive/login_data_helper.dart';
 import '../../data/services/auth_remote_data_service.dart';
 
 class AuthController extends GetxController{
   RxBool isLoggedIn = false.obs;
   RxBool loading = false.obs;
 
-  SignInResponse? signInResponse;
+  network.SignInResponse? signInResponse;
   // UserInfo? userInfo;
   RxString message = ''.obs;
   RxBool isLoggingIn = true.obs;
@@ -51,15 +53,22 @@ class AuthController extends GetxController{
         message.value = response['message'];
       }
       if (response['success']) {
-        signInResponse = _processData(response);
+        // signInResponse = _processData(response);
         // userInfo = SignInResponseModel.fromJson(response).userInfo;
         isLoggedIn(true);
+        LoginDataBoxManager().loginData = LoginData.fromJson(response['data']) ?? null;
+
         Preference.setLoggedInFlag(true);
-        // Preference.setUserInfo(userInfo!);
+        // Preference.setLoginData(signInResponse!.loginData);
+
+        logger.d(LoginDataBoxManager().loginData?.permissions.length);
       }
     } finally {
-      if(message.isNotEmpty && isLoggedIn.value){
+      if(message.isNotEmpty){
         Methods.showSnackbar(msg: message.value, isSuccess: isLoggedIn.value?true:null);
+      }
+      if(isLoggedIn.value){
+        Get.toNamed(MainPage.routeName);
       }
       loading(false);
       Methods.hideLoading();
@@ -67,19 +76,19 @@ class AuthController extends GetxController{
   }
 
   // Function to process Map data in the background
-  Future<SignInResponse> processDataInBackground(Map<String, dynamic> data) async {
+  Future<network.SignInResponse> processDataInBackground(Map<String, dynamic> data) async {
     return compute(_processData, data);
   }
 
 // The actual processing logic
-  SignInResponse _processData(Map<String, dynamic> data) {
-    return SignInResponse.fromJson(data);
+  network.SignInResponse _processData(Map<String, dynamic> data) {
+    return network.SignInResponse.fromJson(data);
   }
 
 // Example Usage
   void processLoginResponse(Map<String, dynamic> jsonResponse) async {
     try {
-      SignInResponse userData = _processData(jsonResponse);
+      network.SignInResponse userData = _processData(jsonResponse);
       print("User Token: ${userData.loginData.token}");
       print("Permissions Count: ${userData.loginData.permissions.length}");
     } catch (e) {

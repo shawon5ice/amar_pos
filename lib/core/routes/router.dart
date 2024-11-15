@@ -1,6 +1,6 @@
 import 'package:amar_pos/core/routes/bindings.dart';
 import 'package:amar_pos/features/auth/presentation/ui/login_screen.dart';
-import 'package:amar_pos/features/category/presentation/configuration_screen.dart';
+import 'package:amar_pos/features/config/presentation/configuration_screen.dart';
 import 'package:amar_pos/features/drawer/main_page.dart';
 import 'package:amar_pos/features/home/presentation/home_screen.dart';
 import 'package:amar_pos/features/splash/splash_screen.dart';

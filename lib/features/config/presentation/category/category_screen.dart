@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:amar_pos/core/constants/app_assets.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
-import 'package:amar_pos/features/category/presentation/category/category_controller.dart';
-import 'package:amar_pos/features/category/presentation/category/create_category_bottom_sheet.dart';
+import 'package:amar_pos/features/config/presentation/category/category_controller.dart';
+import 'package:amar_pos/features/config/presentation/category/create_category_bottom_sheet.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';

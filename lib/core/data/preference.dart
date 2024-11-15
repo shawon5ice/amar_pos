@@ -1,4 +1,7 @@
+import 'package:amar_pos/features/auth/data/model/sign_in_response.dart';
 import 'package:get_storage/get_storage.dart';
+
+import '../constants/logger/logger.dart';
 // import 'package:service_team/features/auth/data/model/sing_in_response_model.dart';
 //
 // import '../constants/logger/logger.dart';
@@ -14,7 +17,7 @@ class Preference {
   static const rememberMeFlag = 'rememberMeFlag';
   static const loginEmail = 'loginEmail';
   static const loginPass = 'loginPass';
-  static const userInfo = 'user_info';
+  static const loginData = 'login_data';
 
   static bool getOnboardFlag() => prefs.read(onboardFlag) ?? false;
   static void setOnboardFlag(bool value) => prefs.write(onboardFlag, value);
@@ -32,16 +35,17 @@ class Preference {
   static String getLoginPass() => prefs.read(loginPass) ?? '';
   static void setLoginPass(String value) => prefs.write(loginPass, value);
 
-  // static UserInfo getUserInfo() {
-  //   var result = prefs.read(userInfo);
-  //   logger.d(result);
-  //   return UserInfo.fromJson(result);
-  // }
+  static LoginData getLoginInfo() {
+    var result = prefs.read(loginData);
+    logger.d(result);
+    return LoginData.fromJson(result);
+  }
   //
-  // static Future setUserInfo(UserInfo value) async{
-  //   print('Storing user info: ${value.toJson()}');
-  //   await prefs.write(userInfo, (value).toJson());
-  // }
+  static Future setLoginData(LoginData value) async{
+    print('Storing user info: ${value.toJson()}');
+    logger.e(value.permissions.length);
+    await prefs.write(loginData, (value).toJson());
+  }
 
 
   static void logout() => prefs.remove(loggedInFlag);

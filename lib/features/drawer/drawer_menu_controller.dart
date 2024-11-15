@@ -1,7 +1,9 @@
+import 'package:amar_pos/features/auth/data/model/hive/login_data.dart';
+import 'package:amar_pos/features/auth/data/model/hive/login_data_helper.dart';
 import 'package:amar_pos/features/inventory/presentation/inventory_screen.dart';
 import 'package:get/get.dart';
 import 'package:amar_pos/features/home/presentation/home_screen.dart';
-import 'package:amar_pos/features/category/presentation/configuration_screen.dart';
+import 'package:amar_pos/features/config/presentation/configuration_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:amar_pos/features/drawer/model/drawer_items.dart';
 import 'package:amar_pos/features/drawer/model/menu_selection.dart';
@@ -16,10 +18,18 @@ class DrawerMenuController extends GetxController {
 
   Rx<MenuSelection?> selectedMenuItem = Rx<MenuSelection?>(null);
 
+  LoginData? loginData = LoginDataBoxManager().loginData;
+
   @override
   void onInit() {
     super.onInit();
     selectMenuItem(MenuSelection(parent: DrawerItems.overview));
+  }
+
+  @override
+  void onReady() {
+    loginData = LoginDataBoxManager().loginData;
+    super.onReady();
   }
 
 

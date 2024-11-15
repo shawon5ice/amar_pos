@@ -1,6 +1,6 @@
 import 'package:amar_pos/core/widgets/custom_button.dart';
-import 'package:amar_pos/features/category/data/model/unit/unit_model.dart';
-import 'package:amar_pos/features/category/presentation/unit/unit_controller.dart';
+import 'package:amar_pos/features/config/data/model/unit/unit_model.dart';
+import 'package:amar_pos/features/config/presentation/unit/unit_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

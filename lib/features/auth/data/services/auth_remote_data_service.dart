@@ -1,5 +1,7 @@
 
 
+import 'package:amar_pos/core/network/network_strings.dart';
+
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/constants/logger/logger.dart';
 import '../../../../core/network/base_client.dart';
@@ -10,7 +12,7 @@ class AuthRemoteDataService{
     required String pass,
   }) async {
     var response = await BaseClient.postData(
-      api: AppStrings.kLoginUrl,
+      api: NetWorkStrings.loginUrl,
       body: {
         "email": email,
         "password": pass,

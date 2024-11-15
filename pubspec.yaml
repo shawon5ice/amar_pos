@@ -48,6 +48,9 @@ dependencies:
   photo_view:
   image_picker:
   pinput:
+  hive:
+  hive_flutter:
+  path_provider:
 
 dev_dependencies:
   flutter_test:
@@ -60,6 +63,9 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^4.0.0
   logger:
+  build_runner:
+  hive_generator:
+
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

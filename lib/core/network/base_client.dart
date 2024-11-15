@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'package:amar_pos/core/network/network_strings.dart';
 import 'package:dio/dio.dart';
 
 import '../constants/app_strings.dart';
@@ -16,10 +17,10 @@ class BaseClient {
     bool? noDealer,
     bool? fullUrlGiven,
   }) async {
-    String url = fullUrlGiven != null? api :'${AppStrings.kBaseUrl}/$api';
+    String url = fullUrlGiven != null? api :'${NetWorkStrings.baseUrl}/$api';
 
     if (noDealer != null) {
-      url = AppStrings.kBaseUrl + api;
+      url = NetWorkStrings.baseUrl + api;
     }
     print('Sending request to: $url');
     if (token != null) {
@@ -64,9 +65,9 @@ class BaseClient {
   }) async {
     // String apiV = apiVersion ?? ConstantStrings.kAPIVersion;
     // String url = ConstantStrings.kBaseUrl + apiV + api;
-    String url = fullUrlGiven!= null? api: '${AppStrings.kBaseUrl}/$api';
+    String url = fullUrlGiven!= null? api: '${NetWorkStrings.baseUrl}/$api';
     if (noDealer != null) {
-      url = AppStrings.kBaseUrl + api;
+      url = NetWorkStrings.baseUrl + api;
     }
     print('Sending request to: $url');
     if (token != null) {
@@ -111,9 +112,9 @@ class BaseClient {
   }) async {
     // String apiV = apiVersion ?? ConstantStrings.kAPIVersion;
     // String url = ConstantStrings.kBaseUrl + apiV + api;
-    String url = fullUrlGiven != null? api :'${AppStrings.kBaseUrl}/$api';
+    String url = fullUrlGiven != null? api :'${NetWorkStrings.baseUrl}/$api';
     if (noDealer != null) {
-      url = AppStrings.kBaseUrl + api;
+      url = NetWorkStrings.baseUrl + api;
     }
     print('Sending request to: $url');
     if (token != null) {
@@ -187,11 +188,11 @@ class BaseClient {
 
   static Future<dynamic> deleteData({
     required String api,
+    bool? fullUrlGiven,
     String? token,
   }) async {
     // String apiV = apiVersion ?? ConstantStrings.kAPIVersion;
-    // String url = ConstantStrings.kBaseUrl + apiV + api;
-    String url = api;
+    String url = fullUrlGiven != null? api :'${NetWorkStrings.baseUrl}/$api';
 
     print('Sending request to: $url');
     if (token != null) {
@@ -208,9 +209,9 @@ class BaseClient {
           },
         ) : null,
       );
-      print('POST Method: ${response.statusCode}');
+      print('DELETE Method: ${response.statusCode}');
       print(url);
-      log("POST Response:  ");
+      log("DELETE Response:  ");
       log(jsonEncode(response.data));
       return response.data;
     } catch (e) {

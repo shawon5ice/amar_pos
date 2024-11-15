@@ -1,4 +1,4 @@
-import 'package:amar_pos/features/category/data/model/category/category_model.dart';
+import 'package:amar_pos/features/config/data/model/category/category_model.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 

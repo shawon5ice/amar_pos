@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:amar_pos/core/constants/app_colors.dart';
+import 'package:amar_pos/core/data/preference.dart';
+import 'package:amar_pos/features/auth/data/model/hive/login_data_helper.dart';
 import 'package:amar_pos/features/auth/presentation/ui/login_screen.dart';
 import 'package:amar_pos/features/drawer/main_page.dart';
 import 'package:flutter/material.dart';
@@ -69,8 +71,15 @@ class _SplashScreenState extends State<SplashScreen> {
   void navigate() {
     Future.delayed(
       const Duration(milliseconds: 1000),
-          () => Get.offNamed(LoginScreen.routeName),
+      () {
+        if (LoginDataBoxManager().loginData != null) {
+          Get.toNamed(MainPage.routeName);
+        } else {
+          Get.toNamed(LoginScreen.routeName);
+        }
+      },
     );
+
     // userItems = Boxes.getUserItems();
     // if (userItems.isNotEmpty) {
     //   // generate a new uuid each time
@@ -165,7 +174,10 @@ class _SplashScreenState extends State<SplashScreen> {
               alignment: Alignment.bottomCenter,
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 50),
-                child: Text('V$_version($_buildNumber)', style: TextStyle(fontSize: 12),),
+                child: Text(
+                  'V$_version($_buildNumber)',
+                  style: TextStyle(fontSize: 12),
+                ),
               ),
             ),
           ],
