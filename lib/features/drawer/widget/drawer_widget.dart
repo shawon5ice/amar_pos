@@ -1,8 +1,11 @@
 import 'package:amar_pos/core/constants/app_assets.dart';
+import 'package:amar_pos/core/data/preference.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/features/auth/data/model/hive/login_data_helper.dart';
+import 'package:amar_pos/features/auth/presentation/ui/login_screen.dart';
 import 'package:amar_pos/features/drawer/drawer_menu_controller.dart';
 import 'package:amar_pos/features/drawer/model/menu_selection.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -158,6 +161,24 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                 height: 32,
               ),
               ListTile(
+                onTap: (){
+                  AwesomeDialog(
+                    context: context,
+                    dialogType: DialogType.question,
+                    headerAnimationLoop: false,
+                    title: "Are you sure?",
+                    desc: "You are going to log out from AMAR POS.",
+                    btnCancelColor: Colors.green,
+                    btnOkColor: Colors.red,
+                    btnOkOnPress: () {
+                      LoginDataBoxManager().loginData = null;
+                      Preference.setLoggedInFlag(false);
+                      Get.offAndToNamed(LoginScreen.routeName);
+                    },
+                    btnCancelOnPress: (){
+                    }
+                  ).show();
+                },
                 leading: SvgPicture.asset(AppAssets.logoutMenuIcon),
                 title: Text(
                   'Log Out',
@@ -165,7 +186,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                       color: AppColors.error, fontWeight: FontWeight.bold),
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 32,
               ),
             ],

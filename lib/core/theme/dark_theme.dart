@@ -13,6 +13,9 @@ class DarkTheme {
       appBarTheme: AppBarTheme(
         color: AppColors.darkPrimary,
       ),
+      bottomSheetTheme: BottomSheetThemeData(
+          backgroundColor: AppColors.bottomSheetBGColor
+      ),
       colorScheme: const ColorScheme.dark(
         primary: AppColors.darkPrimary,
         secondary: AppColors.darkAccent,

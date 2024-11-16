@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/data/preference.dart';
 import '../../../../core/responsive/pixel_perfect.dart';
-import '../../../../core/widgets/custom_field.dart';
+import '../../../../core/widgets/custom_glass_morf_field.dart';
 import '../../../../core/widgets/custom_txt_btn.dart';
 import '../controller/auth_controller.dart';
 import 'forget_password/forgot_password.dart';
@@ -113,7 +113,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         const FieldTitle("Email or phone number",),
                         addH(8.h),
                         // email field
-                        CustomField(
+                        CustomGlassMorfTextField(
                           textCon: _emailController,
                           hintText: 'Enter email or phone number',
                           txtSize: 14.sp,
@@ -133,7 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         buildFieldTitle('Password'),
                         addH(8.h),
                         // password field
-                        CustomField(
+                        CustomGlassMorfTextField(
                           textCon: _passwordController,
                           hintText: 'Enter password',
                           isPassField: true,

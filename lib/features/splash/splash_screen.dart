@@ -73,9 +73,9 @@ class _SplashScreenState extends State<SplashScreen> {
       const Duration(milliseconds: 1000),
       () {
         if (LoginDataBoxManager().loginData != null) {
-          Get.toNamed(MainPage.routeName);
+          Get.offAndToNamed(MainPage.routeName);
         } else {
-          Get.toNamed(LoginScreen.routeName);
+          Get.offAndToNamed(LoginScreen.routeName);
         }
       },
     );

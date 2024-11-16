@@ -6,7 +6,7 @@ import 'package:flutter_svg/svg.dart';
 import '../constants/app_colors.dart';
 import 'methods/glass_effects.dart';
 
-class CustomField extends StatefulWidget {
+class CustomGlassMorfTextField extends StatefulWidget {
   final TextEditingController textCon;
   String? prefixIcon;
   Widget? suffixWidget;
@@ -33,7 +33,7 @@ class CustomField extends StatefulWidget {
   void Function()? onSubmitted;
   void Function()? onTap;
   void Function(String)? onEditStop;
-  CustomField({
+  CustomGlassMorfTextField({
     super.key,
     required this.textCon,
     this.prefixIcon,
@@ -64,10 +64,10 @@ class CustomField extends StatefulWidget {
   });
 
   @override
-  State<CustomField> createState() => _CustomFieldState();
+  State<CustomGlassMorfTextField> createState() => _CustomGlassMorfTextFieldState();
 }
 
-class _CustomFieldState extends State<CustomField> {
+class _CustomGlassMorfTextFieldState extends State<CustomGlassMorfTextField> {
   bool obscureText = false;
 
   @override

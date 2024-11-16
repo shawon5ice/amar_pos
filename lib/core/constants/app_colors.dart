@@ -10,8 +10,8 @@ class AppColors {
   static const Color card = Colors.white;
   static const Color textPrimary = Colors.black;
   static const Color textSecondary = Colors.black54;
+  static const Color bottomSheetBGColor = Color(0xffF7F6F2);
 
-  static const Color bottomSheetBg = Color(0xffF7F6F2);
   static const Color inputBorderColor = Color(0xffD8E0EC);
 
 

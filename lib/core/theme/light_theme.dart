@@ -18,6 +18,9 @@ class LightTheme {
         LightTextTheme.textTheme(context).titleLarge!.copyWith(
             color: Colors.black, fontSize: 24.px),
       ),
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: AppColors.bottomSheetBGColor
+      ),
       colorScheme: const ColorScheme.light(
         primary: AppColors.primary,
         secondary: AppColors.accent,

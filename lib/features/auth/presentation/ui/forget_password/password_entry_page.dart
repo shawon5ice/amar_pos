@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import '../../../../../core/data/preference.dart';
 import '../../../../../core/responsive/pixel_perfect.dart';
 import '../../../../../core/widgets/custom_btn.dart';
-import '../../../../../core/widgets/custom_field.dart';
+import '../../../../../core/widgets/custom_glass_morf_field.dart';
 import '../../../../../core/widgets/methods/helper_methods.dart';
 import '../../controller/auth_controller.dart';
 import '../login_screen.dart';
@@ -42,7 +42,7 @@ class PasswordEntryPage extends StatelessWidget {
                       buildFieldTitle('Password'),
                       addH(10.h),
                       // password field
-                      CustomField(
+                      CustomGlassMorfTextField(
                         textCon: _passCon,
                         hintText: 'Enter password',
                         isPassField: true,
@@ -51,7 +51,7 @@ class PasswordEntryPage extends StatelessWidget {
                       addH(20.h),
                       buildFieldTitle('Retype Password'),
                       addH(10.h),
-                      CustomField(
+                      CustomGlassMorfTextField(
                         textCon: _passCon2,
                         hintText: 'Retype password',
                         isPassField: true,

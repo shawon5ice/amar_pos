@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:amar_pos/core/constants/app_assets.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/features/config/presentation/category/category_controller.dart';
@@ -7,14 +5,24 @@ import 'package:amar_pos/features/config/presentation/category/create_category_b
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
-
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/search_widget.dart';
 
-class CategoryScreen extends StatelessWidget {
+class CategoryScreen extends StatefulWidget {
   CategoryScreen({super.key});
 
+  @override
+  State<CategoryScreen> createState() => _CategoryScreenState();
+}
+
+class _CategoryScreenState extends State<CategoryScreen> {
   final CategoryController _categoryController = Get.put(CategoryController());
+
+  @override
+  void initState() {
+    _categoryController.getAllCategory();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,20 +50,31 @@ class CategoryScreen extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20, vertical: 20),
                     child: GetBuilder<CategoryController>(
-                        id: "new_category_list",
+                        id: "category_list",
                         builder: (controller) {
-                          if (_categoryController.categories.isEmpty) {
+                          if (_categoryController.categoryListLoading) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }else if(_categoryController.categoryModelResponse == null){
                             return Center(
                               child: Text(
-                                "No Category Added",
+                                "Something went wrong",
+                                style: context.textTheme.titleLarge,
+                              ),
+                            );
+                          }else if (_categoryController.categoryList.isEmpty) {
+                            return Center(
+                              child: Text(
+                                "No Category Found",
                                 style: context.textTheme.titleLarge,
                               ),
                             );
                           }
                           return ListView.separated(
-                            itemCount: _categoryController.categories.length,
+                            itemCount: _categoryController.categoryList.length,
                             separatorBuilder: (context, index) {
-                              if (index == _categoryController.categories.length - 1) {
+                              if (index == _categoryController.categoryList.length - 1) {
                                 return const SizedBox.shrink();
                               } else {
                                 return const Divider(
@@ -66,7 +85,7 @@ class CategoryScreen extends StatelessWidget {
                             itemBuilder: (context, index) => ListTile(
                               contentPadding: EdgeInsets.zero,
                               title: Text(
-                                controller.categories[index].categoryName,
+                                controller.categoryList[index].name,
                                 style: context.textTheme.titleSmall?.copyWith(
                                     color: Colors.black,
                                     fontWeight: FontWeight.w500,
@@ -88,7 +107,7 @@ class CategoryScreen extends StatelessWidget {
                                         builder: (context) {
                                           return CreateCategoryBottomSheet(
                                             category:
-                                            _categoryController.categories[index],
+                                            _categoryController.categoryList[index],
                                           );
                                         },
                                       );
@@ -102,7 +121,7 @@ class CategoryScreen extends StatelessWidget {
                                     onTap: () {
                                       _categoryController.deleteCategory(
                                           category:
-                                          _categoryController.categories[index]);
+                                          _categoryController.categoryList[index]);
                                     },
                                     child:
                                     SvgPicture.asset(AppAssets.deleteIcon),

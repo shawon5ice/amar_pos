@@ -1,7 +1,11 @@
+import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/core/widgets/custom_button.dart';
-import 'package:amar_pos/features/config/data/model/category/category_model.dart';
+import 'package:amar_pos/core/widgets/custom_glass_morf_field.dart';
+import 'package:amar_pos/core/widgets/custom_text_field.dart';
+import 'package:amar_pos/core/widgets/field_title.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../data/model/category/category_model_response.dart';
 import 'category_controller.dart';
 
 class CreateCategoryBottomSheet extends StatefulWidget {
@@ -20,7 +24,7 @@ class _CreateCategoryBottomSheetState extends State<CreateCategoryBottomSheet> {
   void initState() {
     _textEditingController = TextEditingController();
     if(widget.category != null){
-      _textEditingController.text = widget.category!.categoryName;
+      _textEditingController.text = widget.category!.name;
     }
     super.initState();
   }
@@ -48,7 +52,7 @@ class _CreateCategoryBottomSheetState extends State<CreateCategoryBottomSheet> {
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
-              const Text(
+              Text(
                 "Create New Category",
                 style: TextStyle(
                   fontSize: 22,
@@ -56,16 +60,23 @@ class _CreateCategoryBottomSheetState extends State<CreateCategoryBottomSheet> {
                 ),
               ),
               const SizedBox(height: 20),
-              TextField(
-                controller: _textEditingController,
-                decoration: InputDecoration(
-                  labelText: "Category Name",
-                  labelStyle: const TextStyle(fontSize: 16),
-                  hintText: "Type name here...",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+              Container(
+                padding: EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(Radius.circular(20))
                 ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                  FieldTitle("Category Name",),
+                  addH(8),
+                  CustomTextField(
+                    textCon: _textEditingController,
+                    hintText: "Type name here...",
+
+                  ),
+                ],),
               ),
               const SizedBox(height: 20),
               CustomButton(

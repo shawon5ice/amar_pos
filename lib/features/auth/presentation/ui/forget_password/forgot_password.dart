@@ -4,7 +4,7 @@ import 'package:pinput/pinput.dart';
 
 import '../../../../../core/responsive/pixel_perfect.dart';
 import '../../../../../core/widgets/custom_btn.dart';
-import '../../../../../core/widgets/custom_field.dart';
+import '../../../../../core/widgets/custom_glass_morf_field.dart';
 import '../../../../../core/widgets/field_title.dart';
 import '../../controller/auth_controller.dart';
 import '../widgets/auth_header.dart';
@@ -96,7 +96,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         // email title
                         buildFieldTitle("Phone number"),
                         addH(10),
-                        CustomField(
+                        CustomGlassMorfTextField(
                           enabledFlag: !_authCon.otpSend.value,
                           textCon: _authCon.phoneCon,
                           hintText: 'Enter your phone number',

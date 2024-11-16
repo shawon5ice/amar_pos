@@ -9,4 +9,16 @@ class NetWorkStrings{
   static const String addBrand = "brand/store";
   static const String updateBrand = "brand/update/";
   static const String deleteBrand = "brand/delete/";
+
+  //Brand
+  static const String getAllCategories = "category/get-categories";
+  static const String addCategory = "category/store";
+  static const String updateCategory = "category/update/";
+  static const String deleteCategory = "category/delete/";
+
+  //Unit
+  static const String getAllUnits = "product/get-units";
+
+  //Warranty
+  static const String getAllWarranty = "product/get-warranties";
 }
