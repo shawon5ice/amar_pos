@@ -56,7 +56,7 @@ class AuthController extends GetxController{
         // signInResponse = _processData(response);
         // userInfo = SignInResponseModel.fromJson(response).userInfo;
         isLoggedIn(true);
-        LoginDataBoxManager().loginData = LoginData.fromJson(response['data']) ?? null;
+        LoginDataBoxManager().loginData = LoginData.fromJson(response['data']);
 
         Preference.setLoggedInFlag(true);
         // Preference.setLoginData(signInResponse!.loginData);

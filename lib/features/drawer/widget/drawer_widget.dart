@@ -84,7 +84,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                   CircleAvatar(
                     backgroundColor: Colors.white,
                     radius: 25,
-                    child: (controller.loginData?.business.logo != null) ?Image.network(controller.loginData!.business.logo!):Icon(Icons.broken_image),
+                    child: (controller.loginData?.business.logo != null && controller.loginData!.business.logo!.contains('http')) ?Image.network(controller.loginData!.business.logo!):Icon(Icons.broken_image),
                   ),
                   const SizedBox(
                     width: 12,
@@ -161,6 +161,11 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                 height: 32,
               ),
               ListTile(
+                selectedTileColor: AppColors.lightGreen.withOpacity(.3),
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(12)),
+                ),
+                dense: true,
                 onTap: (){
                   AwesomeDialog(
                     context: context,

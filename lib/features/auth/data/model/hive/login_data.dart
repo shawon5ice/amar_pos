@@ -23,13 +23,13 @@ class LoginData extends HiveObject {
   @HiveField(5)
   Business business;
 
-  @HiveField(6)
-  Subscription subscription;
+  // @HiveField(6)
+  // Subscription subscription;
 
-  @HiveField(7)
+  @HiveField(6)
   String address;
 
-  @HiveField(8)
+  @HiveField(7)
   List<String> permissions;
 
   LoginData({
@@ -39,7 +39,7 @@ class LoginData extends HiveObject {
     required this.email,
     required this.phone,
     required this.business,
-    required this.subscription,
+    // required this.subscription,
     required this.address,
     required this.permissions,
   });
@@ -49,11 +49,11 @@ class LoginData extends HiveObject {
     return LoginData(
       token: json['token'],
       name: json['name'],
-      status: json['status'],
-      email: json['email'],
-      phone: json['phone'],
+      status: json['status']??'--',
+      email: json['email']??'--',
+      phone: json['phone']??'--',
       business: Business.fromJson(json['business']),
-      subscription: Subscription.fromJson(json['subscription']),
+      // subscription: Subscription.fromJson(json['subscription']),
       address: json['address'],
       permissions: List<String>.from(json['permissions']),
     );
@@ -109,15 +109,15 @@ class Business extends HiveObject {
   factory Business.fromJson(Map<String, dynamic> json) {
     return Business(
       id: json['id'],
-      name: json['name'],
-      phone: json['phone'],
-      email: json['email'],
-      logo: json['logo'],
-      address: json['address'],
-      currencyId: json['currency_id'],
-      ownerId: json['owner_id'],
-      timeZone: json['time_zone'],
-      photoUrl: json['photo_url'],
+      name: json['name']??'--',
+      phone: json['phone']??'--',
+      email: json['email']??'--',
+      logo: json['logo']??'--',
+      address: json['address']??'--',
+      currencyId: json['currency_id']??-1,
+      ownerId: json['owner_id']??-1,
+      timeZone: json['time_zone']??'--',
+      photoUrl: json['photo_url']??'--',
     );
   }
 
@@ -159,12 +159,12 @@ class Subscription extends HiveObject {
   factory Subscription.fromJson(Map<String, dynamic> json) {
     return Subscription(
       slNo: json['sl_no'],
-      businessId: json['business_id'],
-      packageId: json['package_id'],
-      startDate: json['start_date'],
-      endDate: json['end_date'],
-      packagePrice: json['package_price'],
-      paymentStatus: json['payment_status'],
+      businessId: json['business_id']??-1,
+      packageId: json['package_id']??-1,
+      startDate: json['start_date']??'--',
+      endDate: json['end_date']??'--',
+      packagePrice: json['package_price']??-1,
+      paymentStatus: json['payment_status']??-1,
     );
   }
 
