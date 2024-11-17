@@ -1,6 +1,5 @@
 import 'package:amar_pos/core/constants/app_assets.dart';
 import 'package:amar_pos/core/data/preference.dart';
-import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/features/auth/data/model/hive/login_data_helper.dart';
 import 'package:amar_pos/features/auth/presentation/ui/login_screen.dart';
 import 'package:amar_pos/features/drawer/drawer_menu_controller.dart';
@@ -9,7 +8,6 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-
 import '../../../core/constants/app_colors.dart';
 import '../model/drawer_item.dart';
 import '../model/drawer_items.dart';
@@ -84,7 +82,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                   CircleAvatar(
                     backgroundColor: Colors.white,
                     radius: 25,
-                    child: (controller.loginData?.business.logo != null && controller.loginData!.business.logo!.contains('http')) ?Image.network(controller.loginData!.business.logo!):Icon(Icons.broken_image),
+                    child: (controller.loginData?.business.logo != null && controller.loginData!.business.logo!.contains('http')) ?Image.network(controller.loginData!.business.logo!): const Icon(Icons.broken_image),
                   ),
                   const SizedBox(
                     width: 12,

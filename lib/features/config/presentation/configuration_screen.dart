@@ -3,6 +3,7 @@ import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/features/config/data/service/warranty_service.dart';
 import 'package:amar_pos/features/config/presentation/brand/brand_screen.dart';
 import 'package:amar_pos/features/config/presentation/category/category_screen.dart';
+import 'package:amar_pos/features/config/presentation/supplier/supplier_screen.dart';
 import 'package:amar_pos/features/config/presentation/unit/unit_screen.dart';
 import 'package:amar_pos/features/config/presentation/warranty/warranty_screen.dart';
 import 'package:amar_pos/features/drawer/widget/custom_app_bar.dart';
@@ -43,7 +44,9 @@ class ConfigurationScreen extends StatelessWidget {
           Get.to(() => const WarrantyScreen());
         }),
     ConfigItem(
-        title: "Supplier", asset: AppAssets.supplierIcon, onPress: () {}),
+        title: "Supplier", asset: AppAssets.supplierIcon, onPress: () {
+      Get.to(() => const SupplierScreen());
+    }),
     ConfigItem(title: "Outlet", asset: AppAssets.outletIcon, onPress: () {}),
     ConfigItem(
         title: "Employee", asset: AppAssets.employeeIcon, onPress: () {}),

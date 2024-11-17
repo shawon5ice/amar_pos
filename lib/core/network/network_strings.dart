@@ -21,4 +21,10 @@ class NetWorkStrings{
 
   //Warranty
   static const String getAllWarranty = "product/get-warranties";
+
+  //Supplier
+  static const String getAllSuppliers = "supplier/get-suppliers";
+  static const String addSupplier = "supplier/store";
+  static const String updateSupplier = "supplier/update/";
+  static const String deleteSupplier = "supplier/delete/";
 }

@@ -110,7 +110,7 @@ class _CreateBrandBottomSheetState extends State<CreateBrandBottomSheet> {
                                         size: 40, color: Colors.grey),
                                     SizedBox(height: 8),
                                     Text(
-                                      "Drag file here or Browse",
+                                      "Select brand logo",
                                       style: TextStyle(color: Colors.grey),
                                     ),
                                   ],
