@@ -1,6 +1,8 @@
 class AppAssets {
 
 
+  static const String attentionIcon = "assets/configuration/attention_icon.svg";
+
   //Menu Icons
   static const String accountingMenuIcon = "assets/menu_icons/accounting.svg";
   static const String configMenuIcon = "assets/menu_icons/config.svg";

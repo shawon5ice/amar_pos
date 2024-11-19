@@ -52,6 +52,7 @@ dependencies:
   hive_flutter:
   path_provider:
   auto_size_text_plus:
+  dropdown_button2:
 
 dev_dependencies:
   flutter_test:

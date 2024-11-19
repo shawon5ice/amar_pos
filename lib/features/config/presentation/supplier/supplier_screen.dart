@@ -1,6 +1,8 @@
 import 'package:amar_pos/core/constants/app_assets.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/features/config/presentation/supplier/create_supplier_bottom_sheet.dart';
+import 'package:amar_pos/features/config/presentation/supplier/supplier_action_drop_down_widget.dart';
+import 'package:amar_pos/features/config/presentation/supplier/supplier_action_menu_widget.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'supplier_controller.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -70,7 +72,7 @@ class _SupplierScreenState extends State<SupplierScreen> {
                       itemCount: _controller.supplierList.length,
                       itemBuilder: (context, index) => Container(
                         margin: EdgeInsets.symmetric(vertical: 5.h),
-                        padding: EdgeInsets.all(20.px),
+                        padding: EdgeInsets.only(left: 20,top: 10,bottom: 20, right: 0),
                         decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius:
@@ -84,6 +86,7 @@ class _SupplierScreenState extends State<SupplierScreen> {
                                 Container(
                                   width: 50.w,
                                   height: 50.w,
+                                  margin: EdgeInsets.only(top: 10),
                                   padding: EdgeInsets.all(2.px),
                                   decoration: ShapeDecoration(
                                     color: const Color(0x33BEBEBE),
@@ -106,49 +109,59 @@ class _SupplierScreenState extends State<SupplierScreen> {
                                 addW(12.w),
                                 Expanded(
                                   flex: 8,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        controller.supplierList[index].name,
-                                        style: context.textTheme.titleSmall
-                                            ?.copyWith(
-                                          fontSize: 16.sp,
+                                  child: Container(
+                                    margin: EdgeInsets.only(top: 10),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          controller.supplierList[index].name,
+                                          style: context.textTheme.titleSmall
+                                              ?.copyWith(
+                                            fontSize: 16.sp,
+                                          ),
                                         ),
-                                      ),
-                                      AutoSizeText(
-                                        controller.supplierList[index].phone!,
-                                        style: context.textTheme.bodyLarge
-                                            ?.copyWith(
-                                                color: const Color(0xff7C7C7C),
-                                                fontSize: 12.sp),
-                                      ),
-                                      AutoSizeText(
-                                        controller.supplierList[index].address!,
-                                        style: context.textTheme.bodyLarge
-                                            ?.copyWith(
-                                          color: const Color(0xff7C7C7C),
+                                        AutoSizeText(
+                                          controller.supplierList[index].phone!,
+                                          style: context.textTheme.bodyLarge
+                                              ?.copyWith(
+                                                  color: const Color(0xff7C7C7C),
+                                                  fontSize: 12.sp),
                                         ),
-                                        minFontSize: 8,
-                                        maxFontSize: 12,
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ],
+                                        AutoSizeText(
+                                          controller.supplierList[index].address!,
+                                          style: context.textTheme.bodyLarge
+                                              ?.copyWith(
+                                            color: const Color(0xff7C7C7C),
+                                          ),
+                                          minFontSize: 8,
+                                          maxFontSize: 12,
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                                 Spacer(),
-                                InkWell(
-                                  onTap: () {},
-                                  child:
-                                      SvgPicture.asset(AppAssets.threeDotMenu),
-                                )
+                                // ActionDropDownWidget(),
+                                ActionMenu(
+                                  onSelected: (value) {},
+                                ),
+                                // InkWell(
+                                //   onTap: () {
+                                //
+                                //   },
+                                //   child:
+                                //       SvgPicture.asset(AppAssets.threeDotMenu),
+                                // )
                               ],
                             ),
                             addH(12.h),
                             Container(
+                              margin: EdgeInsets.only(right: 20),
                               height: 30.h,
                               decoration: BoxDecoration(
                                   color: Color(0xffF6FBFF),
