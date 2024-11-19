@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:amar_pos/core/data/preference.dart';
+import 'package:amar_pos/core/network/helpers/error_extractor.dart';
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import '../../features/auth/data/model/hive/login_data_helper.dart';
@@ -34,6 +37,9 @@ class BaseClient {
           errorMessage = "Forbidden access. You don't have permission.";
         } else if (statusCode == 404) {
           errorMessage = "Requested resource not found.";
+        } else if(statusCode == 422){
+          errorMessage = "Unprocessable input data";
+          ErrorExtractor.showErrorDialog(Get.context!, error.response?.data);
         } else if (statusCode >= 500) {
           errorMessage = "Server error. Please try again later.";
         } else {
@@ -53,8 +59,10 @@ class BaseClient {
         errorMessage = "Failed to connect to the server. Please check your internet connection.";
         break;
     }
+    if(error.response?.statusCode != 422){
+      Methods.showSnackbar(msg: errorMessage);
+    }
 
-    Methods.showSnackbar(msg: errorMessage);
   }
 
   /// Redirects user to login screen

@@ -1,8 +1,7 @@
 import 'package:amar_pos/core/constants/logger/logger.dart';
+import 'package:amar_pos/core/network/helpers/error_extractor.dart';
 import 'package:amar_pos/core/widgets/methods/helper_methods.dart';
-import 'package:amar_pos/features/config/data/model/category/category_model_response.dart';
 import 'package:amar_pos/features/config/data/model/supplier/supplier_list_response_model.dart';
-import 'package:amar_pos/features/config/data/service/category_service.dart';
 import 'package:amar_pos/features/config/data/service/supplier_service.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
@@ -87,13 +86,12 @@ class SupplierController extends GetxController {
         balance: balance,
         supplierLogo: supplierLogo
       );
-      if (response != null) {
-
+      if (response != null && response['success']) {
         if(response['success']){
           Get.back();
           getAllSupplier();
+          Methods.showSnackbar(msg: response['message'], isSuccess: true);
         }
-        Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true: null );
       }
     }catch(e){
       logger.e(e);
