@@ -40,7 +40,7 @@ class SupplierController extends GetxController {
 
   }
 
-  void searchCategory({required String search}) async {
+  void searchSupplier({required String search}) async {
     try {
       // Show loading state
       isAddSupplierLoading = true;
@@ -90,6 +90,7 @@ class SupplierController extends GetxController {
       if (response != null) {
 
         if(response['success']){
+          Get.back();
           getAllSupplier();
         }
         Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true: null );

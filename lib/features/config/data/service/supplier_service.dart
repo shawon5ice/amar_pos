@@ -1,5 +1,6 @@
 import 'dart:ffi';
 
+import 'package:amar_pos/core/constants/logger/logger.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 
 import '../../../../core/network/base_client.dart';
@@ -33,7 +34,7 @@ class SupplierService {
       "address": address,
       "opening_balance": balance,
       "photo": await MultipartFile.fromFile(
-        supplierLogo!,
+        supplierLogo,
         filename: supplierLogo.split('/').last,
       )
     });

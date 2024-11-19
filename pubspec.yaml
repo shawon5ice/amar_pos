@@ -51,6 +51,7 @@ dependencies:
   hive:
   hive_flutter:
   path_provider:
+  auto_size_text_plus:
 
 dev_dependencies:
   flutter_test:

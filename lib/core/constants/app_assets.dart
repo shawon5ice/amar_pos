@@ -32,6 +32,7 @@ class AppAssets {
 
   static const String deleteIcon = "assets/configuration/delete_icon.svg";
   static const String editIcon = "assets/configuration/edit_icon.svg";
+  static const String threeDotMenu = "assets/configuration/three_dot_menu.svg";
 
 
   static List<String> get configurationAssets => [

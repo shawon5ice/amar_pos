@@ -22,7 +22,18 @@ class AuthController extends GetxController{
   // UserInfo? userInfo;
   RxString message = ''.obs;
   RxBool isLoggingIn = true.obs;
-  final TextEditingController phoneCon = TextEditingController();
+
+  bool rememberMeFlag  = false;
+
+  late final formKey;
+  late final TextEditingController emailController;
+  late final TextEditingController passwordController;
+  late final TextEditingController phoneCon;
+
+  late FocusNode emailFocus;
+  late FocusNode passwordFocus;
+
+
   RxBool otpSend = false.obs;
   RxBool verificationDone = false.obs;
   bool fromChangePassword = false;
@@ -36,17 +47,65 @@ class AuthController extends GetxController{
     '',
   ].obs;
 
-  void signIn({
-    required String email,
-    required String password,
-  }) async {
+  @override
+  void onInit() {
+    formKey = GlobalKey<FormState>();
+    emailController = TextEditingController();
+    passwordController = TextEditingController();
+    phoneCon = TextEditingController();
+
+    emailFocus = FocusNode();
+    passwordFocus = FocusNode();
+
+    if (Preference.getRememberMeFlag()) {
+      emailController.text = Preference.getLoginEmail();
+      passwordController.text = Preference.getLoginPass();
+      rememberMeFlag = true;
+      update(['remember_me']);
+    }
+    super.onInit();
+  }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    phoneCon.dispose();
+
+    emailFocus.dispose();
+    passwordFocus.dispose();
+
+    formKey = null;
+    super.dispose();
+  }
+  void handleRememberMe({bool? remember}){
+    rememberMeFlag = remember ?? !rememberMeFlag;
+    update(['remember_me']);
+  }
+
+  void saveOrNot(){
+    if(rememberMeFlag){
+      Preference.setLoginEmail(emailController.text.trim());
+      Preference.setLoginPass(passwordController.text.trim());
+    }else{
+      Preference.setLoginEmail("");
+      Preference.setLoginPass("");
+    }
+  }
+
+  void signIn() async {
+    if(!formKey.currentState!.validate()){
+      return;
+    }
+    FocusManager.instance.primaryFocus?.unfocus();
+    saveOrNot();
     message.value = '';
     loading(true);
     Methods.showLoading();
     try {
       var response = await AuthRemoteDataService.signIn(
-        email: email,
-        pass: password,
+        email: emailController.text.trim(),
+        pass: passwordController.text.trim(),
       );
       logger.i(response);
       if(response != null){
@@ -220,3 +279,47 @@ class AuthController extends GetxController{
   }
 
 }
+
+
+// late StreamSubscription _subscription;
+// bool _isOffline = false;
+
+// @override
+// void initState() {
+//   _emailFocus = FocusNode();
+//   _passwordFocus = FocusNode();
+//   if (Preference.getRememberMeFlag()) {
+//     _emailController.text = Preference.getLoginEmail();
+//     _passwordController.text = Preference.getLoginPass();
+//     _rememberMeFlag = true;
+//   }
+//
+//   _authCon.loading.listen((value) {
+//     if (!value && _authCon.isLoggedIn.value) {
+//       _authCon.isLoggedIn(false);
+//       // UserInfo userInfo = Preference.getUserInfo();
+//       // logger.i("ID:${userInfo.departmentId}");
+//       // if(userInfo.departmentId == 8){
+//       //   Future.delayed(
+//       //     const Duration(milliseconds: 100),
+//       //         () => Get.offAllNamed(HomeScreen.routeName),
+//       //   );
+//       // }else{
+//       //   Future.delayed(
+//       //     const Duration(milliseconds: 100),
+//       //         () => Get.offAllNamed(HRMScreen.routeName),
+//       //   );
+//       // }
+//     }
+//   });
+//
+//
+//   // _subscription = InternetConnectionChecker().onStatusChange.listen((status) {
+//   //   final hasInternet = status == InternetConnectionStatus.connected;
+//   //   setState(() {
+//   //     isOffline = !hasInternet;
+//   //   });
+//   // });
+//
+//   super.initState();
+// }

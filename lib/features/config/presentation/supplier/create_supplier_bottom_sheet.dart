@@ -187,7 +187,6 @@ class _CreateSupplierBottomSheetState extends State<CreateSupplierBottomSheet> {
                     supplierLogo: fileName
                   );
                 } : (){
-                  Get.back();
                   _controller.addNewSupplier(
                     name: _nameTextEditingController.text,
                       phoneNo: _phoneNoTextEditingController.text,

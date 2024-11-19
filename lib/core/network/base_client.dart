@@ -1,248 +1,180 @@
-import 'dart:convert';
-import 'dart:developer';
-import 'package:amar_pos/core/network/network_strings.dart';
+import 'package:amar_pos/core/data/preference.dart';
 import 'package:dio/dio.dart';
-
+import 'package:get/get.dart';
+import '../../features/auth/data/model/hive/login_data_helper.dart';
+import '../../features/auth/presentation/ui/login_screen.dart';
 import '../constants/app_strings.dart';
 import '../constants/logger/logger.dart';
 import '../widgets/methods/helper_methods.dart';
-// import '../core.dart';
+import 'network_strings.dart';
 
 class BaseClient {
+  static final Dio _dio = Dio();
+
+  /// Common exception handler for Dio errors
+  static void _handleDioError(DioException error) {
+    String errorMessage = AppStrings.kWentWrong;
+
+    switch (error.type) {
+      case DioExceptionType.connectionTimeout:
+        errorMessage = "Connection timeout. Please try again.";
+        break;
+      case DioExceptionType.sendTimeout:
+        errorMessage = "Request timeout. Please try again.";
+        break;
+      case DioExceptionType.receiveTimeout:
+        errorMessage = "Server response timeout. Please try again.";
+        break;
+      case DioExceptionType.badResponse:
+        final statusCode = error.response?.statusCode ?? 0;
+        if (statusCode == 401) {
+          goToSignInScreen();
+          return;
+        } else if (statusCode == 403) {
+          errorMessage = "Forbidden access. You don't have permission.";
+        } else if (statusCode == 404) {
+          errorMessage = "Requested resource not found.";
+        } else if (statusCode >= 500) {
+          errorMessage = "Server error. Please try again later.";
+        } else {
+          errorMessage = "Error occurred: ${error.response?.statusMessage}";
+        }
+        break;
+      case DioExceptionType.cancel:
+        errorMessage = "Request was cancelled.";
+        break;
+      case DioExceptionType.unknown:
+        errorMessage = "Unexpected error occurred. Please check your network.";
+        break;
+      case DioExceptionType.badCertificate:
+        errorMessage = "Certificate verification failed. Please ensure your connection is secure.";
+        break;
+      case DioExceptionType.connectionError:
+        errorMessage = "Failed to connect to the server. Please check your internet connection.";
+        break;
+    }
+
+    Methods.showSnackbar(msg: errorMessage);
+  }
+
+  /// Redirects user to login screen
+  static void goToSignInScreen() {
+    LoginDataBoxManager().loginData = null;
+    Preference.setLoggedInFlag(false);
+    Methods.showSnackbar(msg: "Session expired. Please login again.");
+    Get.offAllNamed(LoginScreen.routeName);
+  }
+
+  /// GET request
   static Future<dynamic> getData({
     String? token,
     required String api,
     dynamic parameter,
-    String? apiVersion,
-    bool? noDealer,
     bool? fullUrlGiven,
   }) async {
-    String url = fullUrlGiven != null? api :'${NetWorkStrings.baseUrl}/$api';
+    String url = fullUrlGiven == true ? api : '${NetWorkStrings.baseUrl}/$api';
 
-    if (noDealer != null) {
-      url = NetWorkStrings.baseUrl + api;
-    }
-    print('Sending request to: $url');
-    if (token != null) {
-      print('User Token: $token');
-    }
-    if (parameter != null) {
-      print("Parameter: $parameter");
-    }
     try {
-      var response = await Dio().get(
+      final response = await _dio.get(
         url,
         options: token != null
             ? Options(
-            headers: {
-              'Authorization': 'Bearer $token',
-              "Accept":"application/json",
-            },
-            contentType: "application/x-www-form-urlencoded"
+          headers: {'Authorization': 'Bearer $token', "Accept": "application/json"},
+          contentType: "application/x-www-form-urlencoded",
         )
             : null,
         queryParameters: parameter,
       );
-      print('GET Method: ${response.statusCode}');
-      print(url);
-      log("GET Response:  ${jsonEncode(response.data)}");
+      logger.i('GET Response: ${response.statusCode}');
       return response.data;
-    } catch (e) {
-      print(e.toString());
-      Methods.showSnackbar(
-        msg: AppStrings.kWentWrong,
-      );
+    } on DioException catch (error) {
+      logger.e(error);
+      _handleDioError(error);
+    } catch (error) {
+      logger.e(error);
+      Methods.showSnackbar(msg: AppStrings.kWentWrong);
     }
   }
 
+  /// POST request
   static Future<dynamic> postData({
     required String api,
     String? token,
     dynamic body,
-    String? apiVersion,
-    bool? noDealer,
     bool? fullUrlGiven,
   }) async {
-    // String apiV = apiVersion ?? ConstantStrings.kAPIVersion;
-    // String url = ConstantStrings.kBaseUrl + apiV + api;
-    String url = fullUrlGiven!= null? api: '${NetWorkStrings.baseUrl}/$api';
-    if (noDealer != null) {
-      url = NetWorkStrings.baseUrl + api;
-    }
-    print('Sending request to: $url');
-    if (token != null) {
-      print('User Token: $token');
-    }
-    if (body != null) {
-      log("Post Body: $body");
-    }
+    String url = fullUrlGiven == true ? api : '${NetWorkStrings.baseUrl}/$api';
+
     try {
-      var response = await Dio().post(
+      final response = await _dio.post(
         url,
-        options: token != null
-            ? Options(
-          headers: {
-            'Authorization': 'Bearer $token',
-          },
-        )
-            : null,
         data: body,
+        options: token != null
+            ? Options(headers: {'Authorization': 'Bearer $token'})
+            : null,
       );
-      print('POST Method: ${response.statusCode}');
-      print(url);
-      log("POST Response:  ");
-      logger.e(response);
-      log(jsonEncode(response.data));
+      logger.i('POST Response: ${response.statusCode}');
       return response.data;
-    } catch (e) {
-      print(e.toString());
-      Methods.showSnackbar(
-        msg: AppStrings.kWentWrong,
-      );
+    } on DioException catch (error) {
+      logger.e(error);
+      _handleDioError(error);
+    } catch (error) {
+      logger.e(error);
+      Methods.showSnackbar(msg: AppStrings.kWentWrong);
     }
   }
 
+  /// PUT request
   static Future<dynamic> updateData({
     required String api,
     String? token,
     dynamic body,
-    String? apiVersion,
-    bool? noDealer,
     bool? fullUrlGiven,
   }) async {
-    // String apiV = apiVersion ?? ConstantStrings.kAPIVersion;
-    // String url = ConstantStrings.kBaseUrl + apiV + api;
-    String url = fullUrlGiven != null? api :'${NetWorkStrings.baseUrl}/$api';
-    if (noDealer != null) {
-      url = NetWorkStrings.baseUrl + api;
-    }
-    print('Sending request to: $url');
-    if (token != null) {
-      print('User Token: $token');
-    }
-    if (body != null) {
-      log("Post Body: $body");
-    }
+    String url = fullUrlGiven == true ? api : '${NetWorkStrings.baseUrl}/$api';
+
     try {
-      var response = await Dio().put(
+      final response = await _dio.put(
         url,
+        data: body,
         options: token != null
-            ? Options(
-          headers: {
-            'Authorization': 'Bearer $token',
-          },
-        )
+            ? Options(headers: {'Authorization': 'Bearer $token'})
             : null,
-        data: body,
       );
-      print('POST Method: ${response.statusCode}');
-      print(url);
-      log("POST Response:  ");
-      log(jsonEncode(response.data));
+      logger.i('PUT Response: ${response.statusCode}');
       return response.data;
-    } catch (e) {
-      print(e.toString());
-      Methods.showSnackbar(
-        msg: AppStrings.kWentWrong,
-      );
+    } on DioException catch (error) {
+      logger.e(error);
+      _handleDioError(error);
+    } catch (error) {
+      logger.e(error);
+      Methods.showSnackbar(msg: AppStrings.kWentWrong);
     }
   }
 
-  static Future<dynamic> patchData({
-    required String api,
-    String? token,
-    dynamic body,
-  }) async {
-    // String apiV = apiVersion ?? ConstantStrings.kAPIVersion;
-    // String url = ConstantStrings.kBaseUrl + apiV + api;
-    String url = api;
-
-    print('Sending request to: $url');
-    if (token != null) {
-      print('User Token: $token');
-    }
-
-    try {
-      var response = await Dio().patch(
-        url,
-        data: body,
-        options: token != null
-            ? Options(
-          headers: {
-            'Authorization': 'Bearer $token',
-          },
-        ) : null,
-      );
-      print('POST Method: ${response.statusCode}');
-      print(url);
-      log("POST Response:  ");
-      log(jsonEncode(response.data));
-      return response.data;
-    } catch (e) {
-      print(e.toString());
-      Methods.showSnackbar(
-        msg: AppStrings.kWentWrong,
-      );
-    }
-  }
-
+  /// DELETE request
   static Future<dynamic> deleteData({
     required String api,
-    bool? fullUrlGiven,
     String? token,
+    bool? fullUrlGiven,
   }) async {
-    // String apiV = apiVersion ?? ConstantStrings.kAPIVersion;
-    String url = fullUrlGiven != null? api :'${NetWorkStrings.baseUrl}/$api';
-
-    print('Sending request to: $url');
-    if (token != null) {
-      print('User Token: $token');
-    }
+    String url = fullUrlGiven == true ? api : '${NetWorkStrings.baseUrl}/$api';
 
     try {
-      var response = await Dio().delete(
+      final response = await _dio.delete(
         url,
         options: token != null
-            ? Options(
-          headers: {
-            'Authorization': 'Bearer $token',
-          },
-        ) : null,
+            ? Options(headers: {'Authorization': 'Bearer $token'})
+            : null,
       );
-      print('DELETE Method: ${response.statusCode}');
-      print(url);
-      log("DELETE Response:  ");
-      log(jsonEncode(response.data));
+      logger.i('DELETE Response: ${response.statusCode}');
       return response.data;
-    } catch (e) {
-      print(e.toString());
-      Methods.showSnackbar(
-        msg: AppStrings.kWentWrong,
-      );
+    } on DioException catch (error) {
+      logger.e(error);
+      _handleDioError(error);
+    } catch (error) {
+      logger.e(error);
+      Methods.showSnackbar(msg: AppStrings.kWentWrong);
     }
   }
-// static Future<dynamic> getData({required String api}) async {
-//   print(ConstantStrings.kBaseUrl + api);
-//   try {
-//     var response = await Dio().get(ConstantStrings.kBaseUrl + api);
-//     print('Base Client: ${response.statusCode}');
-//     print(response.data);
-//     return response.data;
-//   } catch (e) {
-//     print(e);
-//   }
-// }
-
-// static Future<dynamic> postData(
-//     {required String api, required dynamic body}) async {
-//   try {
-//     var response = await Dio().post(
-//       ConstantStrings.kBaseUrl + api,
-//       data: body,
-//     );
-//     return response.data;
-//   } catch (e) {
-//     print(e);
-//   }
-// }
 }
