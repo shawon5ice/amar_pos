@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'create_supplier_bottom_sheet.dart';
+
 class ActionMenu extends StatelessWidget {
   final Function(String) onSelected;
 
@@ -20,56 +22,27 @@ class ActionMenu extends StatelessWidget {
         ),
         popUpAnimationStyle: AnimationStyle(curve: Curves.fastOutSlowIn),
         splashRadius: 12,
-        onSelected: (value) {
-          // Handle menu item selection
-          switch (value) {
-            case 'repair':
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Repair selected for Item=')),
-              );
-              break;
-            case 'replace':
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Replace Request selected for Item =')),
-              );
-              break;
-            case 'reject':
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Reject selected for Item=')),
-              );
-              break;
-          }
-        },
+        onSelected: onSelected,
         itemBuilder: (BuildContext context) {
           return [
-            PopupMenuItem<String>(
-              value: 'repair',
+            const PopupMenuItem<String>(
+              value: 'edit',
               child: Row(
                 children: const [
-                  Icon(Icons.build, color: Colors.black54),
+                  Icon(Icons.edit, color: Colors.black54),
                   SizedBox(width: 8),
-                  Text("Repair"),
+                  Text("Edit"),
                 ],
               ),
             ),
-            PopupMenuItem<String>(
-              value: 'replace',
+            const PopupMenuItem<String>(
+              value: 'delete',
               child: Row(
                 children: const [
-                  Icon(Icons.sync, color: Colors.black54),
-                  SizedBox(width: 8),
-                  Text("Replace Request"),
-                ],
-              ),
-            ),
-            PopupMenuItem<String>(
-              value: 'reject',
-              child: Row(
-                children: const [
-                  Icon(Icons.cancel, color: Colors.red),
+                  Icon(Icons.delete_forever, color: Colors.red),
                   SizedBox(width: 8),
                   Text(
-                    "Reject",
+                    "Delete",
                     style: TextStyle(color: Colors.red),
                   ),
                 ],

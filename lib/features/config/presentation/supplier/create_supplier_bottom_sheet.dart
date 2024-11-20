@@ -40,6 +40,7 @@ class _CreateSupplierBottomSheetState extends State<CreateSupplierBottomSheet> {
       _phoneNoTextEditingController.text = widget.supplier!.phone ?? '';
       _addressTextEditingController.text = widget.supplier!.address ?? '';
       _openingBalanceTextEditingController.text = widget.supplier!.openingBalance.toString();
+      fileName = widget.supplier?.photo;
     }
     super.initState();
   }
@@ -128,7 +129,8 @@ class _CreateSupplierBottomSheetState extends State<CreateSupplierBottomSheet> {
                     CustomTextField(
                       textCon: _openingBalanceTextEditingController,
                       hintText: "Enter opening balance here...",
-                      inputType: TextInputType.numberWithOptions(signed: false,decimal: false),
+                      enabledFlag: widget.supplier != null && (widget.supplier!.openingBalance! > 0) ? false : null,
+                      inputType: const TextInputType.numberWithOptions(signed: false,decimal: false),
                     ),
                     addH(16.h),
                     const FieldTitle(
@@ -136,7 +138,7 @@ class _CreateSupplierBottomSheetState extends State<CreateSupplierBottomSheet> {
                     ),
                     addH(8.h),
                     InkWell(
-                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                      borderRadius: const BorderRadius.all(Radius.circular(8)),
                       onTap: selectFile,
                       child: CustomPaint(
                         painter: DottedBorderPainter(
@@ -161,7 +163,7 @@ class _CreateSupplierBottomSheetState extends State<CreateSupplierBottomSheet> {
                             )
                                 : Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: widget.supplier != null && widget.supplier!.photo != null ? Image.network(widget.supplier!.photo!): Image.file(
+                              child: widget.supplier != null && widget.supplier!.photo != null && fileName!.contains("http")? Image.network(widget.supplier!.photo!): Image.file(
                                 fit: BoxFit.cover,
                                 File(fileName!),
                               ),
@@ -177,14 +179,13 @@ class _CreateSupplierBottomSheetState extends State<CreateSupplierBottomSheet> {
               CustomButton(
                 text: widget.supplier != null ? "Update" :"Add Now",
                 onTap: widget.supplier != null ? (){
-                  Get.back();
                   _controller.editSupplier(
                     supplier: widget.supplier!,
                     name: _nameTextEditingController.text,
                     phoneNo: _phoneNoTextEditingController.text,
                     balance: _openingBalanceTextEditingController.text,
                     address: _addressTextEditingController.text,
-                    supplierLogo: fileName
+                    supplierLogo: fileName??''
                   );
                 } : (){
                   _controller.addNewSupplier(

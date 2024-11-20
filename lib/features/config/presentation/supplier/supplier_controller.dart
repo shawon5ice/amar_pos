@@ -109,23 +109,29 @@ class SupplierController extends GetxController {
     required String phoneNo,
     required String address,
     required String balance,
-    required String? supplierLogo,
+    required String supplierLogo,
   }) async {
     isAddSupplierLoading = true;
     update(["supplier_list"]);
     EasyLoading.show();
     try{
-      // var response = await SupplierService.update(
-      //   token: loginData!.token,
-      //   supplierId: supplier.id,
-      // );
-      // if (response != null) {
-      //
-      //   if(response['success']){
-      //     getAllCategory();
-      //   }
-      //   Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true: null );
-      // }
+      var response = await SupplierService.update(
+        token: loginData!.token,
+        supplierId: supplier.id,
+        supplierName: name,
+        phoneNo: phoneNo,
+        address: address,
+        openingBalance: balance,
+        photo: supplierLogo
+      );
+      if (response != null) {
+
+        if(response['success']){
+          Get.back();
+          getAllSupplier();
+        }
+        Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true: null );
+      }
     }catch(e){
       logger.e(e);
     }finally{

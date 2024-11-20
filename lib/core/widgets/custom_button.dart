@@ -9,7 +9,7 @@ class CustomButton extends StatelessWidget {
     super.key,
     this.marginHorizontal = 0,
     this.marginVertical = 0,
-    this.height = 60,
+    this.height = 54,
     this.radius = 40,
     this.width = double.infinity,
     this.text = "Add Now",

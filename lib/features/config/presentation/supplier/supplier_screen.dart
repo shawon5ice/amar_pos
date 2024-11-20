@@ -1,11 +1,10 @@
-import 'package:amar_pos/core/constants/app_assets.dart';
+import 'package:amar_pos/core/constants/logger/logger.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/features/config/presentation/supplier/create_supplier_bottom_sheet.dart';
-import 'package:amar_pos/features/config/presentation/supplier/supplier_action_drop_down_widget.dart';
 import 'package:amar_pos/features/config/presentation/supplier/supplier_action_menu_widget.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'supplier_controller.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/widgets/custom_button.dart';
@@ -148,7 +147,36 @@ class _SupplierScreenState extends State<SupplierScreen> {
                                 Spacer(),
                                 // ActionDropDownWidget(),
                                 ActionMenu(
-                                  onSelected: (value) {},
+                                  onSelected: (value) {
+                                    switch(value){
+                                      case "edit":
+                                        showModalBottomSheet(
+                                          context: context,
+                                          isScrollControlled: true,
+                                          shape: const RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                                          ),
+                                          builder: (context) {
+                                            return CreateSupplierBottomSheet(supplier: controller.supplierList[index],);
+                                          },
+                                        );
+                                        break;
+                                      case "delete":
+                                        AwesomeDialog(
+                                            context: context,
+                                          dialogType: DialogType.warning,
+                                          title: "Are you sure?",
+                                          desc: "You are going to delete your supplier ${controller.supplierList[index].name}",
+                                          btnOkOnPress: (){
+                                            controller.deleteSupplier(supplier: controller.supplierList[index]);
+                                          },
+                                          btnCancelOnPress: (){
+                                          }
+                                        ).show();
+
+                                        break;
+                                    }
+                                  },
                                 ),
                                 // InkWell(
                                 //   onTap: () {
