@@ -27,4 +27,5 @@ class NetWorkStrings{
   static const String addSupplier = "supplier/store";
   static const String updateSupplier = "supplier/update/";
   static const String deleteSupplier = "supplier/delete/";
+  static const String changeStatusOfSupplier = "supplier/change-status/";
 }

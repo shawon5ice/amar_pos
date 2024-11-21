@@ -29,6 +29,7 @@ class Supplier {
     this.address,
     this.openingBalance,
     this.photo,
+    this.status = 0,
   });
   late final int id;
   late String? business;
@@ -38,6 +39,7 @@ class Supplier {
   late String? address;
   late int? openingBalance;
   late String? photo;
+  late int status;
 
   Supplier.fromJson(Map<String, dynamic> json){
     id = json['id'];
@@ -48,6 +50,7 @@ class Supplier {
     address = json['address'];
     openingBalance = json['opening_balance'];
     photo = json['photo'];
+    status = json['status'];
   }
 
   Map<String, dynamic> toJson() {
@@ -60,6 +63,7 @@ class Supplier {
     _data['address'] = address;
     _data['opening_balance'] = openingBalance;
     _data['photo'] = photo;
+    _data['status'] = status;
     return _data;
   }
 }

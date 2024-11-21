@@ -128,4 +128,17 @@ class SupplierService {
     logger.e(response);
     return response;
   }
+
+  static Future<dynamic> changeStatus({
+    required int supplierId,
+    required String token,
+  }) async {
+
+    var response = await BaseClient.getData(
+      token: token,
+      api: "${NetWorkStrings.changeStatusOfSupplier}$supplierId",
+    );
+    logger.e(response);
+    return response;
+  }
 }

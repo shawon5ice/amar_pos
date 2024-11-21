@@ -170,4 +170,31 @@ class SupplierController extends GetxController {
     update(["supplier_list"]);
     EasyLoading.dismiss();
   }
+
+  void changeStatusOfSupplier({
+    required Supplier supplier,
+  }) async {
+    isAddSupplierLoading = true;
+    update(["supplier_list"]);
+    EasyLoading.show();
+    try{
+      var response = await SupplierService.changeStatus(
+        token: loginData!.token,
+        supplierId: supplier.id,
+      );
+      if (response != null) {
+        if(response['success']){
+          getAllSupplier();
+        }
+        Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true: null );
+      }
+    }catch(e){
+      logger.e(e);
+    }finally{
+      supplierListLoading = false;
+      update(['supplier_list']);
+    }
+    update(["supplier_list"]);
+    EasyLoading.dismiss();
+  }
 }

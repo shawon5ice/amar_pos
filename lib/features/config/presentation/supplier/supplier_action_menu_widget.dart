@@ -1,11 +1,13 @@
+import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:flutter/material.dart';
 
 import 'create_supplier_bottom_sheet.dart';
 
 class ActionMenu extends StatelessWidget {
   final Function(String) onSelected;
+  final int status;
 
-  const ActionMenu({Key? key, required this.onSelected}) : super(key: key);
+  const ActionMenu({super.key, required this.onSelected, required this.status});
 
   @override
   Widget build(BuildContext context) {
@@ -35,10 +37,23 @@ class ActionMenu extends StatelessWidget {
                 ],
               ),
             ),
+            PopupMenuItem<String>(
+              value: 'change-status',
+              child: Row(
+                children: [
+                  Icon(status == 1 ? Icons.visibility_off_outlined : Icons.visibility, color: status == 1 ? Colors.grey : Colors.green),
+                  addW(8),
+                  Text(
+                    status == 1 ? "Inactive":"Active",
+                    style: TextStyle(color: status == 1 ? Colors.grey : Colors.green),
+                  ),
+                ],
+              ),
+            ),
             const PopupMenuItem<String>(
               value: 'delete',
               child: Row(
-                children: const [
+                children: [
                   Icon(Icons.delete_forever, color: Colors.red),
                   SizedBox(width: 8),
                   Text(

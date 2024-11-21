@@ -71,7 +71,12 @@ class _SupplierScreenState extends State<SupplierScreen> {
                       itemCount: _controller.supplierList.length,
                       itemBuilder: (context, index) => Container(
                         margin: EdgeInsets.symmetric(vertical: 5.h),
-                        padding: EdgeInsets.only(left: 20,top: 10,bottom: 20, right: 0),
+                        padding: const EdgeInsets.only(left: 20,top: 10,bottom: 20, right: 0),
+                        foregroundDecoration: controller.supplierList[index].status == 0 ? BoxDecoration(
+                          color: Color(0xff7c7c7c).withOpacity(.3),
+                            borderRadius:
+                            BorderRadius.all(Radius.circular(20.r)),
+                        ): null,
                         decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius:
@@ -144,9 +149,10 @@ class _SupplierScreenState extends State<SupplierScreen> {
                                     ),
                                   ),
                                 ),
-                                Spacer(),
+                                const Spacer(),
                                 // ActionDropDownWidget(),
                                 ActionMenu(
+                                  status: controller.supplierList[index].status,
                                   onSelected: (value) {
                                     switch(value){
                                       case "edit":
@@ -161,10 +167,22 @@ class _SupplierScreenState extends State<SupplierScreen> {
                                           },
                                         );
                                         break;
+                                      case "change-status":
+                                        AwesomeDialog(
+                                            context: context,
+                                            dialogType: DialogType.question,
+                                            title: "Are you sure?",
+                                            desc: "You are going to ${controller.supplierList[index].status==1?'Deactivate':'Activate'} your supplier ${controller.supplierList[index].name}",
+                                            btnOkOnPress: (){
+                                              controller.changeStatusOfSupplier(supplier: controller.supplierList[index]);
+                                            },
+                                            btnCancelOnPress: (){
+                                            }
+                                        ).show();
                                       case "delete":
                                         AwesomeDialog(
                                             context: context,
-                                          dialogType: DialogType.warning,
+                                          dialogType: DialogType.error,
                                           title: "Are you sure?",
                                           desc: "You are going to delete your supplier ${controller.supplierList[index].name}",
                                           btnOkOnPress: (){
