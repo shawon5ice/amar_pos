@@ -72,7 +72,7 @@ class SupplierController extends GetxController {
     required String phoneNo,
     required String address,
     required num balance,
-    required String supplierLogo,
+    required String? supplierLogo,
   }) async {
     isAddSupplierLoading = true;
     update(["supplier_list"]);

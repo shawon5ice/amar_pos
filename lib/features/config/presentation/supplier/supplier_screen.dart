@@ -130,7 +130,7 @@ class _SupplierScreenState extends State<SupplierScreen> {
                                                   fontSize: 12.sp),
                                         ),
                                         AutoSizeText(
-                                          controller.supplierList[index].address!,
+                                          controller.supplierList[index].address??'--',
                                           style: context.textTheme.bodyLarge
                                               ?.copyWith(
                                             color: const Color(0xff7C7C7C),

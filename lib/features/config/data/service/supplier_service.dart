@@ -1,13 +1,11 @@
-import 'dart:ffi';
+import 'package:dio/dio.dart';
 import 'dart:io';
 
 import 'package:amar_pos/core/constants/logger/logger.dart';
-import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../../../core/network/base_client.dart';
 import '../../../../core/network/network_strings.dart';
-import 'package:dio/dio.dart';
 
 
 class SupplierService {
@@ -26,7 +24,7 @@ class SupplierService {
     required String phoneNo,
     required String address,
     required num balance,
-    required String supplierLogo,
+    required String? supplierLogo,
     required String token,
   }) async {
 
@@ -35,11 +33,19 @@ class SupplierService {
       "phone_no": phoneNo,
       "address": address,
       "opening_balance": balance,
-      "photo": await MultipartFile.fromFile(
-        supplierLogo,
-        filename: supplierLogo.split('/').last,
-      )
     });
+
+    if (supplierLogo != null) {
+      formData.files.add(
+        MapEntry(
+          "photo",
+          await MultipartFile.fromFile(
+            supplierLogo,
+            filename: supplierLogo.split('/').last,
+          ),
+        ),
+      );
+    }
 
     var response = await BaseClient.postData(
       token: token,

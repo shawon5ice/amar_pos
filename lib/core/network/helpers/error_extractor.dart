@@ -28,7 +28,7 @@ class ErrorExtractor {
               color: Colors.white,
               fontSize: 14,
             ),
-            textAlign: TextAlign.center,
+            textAlign: TextAlign.start,
           ),
         )
         .toList();
@@ -44,7 +44,7 @@ class ErrorExtractor {
     if (errorMessages.isNotEmpty) {
       await showGeneralDialog(
         context: context,
-        barrierDismissible: true, // Allows dismissal by tapping outside
+        barrierDismissible: true,
         barrierLabel: "Dismiss",
         barrierColor: Colors.black54, // Background dimming
         transitionDuration: const Duration(milliseconds: 300),
@@ -76,7 +76,7 @@ class ErrorExtractor {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 24),
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisSize: MainAxisSize.min,
                           children: widgets,
                         ),

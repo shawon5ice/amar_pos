@@ -193,7 +193,7 @@ class _CreateSupplierBottomSheetState extends State<CreateSupplierBottomSheet> {
                       phoneNo: _phoneNoTextEditingController.text,
                       balance: _openingBalanceTextEditingController.text.isNotEmpty && _openingBalanceTextEditingController.text.toString().isNum ? num.parse(_openingBalanceTextEditingController.text) : 0,
                       address: _addressTextEditingController.text,
-                      supplierLogo: fileName!
+                      supplierLogo: fileName
                   );
                 },
               ),
