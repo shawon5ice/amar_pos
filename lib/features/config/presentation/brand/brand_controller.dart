@@ -73,7 +73,7 @@ class BrandController extends GetxController {
 
   void addNewBrand({
     required String brandName,
-    required String brandLogo,
+    String? brandLogo,
   }) async {
     isAddBrandLoading = true;
     update(["brand_list"]);
@@ -87,6 +87,7 @@ class BrandController extends GetxController {
       if (response != null) {
 
         if(response['success']){
+          Get.back();
           getAllBrand();
         }
         Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true: null );
@@ -125,15 +126,15 @@ class BrandController extends GetxController {
   void editBrand({
     required Brand brand,
     required String brandName,
-    required String brandLogo,
+    String? brandLogo,
   }) async {
     isAddBrandLoading = true;
     update(["brand_list"]);
     EasyLoading.show();
     try{
-      if(brandLogo.contains('https://')){
-        brandLogo = await downloadAndSaveImage(brandLogo);
-      }
+      // if(brandLogo.contains('https://')){
+      //   brandLogo = await downloadAndSaveImage(brandLogo);
+      // }
       var response = await BrandService.updateBrand(
         token: loginData!.token,
         brandLogo: brandLogo,
@@ -143,6 +144,7 @@ class BrandController extends GetxController {
       if (response != null) {
 
         if(response['success']){
+          Get.back();
           getAllBrand();
         }
         Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true: null );

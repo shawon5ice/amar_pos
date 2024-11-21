@@ -6,6 +6,9 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../../core/responsive/pixel_perfect.dart';
+import '../../../../core/widgets/custom_text_field.dart';
+import '../../../../core/widgets/field_title.dart';
 import '../../data/model/brand/brand_model_response.dart';
 import 'brand_controller.dart';
 
@@ -71,39 +74,44 @@ class _CreateBrandBottomSheetState extends State<CreateBrandBottomSheet> {
                 ),
               ),
               const SizedBox(height: 20),
-              TextField(
-                controller: _textEditingController,
-                decoration: InputDecoration(
-                  labelText: "Brand Name",
-                  labelStyle: TextStyle(fontSize: 16),
-                  hintText: "Type name here...",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+              Container(
+                padding: EdgeInsets.all(20.w),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.all(Radius.circular(20.sp))
                 ),
-              ),
-              SizedBox(height: 20),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Upload Photo",
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  SizedBox(height: 8),
-                  InkWell(
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
-                    onTap: selectFile,
-                    child: CustomPaint(
-                      painter: DottedBorderPainter(
-                        color: const Color(0xffD8E0EC),
-                      ),
-                      child: SizedBox(
-                        height: 150,
-                        width: double.infinity,
-                        child: Center(
-                          child: fileName == null
-                              ? const Column(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const FieldTitle(
+                      "Brand Name",
+                    ),
+                    addH(8.h),
+                    CustomTextField(
+                      textCon: _textEditingController,
+                      hintText: "Type name here...",
+                    ),
+                    addH(20.h),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const FieldTitle(
+                          "Upload Photo",
+                        ),
+                        addH(8.h),
+                        InkWell(
+                          borderRadius: BorderRadius.all(Radius.circular(8)),
+                          onTap: selectFile,
+                          child: CustomPaint(
+                            painter: DottedBorderPainter(
+                              color: const Color(0xffD8E0EC),
+                            ),
+                            child: SizedBox(
+                              height: 150,
+                              width: double.infinity,
+                              child: Center(
+                                child: fileName == null
+                                    ? const Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Icon(Icons.image_outlined,
@@ -115,28 +123,29 @@ class _CreateBrandBottomSheetState extends State<CreateBrandBottomSheet> {
                                     ),
                                   ],
                                 )
-                              : Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: widget.brand != null ? Image.network(widget.brand!.logo): Image.file(
-                                  fit: BoxFit.cover,
+                                    : Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: widget.brand != null ? Image.network(widget.brand!.logo): Image.file(
+                                    fit: BoxFit.cover,
                                     File(fileName!),
                                   ),
+                                ),
                               ),
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               const SizedBox(height: 20),
               CustomButton(
                 text: widget.brand != null ? "Update" :"Add Now",
                 onTap: widget.brand != null ? (){
-                  Get.back();
-                  _brandController.editBrand(brand: widget.brand! ,brandName: _textEditingController.text, brandLogo: fileName??"");
+                  _brandController.editBrand(brand: widget.brand! ,brandName: _textEditingController.text, brandLogo: fileName);
                 } : (){
-                  Get.back();
-                  _brandController.addNewBrand(brandName: _textEditingController.text, brandLogo: fileName??"");
+                  _brandController.addNewBrand(brandName: _textEditingController.text, brandLogo: fileName);
                 },
               ),
               const SizedBox(height: 20),

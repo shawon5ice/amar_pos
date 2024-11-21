@@ -15,16 +15,24 @@ class BrandService {
 
   static Future<dynamic> addBrand({
     required String brandName,
-    required String brandLogo,
+    String? brandLogo,
     required String token,
   }) async {
     FormData formData = FormData.fromMap({
-      'logo': await MultipartFile.fromFile(
-        brandLogo,
-        filename: brandLogo.split('/').last, // Add file name
-      ),
       'name': brandName, // Include other fields if needed
     });
+
+    if (brandLogo != null) {
+      formData.files.add(
+        MapEntry(
+          "logo",
+          await MultipartFile.fromFile(
+            brandLogo,
+            filename: brandLogo.split('/').last, // Add file name
+          ),
+        ),
+      );
+    }
 
     var response = await BaseClient.postData(
       token: token,
@@ -36,17 +44,25 @@ class BrandService {
 
   static Future<dynamic> updateBrand({
     required String brandName,
-    required String brandLogo,
+    String? brandLogo,
     required int brandId,
     required String token,
   }) async {
     FormData formData = FormData.fromMap({
-      'logo': await MultipartFile.fromFile(
-        brandLogo,
-        filename: brandLogo.split('/').last, // Add file name
-      ),
-      'name': brandName, // Include other fields if needed
+      'name': brandName,
     });
+
+    if (brandLogo != null && !brandLogo.contains("http")) {
+      formData.files.add(
+        MapEntry(
+          "logo",
+          await MultipartFile.fromFile(
+            brandLogo,
+            filename: brandLogo.split('/').last, // Add file name
+          ),
+        ),
+      );
+    }
 
     var response = await BaseClient.postData(
       token: token,
@@ -60,7 +76,6 @@ class BrandService {
     required int brandId,
     required String token,
   }) async {
-
     var response = await BaseClient.deleteData(
       token: token,
       api: "${NetWorkStrings.deleteBrand}$brandId",
