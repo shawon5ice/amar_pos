@@ -28,4 +28,13 @@ class NetWorkStrings{
   static const String updateSupplier = "supplier/update/";
   static const String deleteSupplier = "supplier/delete/";
   static const String changeStatusOfSupplier = "supplier/change-status/";
+
+  //Employee
+  static const String getAllPermissions = "get-all-permissions";
+  static const String getAllEmployees = "business_user/get-users";
+  static const String getSingleEmployees = "business_user/get-user/";
+  static const String addEmployee = "business_user/store";
+  static const String updateEmployee = "business_user/update/";
+  static const String deleteEmployee = "business_user/delete/";
+  static const String changeStatusOfEmployee = "business_user/change-status/";
 }

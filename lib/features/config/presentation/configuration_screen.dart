@@ -1,12 +1,11 @@
 import 'package:amar_pos/core/constants/app_assets.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
-import 'package:amar_pos/features/config/data/service/warranty_service.dart';
 import 'package:amar_pos/features/config/presentation/brand/brand_screen.dart';
 import 'package:amar_pos/features/config/presentation/category/category_screen.dart';
+import 'package:amar_pos/features/config/presentation/employee/employee_screen.dart';
 import 'package:amar_pos/features/config/presentation/supplier/supplier_screen.dart';
 import 'package:amar_pos/features/config/presentation/unit/unit_screen.dart';
 import 'package:amar_pos/features/config/presentation/warranty/warranty_screen.dart';
-import 'package:amar_pos/features/drawer/widget/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../drawer/drawer_menu_controller.dart';
@@ -49,7 +48,9 @@ class ConfigurationScreen extends StatelessWidget {
     }),
     ConfigItem(title: "Outlet", asset: AppAssets.outletIcon, onPress: () {}),
     ConfigItem(
-        title: "Employee", asset: AppAssets.employeeIcon, onPress: () {}),
+        title: "Employee", asset: AppAssets.employeeIcon, onPress: () {
+          Get.to(EmployeeScreen());
+    }),
     ConfigItem(title: "Client", asset: AppAssets.clientIcon, onPress: () {}),
     ConfigItem(
         title: "Customer", asset: AppAssets.customerIcon, onPress: () {}),

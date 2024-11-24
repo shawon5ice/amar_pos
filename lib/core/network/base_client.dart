@@ -73,6 +73,10 @@ class BaseClient {
     Get.offAllNamed(LoginScreen.routeName);
   }
 
+  static void showRequestLog({String? token, String? url, String? requestType}){
+    logger.i("$requestType request to :$url\nToken : $token");
+  }
+
   /// GET request
   static Future<dynamic> getData({
     String? token,
@@ -81,7 +85,7 @@ class BaseClient {
     bool? fullUrlGiven,
   }) async {
     String url = fullUrlGiven == true ? api : '${NetWorkStrings.baseUrl}/$api';
-
+    showRequestLog(url: url, token: token, requestType: "GET");
     try {
       final response = await _dio.get(
         url,
@@ -112,7 +116,7 @@ class BaseClient {
     bool? fullUrlGiven,
   }) async {
     String url = fullUrlGiven == true ? api : '${NetWorkStrings.baseUrl}/$api';
-
+    showRequestLog(url: url, token: token, requestType: "POST");
     try {
       final response = await _dio.post(
         url,
@@ -140,7 +144,7 @@ class BaseClient {
     bool? fullUrlGiven,
   }) async {
     String url = fullUrlGiven == true ? api : '${NetWorkStrings.baseUrl}/$api';
-
+    showRequestLog(url: url, token: token, requestType: "UPDATE");
     try {
       final response = await _dio.put(
         url,
@@ -167,7 +171,7 @@ class BaseClient {
     bool? fullUrlGiven,
   }) async {
     String url = fullUrlGiven == true ? api : '${NetWorkStrings.baseUrl}/$api';
-
+    showRequestLog(url: url, token: token, requestType: "DELETE");
     try {
       final response = await _dio.delete(
         url,
