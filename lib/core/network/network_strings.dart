@@ -1,4 +1,5 @@
 class NetWorkStrings{
+  static String errorMessage = '';
   static const String baseUrl = "https://amarpos.motionview.com.bd/api";
 
 
@@ -10,7 +11,7 @@ class NetWorkStrings{
   static const String updateBrand = "brand/update/";
   static const String deleteBrand = "brand/delete/";
 
-  //Brand
+  //Category
   static const String getAllCategories = "category/get-categories";
   static const String addCategory = "category/store";
   static const String updateCategory = "category/update/";
@@ -37,4 +38,12 @@ class NetWorkStrings{
   static const String updateEmployee = "business_user/update/";
   static const String deleteEmployee = "business_user/delete/";
   static const String changeStatusOfEmployee = "business_user/change-status/";
+
+  //Outlet
+  static const String getAllOutlet = "outlet/get-outlets";
+  static const String getOutlet = "outlet/get-outlet/";
+  static const String addOutlet = "outlet/store";
+  static const String updateOutlet = "outlet/update/";
+  static const String deleteOutlet = "outlet/delete/";
+  static const String changeStatusOfOutlet = "outlet/change-status/";
 }

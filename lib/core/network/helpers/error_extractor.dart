@@ -1,10 +1,7 @@
 import 'package:amar_pos/core/constants/app_assets.dart';
-import 'package:amar_pos/core/constants/logger/logger.dart';
-import 'package:amar_pos/core/network/base_client.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:path_provider/path_provider.dart';
 
 class ErrorExtractor {
   /// Extracts all error messages from a given JSON response.
@@ -36,7 +33,7 @@ class ErrorExtractor {
 
   /// Shows a dialog with the extracted error messages.
   static Future<void> showErrorDialog(
-      BuildContext context, Map<String, dynamic> response) async {
+      BuildContext context, Map<String, dynamic> response, ) async {
     final errorMessages = extractErrorMessages(response);
 
     var widgets = getListOfTextWidget(errorMessages);

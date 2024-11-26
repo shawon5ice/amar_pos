@@ -60,7 +60,8 @@ class BaseClient {
         break;
     }
     if(error.response?.statusCode != 422){
-      Methods.showSnackbar(msg: errorMessage);
+      NetWorkStrings.errorMessage = errorMessage;
+      Methods.showSnackbar(msg: errorMessage, duration: 3);
     }
 
   }

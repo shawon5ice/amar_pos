@@ -1,11 +1,11 @@
 import 'package:amar_pos/features/config/presentation/employee/employee_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
-import 'package:amar_pos/features/config/presentation/employee/permission_header.dart';
 import 'package:get/get.dart';
 
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_text_field.dart';
+import '../../../../core/widgets/divider_heading.dart';
 import '../../../../core/widgets/field_title.dart';
 
 class CreateUserScreen extends GetView<EmployeeController> {
@@ -67,7 +67,7 @@ class CreateUserScreen extends GetView<EmployeeController> {
                           ],
                         ),
                       ),
-                      const PermissionsHeader(),
+                      const DividerHeading(heading: "Permissions"),
                       Container(
                         padding: EdgeInsets.all(20.w),
                         decoration: BoxDecoration(
