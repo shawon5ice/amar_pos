@@ -46,4 +46,21 @@ class NetWorkStrings{
   static const String updateOutlet = "outlet/update/";
   static const String deleteOutlet = "outlet/delete/";
   static const String changeStatusOfOutlet = "outlet/change-status/";
+
+
+  //Client
+  static const String getAllClient = "client/get-clients";
+  static const String getClient = "client/get-client/";
+  static const String addClient = "client/store";
+  static const String updateClient = "client/update/";
+  static const String deleteClient = "client/delete/";
+  static const String changeStatusOfClient = "client/change-status/";
+
+  //Client
+  static const String getAllCustomer = "customer/get-customers";
+  static const String getCustomer = "customer/get-customer";
+  static const String addCustomer = "customer/store";
+  static const String updateCustomer = "customer/update/";
+  static const String deleteCustomer = "customer/delete/";
+  static const String changeStatusOfCustomer = "customer/change-status/";
 }

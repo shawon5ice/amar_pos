@@ -1,43 +1,41 @@
-import 'dart:io';
 import 'package:amar_pos/core/constants/logger/logger.dart';
 import 'package:amar_pos/core/widgets/methods/helper_methods.dart';
-import 'package:amar_pos/features/config/data/model/outlet/outlet_list_model_response.dart';
-import 'package:amar_pos/features/config/data/service/outlet_service.dart';
-import 'package:dio/dio.dart';
+import 'package:amar_pos/features/config/data/model/client/client_list_model_response.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
-import 'package:path_provider/path_provider.dart';
 import '../../../auth/data/model/hive/login_data.dart';
 import '../../../auth/data/model/hive/login_data_helper.dart';
+import '../../data/service/client_service.dart';
+import '../../data/service/customer_service.dart';
 
-class OutletController extends GetxController {
-  bool isAddOutletLoading = false;
-  bool outletListLoading = false;
+class ClientController extends GetxController {
+  bool isAddClientLoading = false;
+  bool clientListLoading = false;
 
   LoginData? loginData = LoginDataBoxManager().loginData;
 
-  List<Outlet> outletList = [];
-  List<Outlet> allOutletCopy = [];
-  OutletListModelResponse? outletListModelResponse;
+  List<Client> clientList = [];
+  List<Client> allClientCopy = [];
+  ClientListModelResponse? clientListModelResponse;
 
 
 
-  void getAllOutlets() async {
-    outletListLoading = true;
-    update(['outlet_list']);
+  void getAllClient() async {
+    clientListLoading = true;
+    update(['client_list']);
     try{
-      var response = await OutletService.getAll(usrToken: loginData!.token);
+      var response = await ClientService.getAll(usrToken: loginData!.token);
       if (response != null) {
         logger.d(response);
-        outletListModelResponse = OutletListModelResponse.fromJson(response);
-        outletList = outletListModelResponse!.data.outletList;
-        allOutletCopy = outletList;
+        clientListModelResponse = ClientListModelResponse.fromJson(response);
+        clientList = clientListModelResponse!.data.clientList;
+        allClientCopy = clientList;
       }
     }catch(e){
       logger.e(e);
     }finally{
-      outletListLoading = false;
-      update(['outlet_list']);
+      clientListLoading = false;
+      update(['client_list']);
     }
 
   }
@@ -45,16 +43,16 @@ class OutletController extends GetxController {
   void searchBrand({required String search}) async {
     try {
       // Show loading state
-      isAddOutletLoading = true;
-      update(["outlet_list"]);
+      isAddClientLoading = true;
+      update(["client_list"]);
       EasyLoading.show();
 
       if (search.isEmpty) {
         // Reset to full list if search is empty
-        outletList = allOutletCopy;
+        clientList = allClientCopy;
       } else {
         // Perform case-insensitive search
-        outletList = allOutletCopy
+        clientList = allClientCopy
             .where((e) => e.name.toLowerCase().contains(search.toLowerCase()))
             .toList();
       }
@@ -63,14 +61,14 @@ class OutletController extends GetxController {
       logger.e(e);
     } finally {
       // Ensure loading state is turned off and UI is updated
-      isAddOutletLoading = false;
-      update(["outlet_list"]);
+      isAddClientLoading = false;
+      update(["client_list"]);
       EasyLoading.dismiss();
     }
   }
 
 
-  void addNewOutlet({
+  void addNewClient({
     String? name,
     String? shortCode,
     String? nagad,
@@ -79,11 +77,11 @@ class OutletController extends GetxController {
     String? address,
   }) async {
 
-    isAddOutletLoading = true;
-    update(["outlet_list"]);
+    isAddClientLoading = true;
+    update(["client_list"]);
     EasyLoading.show();
     try{
-      var response = await OutletService.store(
+      var response = await ClientService.store(
         token: loginData!.token,
         name: name,
         shortCode: shortCode,
@@ -96,43 +94,22 @@ class OutletController extends GetxController {
 
         if(response['success']){
           Get.back();
-          getAllOutlets();
+          getAllClient();
         }
         Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true: null );
       }
     }catch(e){
       logger.e(e);
     }finally{
-      outletListLoading = false;
-      update(['outlet_list']);
+      clientListLoading = false;
+      update(['client_list']);
     }
-    update(["outlet_list"]);
+    update(["client_list"]);
     EasyLoading.dismiss();
   }
 
-  Future<String> downloadAndSaveImage(String imageUrl) async {
-    try {
-      // Get the temporary directory
-      Directory tempDir = await getTemporaryDirectory();
-      String tempPath = tempDir.path;
-
-      // Create a unique file path
-      String filePath = '$tempPath/${DateTime.now().millisecondsSinceEpoch}.jpg';
-
-      // Download the image
-      Dio dio = Dio();
-      await dio.download(imageUrl, filePath);
-
-      print('Image saved at: $filePath');
-      return filePath; // Return the file path
-    } catch (e) {
-      print('Error saving image: $e');
-      return '';
-    }
-  }
-
-  void editOutlet({
-    required Outlet outlet,
+  void editClient({
+    required Client outlet,
     String? name,
     String? shortCode,
     String? nagad,
@@ -140,11 +117,11 @@ class OutletController extends GetxController {
     String? phone,
     String? address,
   }) async {
-    isAddOutletLoading = true;
-    update(["outlet_list"]);
+    isAddClientLoading = true;
+    update(["client_list"]);
     EasyLoading.show();
     try{
-      var response = await OutletService.update(
+      var response = await ClientService.update(
         token: loginData!.token,
         name: name,
         shortCode: shortCode,
@@ -158,74 +135,74 @@ class OutletController extends GetxController {
 
         if(response['success']){
           Get.back();
-          getAllOutlets();
+          getAllClient();
         }
         Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true: null );
       }
     }catch(e){
       logger.e(e);
     }finally{
-      outletListLoading = false;
-      update(['outlet_list']);
+      clientListLoading = false;
+      update(['client_list']);
     }
-    update(["outlet_list"]);
+    update(["client_list"]);
     EasyLoading.dismiss();
   }
 
-  void deleteOutlet({
-    required Outlet outlet,
+  void deleteClient({
+    required Client client,
   }) async {
-    isAddOutletLoading = true;
-    update(["outlet_list"]);
+    isAddClientLoading = true;
+    update(["client_list"]);
     EasyLoading.show();
     try{
-      var response = await OutletService.delete(
+      var response = await ClientService.delete(
         token: loginData!.token,
-        outletId: outlet.id,
+        outletId: client.id,
       );
       if (response != null) {
 
         if(response['success']){
-          outletList.remove(outlet);
+          clientList.remove(client);
         }
         Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true: null );
       }
     }catch(e){
       logger.e(e);
     }finally{
-      outletListLoading = false;
-      update(['outlet_list']);
+      clientListLoading = false;
+      update(['client_list']);
     }
-    update(["outlet_list"]);
+    update(["client_list"]);
     EasyLoading.dismiss();
   }
 
 
-  void changeStatusOfOutlet({
-    required Outlet outlet,
+  void changeStatusOfClient({
+    required Client client,
   }) async {
-    isAddOutletLoading = true;
-    update(["outlet_list"]);
+    isAddClientLoading = true;
+    update(["client_list"]);
     EasyLoading.show();
     try{
-      var response = await OutletService.changeStatus(
+      var response = await ClientService.changeStatus(
         token: loginData!.token,
-        outletId: outlet.id,
+        outletId: client.id,
       );
       if (response != null) {
         if(response['success']){
-          outlet.status = outlet.status == 1? 0 : 1;
+          client.status = client.status == 1? 0 : 1;
         }
         Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true: null );
       }
     }catch(e){
       logger.e(e);
     }finally{
-      isAddOutletLoading = false;
-      outletListLoading = false;
-      update(['outlet_list']);
+      isAddClientLoading = false;
+      clientListLoading = false;
+      update(['client_list']);
     }
-    update(["outlet_list"]);
+    update(["client_list"]);
     EasyLoading.dismiss();
   }
 }

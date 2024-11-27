@@ -9,25 +9,25 @@ import '../../../auth/data/model/hive/login_data.dart';
 import '../../../auth/data/model/hive/login_data_helper.dart';
 
 class EmployeeController extends GetxController {
-  bool isAddSupplierLoading = false;
+  bool isAddEmployeeLoading = false;
   bool employeeListLoading = false;
 
   LoginData? loginData = LoginDataBoxManager().loginData;
 
   List<Employee> employeeList = [];
   List<Employee> allEmployeeCopy = [];
-  EmployeeListResponseModel? employeeListResponseModel;
+  EmployeeListModelResponse? employeeListModelResponse;
 
 
-  void getAllSupplier() async {
+  void getAllEmployee() async {
     employeeListLoading = true;
     update(['employee_list']);
     try{
-      var response = await EmployeeService.get(usrToken: loginData!.token);
+      var response = await EmployeeService.getAll(usrToken: loginData!.token);
       if (response != null) {
         logger.d(response);
-        employeeListResponseModel = EmployeeListResponseModel.fromJson(response);
-        employeeList = employeeListResponseModel!.employeeList;
+        employeeListModelResponse = EmployeeListModelResponse.fromJson(response);
+        employeeList = employeeListModelResponse!.data.employeeList;
         allEmployeeCopy = employeeList;
       }
     }catch(e){
@@ -42,7 +42,7 @@ class EmployeeController extends GetxController {
   void searchSupplier({required String search}) async {
     try {
       // Show loading state
-      isAddSupplierLoading = true;
+      isAddEmployeeLoading = true;
       update(["employee_list"]);
       EasyLoading.show();
 
@@ -67,29 +67,25 @@ class EmployeeController extends GetxController {
   }
 
 
-  void addNewSupplier({
+  void addNewEmployee({
     required String name,
     required String phoneNo,
     required String address,
-    required num balance,
-    required String? supplierLogo,
   }) async {
-    isAddSupplierLoading = true;
+    isAddEmployeeLoading = true;
     update(["employee_list"]);
     EasyLoading.show();
     try{
-      var response = await SupplierService.store(
+      var response = await EmployeeService.store(
         token: loginData!.token,
         name: name,
         phoneNo: phoneNo,
         address: address,
-        balance: balance,
-        supplierLogo: supplierLogo
       );
       if (response != null && response['success']) {
         if(response['success']){
           Get.back();
-          getAllSupplier();
+          getAllEmployee();
           Methods.showSnackbar(msg: response['message'], isSuccess: true);
         }
       }
@@ -111,7 +107,7 @@ class EmployeeController extends GetxController {
     required String balance,
     required String supplierLogo,
   }) async {
-    isAddSupplierLoading = true;
+    isAddEmployeeLoading = true;
     update(["employee_list"]);
     EasyLoading.show();
     try{
@@ -128,7 +124,7 @@ class EmployeeController extends GetxController {
 
         if(response['success']){
           Get.back();
-          getAllSupplier();
+          getAllEmployee();
         }
         Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true: null );
       }
@@ -145,7 +141,7 @@ class EmployeeController extends GetxController {
   void deleteEmployee({
     required Employee employee,
   }) async {
-    isAddSupplierLoading = true;
+    isAddEmployeeLoading = true;
     update(["employee_list"]);
     EasyLoading.show();
     try{
@@ -174,7 +170,7 @@ class EmployeeController extends GetxController {
   void changeStatusOfSupplier({
     required Employee supplier,
   }) async {
-    isAddSupplierLoading = true;
+    isAddEmployeeLoading = true;
     update(["employee_list"]);
     EasyLoading.show();
     try{
@@ -184,7 +180,7 @@ class EmployeeController extends GetxController {
       );
       if (response != null) {
         if(response['success']){
-          getAllSupplier();
+          getAllEmployee();
         }
         Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true: null );
       }

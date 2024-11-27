@@ -1,7 +1,10 @@
 import 'package:amar_pos/core/constants/app_assets.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
+import 'package:amar_pos/features/config/data/service/client_service.dart';
 import 'package:amar_pos/features/config/presentation/brand/brand_screen.dart';
 import 'package:amar_pos/features/config/presentation/category/category_screen.dart';
+import 'package:amar_pos/features/config/presentation/client/client_screen.dart';
+import 'package:amar_pos/features/config/presentation/customer/customer_screen.dart';
 import 'package:amar_pos/features/config/presentation/employee/employee_screen.dart';
 import 'package:amar_pos/features/config/presentation/outlet/outlet_screen.dart';
 import 'package:amar_pos/features/config/presentation/supplier/supplier_screen.dart';
@@ -54,9 +57,13 @@ class ConfigurationScreen extends StatelessWidget {
         title: "Employee", asset: AppAssets.employeeIcon, onPress: () {
           Get.to(EmployeeScreen());
     }),
-    ConfigItem(title: "Client", asset: AppAssets.clientIcon, onPress: () {}),
+    ConfigItem(title: "Client", asset: AppAssets.clientIcon, onPress: () {
+      Get.to(ClientScreen());
+    }),
     ConfigItem(
-        title: "Customer", asset: AppAssets.customerIcon, onPress: () {}),
+        title: "Customer", asset: AppAssets.customerIcon, onPress: () {
+      Get.to(CustomerScreen());
+    }),
   ];
 
   @override

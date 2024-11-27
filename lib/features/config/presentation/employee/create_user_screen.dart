@@ -110,7 +110,14 @@ class CreateUserScreen extends GetView<EmployeeController> {
                           ],
                         ),
                       ),
-                      const Spacer(),
+                      CustomButton(
+                        text: "Add Now",
+                        marginHorizontal: 20,
+                        marginVertical: 10,
+                        onTap: () {
+                          controller.addNewEmployee(name: '', phoneNo: '', address: '',);
+                        },
+                      ),
                     ],
                   ),
                 ),
@@ -119,14 +126,14 @@ class CreateUserScreen extends GetView<EmployeeController> {
           );
         },
       ),
-      bottomNavigationBar: CustomButton(
-        text: "Add Now",
-        marginHorizontal: 20,
-        marginVertical: 10,
-        onTap: () {
-          // Add logic here
-        },
-      ),
+      // bottomNavigationBar: CustomButton(
+      //   text: "Add Now",
+      //   marginHorizontal: 20,
+      //   marginVertical: 10,
+      //   onTap: () {
+      //     // Add logic here
+      //   },
+      // ),
     );
   }
 }

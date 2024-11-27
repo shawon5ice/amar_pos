@@ -22,7 +22,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
 
   @override
   void initState() {
-    _controller.getAllSupplier();
+    _controller.getAllEmployee();
     super.initState();
   }
 
@@ -52,7 +52,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                       return const Center(
                         child: CircularProgressIndicator(),
                       );
-                    } else if (_controller.employeeListResponseModel == null) {
+                    } else if (_controller.employeeListModelResponse == null) {
                       return Center(
                         child: Text(
                           "Something went wrong",
@@ -62,7 +62,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                     } else if (_controller.employeeList.isEmpty) {
                       return Center(
                         child: Text(
-                          "No Supplier Found",
+                          "No Employee Found",
                           style: context.textTheme.titleLarge,
                         ),
                       );
@@ -90,7 +90,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                                 Container(
                                   width: 50.w,
                                   height: 50.w,
-                                  margin: EdgeInsets.only(top: 10),
+                                  margin: const EdgeInsets.only(top: 10),
                                   padding: EdgeInsets.all(2.px),
                                   decoration: ShapeDecoration(
                                     color: const Color(0x33BEBEBE),
@@ -114,7 +114,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                                 Expanded(
                                   flex: 8,
                                   child: Container(
-                                    margin: EdgeInsets.only(top: 10),
+                                    margin: const EdgeInsets.only(top: 10),
                                     child: Column(
                                       mainAxisAlignment: MainAxisAlignment.start,
                                       crossAxisAlignment:

@@ -9,7 +9,7 @@ import '../../../../core/network/network_strings.dart';
 
 
 class EmployeeService {
-  static Future<dynamic> get({
+  static Future<dynamic> getAll({
     required String usrToken,
   }) async {
     var response = await BaseClient.getData(
@@ -23,8 +23,6 @@ class EmployeeService {
     required String name,
     required String phoneNo,
     required String address,
-    required num balance,
-    required String? supplierLogo,
     required String token,
   }) async {
 
@@ -32,20 +30,7 @@ class EmployeeService {
       "name": name,
       "phone_no": phoneNo,
       "address": address,
-      "opening_balance": balance,
     });
-
-    if (supplierLogo != null) {
-      formData.files.add(
-        MapEntry(
-          "photo",
-          await MultipartFile.fromFile(
-            supplierLogo,
-            filename: supplierLogo.split('/').last,
-          ),
-        ),
-      );
-    }
 
     var response = await BaseClient.postData(
       token: token,
