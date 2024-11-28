@@ -128,7 +128,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                                           ),
                                         ),
                                         AutoSizeText(
-                                          controller.employeeList[index].phone!,
+                                          controller.employeeList[index].phone,
                                           style: context.textTheme.bodyLarge
                                               ?.copyWith(
                                                   color: const Color(0xff7C7C7C),

@@ -67,6 +67,7 @@ dev_dependencies:
   logger:
   build_runner:
   hive_generator:
+  device_preview_plus:
 
 
 # For information on the generic Dart part of this file, see the

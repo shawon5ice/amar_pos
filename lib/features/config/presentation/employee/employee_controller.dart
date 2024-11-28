@@ -1,5 +1,6 @@
 import 'package:amar_pos/core/constants/logger/logger.dart';
 import 'package:amar_pos/core/widgets/methods/helper_methods.dart';
+import 'package:file_picker/file_picker.dart';
 import '../../data/model/employee/employee_list_response_model.dart';
 import 'package:amar_pos/features/config/data/service/employee_service.dart';
 import 'package:amar_pos/features/config/data/service/supplier_service.dart';
@@ -18,7 +19,15 @@ class EmployeeController extends GetxController {
   List<Employee> allEmployeeCopy = [];
   EmployeeListModelResponse? employeeListModelResponse;
 
+  String? fileName;
 
+  Future<void> selectFile() async {
+    final result = await FilePicker.platform.pickFiles();
+    if (result != null) {
+      fileName = result.files.single.path;
+      update(['image_picked']);
+    }
+  }
   void getAllEmployee() async {
     employeeListLoading = true;
     update(['employee_list']);

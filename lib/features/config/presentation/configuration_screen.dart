@@ -12,6 +12,7 @@ import 'package:amar_pos/features/config/presentation/unit/unit_screen.dart';
 import 'package:amar_pos/features/config/presentation/warranty/warranty_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../core/widgets/search_widget.dart';
 import '../../drawer/drawer_menu_controller.dart';
 import '../data/model/config_item.dart';
 import 'config_item_widget.dart';
@@ -81,31 +82,37 @@ class ConfigurationScreen extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           child: Column(
             children: [
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(20),
-                    )),
-                child: const TextField(
-                  decoration: InputDecoration(
-                    hintText: 'Search ...',
-                    prefixIcon: Icon(Icons.search),
-                    border: InputBorder.none,
-                    // contentPadding: EdgeInsets.zero
-                    // contentPadding: EdgeInsets.zero
-                  ),
-                ),
+              SearchWidget(
+                onChanged: (value) {
+                  // _controller.searchSupplier(search: value);
+                },
               ),
-              SizedBox(height: 16.px),
+              addH(16.h),
+              // Container(
+              //   padding: const EdgeInsets.symmetric(horizontal: 16),
+              //   decoration: const BoxDecoration(
+              //       color: Colors.white,
+              //       borderRadius: BorderRadius.all(
+              //         Radius.circular(20),
+              //       )),
+              //   child: const TextField(
+              //     decoration: InputDecoration(
+              //       hintText: 'Search ...',
+              //       prefixIcon: Icon(Icons.search),
+              //       border: InputBorder.none,
+              //       // contentPadding: EdgeInsets.zero
+              //       // contentPadding: EdgeInsets.zero
+              //     ),
+              //   ),
+              // ),
+              // SizedBox(height: 16),
               Expanded(
                 child: GridView.builder(
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
-                    mainAxisSpacing: 20.px,
-                    crossAxisSpacing: 20.px,
-                    childAspectRatio: 2.3.px,
+                    mainAxisSpacing: 20.pw(context),
+                    crossAxisSpacing: 20.pw(context),
+                    childAspectRatio: 2.28.px,
                   ),
                   itemCount: configItems.length,
                   itemBuilder: (context, index) {

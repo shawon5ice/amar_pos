@@ -34,8 +34,8 @@ class CustomButton extends StatelessWidget {
       onTap: onTap,
       child: Container(
         margin: EdgeInsets.symmetric(horizontal: marginHorizontal, vertical: marginVertical),
-        height: height.px,
-        width: width.px,
+        height: height.h,
+        width: width.w,
         decoration: BoxDecoration(
             color: color,
             borderRadius: const BorderRadius.all(Radius.circular(40))),
@@ -43,7 +43,7 @@ class CustomButton extends StatelessWidget {
           child: Text(
             text,
             style: context.textTheme.titleMedium
-                ?.copyWith(color: textColor),
+                ?.copyWith(color: textColor, fontSize: 16.px),
           ),
         ),
       ),
