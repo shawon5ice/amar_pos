@@ -1,6 +1,7 @@
 import 'package:amar_pos/core/constants/logger/logger.dart';
 import 'package:amar_pos/core/widgets/methods/helper_methods.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/cupertino.dart';
 import '../../data/model/employee/employee_list_response_model.dart';
 import 'package:amar_pos/features/config/data/service/employee_service.dart';
 import 'package:amar_pos/features/config/data/service/supplier_service.dart';
@@ -21,6 +22,7 @@ class EmployeeController extends GetxController {
 
   String? fileName;
 
+
   Future<void> selectFile() async {
     final result = await FilePicker.platform.pickFiles();
     if (result != null) {
@@ -28,6 +30,8 @@ class EmployeeController extends GetxController {
       update(['image_picked']);
     }
   }
+
+
   void getAllEmployee() async {
     employeeListLoading = true;
     update(['employee_list']);
@@ -80,6 +84,11 @@ class EmployeeController extends GetxController {
     required String name,
     required String phoneNo,
     required String address,
+    required int allowLogin,
+    String? photo,
+    String? email,
+    String? password,
+    String? confirmPassword,
   }) async {
     isAddEmployeeLoading = true;
     update(["employee_list"]);
@@ -90,7 +99,13 @@ class EmployeeController extends GetxController {
         name: name,
         phoneNo: phoneNo,
         address: address,
+        allowLogin: allowLogin,
+        email: email,
+        photo: photo,
+        password: password,
+        confirmPassword: confirmPassword,
       );
+      logger.e(response);
       if (response != null && response['success']) {
         if(response['success']){
           Get.back();
@@ -113,21 +128,27 @@ class EmployeeController extends GetxController {
     required String name,
     required String phoneNo,
     required String address,
-    required String balance,
-    required String supplierLogo,
+    required int allowLogin,
+    String? photo,
+    String? email,
+    String? password,
+    String? confirmPassword,
   }) async {
     isAddEmployeeLoading = true;
     update(["employee_list"]);
     EasyLoading.show();
     try{
-      var response = await SupplierService.update(
+      var response = await EmployeeService.update(
+        employeeId: employee.id,
         token: loginData!.token,
-        supplierId: employee.id,
-        supplierName: name,
+        name: name,
         phoneNo: phoneNo,
         address: address,
-        openingBalance: balance,
-        photo: supplierLogo
+        allowLogin: allowLogin,
+        email: email,
+        photo: photo,
+        password: password,
+        confirmPassword: confirmPassword,
       );
       if (response != null) {
 
@@ -154,9 +175,9 @@ class EmployeeController extends GetxController {
     update(["employee_list"]);
     EasyLoading.show();
     try{
-      var response = await SupplierService.delete(
+      var response = await EmployeeService.delete(
         token: loginData!.token,
-        supplierId: employee.id,
+        employeeId: employee.id,
       );
       if (response != null) {
 
@@ -176,16 +197,16 @@ class EmployeeController extends GetxController {
     EasyLoading.dismiss();
   }
 
-  void changeStatusOfSupplier({
-    required Employee supplier,
+  void changeStatusOfEmployee({
+    required Employee employee,
   }) async {
     isAddEmployeeLoading = true;
     update(["employee_list"]);
     EasyLoading.show();
     try{
-      var response = await SupplierService.changeStatus(
+      var response = await EmployeeService.changeStatus(
         token: loginData!.token,
-        supplierId: supplier.id,
+        employeeId: employee.id,
       );
       if (response != null) {
         if(response['success']){

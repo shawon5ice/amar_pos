@@ -1,19 +1,42 @@
+import 'package:amar_pos/core/core.dart';
+
 class BrandModelResponse {
   BrandModelResponse({
     required this.success,
-    required this.brandList,
+    required this.data,
   });
   late final bool success;
-  late final List<Brand> brandList;
+  late final Data data;
 
   BrandModelResponse.fromJson(Map<String, dynamic> json){
     success = json['success'];
-    brandList = List.from(json['data']).map((e)=>Brand.fromJson(e)).toList();
+    data = Data.fromJson(json['data']);
   }
 
   Map<String, dynamic> toJson() {
     final _data = <String, dynamic>{};
     _data['success'] = success;
+    _data['data'] = data.toJson();
+    return _data;
+  }
+}
+
+class Data {
+  Data({
+    required this.brandList,
+    required this.meta,
+  });
+  late final List<Brand> brandList;
+  late final Meta meta;
+
+  Data.fromJson(Map<String, dynamic> json){
+    meta = Meta.fromJson(json['meta']);
+    brandList = List.from(json['data']).map((e)=>Brand.fromJson(e)).toList();
+  }
+
+  Map<String, dynamic> toJson() {
+    final _data = <String, dynamic>{};
+    _data['meta'] = meta.toJson();
     _data['data'] = brandList.map((e)=>e.toJson()).toList();
     return _data;
   }

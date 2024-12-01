@@ -47,30 +47,30 @@ class Employee {
     required this.store,
     required this.name,
     required this.phone,
-    required this.email,
+    this.email,
     required this.address,
-    required this.allowLogin,
-    required this.dob,
-    required this.gender,
-    required this.maritalStatus,
-    required this.bloodGroup,
+    this.allowLogin,
+    this.dob,
+    this.gender,
+    this.maritalStatus,
+    this.bloodGroup,
     required this.photo,
-    required this.status,
+    this.status,
   });
   late final int id;
   late final String business;
   late final String store;
   late final String name;
   late final String phone;
-  late final String email;
+  late final String? email;
   late final String address;
-  late final String allowLogin;
-  late final String dob;
-  late final String gender;
-  late final String maritalStatus;
-  late final String bloodGroup;
+  late final String? allowLogin;
+  late final String? dob;
+  late final String? gender;
+  late final String? maritalStatus;
+  late final String? bloodGroup;
   late final String photo;
-  late final int status;
+  late final int? status;
 
   Employee.fromJson(Map<String, dynamic> json){
     id = json['id'];

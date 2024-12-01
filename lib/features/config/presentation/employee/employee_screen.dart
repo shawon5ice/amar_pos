@@ -152,20 +152,11 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                                 const Spacer(),
                                 // ActionDropDownWidget(),
                                 ActionMenu(
-                                  status: controller.employeeList[index].status,
+                                  status: controller.employeeList[index].status ?? 0,
                                   onSelected: (value) {
                                     switch(value){
                                       case "edit":
-                                        // showModalBottomSheet(
-                                        //   context: context,
-                                        //   isScrollControlled: true,
-                                        //   shape: const RoundedRectangleBorder(
-                                        //     borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                                        //   ),
-                                        //   builder: (context) {
-                                        //     return CreateSupplierBottomSheet(supplier: controller.employeeList[index],);
-                                        //   },
-                                        // );
+                                        Get.to(() => CreateUserScreen(user: controller.employeeList[index],), transition: Transition.fadeIn,);
                                         break;
                                       case "change-status":
                                         AwesomeDialog(
@@ -174,7 +165,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                                             title: "Are you sure?",
                                             desc: "You are going to ${controller.employeeList[index].status==1?'Deactivate':'Activate'} your supplier ${controller.employeeList[index].name}",
                                             btnOkOnPress: (){
-                                              controller.changeStatusOfSupplier(supplier: controller.employeeList[index]);
+                                              controller.changeStatusOfEmployee(employee: controller.employeeList[index]);
                                             },
                                             btnCancelOnPress: (){
                                             }
@@ -221,7 +212,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
         marginHorizontal: 20,
         marginVertical: 10,
         onTap: () {
-          Get.to(() => CreateUserScreen(), transition: Transition.zoom);
+          Get.to(() => CreateUserScreen(), transition: Transition.fadeIn);
         },
       ),
     );

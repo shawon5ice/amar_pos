@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:amar_pos/core/constants/app_assets.dart';
+import 'package:amar_pos/core/constants/logger/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -34,6 +37,7 @@ class ErrorExtractor {
   /// Shows a dialog with the extracted error messages.
   static Future<void> showErrorDialog(
       BuildContext context, Map<String, dynamic> response, ) async {
+    logger.i(response);
     final errorMessages = extractErrorMessages(response);
 
     var widgets = getListOfTextWidget(errorMessages);

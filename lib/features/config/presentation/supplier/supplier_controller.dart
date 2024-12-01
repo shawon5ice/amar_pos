@@ -27,7 +27,7 @@ class SupplierController extends GetxController {
       if (response != null) {
         logger.d(response);
         supplierListResponseModel = SupplierListResponseModel.fromJson(response);
-        supplierList = supplierListResponseModel!.supplierList;
+        supplierList = supplierListResponseModel!.data.supplierList;
         allSupplierCopy = supplierList;
       }
     }catch(e){

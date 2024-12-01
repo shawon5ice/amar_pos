@@ -24,17 +24,38 @@ class EmployeeService {
     required String phoneNo,
     required String address,
     required String token,
+    required int allowLogin,
+    String? photo,
+    String? email,
+    String? password,
+    String? confirmPassword,
   }) async {
 
     FormData formData = FormData.fromMap({
       "name": name,
-      "phone_no": phoneNo,
+      "phone": phoneNo,
       "address": address,
+      "allow_login": allowLogin,
+      "email": email,
+      "password": password,
+      "password_confirmation": confirmPassword,
     });
+
+    if (photo != null && !photo.contains("http")) {
+      formData.files.add(
+        MapEntry(
+          "photo",
+          await MultipartFile.fromFile(
+            photo,
+            filename: photo.split('/').last, // Add file name
+          ),
+        ),
+      );
+    }
 
     var response = await BaseClient.postData(
       token: token,
-      api: NetWorkStrings.addSupplier,
+      api: NetWorkStrings.addEmployee,
       body: formData,
     );
     return response;
@@ -62,66 +83,70 @@ class EmployeeService {
   }
 
   static Future<dynamic> update({
-    required String supplierName,
+    required int employeeId,
+    required String name,
     required String phoneNo,
     required String address,
-    required String openingBalance,
-    required String photo,
-    required int supplierId,
     required String token,
+    required int allowLogin,
+    String? photo,
+    String? email,
+    String? password,
+    String? confirmPassword,
   }) async {
 
-    late FormData formData;
-    if(!photo.contains("http") && photo.isNotEmpty){
-      formData = FormData.fromMap({
-        "name": supplierName,
-        "phone_no": phoneNo,
-        "address": address,
-        "opening_balance": openingBalance,
-        "photo": await MultipartFile.fromFile(
-          photo,
-          filename: photo.split('/').last,
-        )
-      });
-    }else{
-      formData = FormData.fromMap({
-        "name": supplierName,
-        "phone_no": phoneNo,
-        "address": address,
-        "opening_balance": openingBalance,
-      });
+    FormData formData = FormData.fromMap({
+      "name": name,
+      "phone": phoneNo,
+      "address": address,
+      "allow_login": allowLogin,
+      "email": email,
+      "password": password,
+      "password_confirmation": confirmPassword,
+    });
+
+    if (photo != null && !photo.contains("http")) {
+      formData.files.add(
+        MapEntry(
+          "photo",
+          await MultipartFile.fromFile(
+            photo,
+            filename: photo.split('/').last, // Add file name
+          ),
+        ),
+      );
     }
 
 
     var response = await BaseClient.postData(
       token: token,
-      api: "${NetWorkStrings.updateSupplier}$supplierId",
+      api: "${NetWorkStrings.updateEmployee}$employeeId",
       body: formData,
     );
     return response;
   }
 
   static Future<dynamic> delete({
-    required int supplierId,
+    required int employeeId,
     required String token,
   }) async {
 
     var response = await BaseClient.deleteData(
       token: token,
-      api: "${NetWorkStrings.deleteSupplier}$supplierId",
+      api: "${NetWorkStrings.deleteEmployee}$employeeId",
     );
     logger.e(response);
     return response;
   }
 
   static Future<dynamic> changeStatus({
-    required int supplierId,
+    required int employeeId,
     required String token,
   }) async {
 
     var response = await BaseClient.getData(
       token: token,
-      api: "${NetWorkStrings.changeStatusOfSupplier}$supplierId",
+      api: "${NetWorkStrings.changeStatusOfEmployee}$employeeId",
     );
     logger.e(response);
     return response;

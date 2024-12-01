@@ -1,19 +1,45 @@
+import 'package:amar_pos/core/core.dart';
+
 class SupplierListResponseModel {
   SupplierListResponseModel({
     required this.success,
-    required this.supplierList,
+    required this.data,
   });
   late final bool success;
-  late final List<Supplier> supplierList;
+  late final Data data;
 
   SupplierListResponseModel.fromJson(Map<String, dynamic> json){
     success = json['success'];
-    supplierList = List.from(json['data']).map((e)=>Supplier.fromJson(e)).toList();
+    data = Data.fromJson(json['data']);
   }
 
   Map<String, dynamic> toJson() {
     final _data = <String, dynamic>{};
     _data['success'] = success;
+    _data['data'] = data.toJson();
+    return _data;
+  }
+}
+
+
+
+class Data {
+  Data({
+    required this.supplierList,
+    required this.meta,
+
+  });
+  late final List<Supplier> supplierList;
+  late final Meta meta;
+
+  Data.fromJson(Map<String, dynamic> json){
+    meta = Meta.fromJson(json['meta']);
+    supplierList = List.from(json['data']).map((e)=>Supplier.fromJson(e)).toList();
+  }
+
+  Map<String, dynamic> toJson() {
+    final _data = <String, dynamic>{};
+    _data['meta'] = meta.toJson();
     _data['data'] = supplierList.map((e)=>e.toJson()).toList();
     return _data;
   }

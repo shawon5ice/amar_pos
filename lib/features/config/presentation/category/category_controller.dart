@@ -26,7 +26,7 @@ class CategoryController extends GetxController {
       if (response != null) {
         logger.d(response);
         categoryModelResponse = CategoryModelResponse.fromJson(response);
-        categoryList = categoryModelResponse!.categoryList;
+        categoryList = categoryModelResponse!.data.categoryList;
         allCategoryCopy = categoryList;
       }
     }catch(e){

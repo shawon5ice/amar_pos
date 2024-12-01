@@ -31,7 +31,7 @@ class BrandController extends GetxController {
       if (response != null) {
         logger.d(response);
         brandModelResponse = BrandModelResponse.fromJson(response);
-        brandList = brandModelResponse!.brandList;
+        brandList = brandModelResponse!.data.brandList;
         allBrandCopy = brandList;
       }
     }catch(e){
