@@ -1,6 +1,10 @@
 import 'dart:io';
 
+import 'package:amar_pos/core/constants/app_colors.dart';
+import 'package:amar_pos/core/constants/app_strings.dart';
 import 'package:amar_pos/features/config/data/model/employee/employee_list_response_model.dart';
+import 'package:amar_pos/features/config/data/model/employee/outlet_list_dd_response_model.dart';
+import 'package:amar_pos/features/config/data/model/outlet/outlet_list_model_response.dart';
 import 'package:amar_pos/features/config/presentation/employee/employee_controller.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:file_picker/file_picker.dart';
@@ -61,7 +65,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
     dob = TextEditingController();
     gender = TextEditingController();
     maritalStatus = TextEditingController();
-
+    controller.getAllOutletForDD(employee: widget.user);
     if (widget.user != null) {
       name.text = widget.user!.name;
       phoneNo.text = widget.user!.phone;
@@ -87,18 +91,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
     maritalStatus.dispose();
   }
 
-
-  final List<String> items = [
-    'Apple',
-    'Banana',
-    'Grapes',
-    'Orange',
-    'Pineapple',
-    'Strawberry',
-    'Watermelon',
-  ];
-
-  String? selectedItem;
+  final TextEditingController textEditingController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -188,6 +181,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                           addH(8.h),
                           CustomTextField(
                             textCon: pass,
+                            isPassField: true,
                             hintText: "Type password here...",
                             validator: (value) =>
                                 allowLogin ? FieldValidator.nonNullableFieldValidator(
@@ -199,6 +193,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                           CustomTextField(
                             textCon: confirmPass,
                             hintText: "Retype password here...",
+                            isPassField: true,
                             validator: (value) =>
                             allowLogin ? FieldValidator.nonNullableFieldValidator(
                                 value, "Confirm password") : null,
@@ -241,7 +236,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                                         )
                                       : Padding(
                                           padding: const EdgeInsets.all(8.0),
-                                          child: !fileName!.contains('https://')
+                                          child: fileName!.contains('https://') && widget.user!=null
                                               ? Image.network(
                                                   widget.user!.photo)
                                               : Image.file(
@@ -260,79 +255,114 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                 ),
               ),
               addH(20.h),
-              DropdownButtonHideUnderline(
-                child: DropdownButton2(
-                  isExpanded: true,
-                  hint: Text(
-                    'Select an item',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Theme.of(context).hintColor,
-                    ),
-                  ),
-                  items: items
-                      .map((item) => DropdownMenuItem<String>(
-                    value: item,
-                    child: Text(
-                      item,
-                      style: const TextStyle(
-                        fontSize: 16,
-                      ),
-                    ),
-                  ))
-                      .toList(),
-                  value: selectedItem,
-                  onChanged: (value) {
-                    setState(() {
-                      selectedItem = value as String?;
-                    });
-                  },
-                  buttonStyleData: const ButtonStyleData(
-                    height: 50,
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                  ),
-                  dropdownStyleData: DropdownStyleData(
-                    maxHeight: 200,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(14),
-                      color: Colors.white,
-                    ),
-                  ),
-                  menuItemStyleData: const MenuItemStyleData(
-                    height: 40,
-                  ),
-                  dropdownSearchData: DropdownSearchData(
-                    searchController: TextEditingController(),
-                    searchInnerWidgetHeight: 50,
-                    searchInnerWidget: Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: TextFormField(
-                        decoration: InputDecoration(
-                          isDense: true,
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 8,
-                          ),
-                          hintText: 'Search...',
-                          hintStyle: const TextStyle(fontSize: 14),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 20),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(Radius.circular(20))
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const FieldTitle("Select Outlet"),
+                    addH(8),
+                    GetBuilder<EmployeeController>(
+                      id: 'outlet_dd',
+                      builder: (controller) => DropdownButtonHideUnderline(
+                      child: DropdownButton2<OutletDD>(
+                        isExpanded: true,
+                        hint: Text(
+                          controller.outlets.isEmpty ? 'Loading...' : controller.outletListDDResponseModel == null ? AppStrings.kWentWrong : 'Select an outlet...',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Theme.of(context).hintColor,
                           ),
                         ),
+                        items: controller.outlets
+                            .map((item) => DropdownMenuItem(
+                          value: item,
+                          child: Text(
+                            item.name,
+                            style: const TextStyle(
+                              fontSize: 14,
+                            ),
+                          ),
+                        ))
+                            .toList(),
+                        value: controller.selectedOutlet,
+                        onChanged: (value) {
+                          setState(() {
+                            controller.selectedOutlet = value;
+                          });
+                        },
+                        buttonStyleData: ButtonStyleData(
+                          height: 58,
+                          decoration: BoxDecoration(
+                              border: Border.all(color: AppColors.inputBorderColor),
+                              borderRadius: const BorderRadius.all(Radius.circular(8))
+                          ),
+                          // width: 200,
+                        ),
+                        dropdownStyleData: const DropdownStyleData(
+                          maxHeight: 200,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.all(Radius.circular(8)),
+                          ),
+                        ),
+                        menuItemStyleData: const MenuItemStyleData(
+                          height: 40,
+                        ),
+                        dropdownSearchData: DropdownSearchData(
+                          searchController: textEditingController,
+                          searchInnerWidgetHeight: 58,
+                          searchInnerWidget: Container(
+                            height: 58,
+                            padding: const EdgeInsets.only(
+                              top: 8,
+                              bottom: 4,
+                              right: 8,
+                              left: 8,
+                            ),
+                            child: TextFormField(
+                              expands: true,
+                              maxLines: null,
+                              controller: textEditingController,
+                              validator: (value){
+                                if(controller.selectedOutlet == null){
+                                  return "Please select an outlet";
+                                }
+                                return null;
+                              },
+                              decoration: InputDecoration(
+                                isDense: true,
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 8,
+                                ),
+                                hintText: 'Search for an item...',
+                                hintStyle: const TextStyle(fontSize: 12),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            ),
+                          ),
+                          searchMatchFn: (item, searchValue) {
+                            return item.value!.name.toString().contains(searchValue);
+                          },
+                        ),
+                        //This to clear the search value when you close the menu
+                        onMenuStateChange: (isOpen) {
+                          if (!isOpen) {
+                            textEditingController.clear();
+                          }
+                        },
                       ),
-                    ),
-                    searchMatchFn: (item, searchValue) {
-                      return item.value.toString().toLowerCase().contains(searchValue.toLowerCase());
-                    },
-                  ),
-                  //This to clear the search value when you close the dropdown
-                  onMenuStateChange: (isOpen) {
-                    if (!isOpen) {
-                      // DropdownButton2;
-                    }
-                  },
+                    ),)
+                  ],
                 ),
-              ),
+              )
             ],
           ),
         ),

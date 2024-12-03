@@ -19,12 +19,24 @@ class EmployeeService {
     return response;
   }
 
+  static Future<dynamic> getAllOutletDD({
+    required String usrToken,
+  }) async {
+    var response = await BaseClient.getData(
+      token: usrToken,
+      api: NetWorkStrings.getAllOutletsDD,
+    );
+    return response;
+  }
+
+
   static Future<dynamic> store({
     required String name,
     required String phoneNo,
     required String address,
     required String token,
     required int allowLogin,
+    required int storeId,
     String? photo,
     String? email,
     String? password,
@@ -39,6 +51,7 @@ class EmployeeService {
       "email": email,
       "password": password,
       "password_confirmation": confirmPassword,
+      "store_id": storeId,
     });
 
     if (photo != null && !photo.contains("http")) {
@@ -89,6 +102,7 @@ class EmployeeService {
     required String address,
     required String token,
     required int allowLogin,
+    required int storeId,
     String? photo,
     String? email,
     String? password,
@@ -103,6 +117,7 @@ class EmployeeService {
       "email": email,
       "password": password,
       "password_confirmation": confirmPassword,
+      "store_id": storeId,
     });
 
     if (photo != null && !photo.contains("http")) {

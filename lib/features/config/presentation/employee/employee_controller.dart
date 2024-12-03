@@ -1,5 +1,7 @@
 import 'package:amar_pos/core/constants/logger/logger.dart';
 import 'package:amar_pos/core/widgets/methods/helper_methods.dart';
+import 'package:amar_pos/features/config/data/model/employee/outlet_list_dd_response_model.dart';
+import 'package:amar_pos/features/config/data/model/outlet/outlet_list_model_response.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import '../../data/model/employee/employee_list_response_model.dart';
@@ -18,6 +20,11 @@ class EmployeeController extends GetxController {
 
   List<Employee> employeeList = [];
   List<Employee> allEmployeeCopy = [];
+
+  List<OutletDD> outlets = [];
+  OutletDD? selectedOutlet;
+  OutletListDDResponseModel? outletListDDResponseModel;
+
   EmployeeListModelResponse? employeeListModelResponse;
 
   String? fileName;
@@ -29,6 +36,27 @@ class EmployeeController extends GetxController {
       fileName = result.files.single.path;
       update(['image_picked']);
     }
+  }
+
+  Future<void> getAllOutletForDD({Employee? employee}) async {
+    selectedOutlet = null;
+    update(['outlet_dd']);
+    try{
+      var response = await EmployeeService.getAllOutletDD(usrToken: loginData!.token);
+      if (response != null) {
+        logger.d(response);
+        outletListDDResponseModel = OutletListDDResponseModel.fromJson(response);
+        outlets = outletListDDResponseModel!.outletDDList;
+      }
+    }catch(e){
+      logger.e(e);
+    }finally{
+      if(employee != null){
+        selectedOutlet = outlets.singleWhere((e) => e.name == employee.store);
+      }
+      update(['outlet_dd']);
+    }
+
   }
 
 
@@ -90,6 +118,10 @@ class EmployeeController extends GetxController {
     String? password,
     String? confirmPassword,
   }) async {
+    if(selectedOutlet == null){
+      Methods.showSnackbar(msg: "Please select an outlet",isSuccess: null);
+      return;
+    }
     isAddEmployeeLoading = true;
     update(["employee_list"]);
     EasyLoading.show();
@@ -104,6 +136,7 @@ class EmployeeController extends GetxController {
         photo: photo,
         password: password,
         confirmPassword: confirmPassword,
+        storeId: selectedOutlet!.id,
       );
       logger.e(response);
       if (response != null && response['success']) {
@@ -134,6 +167,10 @@ class EmployeeController extends GetxController {
     String? password,
     String? confirmPassword,
   }) async {
+    if(selectedOutlet == null){
+      Methods.showSnackbar(msg: "Please select an outlet",isSuccess: null);
+      return;
+    }
     isAddEmployeeLoading = true;
     update(["employee_list"]);
     EasyLoading.show();
@@ -149,6 +186,7 @@ class EmployeeController extends GetxController {
         photo: photo,
         password: password,
         confirmPassword: confirmPassword,
+        storeId: selectedOutlet!.id
       );
       if (response != null) {
 

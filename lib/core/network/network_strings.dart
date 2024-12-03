@@ -33,6 +33,7 @@ class NetWorkStrings{
   //Employee
   static const String getAllPermissions = "get-all-permissions";
   static const String getAllEmployees = "business_user/get-users";
+  static const String getAllOutletsDD = "outlet/get-outlet-list";
   static const String getSingleEmployees = "business_user/get-user/";
   static const String addEmployee = "business_user/store";
   static const String updateEmployee = "business_user/update/";
