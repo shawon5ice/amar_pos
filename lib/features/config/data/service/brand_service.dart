@@ -1,3 +1,5 @@
+import 'package:amar_pos/core/constants/logger/logger.dart';
+
 import '../../../../core/network/base_client.dart';
 import '../../../../core/network/network_strings.dart';
 import 'package:dio/dio.dart';
@@ -53,6 +55,7 @@ class BrandService {
     });
 
     if (brandLogo != null && !brandLogo.contains("http")) {
+      logger.d("HELLO MF");
       formData.files.add(
         MapEntry(
           "logo",

@@ -12,7 +12,7 @@ import 'core/theme/app_theme.dart';
 import 'package:device_preview_plus/device_preview_plus.dart';
 import 'features/splash/splash_screen.dart';
 
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final directory = await getApplicationDocumentsDirectory();
   Hive.init(directory.path);
@@ -30,7 +30,6 @@ void main() async{
   );
 }
 
-
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
@@ -44,7 +43,15 @@ class MyApp extends StatelessWidget {
       // initialBinding: InitialBinding(),
       theme: AppTheme(context).getLightTheme(),
       // darkTheme: AppTheme(context).getDarkTheme(),
-      builder: EasyLoading.init(),
+      builder: EasyLoading.init(builder: (context, child) {
+        return GestureDetector(
+          onTap: () {
+            FocusManager.instance.primaryFocus?.unfocus();
+          },
+          behavior: HitTestBehavior.opaque,
+          child: child,
+        );
+      }),
       // home: DrawerSetup(),
     );
   }

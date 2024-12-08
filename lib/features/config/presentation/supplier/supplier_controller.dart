@@ -71,7 +71,7 @@ class SupplierController extends GetxController {
     required String name,
     required String phoneNo,
     required String address,
-    required num balance,
+    required String balance,
     required String? supplierLogo,
   }) async {
     isAddSupplierLoading = true;
@@ -121,7 +121,7 @@ class SupplierController extends GetxController {
         supplierName: name,
         phoneNo: phoneNo,
         address: address,
-        openingBalance: balance,
+        openingBalance: num.parse(balance) != supplier.openingBalance? balance : null ,
         photo: supplierLogo
       );
       if (response != null) {

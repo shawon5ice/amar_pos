@@ -24,6 +24,7 @@ class CustomTextField extends StatefulWidget {
   bool? enabledFlag;
   String? errorText;
   int? maxLine;
+  int? maxLength;
   FocusNode? focusNode;
   List<TextInputFormatter>? inputFormatters;
   bool? isCenterAlign;
@@ -49,6 +50,7 @@ class CustomTextField extends StatefulWidget {
     this.disableClr,
     this.txtClr,
     this.brdrClr,
+    this.maxLength,
     this.brdrRadius,
     this.txtSize,
     this.onCngdFn,
@@ -83,6 +85,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
       focusNode: widget.focusNode,
       inputFormatters: widget.inputFormatters,
       validator: widget.validator,
+      maxLength: widget.maxLength,
       textAlign: widget.isCenterAlign != null? TextAlign.center: TextAlign.start,
       style: TextStyle(
         fontSize: widget.txtSize ?? 12,

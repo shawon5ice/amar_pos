@@ -99,7 +99,11 @@ class BaseClient {
         queryParameters: parameter,
       );
       logger.i('GET Response: ${response.statusCode}');
-      return response.data;
+      if(response.data['success']){
+        return response.data;
+      }else{
+        ErrorExtractor.showErrorDialog(Get.context!, response.data);
+      }
     } on DioException catch (error) {
       logger.e(error);
       _handleDioError(error);
@@ -127,6 +131,11 @@ class BaseClient {
             : null,
       );
       logger.i('POST Response: ${response.statusCode}');
+      if(response.data['success']){
+        return response.data;
+      }else{
+        ErrorExtractor.showErrorDialog(Get.context!, response.data);
+      }
       return response.data;
     } on DioException catch (error) {
       logger.e(error);
@@ -155,7 +164,11 @@ class BaseClient {
             : null,
       );
       logger.i('PUT Response: ${response.statusCode}');
-      return response.data;
+      if(response.data['success']){
+        return response.data;
+      }else{
+        ErrorExtractor.showErrorDialog(Get.context!, response.data);
+      }
     } on DioException catch (error) {
       logger.e(error);
       _handleDioError(error);
@@ -181,7 +194,11 @@ class BaseClient {
             : null,
       );
       logger.i('DELETE Response: ${response.statusCode}');
-      return response.data;
+      if(response.data['success']){
+        return response.data;
+      }else{
+        ErrorExtractor.showErrorDialog(Get.context!, response.data);
+      }
     } on DioException catch (error) {
       logger.e(error);
       _handleDioError(error);

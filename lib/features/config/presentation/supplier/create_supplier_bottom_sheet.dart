@@ -46,7 +46,10 @@ class _CreateSupplierBottomSheetState extends State<CreateSupplierBottomSheet> {
   }
 
   Future<void> selectFile() async {
-    final result = await FilePicker.platform.pickFiles();
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+
+    );
     if (result != null) {
       setState(() {
         fileName = result.files.single.path;
@@ -101,6 +104,7 @@ class _CreateSupplierBottomSheetState extends State<CreateSupplierBottomSheet> {
                     CustomTextField(
                       textCon: _nameTextEditingController,
                       hintText: "Type name here...",
+                      maxLength: 50,
                     ),
                     addH(16.h),
                     const FieldTitle(
@@ -120,6 +124,7 @@ class _CreateSupplierBottomSheetState extends State<CreateSupplierBottomSheet> {
                     CustomTextField(
                       textCon: _addressTextEditingController,
                       hintText: "Type address here...",
+                      maxLength: 250,
                     ),
                     addH(16.h),
                     const FieldTitle(
@@ -156,7 +161,7 @@ class _CreateSupplierBottomSheetState extends State<CreateSupplierBottomSheet> {
                                     size: 40, color: Colors.grey),
                                 SizedBox(height: 8),
                                 Text(
-                                  "Select brand logo",
+                                  "Select supplier logo",
                                   style: TextStyle(color: Colors.grey),
                                 ),
                               ],
@@ -191,7 +196,7 @@ class _CreateSupplierBottomSheetState extends State<CreateSupplierBottomSheet> {
                   _controller.addNewSupplier(
                     name: _nameTextEditingController.text,
                       phoneNo: _phoneNoTextEditingController.text,
-                      balance: _openingBalanceTextEditingController.text.isNotEmpty && _openingBalanceTextEditingController.text.toString().isNum ? num.parse(_openingBalanceTextEditingController.text) : 0,
+                      balance: _openingBalanceTextEditingController.text,
                       address: _addressTextEditingController.text,
                       supplierLogo: fileName
                   );

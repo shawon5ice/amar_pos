@@ -23,7 +23,7 @@ class SupplierService {
     required String name,
     required String phoneNo,
     required String address,
-    required num balance,
+    required String balance,
     required String? supplierLogo,
     required String token,
   }) async {
@@ -47,11 +47,14 @@ class SupplierService {
       );
     }
 
+    logger.d(formData.fields);
+
     var response = await BaseClient.postData(
       token: token,
       api: NetWorkStrings.addSupplier,
       body: formData,
     );
+    logger.e(response);
     return response;
   }
 
@@ -80,33 +83,35 @@ class SupplierService {
     required String supplierName,
     required String phoneNo,
     required String address,
-    required String openingBalance,
+    String? openingBalance,
     required String photo,
     required int supplierId,
     required String token,
   }) async {
 
-    late FormData formData;
-    if(!photo.contains("http") && photo.isNotEmpty){
-      formData = FormData.fromMap({
-        "name": supplierName,
-        "phone_no": phoneNo,
-        "address": address,
-        "opening_balance": openingBalance,
-        "photo": await MultipartFile.fromFile(
-          photo,
-          filename: photo.split('/').last,
-        )
-      });
-    }else{
-      formData = FormData.fromMap({
-        "name": supplierName,
-        "phone_no": phoneNo,
-        "address": address,
-        "opening_balance": openingBalance,
-      });
-    }
 
+    FormData formData = FormData.fromMap({
+      "name": supplierName,
+      "phone_no": phoneNo,
+      "address": address,
+    });
+
+    if(openingBalance != null){
+      formData.fields.add(
+        MapEntry("opening_balance", openingBalance)
+      );
+    }
+    if (!photo.contains("http")) {
+      formData.files.add(
+        MapEntry(
+          "photo",
+          await MultipartFile.fromFile(
+            photo,
+            filename: photo.split('/').last, // Add file name
+          ),
+        ),
+      );
+    }
 
     var response = await BaseClient.postData(
       token: token,

@@ -63,7 +63,7 @@ class Supplier {
   late String? code ;
   late String? phone;
   late String? address;
-  late int? openingBalance;
+  late num? openingBalance;
   late String? photo;
   late int status;
 

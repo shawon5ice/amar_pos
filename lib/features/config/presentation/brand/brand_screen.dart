@@ -65,7 +65,7 @@ class _BrandScreenState extends State<BrandScreen> {
                       } else if (_brandController.brandList.isEmpty) {
                         return Center(
                           child: Text(
-                            "No Brand Added",
+                            "No Brand Found",
                             style: context.textTheme.titleLarge,
                           ),
                         );

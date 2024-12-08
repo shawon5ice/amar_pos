@@ -33,6 +33,12 @@ class SearchWidget extends StatelessWidget {
           Expanded(
             child: TextField(
               onChanged: onChanged,
+              onEditingComplete: (){
+                FocusManager.instance.primaryFocus?.unfocus();
+              },
+              onSubmitted: (v){
+                FocusManager.instance.primaryFocus?.unfocus();
+              },
               decoration: InputDecoration(
                 hintText: hintText,
                 isDense: true,
