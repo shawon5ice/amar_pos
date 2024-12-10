@@ -37,6 +37,8 @@ class AppAssets {
   static const String threeDotMenu = "assets/configuration/three_dot_menu.svg";
 
 
+
+
   static List<String> get configurationAssets => [
     brandsIcon,
     categoryIcon,
