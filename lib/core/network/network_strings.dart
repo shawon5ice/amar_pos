@@ -64,4 +64,11 @@ class NetWorkStrings{
   static const String updateCustomer = "customer/update/";
   static const String deleteCustomer = "customer/delete/";
   static const String changeStatusOfCustomer = "customer/change-status/";
+
+
+
+  //Inventory
+  //Products
+//Brand
+  static const String getAllProducts = "product/get-products";
 }

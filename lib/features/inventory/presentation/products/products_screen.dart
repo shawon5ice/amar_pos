@@ -1,17 +1,31 @@
+import 'package:amar_pos/core/widgets/pager_list_view.dart';
+import 'package:amar_pos/features/inventory/presentation/products/product_controller.dart';
 import 'package:flutter/material.dart';
-
+import 'package:get/get.dart';
 import '../../../../core/responsive/pixel_perfect.dart';
-import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/search_widget.dart';
 
-class ProductsScreen extends StatelessWidget {
+class ProductsScreen extends StatefulWidget {
   const ProductsScreen({super.key});
+
+  @override
+  State<ProductsScreen> createState() => _ProductsScreenState();
+}
+
+class _ProductsScreenState extends State<ProductsScreen> {
+  final ProductController controller = Get.put(ProductController());
+
+  @override
+  void initState() {
+    controller.getAllProducts(activeStatus: true, page: 1);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Brands"),
+        title: const Text("Products"),
         centerTitle: true,
       ),
       body: SafeArea(
@@ -21,128 +35,65 @@ class ProductsScreen extends StatelessWidget {
             children: [
               SearchWidget(
                 onChanged: (value) {
-                  _brandController.searchBrand(search: value);
+                  // _brandController.searchBrand(search: value);
                 },
               ),
               addH(16.px),
-              // Expanded(
-              //   child: Container(
-              //     decoration: const BoxDecoration(
-              //         color: Colors.white,
-              //         borderRadius: BorderRadius.all(Radius.circular(20))),
-              //     padding:
-              //     const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-              //     child: GetBuilder<BrandController>(
-              //       id: "brand_list",
-              //       builder: (controller) {
-              //         if (_brandController.branListLoading) {
-              //           return const Center(
-              //             child: CircularProgressIndicator(),
-              //           );
-              //         } else if (_brandController.brandModelResponse == null) {
-              //           return const Center(
-              //               child: Text("Something went wrong"));
-              //         } else if (_brandController.brandList.isEmpty) {
-              //           return Center(
-              //             child: Text(
-              //               "No Brand Found",
-              //               style: context.textTheme.titleLarge,
-              //             ),
-              //           );
-              //         }
-              //         return ListView.separated(
-              //           itemCount: _brandController.brandList.length,
-              //           separatorBuilder: (context, index) {
-              //             if (index == _brandController.brandList.length - 1) {
-              //               return const SizedBox.shrink();
-              //             } else {
-              //               return const Divider(
-              //                 color: Colors.grey,
-              //               );
-              //             }
-              //           },
-              //           itemBuilder: (context, index) => ListTile(
-              //             contentPadding: EdgeInsets.zero,
-              //             leading: ClipRRect(
-              //               borderRadius: const BorderRadius.all(
-              //                 Radius.circular(8),
-              //               ),
-              //               child: Image.network(
-              //                 controller.brandList[index].logo,
-              //                 fit: BoxFit.cover,
-              //                 width: 40,
-              //                 height: 40,
-              //               ),
-              //             ),
-              //             title: Text(
-              //               controller.brandList[index].name,
-              //               style: context.textTheme.titleSmall?.copyWith(
-              //                   color: Colors.black,
-              //                   fontWeight: FontWeight.w500,
-              //                   fontSize: 16.px,
-              //                   height: (22 / 16).px),
-              //             ),
-              //             trailing: Row(
-              //               mainAxisSize: MainAxisSize.min,
-              //               children: [
-              //                 InkWell(
-              //                   onTap: () {
-              //                     showModalBottomSheet(
-              //                       context: context,
-              //                       isScrollControlled: true,
-              //                       shape: const RoundedRectangleBorder(
-              //                         borderRadius: BorderRadius.vertical(
-              //                             top: Radius.circular(20)),
-              //                       ),
-              //                       builder: (context) {
-              //                         return CreateBrandBottomSheet(
-              //                           brand:
-              //                           _brandController.brandList[index],
-              //                         );
-              //                       },
-              //                     );
-              //                   },
-              //                   child: SvgPicture.asset(AppAssets.editIcon),
-              //                 ),
-              //                 const SizedBox(
-              //                   width: 8,
-              //                 ),
-              //                 InkWell(
-              //                   onTap: () {
-              //                     _brandController.deleteBrand(
-              //                         brand: _brandController.brandList[index]);
-              //                   },
-              //                   child: SvgPicture.asset(AppAssets.deleteIcon),
-              //                 ),
-              //               ],
-              //             ),
-              //           ),
-              //         );
-              //       },
-              //     ),
-              //   ),
-              // ),
+              Expanded(
+                child:GetBuilder<ProductController>(
+                        id: 'product_list',
+                        builder: (controller) {
+                          if(controller.isProductListLoading){
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                          return PagerListView(
+                            items: controller.productList,
+                            itemBuilder: (_, item) {
+                              return Container(
+                                margin: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                                height: 200,
+                                color: Colors.red,
+                                width: 100,
+                              );
+                            },
+                            isLoading: controller.isLoadingMore,
+                            hasError: controller.hasError,
+                            onNewLoad: (int nextPage) async {
+                              await controller.getAllProducts(
+                                  activeStatus: true, page: nextPage);
+                            },
+                            totalPage: controller
+                                .productsListResponseModel?.data.meta.lastPage??0,
+                            totalSize: controller
+                                .productsListResponseModel?.data.meta.total??0,
+                            itemPerPage: 4,
+                          );
+                        },
+                      ),
+              )
             ],
           ),
         ),
       ),
-      bottomNavigationBar: CustomButton(
-        text: "Add New Brand",
-        marginHorizontal: 20,
-        marginVertical: 10,
-        onTap: () {
-          showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-            ),
-            builder: (context) {
-              return const CreateBrandBottomSheet();
-            },
-          );
-        },
-      ),
+      // bottomNavigationBar: CustomButton(
+      //   text: "Add New Brand",
+      //   marginHorizontal: 20,
+      //   marginVertical: 10,
+      //   onTap: () {
+      //     showModalBottomSheet(
+      //       context: context,
+      //       isScrollControlled: true,
+      //       shape: const RoundedRectangleBorder(
+      //         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      //       ),
+      //       builder: (context) {
+      //         return const CreateBrandBottomSheet();
+      //       },
+      //     );
+      //   },
+      // ),
     );
   }
 }

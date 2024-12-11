@@ -16,7 +16,9 @@ import 'package:flutter/material.dart';
 class LoginScreen extends GetView<AuthController> {
   static String routeName = '/login_screen';
 
-  const LoginScreen({super.key});
+  LoginScreen({super.key});
+
+  final formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +40,7 @@ class LoginScreen extends GetView<AuthController> {
               children: [
                 Obx(() => AuthHeader(title: "Sign In", error: controller.message.value,),),
                 Form(
-                  key: controller.formKey,
+                  key: formKey,
                   child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: 30.w),
                     child: Column(
@@ -155,7 +157,11 @@ class LoginScreen extends GetView<AuthController> {
                         CustomBtn(
                           btnColor: AppColors.accent,
                           onPressedFn: () {
-                            controller.signIn();
+                            if(!formKey.currentState!.validate()){
+                              return;
+                            }else{
+                              controller.signIn();
+                            }
                           },
                           btnTxt: 'Sign In',
                           txtSize: 18,

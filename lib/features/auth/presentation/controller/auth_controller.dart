@@ -25,7 +25,6 @@ class AuthController extends GetxController{
 
   bool rememberMeFlag  = false;
 
-  late final formKey;
   late final TextEditingController emailController;
   late final TextEditingController passwordController;
   late final TextEditingController phoneCon;
@@ -49,7 +48,6 @@ class AuthController extends GetxController{
 
   @override
   void onInit() {
-    formKey = GlobalKey<FormState>();
     emailController = TextEditingController();
     passwordController = TextEditingController();
     phoneCon = TextEditingController();
@@ -75,7 +73,6 @@ class AuthController extends GetxController{
     emailFocus.dispose();
     passwordFocus.dispose();
 
-    formKey = null;
     super.dispose();
   }
   void handleRememberMe({bool? remember}){
@@ -94,9 +91,7 @@ class AuthController extends GetxController{
   }
 
   void signIn() async {
-    if(!formKey.currentState!.validate()){
-      return;
-    }
+    isLoggedIn.value = false;
     FocusManager.instance.primaryFocus?.unfocus();
     saveOrNot();
     message.value = '';
@@ -121,6 +116,8 @@ class AuthController extends GetxController{
         // Preference.setLoginData(signInResponse!.loginData);
 
         logger.d(LoginDataBoxManager().loginData?.permissions.length);
+      }else{
+
       }
     } finally {
       if(message.isNotEmpty){
