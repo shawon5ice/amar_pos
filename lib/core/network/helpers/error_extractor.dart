@@ -28,7 +28,7 @@ class ErrorExtractor {
               color: Colors.white,
               fontSize: 14,
             ),
-            textAlign: TextAlign.start,
+            textAlign: TextAlign.center,
           ),
         )
         .toList();

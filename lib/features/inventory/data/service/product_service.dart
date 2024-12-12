@@ -10,13 +10,14 @@ class ProductService {
     required bool activeStatus,
     required int page,
   }) async {
+    logger.d("Page: $page");
     var response = await BaseClient.getData(
       token: usrToken,
       api: NetWorkStrings.getAllProducts,
       parameter: {
         "status" : activeStatus ? 1 : 0,
         "page": page,
-        "limit": 4,
+        "limit": 10,
       }
     );
     return response;

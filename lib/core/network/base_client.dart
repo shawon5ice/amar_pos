@@ -59,9 +59,15 @@ class BaseClient {
         errorMessage = "Failed to connect to the server. Please check your internet connection.";
         break;
     }
+    Map<String, dynamic> errorM = {
+      'errors': {
+        'x': [errorMessage],
+      },
+    };
     if(error.response?.statusCode != 422){
+      ErrorExtractor.showErrorDialog(Get.context!, errorM);
       NetWorkStrings.errorMessage = errorMessage;
-      Methods.showSnackbar(msg: errorMessage, duration: 3);
+      // Methods.showSnackbar(msg: errorMessage, duration: 3);
     }
 
   }
