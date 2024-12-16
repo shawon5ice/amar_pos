@@ -49,33 +49,35 @@ class Employee {
     required this.phone,
     this.email,
     required this.address,
-    this.allowLogin,
+    required this.allowLogin,
     this.dob,
     this.gender,
     this.maritalStatus,
     this.bloodGroup,
+    this.designation,
     required this.photo,
-    this.status,
+    required this.status,
   });
   late final int id;
-  late final String business;
-  late final String store;
+  late final Business? business;
+  late final Store? store;
   late final String name;
   late final String phone;
   late final String? email;
   late final String address;
-  late final String? allowLogin;
+  late final int allowLogin;
   late final String? dob;
   late final String? gender;
   late final String? maritalStatus;
   late final String? bloodGroup;
+  late final String? designation;
   late final String photo;
-  late final int? status;
+  late final int status;
 
   Employee.fromJson(Map<String, dynamic> json){
     id = json['id'];
-    business = json['business'];
-    store = json['store'];
+    business = json['business'] is Map<String, dynamic> ? Business.fromJson(json['business']) : null;
+    store = json['store'] is Map<String, dynamic> ? Store.fromJson(json['store']) : null;
     name = json['name'];
     phone = json['phone'];
     email = json['email'];
@@ -83,8 +85,9 @@ class Employee {
     allowLogin = json['allow_login'];
     dob = json['dob'];
     gender = json['gender'];
-    maritalStatus = json['marital_status'];
-    bloodGroup = json['blood_group'];
+    maritalStatus = json['maritalStatus'];
+    bloodGroup = json['bloodGroup'];
+    designation = json['designation'];
     photo = json['photo'];
     status = json['status'];
   }
@@ -92,8 +95,8 @@ class Employee {
   Map<String, dynamic> toJson() {
     final _data = <String, dynamic>{};
     _data['id'] = id;
-    _data['business'] = business;
-    _data['store'] = store;
+    _data['business'] = business?.toJson();
+    _data['store'] = store?.toJson();
     _data['name'] = name;
     _data['phone'] = phone;
     _data['email'] = email;
@@ -103,8 +106,83 @@ class Employee {
     _data['gender'] = gender;
     _data['marital_status'] = maritalStatus;
     _data['blood_group'] = bloodGroup;
+    _data['designation'] = designation;
     _data['photo'] = photo;
     _data['status'] = status;
+    return _data;
+  }
+}
+
+class Business {
+  Business({
+    required this.id,
+    this.name,
+    this.phone,
+    this.email,
+    this.logo,
+    this.address,
+    this.currencyId,
+    this.ownerId,
+    this.timeZone,
+    this.photoUrl,
+  });
+  late final int id;
+  late final String? name;
+  late final String? phone;
+  late final String? email;
+  late final String? logo;
+  late final String? address;
+  late final int? currencyId;
+  late final int? ownerId;
+  late final String? timeZone;
+  late final String? photoUrl;
+
+  Business.fromJson(Map<String, dynamic> json){
+    id = json['id'];
+    name = json['name'];
+    phone = json['phone'];
+    email = json['email'];
+    logo = json['logo'];
+    address = json['address'];
+    currencyId = json['currency_id'];
+    ownerId = json['owner_id'];
+    timeZone = json['time_zone'];
+    photoUrl = json['photo_url'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final _data = <String, dynamic>{};
+    _data['id'] = id;
+    _data['name'] = name;
+    _data['phone'] = phone;
+    _data['email'] = email;
+    _data['logo'] = logo;
+    _data['address'] = address;
+    _data['currency_id'] = currencyId;
+    _data['owner_id'] = ownerId;
+    _data['time_zone'] = timeZone;
+    _data['photo_url'] = photoUrl;
+    return _data;
+  }
+}
+
+class Store {
+  Store({
+    required this.id,
+    required this.name,
+  });
+  late final int id;
+  late final String name;
+
+  Store.fromJson(Map<String, dynamic> json){
+    id = json['id'];
+    name = json['name'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final _data = <String, dynamic>{};
+    _data['id'] = id;
+    _data['name'] = name;
     return _data;
   }
 }
@@ -114,18 +192,15 @@ class Meta {
   Meta({
     required this.currentPage,
     required this.lastPage,
-    required this.perPage,
     required this.total,
   });
   late final int currentPage;
   late final int lastPage;
-  late final int perPage;
   late final int total;
 
   Meta.fromJson(Map<String, dynamic> json){
     currentPage = json['current_page'];
     lastPage = json['last_page'];
-    perPage = json['per_page'];
     total = json['total'];
   }
 
@@ -133,7 +208,6 @@ class Meta {
     final _data = <String, dynamic>{};
     _data['current_page'] = currentPage;
     _data['last_page'] = lastPage;
-    _data['per_page'] = perPage;
     _data['total'] = total;
     return _data;
   }

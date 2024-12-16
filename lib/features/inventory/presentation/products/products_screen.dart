@@ -1,10 +1,12 @@
 import 'package:amar_pos/core/constants/app_colors.dart';
 import 'package:amar_pos/core/widgets/pager_list_view.dart';
+import 'package:amar_pos/features/inventory/presentation/products/add_product_screen.dart';
 import 'package:amar_pos/features/inventory/presentation/products/product_controller.dart';
 import 'package:amar_pos/features/inventory/presentation/products/widgets/product_list_filter_bottom_sheet.dart';
 import 'package:amar_pos/features/inventory/presentation/products/widgets/product_list_item_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../../core/core.dart';
 import '../../../../core/responsive/pixel_perfect.dart';
 import '../../../../core/widgets/search_widget.dart';
 
@@ -24,6 +26,7 @@ class _ProductsScreenState extends State<ProductsScreen>
   @override
   void initState() {
     _tabController = TabController(length: 2, vsync: this);
+    controller.getCategoriesBrandWarrantyUnits();
     controller.getAllProducts(activeStatus: true, page: 1);
     _tabController.addListener(() {
       if (_tabController.index != _tabController.previousIndex) {
@@ -125,6 +128,12 @@ class _ProductsScreenState extends State<ProductsScreen>
             ],
           ),
         ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButton: CustomFloatingButton(
+        onTap: (){
+          Get.to(AddProductScreen());
+        },
       ),
     );
   }

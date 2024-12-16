@@ -23,6 +23,17 @@ class ProductService {
     return response;
   }
 
+
+  static Future<dynamic> getCategoriesBrandWarrantyUnits({
+    required String usrToken,
+  }) async {
+    var response = await BaseClient.getData(
+        token: usrToken,
+        api: NetWorkStrings.getProductCategoriesBrandsUnitsWarranties,
+    );
+    return response;
+  }
+
   static Future<dynamic> addBrand({
     required String brandName,
     String? brandLogo,

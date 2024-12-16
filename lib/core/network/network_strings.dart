@@ -71,4 +71,5 @@ class NetWorkStrings{
   //Products
 //Brand
   static const String getAllProducts = "product/get-products";
+  static const String getProductCategoriesBrandsUnitsWarranties = "product/get-categories-brands-units-warranties";
 }

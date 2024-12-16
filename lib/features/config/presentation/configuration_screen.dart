@@ -56,7 +56,7 @@ class ConfigurationScreen extends StatelessWidget {
     }),
     ConfigItem(
         title: "Employee", asset: AppAssets.employeeIcon, onPress: () {
-          Get.to(EmployeeScreen());
+          Get.to(()=> EmployeeScreen());
     }),
     ConfigItem(title: "Client", asset: AppAssets.clientIcon, onPress: () {
       Get.to(ClientScreen());

@@ -52,7 +52,7 @@ class EmployeeController extends GetxController {
       logger.e(e);
     }finally{
       if(employee != null){
-        selectedOutlet = outlets.singleWhere((e) => e.name == employee.store);
+        selectedOutlet = outlets.firstWhere((e) => e.id == employee.store?.id);
       }
       update(['outlet_dd']);
     }
@@ -61,6 +61,7 @@ class EmployeeController extends GetxController {
 
 
   void getAllEmployee() async {
+    logger.i("HELLO EMPLOYEE");
     employeeListLoading = true;
     update(['employee_list']);
     try{

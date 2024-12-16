@@ -53,6 +53,7 @@ dependencies:
   path_provider:
   auto_size_text_plus:
   dropdown_button2:
+  ai_barcode_scanner:
 
 dev_dependencies:
   flutter_test:

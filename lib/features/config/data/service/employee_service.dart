@@ -12,6 +12,7 @@ class EmployeeService {
   static Future<dynamic> getAll({
     required String usrToken,
   }) async {
+    logger.i("HHH");
     var response = await BaseClient.getData(
       token: usrToken,
       api: NetWorkStrings.getAllEmployees,

@@ -110,7 +110,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
         filled: widget.enabledFlag != null ? true : widget.fillClr != null,
         fillColor: widget.enabledFlag != null && widget.enabledFlag == false
             ? widget.disableClr??const Color(0xfff6f6f6)
-            : widget.fillClr,
+            : widget.fillClr ?? Colors.white,
         contentPadding: widget.maxLine !=null || widget.isCenterAlign != null?const EdgeInsets.all(15):const EdgeInsets.only(left: 15),
         border: getInputBorder(),
         enabledBorder: getInputBorder(),
