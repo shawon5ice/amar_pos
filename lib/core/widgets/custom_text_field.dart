@@ -12,6 +12,7 @@ class CustomTextField extends StatefulWidget {
   Widget? suffixWidget;
   final String hintText;
   bool? isPassField;
+  bool? readOnly;
   TextInputType? inputType;
   double? width, height;
   FontWeight? txtFontWeight;
@@ -38,6 +39,7 @@ class CustomTextField extends StatefulWidget {
     super.key,
     required this.textCon,
     this.prefixIcon,
+    this.readOnly,
     this.suffixWidget,
     required this.hintText,
     this.isPassField,
@@ -81,6 +83,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      readOnly: widget.readOnly != null,
       cursorColor: AppColors.primary,
       focusNode: widget.focusNode,
       inputFormatters: widget.inputFormatters,
@@ -162,7 +165,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
       borderRadius: BorderRadius.circular(widget.brdrRadius ?? 8.0),
       borderSide: BorderSide(
         color: widget.brdrClr ?? AppColors.inputBorderColor,
-        width: 0,
+        width: 1,
       ),
     );
   }

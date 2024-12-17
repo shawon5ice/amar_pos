@@ -22,6 +22,9 @@ class ProductController extends GetxController {
   List<String> categories = [];
 
   Categories? selectedCategory;
+  Brands? selectedBrand;
+  Units? selectedUnits;
+  Warranties? selectedWarranties;
 
   ProductsListResponseModel? productsListResponseModel;
   List<ProductInfo> productList = [];

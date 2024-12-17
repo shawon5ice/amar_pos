@@ -50,4 +50,9 @@ class AppAssets {
     clientIcon,
     customerIcon,
   ];
+
+  static const String barCodeIcon = "assets/icon/barcode_icon.svg";
+  static const String calenderIcon = "assets/icon/calender_icon.svg";
+  static const String arrowDownIcon = "assets/icon/arrow_down.svg";
+  static const String barcodeSampleIcon = "assets/icon/barcode_sample_icon.svg";
 }
