@@ -16,7 +16,6 @@ class ActionMenu extends StatelessWidget {
         width: 28,
       child: PopupMenuButton<String>(
         padding: EdgeInsets.zero,
-        menuPadding: EdgeInsets.zero,
         icon: const Icon(Icons.more_vert, color: Colors.black54),
         offset: const Offset(-24, 0), // Position to the left of the button
         shape: RoundedRectangleBorder(

@@ -2,6 +2,7 @@ import 'package:amar_pos/core/constants/app_colors.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/features/inventory/data/products/product_brand_category_warranty_unit_list_response_model.dart';
 import 'package:amar_pos/features/inventory/presentation/products/product_controller.dart';
+import 'package:amar_pos/features/inventory/presentation/products/widgets/custom_drop_down_widget.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -105,7 +106,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   text: "Category",
                 ),
                 addH(8.h),
-
                 GetBuilder<ProductController>(
                   id: 'outlet_dd',
                   builder: (controller) => DropdownButtonHideUnderline(
@@ -189,7 +189,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                           ),
                         ),
                         searchMatchFn: (item, searchValue) {
-                          return item.value!.name.toString().contains(searchValue);
+                          return item.value!.name.toLowerCase().toString().contains(searchValue.toLowerCase());
                         },
                       ),
                       //This to clear the search value when you close the menu
@@ -199,7 +199,28 @@ class _AddProductScreenState extends State<AddProductScreen> {
                         }
                       },
                     ),
-                  ),)
+                  ),),
+                GetBuilder<ProductController>(
+                  id: 'outlet_dd',
+                  builder: (controller) => CustomDropdown<Categories>(
+                    items: controller.productBrandCategoryWarrantyUnitListResponseModel?.data.categories ?? [],
+                    itemLabel: (item) => item.name, // How to display the item
+                    value: controller.selectedCategory,
+                    title: "Category",
+                    hintText: controller.filterListLoading
+                        ? 'Loading...'
+                        : controller.productBrandCategoryWarrantyUnitListResponseModel == null
+                        ? 'Something went wrong'
+                        : 'Select a category...',
+                    searchHintText: 'Search for an item...',
+                    searchController: categoryTextEditingController,
+                    onChanged: (value) {
+                      setState(() {
+                        controller.selectedCategory = value;
+                      });
+                    },
+                  ),
+                )
               ],
             ),
           ),
