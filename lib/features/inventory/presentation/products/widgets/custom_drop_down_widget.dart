@@ -1,6 +1,7 @@
 import 'package:amar_pos/core/constants/app_colors.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../../../../../core/responsive/pixel_perfect.dart';
 import '../../../../../core/widgets/field_title.dart';
@@ -15,19 +16,19 @@ class CustomDropdown<T> extends StatefulWidget {
   final String searchHintText;
   final bool isMandatory;
 
-  // final String? Function()? validator;
+  final String? Function(T?)? validator;
 
   const CustomDropdown({
     super.key,
     required this.items,
+    required this.isMandatory,
     required this.title,
     required this.itemLabel,
     required this.onChanged,
     required this.hintText,
     required this.searchHintText,
-    required this.isMandatory,
+    this.validator,
     this.value,
-    // this.validator,
   });
 
   @override
@@ -49,6 +50,7 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>> {
     super.dispose();
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -58,7 +60,7 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>> {
         widget.isMandatory ? RichFieldTitle(text: widget.title,) : FieldTitle(widget.title,),
         addH(8.h),
         DropdownButtonHideUnderline(
-          child: DropdownButton2<T>(
+          child: DropdownButtonFormField2<T>(
             isExpanded: true,
             hint: Text(
               widget.hintText,
@@ -67,6 +69,23 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>> {
                 color: Theme.of(context).hintColor,
               ),
             ),
+            decoration: InputDecoration(
+              isDense: true,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: AppColors.inputBorderColor),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: AppColors.primary),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: Colors.red),
+              ),
+              contentPadding: EdgeInsets.zero,
+            ),
+            validator: widget.validator,
             items: widget.items
                 .map(
                   (item) => DropdownMenuItem<T>(
@@ -84,10 +103,11 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>> {
             onChanged: widget.onChanged,
             buttonStyleData: ButtonStyleData(
               height: 48,
-              decoration: BoxDecoration(
-                border: Border.all(color: AppColors.inputBorderColor),
-                borderRadius: const BorderRadius.all(Radius.circular(8)),
-              ),
+              padding: EdgeInsets.zero,
+              // decoration: BoxDecoration(
+              //   border: Border.all(color: AppColors.inputBorderColor),
+              //   borderRadius: const BorderRadius.all(Radius.circular(8)),
+              // ),
             ),
             dropdownStyleData: const DropdownStyleData(
               maxHeight: 300,
@@ -114,12 +134,6 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>> {
                   expands: true,
                   maxLines: null,
                   controller: _textEditingController,
-                  validator: (value) {
-                    if (widget.value == null && widget.isMandatory) {
-                      return "Please select a ${widget.title}";
-                    }
-                    return null;
-                  },
                   decoration: InputDecoration(
                     isDense: true,
                     contentPadding: const EdgeInsets.symmetric(
