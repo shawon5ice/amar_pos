@@ -12,44 +12,107 @@ class ProductService {
   }) async {
     logger.d("Page: $page");
     var response = await BaseClient.getData(
-      token: usrToken,
-      api: NetWorkStrings.getAllProducts,
-      parameter: {
-        "status" : activeStatus ? 1 : 0,
-        "page": page,
-        "limit": 10,
-      }
-    );
+        token: usrToken,
+        api: NetWorkStrings.getAllProducts,
+        parameter: {
+          "status": activeStatus ? 1 : 0,
+          "page": page,
+          "limit": 10,
+        });
     return response;
   }
-
 
   static Future<dynamic> getCategoriesBrandWarrantyUnits({
     required String usrToken,
   }) async {
     var response = await BaseClient.getData(
-        token: usrToken,
-        api: NetWorkStrings.getProductCategoriesBrandsUnitsWarranties,
+      token: usrToken,
+      api: NetWorkStrings.getProductCategoriesBrandsUnitsWarranties,
     );
     return response;
   }
 
-  static Future<dynamic> addBrand({
-    required String brandName,
-    String? brandLogo,
+  static Future<dynamic> store({
     required String token,
+    required String sku,
+    required String name,
+    int? brandId,
+    required int categoryId,
+    required int unitId,
+    int? warrantyId,
+    required num wholesalePrice,
+    required num mrpPrice,
+    num? vat,
+    num? alertQuantity,
+    String? mfgDate,
+    String? expiredDate,
+    String? photo,
   }) async {
     FormData formData = FormData.fromMap({
-      'name': brandName, // Include other fields if needed
+      "sku": sku,
+      "name": name,
+      "brand_id": brandId,
+      "category_id": categoryId,
+      "unit_id": unitId,
+      "warranty_id": warrantyId,
+      "wholesale_price": wholesalePrice,
+      "mrp_price": mrpPrice,
+      "vat": vat,
+      "alert_quantity": alertQuantity,
+      "mfg_date": mfgDate,
+      "expired_date": expiredDate,
     });
 
-    if (brandLogo != null) {
+    if (photo != null && !photo.contains("http")) {
       formData.files.add(
         MapEntry(
-          "logo",
+          "photo",
           await MultipartFile.fromFile(
-            brandLogo,
-            filename: brandLogo.split('/').last, // Add file name
+            photo,
+            filename: photo.split('/').last, // Add file name
+          ),
+        ),
+      );
+    }
+  }
+
+  static Future<dynamic> update({
+    required String token,
+    required int id,
+    required String name,
+    int? brandId,
+    required int categoryId,
+    required int unitId,
+    int? warrantyId,
+    required num wholesalePrice,
+    required num mrpPrice,
+    num? vat,
+    num? alertQuantity,
+    String? mfgDate,
+    String? expiredDate,
+    String? photo,
+  }) async {
+    FormData formData = FormData.fromMap({
+      "name": name,
+      "brand_id": brandId,
+      "category_id": categoryId,
+      "unit_id": unitId,
+      "warranty_id": warrantyId,
+      "wholesale_price": wholesalePrice,
+      "mrp_price": mrpPrice,
+      "vat": vat,
+      "alert_quantity": alertQuantity,
+      "mfg_date": mfgDate,
+      "expired_date": expiredDate,
+    });
+
+    if (photo != null && !photo.contains("http")) {
+      formData.files.add(
+        MapEntry(
+          "photo",
+          await MultipartFile.fromFile(
+            photo,
+            filename: photo.split('/').last, // Add file name
           ),
         ),
       );
@@ -57,51 +120,35 @@ class ProductService {
 
     var response = await BaseClient.postData(
       token: token,
-      api: NetWorkStrings.addBrand,
+      api: "${NetWorkStrings.updateProduct}id",
       body: formData,
     );
     return response;
   }
 
-  static Future<dynamic> updateBrand({
-    required String brandName,
-    String? brandLogo,
-    required int brandId,
+  static Future<dynamic> delete({
+    required int productId,
     required String token,
   }) async {
-    FormData formData = FormData.fromMap({
-      'name': brandName,
-    });
 
-    if (brandLogo != null && !brandLogo.contains("http")) {
-      logger.d("HELLO MF");
-      formData.files.add(
-        MapEntry(
-          "logo",
-          await MultipartFile.fromFile(
-            brandLogo,
-            filename: brandLogo.split('/').last, // Add file name
-          ),
-        ),
-      );
-    }
-
-    var response = await BaseClient.postData(
-      token: token,
-      api: "${NetWorkStrings.updateBrand}$brandId",
-      body: formData,
-    );
-    return response;
-  }
-
-  static Future<dynamic> deleteBrand({
-    required int brandId,
-    required String token,
-  }) async {
     var response = await BaseClient.deleteData(
       token: token,
-      api: "${NetWorkStrings.deleteBrand}$brandId",
+      api: "${NetWorkStrings.deleteProduct}$productId",
     );
+    logger.e(response);
+    return response;
+  }
+
+  static Future<dynamic> changeStatus({
+    required int productId,
+    required String token,
+  }) async {
+
+    var response = await BaseClient.getData(
+      token: token,
+      api: "${NetWorkStrings.changeStatusProduct}$productId",
+    );
+    logger.e(response);
     return response;
   }
 }

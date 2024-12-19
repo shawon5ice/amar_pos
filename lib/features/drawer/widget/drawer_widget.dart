@@ -4,6 +4,7 @@ import 'package:amar_pos/features/auth/data/model/hive/login_data_helper.dart';
 import 'package:amar_pos/features/auth/presentation/ui/login_screen.dart';
 import 'package:amar_pos/features/drawer/drawer_menu_controller.dart';
 import 'package:amar_pos/features/drawer/model/menu_selection.dart';
+import 'package:amar_pos/features/inventory/presentation/products/products_screen.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
@@ -57,7 +58,6 @@ class _DrawerWidgetState extends State<DrawerWidget> {
         selectedParentItem = parent;
         selectedChildItem = child;
       });
-
       // Update callback only when child selection changes
       // if (!childItemChanged) {
       //   widget.onSelectedItem(selectedParentItem);
@@ -119,7 +119,19 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                 // endIndent: 20,
               ),
               buildDrawerItems(context, DrawerItems.overview),
-              buildDrawerItems(context, DrawerItems.inventory),
+              ExpandableDrawerWidget(
+                item: DrawerItems.inventory,
+                children: const ["Product List", "Stock Report",],
+                expanded: (bool isExpanded) {
+                  setState(() {
+                    if (isExpanded) selectedParentItem = DrawerItems.inventory;
+                  });
+                },
+                isExpanded: isExpanded && selectedParentItem == DrawerItems.inventory,
+                selectedChild: selectedChildItem,
+                onParentTap: () => onParentTap(DrawerItems.inventory),
+                onChildTap: (child) => onChildTap(DrawerItems.inventory, child),
+              ),
               ExpandableDrawerWidget(
                 item: DrawerItems.sales,
                 children: const ["Retail Sale", "Whole Sale",],

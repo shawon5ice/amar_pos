@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:amar_pos/core/constants/logger/logger.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/core/widgets/date_selection_field_widget.dart';
 import 'package:amar_pos/features/inventory/data/products/product_brand_category_warranty_unit_list_response_model.dart';
@@ -6,6 +7,7 @@ import 'package:amar_pos/features/inventory/presentation/products/product_contro
 import 'package:amar_pos/features/inventory/presentation/products/widgets/custom_drop_down_widget.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_text_field.dart';
@@ -13,9 +15,10 @@ import '../../../../core/widgets/dotted_border_painter.dart';
 import '../../../../core/widgets/field_title.dart';
 import '../../../../core/widgets/methods/field_validator.dart';
 import '../../../../core/widgets/qr_code_scanner.dart';
+import '../../data/products/product_list_response_model.dart';
 
 class AddProductScreen extends StatefulWidget {
-  AddProductScreen({super.key});
+  const AddProductScreen({super.key});
 
   @override
   State<AddProductScreen> createState() => _AddProductScreenState();
@@ -31,11 +34,15 @@ class _AddProductScreenState extends State<AddProductScreen> {
   late TextEditingController mrpPriceController;
   late TextEditingController vatController;
   late TextEditingController noStockAlertController;
-  DateTime? manufacturingDate;
-  DateTime? expireDate;
+  String? manufacturingDate;
+  String? expireDate;
+  Categories? selectedCategory;
+  Brands? selectedBrand;
+  Units? selectedUnits;
+  Warranties? selectedWarranties;
   final formKey = GlobalKey<FormState>();
 
-
+  ProductInfo? productInfo;
 
   String? fileName;
 
@@ -48,29 +55,70 @@ class _AddProductScreenState extends State<AddProductScreen> {
     }
   }
 
-
   @override
   void initState() {
-     productNameController = TextEditingController();
-     productIdController = TextEditingController();
-     costingPriceController = TextEditingController();
-     wholeSalePriceController = TextEditingController();
-     mrpPriceController = TextEditingController();
-     vatController = TextEditingController();
-     noStockAlertController = TextEditingController();
+    productNameController = TextEditingController();
+    productIdController = TextEditingController();
+    costingPriceController = TextEditingController();
+    wholeSalePriceController = TextEditingController();
+    mrpPriceController = TextEditingController();
+    vatController = TextEditingController();
+    noStockAlertController = TextEditingController();
+    if (Get.arguments != null) {
+      initializeData();
+    }
 
     super.initState();
+  }
+
+  Future<void> initializeData() async {
+    productInfo = Get.arguments;
+    logger.e(productInfo!.toJson());
+    productNameController.text = productInfo?.name ?? '';
+    productIdController.text = productInfo?.sku ?? '';
+    costingPriceController.text = productInfo?.costingPrice.toString() ?? '';
+    mrpPriceController.text = productInfo?.mrpPrice.toString() ?? '';
+    wholeSalePriceController.text =
+        productInfo?.wholesalePrice.toString() ?? '';
+    vatController.text = productInfo?.vat.toString() ?? '';
+    noStockAlertController.text = productInfo?.alertQuantity.toString() ?? '';
+
+    if (productInfo?.category != null) {
+      selectedCategory = controller
+          .productBrandCategoryWarrantyUnitListResponseModel?.data.categories
+          .singleWhere((e) => e.id == productInfo?.category!.id);
+    }
+
+    if (productInfo?.brand != null) {
+      selectedBrand = controller
+          .productBrandCategoryWarrantyUnitListResponseModel?.data.brands
+          .singleWhere((e) => e.id == productInfo?.brand!.id);
+    }
+
+    if (productInfo?.warranty != null) {
+      selectedWarranties = controller
+          .productBrandCategoryWarrantyUnitListResponseModel?.data.warranties
+          .singleWhere((e) => e.id == productInfo?.warranty!.id);
+    }
+
+    if (productInfo?.unit != null) {
+      selectedUnits = controller
+          .productBrandCategoryWarrantyUnitListResponseModel?.data.units
+          .singleWhere((e) => e.id == productInfo?.unit!.id);
+    }
+
+    fileName = productInfo?.image;
   }
 
   @override
   void dispose() {
     productIdController.dispose();
-     productIdController.dispose();
-     costingPriceController.dispose();
-     wholeSalePriceController.dispose();
-     mrpPriceController.dispose();
-     vatController.dispose();
-     noStockAlertController.dispose();
+    productNameController.dispose();
+    costingPriceController.dispose();
+    wholeSalePriceController.dispose();
+    mrpPriceController.dispose();
+    vatController.dispose();
+    noStockAlertController.dispose();
 
     super.dispose();
   }
@@ -80,7 +128,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        title: const Text("Add Product"),
+        title: Text(productInfo != null ? "Edit Product": "Add Product"),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -101,7 +149,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     ),
                     addH(8.h),
                     CustomTextField(
-                      textCon: TextEditingController(),
+                      textCon: productNameController,
                       hintText: "Type product name...",
                       inputType: TextInputType.text,
                       validator: (value) =>
@@ -122,12 +170,13 @@ class _AddProductScreenState extends State<AddProductScreen> {
                             final String? scannedCode =
                                 await Navigator.of(context).push(
                               MaterialPageRoute(
-                                builder: (context) => const QRCodeScannerScreen(),
+                                builder: (context) =>
+                                    const QRCodeScannerScreen(),
                               ),
                             );
                             if (scannedCode != null && scannedCode.isNotEmpty) {
                               setState(() {
-                                productIdController.text = scannedCode ?? '';
+                                productIdController.text = scannedCode;
                               });
                             }
                           },
@@ -151,7 +200,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                             [],
                         itemLabel: (item) => item.name,
                         // How to display the item
-                        value: controller.selectedCategory,
+                        value: selectedCategory,
                         title: "Category",
                         hintText: controller.filterListLoading
                             ? 'Loading...'
@@ -162,15 +211,15 @@ class _AddProductScreenState extends State<AddProductScreen> {
                         searchHintText: 'Search for an item...',
                         onChanged: (value) {
                           setState(() {
-                            controller.selectedCategory = value;
+                            selectedCategory = value;
                           });
                         },
-                          validator: (value) {
-                            if (value == null) {
-                              return "Please select a category";
-                            }
-                            return null;
-                          },
+                        validator: (value) {
+                          if (value == null) {
+                            return "Please select a category";
+                          }
+                          return null;
+                        },
                       ),
                     ),
                     GetBuilder<ProductController>(
@@ -184,7 +233,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                             [],
                         itemLabel: (item) => item.name,
                         // How to display the item
-                        value: controller.selectedBrand,
+                        value: selectedBrand,
                         title: "Brand",
                         hintText: controller.filterListLoading
                             ? 'Loading...'
@@ -194,7 +243,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                                 : 'Select a brand...',
                         searchHintText: 'Search for an item...',
                         onChanged: (value) {
-                          controller.selectedBrand = value;
+                          selectedBrand = value;
                           controller.update(['brand_dd']);
                         },
                       ),
@@ -210,7 +259,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                             [],
                         itemLabel: (item) => item.name,
                         // How to display the item
-                        value: controller.selectedUnits,
+                        value: selectedUnits,
                         title: "Unit",
                         hintText: controller.filterListLoading
                             ? 'Loading...'
@@ -220,8 +269,14 @@ class _AddProductScreenState extends State<AddProductScreen> {
                                 : 'Select a unit...',
                         searchHintText: 'Search for an item...',
                         onChanged: (value) {
-                          controller.selectedUnits = value;
+                          selectedUnits = value;
                           controller.update(['unit_dd']);
+                        },
+                        validator: (value) {
+                          if (value == null) {
+                            return "Please select an unit";
+                          }
+                          return null;
                         },
                       ),
                     ),
@@ -236,43 +291,48 @@ class _AddProductScreenState extends State<AddProductScreen> {
                             [],
                         itemLabel: (item) => item.name.toString(),
                         // How to display the item
-                        value: controller.selectedWarranties,
-                        title: "Unit",
+                        value: selectedWarranties,
+                        title: "Warranty",
                         hintText: controller.filterListLoading
                             ? 'Loading...'
                             : controller.productBrandCategoryWarrantyUnitListResponseModel ==
                                     null
                                 ? 'Something went wrong'
-                                : 'Select a unit...',
+                                : 'Select a warranty...',
                         searchHintText: 'Search for an item...',
                         onChanged: (value) {
-                          controller.selectedWarranties = value;
+                          selectedWarranties = value;
                           controller.update(['warranty_dd']);
                         },
                       ),
                     ),
                     CustomDateSelectionFieldWidget(
-                      onDateSelection: (DateTime? selectedDate) {
+                      onDateSelection: (String? selectedDate) {
                         manufacturingDate = selectedDate;
                       },
                       title: "Manufacturing Date",
+                      initialDate: productInfo?.mfgDate,
                     ),
                     CustomDateSelectionFieldWidget(
-                      onDateSelection: (DateTime? selectedDate) {
+                      onDateSelection: (String? selectedDate) {
                         expireDate = selectedDate;
                       },
                       title: "Expiry Date",
+                      initialDate: productInfo?.expiredDate,
                     ),
-
                     addH(16.h),
-                    const FieldTitle("Costing Price",),
+                    const FieldTitle(
+                      "Costing Price",
+                    ),
                     addH(8.h),
                     CustomTextField(
                       textCon: costingPriceController,
                       hintText: "Type here...",
                       inputType: TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                      ],
                     ),
-
                     addH(16.h),
                     const RichFieldTitle(
                       text: "Wholesale Price",
@@ -282,13 +342,15 @@ class _AddProductScreenState extends State<AddProductScreen> {
                       textCon: wholeSalePriceController,
                       hintText: "Type here...",
                       inputType: TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                      ],
                       validator: (value) =>
                           FieldValidator.nonNullableFieldValidator(
-                            value,
-                            "Wholesale price",
-                          ),
+                        value,
+                        "Wholesale price",
+                      ),
                     ),
-
                     addH(16.h),
                     const RichFieldTitle(
                       text: "MRP",
@@ -298,28 +360,40 @@ class _AddProductScreenState extends State<AddProductScreen> {
                       textCon: mrpPriceController,
                       hintText: "Type here...",
                       inputType: TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                      ],
                       validator: (value) =>
                           FieldValidator.nonNullableFieldValidator(
-                            value,
-                            "MRP",
+                        value,
+                        "MRP",
                       ),
                     ),
-
                     addH(16.h),
-                    const FieldTitle("VAT",),
+                    const FieldTitle(
+                      "VAT",
+                    ),
                     addH(8.h),
                     CustomTextField(
                       textCon: vatController,
                       hintText: "Type here...",
                       inputType: TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                      ],
                     ),
                     addH(16.h),
-                    const FieldTitle("No Stock Alert",),
+                    const FieldTitle(
+                      "No Stock Alert",
+                    ),
                     addH(8.h),
                     CustomTextField(
                       textCon: noStockAlertController,
                       hintText: "Type here...",
                       inputType: TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                      ],
                     ),
                     addH(16.h),
                     const FieldTitle(
@@ -339,25 +413,26 @@ class _AddProductScreenState extends State<AddProductScreen> {
                           child: Center(
                             child: fileName == null
                                 ? const Column(
-                              mainAxisAlignment:
-                              MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.image_outlined,
-                                    size: 40, color: Colors.grey),
-                                SizedBox(height: 8),
-                                Text(
-                                  "Select product picture",
-                                  style:
-                                  TextStyle(color: Colors.grey),
-                                ),
-                              ],
-                            )
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.image_outlined,
+                                          size: 40, color: Colors.grey),
+                                      SizedBox(height: 8),
+                                      Text(
+                                        "Select product picture",
+                                        style: TextStyle(color: Colors.grey),
+                                      ),
+                                    ],
+                                  )
                                 : Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Image.file(
-                                fit: BoxFit.cover,
-                                File(fileName!),
-                              ),
+                                    child: fileName!.contains('https://') &&
+                                            productInfo != null
+                                        ? Image.network(fileName!)
+                                        : Image.file(
+                                            fit: BoxFit.cover,
+                                            File(fileName!),
+                                          ),
                             ),
                           ),
                         ),
@@ -370,17 +445,58 @@ class _AddProductScreenState extends State<AddProductScreen> {
           ),
         ),
       ),
-
-      bottomNavigationBar: CustomButton(
-        text: "Add Now",
-        marginHorizontal: 20,
-        marginVertical: 10,
-        onTap: () {
-          if (formKey.currentState!.validate()) {
-
-          }
-        },
-      ),
+      bottomNavigationBar:
+          controller.productBrandCategoryWarrantyUnitListResponseModel != null
+              ? CustomButton(
+                  text: productInfo != null ? "Update" : "Add Now",
+                  marginHorizontal: 20,
+                  marginVertical: 10,
+                  onTap: () {
+                    if (formKey.currentState!.validate()) {
+                      if(productInfo != null){
+                        controller.updateProduct(
+                          id: productInfo!.id,
+                          sku: productIdController.text.trim(),
+                          name: productNameController.text.trim(),
+                          brandId: selectedBrand?.id,
+                          categoryId: selectedCategory!.id,
+                          unitId: selectedUnits!.id,
+                          warrantyId: selectedWarranties?.id,
+                          wholesalePrice:
+                          num.parse(wholeSalePriceController.text.trim()),
+                          mrpPrice: num.parse(mrpPriceController.text.trim()),
+                          vat: vatController.text.trim().isNotEmpty
+                              ? num.parse(vatController.text.trim())
+                              : 0,
+                          alertQuantity: vatController.text.trim().isNotEmpty
+                              ? num.parse(vatController.text.trim())
+                              : 0,
+                          photo: fileName,
+                        );
+                      }else{
+                        controller.addProduct(
+                          sku: productIdController.text.trim(),
+                          name: productNameController.text.trim(),
+                          brandId: selectedBrand?.id,
+                          categoryId: selectedCategory!.id,
+                          unitId: selectedUnits!.id,
+                          warrantyId: selectedWarranties?.id,
+                          wholesalePrice:
+                          num.parse(wholeSalePriceController.text.trim()),
+                          mrpPrice: num.parse(mrpPriceController.text.trim()),
+                          vat: vatController.text.trim().isNotEmpty
+                              ? num.parse(vatController.text.trim())
+                              : 0,
+                          alertQuantity: vatController.text.trim().isNotEmpty
+                              ? num.parse(vatController.text.trim())
+                              : 0,
+                          photo: fileName,
+                        );
+                      }
+                    }
+                  },
+                )
+              : SizedBox.shrink(),
     );
   }
 }

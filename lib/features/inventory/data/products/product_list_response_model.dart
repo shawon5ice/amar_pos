@@ -87,13 +87,13 @@ class ProductInfo {
   late final Warranty? warranty;
   late final String mfgDate;
   late final String expiredDate;
-  late final int costingPrice;
-  late final int wholesalePrice;
-  late final int mrpPrice;
-  late final int vat;
-  late final int alertQuantity;
-  late final int stock;
-  late final int totalCosting;
+  late final num costingPrice;
+  late final num wholesalePrice;
+  late final num mrpPrice;
+  late final num vat;
+  late final num alertQuantity;
+  late final num stock;
+  late final num totalCosting;
   late final String? remarks;
   late final int status;
 

@@ -1,5 +1,6 @@
 import 'package:amar_pos/core/constants/app_colors.dart';
 import 'package:amar_pos/core/widgets/pager_list_view.dart';
+import 'package:amar_pos/features/drawer/drawer_menu_controller.dart';
 import 'package:amar_pos/features/inventory/presentation/products/add_product_screen.dart';
 import 'package:amar_pos/features/inventory/presentation/products/product_controller.dart';
 import 'package:amar_pos/features/inventory/presentation/products/widgets/product_list_filter_bottom_sheet.dart';
@@ -11,6 +12,7 @@ import '../../../../core/responsive/pixel_perfect.dart';
 import '../../../../core/widgets/search_widget.dart';
 
 class ProductsScreen extends StatefulWidget {
+  static const String routeName = "/products-list-screen";
   const ProductsScreen({super.key});
 
   @override
@@ -20,6 +22,7 @@ class ProductsScreen extends StatefulWidget {
 class _ProductsScreenState extends State<ProductsScreen>
     with SingleTickerProviderStateMixin {
   final ProductController controller = Get.put(ProductController());
+  final DrawerMenuController _menuController = Get.find();
 
   late TabController _tabController;
 
@@ -42,12 +45,15 @@ class _ProductsScreenState extends State<ProductsScreen>
       appBar: AppBar(
         title: const Text("Product List"),
         centerTitle: true,
+        leading: DrawerButton(
+          onPressed: _menuController.openDrawer,
+        ),
         actions: [
           IconButton(onPressed: (){
             showModalBottomSheet(context: context, builder: (context){
-              return ProductListFilterBottomSheet();
+              return const ProductListFilterBottomSheet();
             });
-          }, icon: Icon(Icons.filter_alt_outlined))
+          }, icon: const Icon(Icons.filter_alt_outlined))
         ],
       ),
       body: SafeArea(
@@ -58,12 +64,9 @@ class _ProductsScreenState extends State<ProductsScreen>
               Container(
                 height: 40.h,
                 padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.all(Radius.circular(20)),
-                  // border: Border.all(
-                  //   color: Colors.grey.withOpacity(.5),
-                  // ),
                 ),
                 child: TabBar(
                   dividerHeight: 0,
@@ -75,7 +78,7 @@ class _ProductsScreenState extends State<ProductsScreen>
                     borderRadius: BorderRadius.circular(20),
                   ),
                   unselectedLabelStyle:
-                      TextStyle(fontWeight: FontWeight.normal),
+                      const TextStyle(fontWeight: FontWeight.normal),
                   labelColor: Colors.white,
                   splashBorderRadius: BorderRadius.circular(20),
                   unselectedLabelColor: Colors.black,

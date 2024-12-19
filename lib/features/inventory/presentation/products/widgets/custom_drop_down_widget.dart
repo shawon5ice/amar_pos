@@ -71,18 +71,19 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>> {
             ),
             decoration: InputDecoration(
               isDense: true,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: AppColors.inputBorderColor),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: AppColors.primary),
-              ),
-              errorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide(color: Colors.red),
-              ),
+              border: InputBorder.none,
+              // border: OutlineInputBorder(
+              //   borderRadius: BorderRadius.circular(8),
+              //   borderSide: BorderSide(color: AppColors.inputBorderColor),
+              // ),
+              // focusedBorder: OutlineInputBorder(
+              //   borderRadius: BorderRadius.circular(8),
+              //   borderSide: BorderSide(color: AppColors.inputBorderColor),
+              // ),
+              // errorBorder: OutlineInputBorder(
+              //   borderRadius: BorderRadius.circular(8),
+              //   borderSide: BorderSide(color: Colors.red),
+              // ),
               contentPadding: EdgeInsets.zero,
             ),
             validator: widget.validator,
@@ -104,10 +105,10 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>> {
             buttonStyleData: ButtonStyleData(
               height: 48,
               padding: EdgeInsets.zero,
-              // decoration: BoxDecoration(
-              //   border: Border.all(color: AppColors.inputBorderColor),
-              //   borderRadius: const BorderRadius.all(Radius.circular(8)),
-              // ),
+              decoration: BoxDecoration(
+                border: Border.all(color: AppColors.inputBorderColor),
+                borderRadius: const BorderRadius.all(Radius.circular(8)),
+              ),
             ),
             dropdownStyleData: const DropdownStyleData(
               maxHeight: 300,

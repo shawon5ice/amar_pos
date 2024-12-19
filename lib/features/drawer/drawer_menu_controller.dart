@@ -1,6 +1,7 @@
 import 'package:amar_pos/features/auth/data/model/hive/login_data.dart';
 import 'package:amar_pos/features/auth/data/model/hive/login_data_helper.dart';
 import 'package:amar_pos/features/inventory/presentation/inventory_screen.dart';
+import 'package:amar_pos/features/inventory/presentation/products/products_screen.dart';
 import 'package:get/get.dart';
 import 'package:amar_pos/features/home/presentation/home_screen.dart';
 import 'package:amar_pos/features/config/presentation/configuration_screen.dart';
@@ -60,11 +61,19 @@ class DrawerMenuController extends GetxController {
         currentScreen.value = HomeScreen.routeName;
         return const HomeScreen(); // Default to HomeScreen
       case DrawerItems.inventory:
-        currentScreen.value = HomeScreen.routeName;
-        return InventoryScreen(); // Replace with the actual inventory screen widget
+        if(selectedMenuItem.value?.child == "Product List"){
+          return ProductsScreen();
+        }else{
+          return Container();
+        }
+        // Replace with the actual sales screen widget actual inventory screen widget
       case DrawerItems.sales:
-        currentScreen.value = HomeScreen.routeName;
-        return Container(); // Replace with the actual sales screen widget
+        if(selectedMenuItem.value?.child == "Product List"){
+          return ProductsScreen();
+        }else{
+          return Container();
+        }
+        // / Replace with the actual sales screen widget
       case DrawerItems.config:
         currentScreen.value = ConfigurationScreen.routeName;
         return ConfigurationScreen(); // Configuration screen widget

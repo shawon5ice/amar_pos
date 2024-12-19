@@ -72,6 +72,7 @@ class ConfigurationScreen extends StatelessWidget {
     final DrawerMenuController drawerMenuController = Get.find();
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         leading: DrawerButton(
           onPressed: drawerMenuController.openDrawer,
         ),

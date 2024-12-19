@@ -1,3 +1,4 @@
+import 'package:amar_pos/core/methods/helper_methods.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
@@ -8,10 +9,11 @@ import 'custom_text_field.dart';
 import 'field_title.dart';
 
 class CustomDateSelectionFieldWidget extends StatefulWidget {
-  const CustomDateSelectionFieldWidget({super.key, required this.onDateSelection, required this.title});
+  const CustomDateSelectionFieldWidget({super.key, required this.onDateSelection, required this.title, this.initialDate});
 
-  final Function(DateTime? date) onDateSelection;
+  final Function(String? date) onDateSelection;
   final String title;
+  final String? initialDate;
 
   @override
   State<CustomDateSelectionFieldWidget> createState() =>
@@ -25,6 +27,7 @@ class _CustomDateSelectionFieldWidgetState
   @override
   void initState() {
     _textEditingController = TextEditingController();
+    _textEditingController.text = widget.initialDate ?? '';
     super.initState();
   }
 
@@ -53,9 +56,9 @@ class _CustomDateSelectionFieldWidgetState
               initialDate: DateTime.now(),);
             if(selectedDate != null){
               setState(() {
-                _textEditingController.text = DateFormat("dd/MM/yyyy").format(selectedDate);
+                _textEditingController.text = formatDate(selectedDate);
               });
-              widget.onDateSelection(selectedDate);
+              widget.onDateSelection(_textEditingController.text);
             }
           },
           textCon: _textEditingController,
