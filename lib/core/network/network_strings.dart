@@ -73,7 +73,9 @@ class NetWorkStrings{
   static const String getAllProducts = "product/get-products";
   static const String addProduct = "product/store";
   static const String updateProduct = "product/update/";
+  static const String quickEditProduct = "product/quickEdit/";
   static const String deleteProduct = "product/delete/";
+  static const String generateProductBarcode = "product/generate-barcode/";
   static const String changeStatusProduct = "product/change-status/";
   static const String getProductCategoriesBrandsUnitsWarranties = "product/get-categories-brands-units-warranties";
 }

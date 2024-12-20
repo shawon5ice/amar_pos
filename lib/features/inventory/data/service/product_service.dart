@@ -126,6 +126,30 @@ class ProductService {
     return response;
   }
 
+  static Future<dynamic> quickEdit({
+    required String token,
+    required int id,
+    String? wholeSalePrice,
+    String? mrpPrice,
+    String? stockIn,
+    String? stockOut,
+  }) async {
+    FormData formData = FormData.fromMap({
+      "wholesale_price": wholeSalePrice,
+      "mrp_price": mrpPrice,
+      "stock_in": stockIn,
+      "stock_out": stockOut
+    });
+
+
+    var response = await BaseClient.postData(
+      token: token,
+      api: "${NetWorkStrings.quickEditProduct}$id",
+      body: formData,
+    );
+    return response;
+  }
+
   static Future<dynamic> delete({
     required int productId,
     required String token,
@@ -149,6 +173,19 @@ class ProductService {
       api: "${NetWorkStrings.changeStatusProduct}$productId",
     );
     logger.e(response);
+    return response;
+  }
+
+  static Future<dynamic> generateBarcode({
+    required String usrToken,
+    required int id,
+  }) async {
+    var response = await BaseClient.getData(
+        token: usrToken,
+        api: "${NetWorkStrings.generateProductBarcode}$id",
+        parameter: {
+          "id": id
+        });
     return response;
   }
 }

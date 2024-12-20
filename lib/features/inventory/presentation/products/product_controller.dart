@@ -14,6 +14,8 @@ class ProductController extends GetxController {
   bool isLoadingMore = false;
   bool isActionLoading = false;
   bool filterListLoading = false;
+  String generatedBarcode = "";
+  bool barcodeGenerationLoading = false;
 
   LoginData? loginData = LoginDataBoxManager().loginData;
 
@@ -188,6 +190,71 @@ class ProductController extends GetxController {
     }
   }
 
+  void quickEditProduct({
+    required int id,
+    String? wholeSalePrice,
+    String? mrpPrice,
+    String? stockIn,
+    String? stockOut,
+  }) async {
+    // Perform necessary validations
+
+    EasyLoading.show();
+    try {
+      var response = await ProductService.quickEdit(
+        token: loginData!.token,
+        id: id,
+        wholeSalePrice: wholeSalePrice,
+        mrpPrice: mrpPrice,
+        stockOut: stockOut,
+        stockIn: stockIn,
+      );
+
+      logger.i(response);
+      if (response != null && response['success']) {
+        EasyLoading.dismiss();
+        Get.back();
+        getAllProducts(activeStatus: true, page: 1);
+        Methods.showSnackbar(msg: response['message'], isSuccess: true);
+
+      }
+    } catch (e) {
+      logger.e(e);
+      Methods.showSnackbar(msg: "An error occurred", isSuccess: false);
+    } finally {
+      EasyLoading.dismiss();
+    }
+  }
+
+  void generateBarcode({
+    required int id,
+  }) async {
+    // Perform necessary validations
+    generatedBarcode = "";
+    barcodeGenerationLoading = true;
+    update(['barcode_list']);
+    EasyLoading.show();
+    try {
+      var response = await ProductService.generateBarcode(
+        usrToken: loginData!.token,
+        id: id,
+      );
+
+      logger.i(response);
+      if (response != null && response['success']) {
+        EasyLoading.dismiss();
+        generatedBarcode = response['data'];
+        barcodeGenerationLoading = false;
+        update(['barcode_list']);
+      }
+    } catch (e) {
+      logger.e(e);
+      Methods.showSnackbar(msg: "An error occurred", isSuccess: false);
+    } finally {
+      EasyLoading.dismiss();
+    }
+  }
+
 
 
   void deleteProduct({
@@ -302,4 +369,5 @@ class ProductController extends GetxController {
       return categories.where((e) => e.toLowerCase().contains(search.toLowerCase())).toList();
     }
   }
+
 }

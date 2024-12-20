@@ -3,6 +3,7 @@ import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/features/inventory/data/products/product_list_response_model.dart';
 import 'package:amar_pos/features/inventory/presentation/products/add_product_screen.dart';
 import 'package:amar_pos/features/inventory/presentation/products/product_controller.dart';
+import 'package:amar_pos/features/inventory/presentation/products/widgets/product_quick_edit.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -18,9 +19,9 @@ class ProductListItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return GestureDetector(
       onTap: (){
-
+        Get.to(()=> const ProductQuickViewScreen(), arguments: productInfo);
       },
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 5.h),

@@ -91,7 +91,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
       maxLength: widget.maxLength,
       textAlign: widget.isCenterAlign != null? TextAlign.center: TextAlign.start,
       style: TextStyle(
-        fontSize: widget.txtSize ?? 12,
+        fontSize: widget.txtSize ?? 16.sp,
         // fontFamily: ConstantStrings.kFontFamily,
         fontWeight: widget.txtFontWeight ?? FontWeight.normal,
         color: widget.enabledFlag == false? Colors.grey.shade800: Colors.black,
@@ -115,7 +115,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
             ? widget.disableClr??const Color(0xfff6f6f6)
             : widget.fillClr ?? Colors.white,
         contentPadding: widget.maxLine !=null || widget.isCenterAlign != null?const EdgeInsets.all(15):const EdgeInsets.only(left: 15),
-        border: getInputBorder(),
+        border: getInputBorder(isDisabled: widget.enabledFlag),
         enabledBorder: getInputBorder(),
         focusedBorder: getInputBorder(),
         prefixIcon: widget.prefixIcon != null
@@ -133,7 +133,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
             : null,
         hintText: widget.hintText,
         hintStyle: TextStyle(
-          fontSize: widget.txtSize ?? 16,
+          fontSize: widget.txtSize ?? 16.sp,
           // fontFamily: ConstantStrings.kFontFamily,
           color: const Color(0xff909090),
           fontWeight: widget.txtFontWeight,
@@ -160,12 +160,12 @@ class _CustomTextFieldState extends State<CustomTextField> {
     );
   }
 
-  InputBorder getInputBorder() {
+  InputBorder getInputBorder({bool? isDisabled}) {
     return OutlineInputBorder(
       borderRadius: BorderRadius.circular(widget.brdrRadius ?? 8.0),
       borderSide: BorderSide(
-        color: widget.brdrClr ?? AppColors.inputBorderColor,
-        width: 1,
+        color: isDisabled != null ? Colors.transparent :widget.brdrClr ?? AppColors.inputBorderColor,
+        width: isDisabled != null ? 0 : 1,
       ),
     );
   }

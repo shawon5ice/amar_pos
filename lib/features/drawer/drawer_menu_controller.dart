@@ -25,6 +25,7 @@ class DrawerMenuController extends GetxController {
   void onInit() {
     super.onInit();
     selectMenuItem(MenuSelection(parent: DrawerItems.overview));
+    update();
   }
 
   @override

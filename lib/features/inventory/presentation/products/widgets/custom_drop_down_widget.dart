@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 import '../../../../../core/responsive/pixel_perfect.dart';
 import '../../../../../core/widgets/field_title.dart';
 
-class CustomDropdown<T> extends StatefulWidget {
+class CustomDropdownWithSearchWidget<T> extends StatefulWidget {
   final List<T> items;
   final T? value;
   final String Function(T) itemLabel; // A function to extract display text
@@ -18,7 +18,7 @@ class CustomDropdown<T> extends StatefulWidget {
 
   final String? Function(T?)? validator;
 
-  const CustomDropdown({
+  const CustomDropdownWithSearchWidget({
     super.key,
     required this.items,
     required this.isMandatory,
@@ -32,10 +32,10 @@ class CustomDropdown<T> extends StatefulWidget {
   });
 
   @override
-  State<CustomDropdown<T>> createState() => _CustomDropdownState<T>();
+  State<CustomDropdownWithSearchWidget<T>> createState() => _CustomDropdownWithSearchWidgetState<T>();
 }
 
-class _CustomDropdownState<T> extends State<CustomDropdown<T>> {
+class _CustomDropdownWithSearchWidgetState<T> extends State<CustomDropdownWithSearchWidget<T>> {
   late final TextEditingController _textEditingController;
 
   @override

@@ -31,6 +31,11 @@ class _DrawerWidgetState extends State<DrawerWidget> {
 
   // bool parentItemChanged = false;
   // bool childItemChanged = false;
+  @override
+  void initState() {
+    super.initState();
+  }
+
 
   void onParentTap(DrawerItem item) {
     // Only update if the selection has actually changed

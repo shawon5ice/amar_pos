@@ -1,5 +1,6 @@
 import 'package:amar_pos/features/drawer/drawer_menu_controller.dart';
 import 'package:amar_pos/features/drawer/model/menu_selection.dart';
+import 'package:amar_pos/features/home/presentation/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -16,22 +17,46 @@ class MainPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: menuController.isDrawerOpened.value ||
+              menuController.selectedMenuItem.value?.parent !=
+                  DrawerItems.overview
+          ? false
+          : true,
+      onPopInvokedWithResult: (value, v) {
         if (menuController.isDrawerOpened.value) {
           // If drawer is open on any screen, close the drawer
+          if (menuController.selectedMenuItem.value?.parent !=
+              DrawerItems.overview) {
+            menuController.currentScreen.value = HomeScreen.routeName;
+            menuController.selectMenuItem(MenuSelection(parent: DrawerItems.overview));
+          }else{
+            menuController.closeDrawer();
+          }
           menuController.closeDrawer();
-          return false;
         } else if (menuController.selectedMenuItem.value?.parent !=
             DrawerItems.overview) {
-          // If on a non-overview screen, open the drawer
           menuController.openDrawer();
-          return false;
         } else {
           // If on the Overview screen and the drawer is closed, show exit dialog
-          return await showExitConfirmation(context);
+          showExitConfirmation(context);
         }
       },
+      // onWillPop: () async {
+      //   if (menuController.isDrawerOpened.value) {
+      //     // If drawer is open on any screen, close the drawer
+      //     menuController.closeDrawer();
+      //     return false;
+      //   } else if (menuController.selectedMenuItem.value?.parent !=
+      //       DrawerItems.overview) {
+      //     // If on a non-overview screen, open the drawer
+      //     menuController.openDrawer();
+      //     return false;
+      //   } else {
+      //     // If on the Overview screen and the drawer is closed, show exit dialog
+      //     return await showExitConfirmation(context);
+      //   }
+      // },
       child: Scaffold(
         backgroundColor: AppColors.darkGreen,
         body: Stack(
@@ -92,7 +117,9 @@ class MainPage extends StatelessWidget {
           if (isSameItemSelected) {
             menuController.closeDrawer();
           } else {
-            bool isParentWithChildren = (value?.parent == DrawerItems.sales || value?.parent == DrawerItems.inventory) && value?.child == null ;
+            bool isParentWithChildren = (value?.parent == DrawerItems.sales ||
+                    value?.parent == DrawerItems.inventory) &&
+                value?.child == null;
             if (!isParentWithChildren) {
               menuController.selectedMenuItem.value = value;
             }

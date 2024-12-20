@@ -191,7 +191,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     ),
                     GetBuilder<ProductController>(
                       id: 'category_dd',
-                      builder: (controller) => CustomDropdown<Categories>(
+                      builder: (controller) => CustomDropdownWithSearchWidget<Categories>(
                         isMandatory: true,
                         items: controller
                                 .productBrandCategoryWarrantyUnitListResponseModel
@@ -224,7 +224,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     ),
                     GetBuilder<ProductController>(
                       id: 'brand_dd',
-                      builder: (controller) => CustomDropdown<Brands>(
+                      builder: (controller) => CustomDropdownWithSearchWidget<Brands>(
                         isMandatory: false,
                         items: controller
                                 .productBrandCategoryWarrantyUnitListResponseModel
@@ -250,7 +250,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     ),
                     GetBuilder<ProductController>(
                       id: 'unit_dd',
-                      builder: (controller) => CustomDropdown<Units>(
+                      builder: (controller) => CustomDropdownWithSearchWidget<Units>(
                         isMandatory: true,
                         items: controller
                                 .productBrandCategoryWarrantyUnitListResponseModel
@@ -282,7 +282,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     ),
                     GetBuilder<ProductController>(
                       id: 'warranty_dd',
-                      builder: (controller) => CustomDropdown<Warranties>(
+                      builder: (controller) => CustomDropdownWithSearchWidget<Warranties>(
                         isMandatory: false,
                         items: controller
                                 .productBrandCategoryWarrantyUnitListResponseModel
