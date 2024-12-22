@@ -187,7 +187,7 @@ class ProductListItemWidget extends StatelessWidget {
                     // margin: EdgeInsets.only(right: 20),
                     height: 30.h,
                     decoration: BoxDecoration(
-                        color: Color(0xffFFFBED).withOpacity(.3),
+                        color: const Color(0xffFFFBED).withOpacity(.3),
                         borderRadius: BorderRadius.all(Radius.circular(20.r)),
                         border: Border.all(
                             color: const Color(0xffff9000).withOpacity(.3),

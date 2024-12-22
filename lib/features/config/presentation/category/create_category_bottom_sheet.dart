@@ -1,12 +1,10 @@
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/core/widgets/custom_button.dart';
-import 'package:amar_pos/core/widgets/custom_glass_morf_field.dart';
 import 'package:amar_pos/core/widgets/custom_text_field.dart';
 import 'package:amar_pos/core/widgets/field_title.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/core.dart';
-import '../../data/model/category/category_model_response.dart';
 import 'category_controller.dart';
 
 class CreateCategoryBottomSheet extends StatefulWidget {

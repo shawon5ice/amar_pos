@@ -69,7 +69,6 @@ class NetWorkStrings{
 
   //Inventory
   //Products
-//Brand
   static const String getAllProducts = "product/get-products";
   static const String addProduct = "product/store";
   static const String updateProduct = "product/update/";
@@ -78,4 +77,7 @@ class NetWorkStrings{
   static const String generateProductBarcode = "product/generate-barcode/";
   static const String changeStatusProduct = "product/change-status/";
   static const String getProductCategoriesBrandsUnitsWarranties = "product/get-categories-brands-units-warranties";
+
+  //stock report
+  static const String getStockReportList = "inventory/get-product-stock-report";
 }

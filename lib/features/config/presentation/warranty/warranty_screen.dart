@@ -77,6 +77,7 @@ class _WarrantyScreenState extends State<WarrantyScreen> {
                                 return const SizedBox.shrink();
                               } else {
                                 return const Divider(
+                                  height: 0,
                                   color: Colors.grey,
                                 );
                               }
@@ -85,7 +86,7 @@ class _WarrantyScreenState extends State<WarrantyScreen> {
                               enabled: false,
                               contentPadding: EdgeInsets.zero,
                               title: Text(
-                                _warrantyController.warrantyList[index].title,
+                                _warrantyController.warrantyList[index].name,
                                 style: context.textTheme.titleSmall?.copyWith(
                                     color: Colors.black,
                                     fontWeight: FontWeight.w500,

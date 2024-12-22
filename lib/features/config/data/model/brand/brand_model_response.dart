@@ -26,12 +26,12 @@ class Data {
     required this.brandList,
     required this.meta,
   });
-  late final List<Brand> brandList;
+  late final List<BrandDetails> brandList;
   late final Meta meta;
 
   Data.fromJson(Map<String, dynamic> json){
     meta = Meta.fromJson(json['meta']);
-    brandList = List.from(json['data']).map((e)=>Brand.fromJson(e)).toList();
+    brandList = List.from(json['data']).map((e)=>BrandDetails.fromJson(e)).toList();
   }
 
   Map<String, dynamic> toJson() {
@@ -42,8 +42,8 @@ class Data {
   }
 }
 
-class Brand {
-  Brand({
+class BrandDetails {
+  BrandDetails({
     required this.id,
     this.business,
     required this.name,
@@ -58,7 +58,7 @@ class Brand {
   late final String? url;
   late final String logo;
 
-  Brand.fromJson(Map<String, dynamic> json){
+  BrandDetails.fromJson(Map<String, dynamic> json){
     id = json['id'];
     business = json['business'];
     name = json['name'];

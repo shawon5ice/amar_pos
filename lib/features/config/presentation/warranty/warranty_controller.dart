@@ -49,7 +49,7 @@ class WarrantyController extends GetxController {
       } else {
         // Perform case-insensitive search
         warrantyList = allWarrantyCopy
-            .where((e) => e.title.toLowerCase().contains(search.toLowerCase()))
+            .where((e) => e.name.toLowerCase().contains(search.toLowerCase()))
             .toList();
       }
     } catch (e) {

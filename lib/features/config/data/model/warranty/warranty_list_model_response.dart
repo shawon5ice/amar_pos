@@ -22,32 +22,20 @@ class WarrantyListModelResponse {
 class Warranty {
   Warranty({
     required this.id,
-    required this.title,
-    required this.description,
-    required this.type,
-    required this.count,
+    required this.name,
   });
   late final int id;
-  late final String title;
-  late final String description;
-  late final String type;
-  late final int count;
+  late final String name;
 
   Warranty.fromJson(Map<String, dynamic> json){
     id = json['id'];
-    title = json['title'];
-    description = json['description'];
-    type = json['type'];
-    count = json['count'];
+    name = json['name'];
   }
 
   Map<String, dynamic> toJson() {
     final _data = <String, dynamic>{};
     _data['id'] = id;
-    _data['title'] = title;
-    _data['description'] = description;
-    _data['type'] = type;
-    _data['count'] = count;
+    _data['name'] = name;
     return _data;
   }
 }

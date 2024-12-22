@@ -76,6 +76,7 @@ class _UnitScreenState extends State<UnitScreen> {
                                 return const SizedBox.shrink();
                               } else {
                                 return const Divider(
+                                  height: 0,
                                   color: Colors.grey,
                                 );
                               }

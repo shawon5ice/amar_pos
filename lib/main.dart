@@ -10,6 +10,7 @@ import 'package:path_provider/path_provider.dart';
 import 'core/routes/router.dart';
 import 'core/theme/app_theme.dart';
 import 'package:device_preview_plus/device_preview_plus.dart';
+import 'core/widgets/loading/random_lottie_loader.dart';
 import 'features/splash/splash_screen.dart';
 
 void main() async {
@@ -31,6 +32,7 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
+
   const MyApp({Key? key}) : super(key: key);
 
   @override

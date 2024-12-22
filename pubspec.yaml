@@ -54,6 +54,7 @@ dependencies:
   auto_size_text_plus:
   dropdown_button2:
   ai_barcode_scanner:
+  lottie:
 
 dev_dependencies:
   flutter_test:
@@ -90,6 +91,7 @@ flutter:
     - assets/configuration/
     - assets/
     - assets/icon/
+    - assets/lottie/
   # assets:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg

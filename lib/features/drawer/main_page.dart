@@ -25,14 +25,14 @@ class MainPage extends StatelessWidget {
           : true,
       onPopInvokedWithResult: (value, v) {
         if (menuController.isDrawerOpened.value) {
-          // If drawer is open on any screen, close the drawer
-          if (menuController.selectedMenuItem.value?.parent !=
-              DrawerItems.overview) {
-            menuController.currentScreen.value = HomeScreen.routeName;
-            menuController.selectMenuItem(MenuSelection(parent: DrawerItems.overview));
-          }else{
-            menuController.closeDrawer();
-          }
+          // // If drawer is open on any screen, close the drawer
+          // if (menuController.selectedMenuItem.value?.parent !=
+          //     DrawerItems.overview) {
+          //   menuController.currentScreen.value = HomeScreen.routeName;
+          //   menuController.selectMenuItem(MenuSelection(parent: DrawerItems.overview));
+          // }else{
+          //   menuController.closeDrawer();
+          // }
           menuController.closeDrawer();
         } else if (menuController.selectedMenuItem.value?.parent !=
             DrawerItems.overview) {

@@ -15,7 +15,7 @@ import 'brand_controller.dart';
 
 class CreateBrandBottomSheet extends StatefulWidget {
   const CreateBrandBottomSheet({super.key, this.brand});
-  final Brand? brand;
+  final BrandDetails? brand;
 
   @override
   State<CreateBrandBottomSheet> createState() => _CreateBrandBottomSheetState();

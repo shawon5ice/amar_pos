@@ -18,8 +18,8 @@ class BrandController extends GetxController {
 
   LoginData? loginData = LoginDataBoxManager().loginData;
 
-  List<Brand> brandList = [];
-  List<Brand> allBrandCopy = [];
+  List<BrandDetails> brandList = [];
+  List<BrandDetails> allBrandCopy = [];
   BrandModelResponse? brandModelResponse;
 
 
@@ -124,7 +124,7 @@ class BrandController extends GetxController {
   }
 
   void editBrand({
-    required Brand brand,
+    required BrandDetails brand,
     required String brandName,
     String? brandLogo,
   }) async {
@@ -160,7 +160,7 @@ class BrandController extends GetxController {
   }
 
   void deleteBrand({
-    required Brand brand,
+    required BrandDetails brand,
   }) async {
     isAddBrandLoading = true;
     update(["brand_list"]);

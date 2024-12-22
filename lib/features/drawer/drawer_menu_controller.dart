@@ -1,7 +1,7 @@
 import 'package:amar_pos/features/auth/data/model/hive/login_data.dart';
 import 'package:amar_pos/features/auth/data/model/hive/login_data_helper.dart';
-import 'package:amar_pos/features/inventory/presentation/inventory_screen.dart';
 import 'package:amar_pos/features/inventory/presentation/products/products_screen.dart';
+import 'package:amar_pos/features/inventory/presentation/stock_report/stock_report.dart';
 import 'package:get/get.dart';
 import 'package:amar_pos/features/home/presentation/home_screen.dart';
 import 'package:amar_pos/features/config/presentation/configuration_screen.dart';
@@ -63,7 +63,9 @@ class DrawerMenuController extends GetxController {
         return const HomeScreen(); // Default to HomeScreen
       case DrawerItems.inventory:
         if(selectedMenuItem.value?.child == "Product List"){
-          return ProductsScreen();
+          return const ProductsScreen();
+        }else if(selectedMenuItem.value?.child == "Stock Report"){
+          return const StockReportScreen();
         }else{
           return Container();
         }
