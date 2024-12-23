@@ -1,12 +1,11 @@
 import 'package:amar_pos/core/constants/app_colors.dart';
 import 'package:amar_pos/features/drawer/drawer_menu_controller.dart';
+import 'package:amar_pos/features/inventory/presentation/stock_report/page/stock_ledger_page.dart';
 import 'package:amar_pos/features/inventory/presentation/stock_report/page/stock_report_page.dart';
 import 'package:amar_pos/features/inventory/presentation/stock_report/stock_report_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:lottie/lottie.dart';
 import '../../../../core/responsive/pixel_perfect.dart';
-import '../../../../core/widgets/loading/random_lottie_loader.dart';
 
 class StockReportScreen extends StatefulWidget {
   static const String routeName = "/stock-report";
@@ -27,12 +26,7 @@ class _StockReportScreenState extends State<StockReportScreen>
   @override
   void initState() {
     _tabController = TabController(length: 2, vsync: this);
-    controller.getStockReportList(page: 1, context: context);
-    _tabController.addListener(() {
-      if (_tabController.index == 0) {
-        controller.getStockReportList(page: 1, context: context);
-      }
-    });
+    // controller.getStockReportList(page: 1, context: context);
     super.initState();
   }
 
@@ -82,13 +76,12 @@ class _StockReportScreenState extends State<StockReportScreen>
                 ),
               ),
               addH(12),
-              Lottie.asset('assets/lottie/loading1.json', width: 300, height: 100),
               Expanded(
                 child: TabBarView(
                   controller: _tabController,
-                  children: [
+                  children: const [
                     StockReportPage(),
-                    Container(),
+                    StockLedgerPage(),
                   ],
                 ),
               )

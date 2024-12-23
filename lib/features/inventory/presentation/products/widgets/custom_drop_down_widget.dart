@@ -15,11 +15,13 @@ class CustomDropdownWithSearchWidget<T> extends StatefulWidget {
   final String title;
   final String searchHintText;
   final bool isMandatory;
+  final bool? noTitle;
 
   final String? Function(T?)? validator;
 
   const CustomDropdownWithSearchWidget({
     super.key,
+    this.noTitle,
     required this.items,
     required this.isMandatory,
     required this.title,
@@ -56,9 +58,14 @@ class _CustomDropdownWithSearchWidgetState<T> extends State<CustomDropdownWithSe
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        addH(16.h),
-        widget.isMandatory ? RichFieldTitle(text: widget.title,) : FieldTitle(widget.title,),
-        addH(8.h),
+        if(widget.noTitle == null)
+          Column(
+            children: [
+              addH(16.h),
+              widget.isMandatory ? RichFieldTitle(text: widget.title,) : FieldTitle(widget.title,),
+              addH(8.h),
+            ],
+          ),
         DropdownButtonHideUnderline(
           child: DropdownButtonFormField2<T>(
             isExpanded: true,
@@ -69,21 +76,9 @@ class _CustomDropdownWithSearchWidgetState<T> extends State<CustomDropdownWithSe
                 color: Theme.of(context).hintColor,
               ),
             ),
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               isDense: true,
               border: InputBorder.none,
-              // border: OutlineInputBorder(
-              //   borderRadius: BorderRadius.circular(8),
-              //   borderSide: BorderSide(color: AppColors.inputBorderColor),
-              // ),
-              // focusedBorder: OutlineInputBorder(
-              //   borderRadius: BorderRadius.circular(8),
-              //   borderSide: BorderSide(color: AppColors.inputBorderColor),
-              // ),
-              // errorBorder: OutlineInputBorder(
-              //   borderRadius: BorderRadius.circular(8),
-              //   borderSide: BorderSide(color: Colors.red),
-              // ),
               contentPadding: EdgeInsets.zero,
             ),
             validator: widget.validator,
@@ -96,6 +91,8 @@ class _CustomDropdownWithSearchWidgetState<T> extends State<CustomDropdownWithSe
                       style: const TextStyle(
                         fontSize: 14,
                       ),
+                      // maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 )

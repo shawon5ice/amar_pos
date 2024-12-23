@@ -1,14 +1,11 @@
 import 'dart:async';
-
-import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
-import 'package:amar_pos/features/inventory/data/products/product_brand_category_warranty_unit_list_response_model.dart';
 import 'package:amar_pos/features/inventory/data/service/product_service.dart';
 import 'package:amar_pos/features/inventory/data/service/stock_report_service.dart';
+import 'package:amar_pos/features/inventory/data/stock_report/stock_ledger_list_response_model.dart';
 import 'package:amar_pos/features/inventory/data/stock_report/stock_report_list_reponse_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
-
 import '../../../../core/constants/logger/logger.dart';
 import '../../../../core/widgets/methods/helper_methods.dart';
 import '../../../auth/data/model/hive/login_data.dart';
@@ -17,27 +14,19 @@ import '../../data/products/product_list_response_model.dart';
 
 class StockReportController extends GetxController {
   bool isStockReportListLoading = false;
+  bool isStockLedgerListLoading = false;
   bool isLoadingMore = false;
   bool isActionLoading = false;
   bool filterListLoading = false;
-  String generatedBarcode = "";
-  bool barcodeGenerationLoading = false;
 
   LoginData? loginData = LoginDataBoxManager().loginData;
-
-  List<String> selectedFilterItems = [];
-  List<String> selectedBrands = [];
-  List<String> selectedCategories = [];
-
-  List<String> brands = [];
-  List<String> categories = [];
 
 
   StockReportListResponseModel? stockReportListResponseModel;
   List<StockReport> stockReportList = [];
 
-  ProductBrandCategoryWarrantyUnitListResponseModel?
-      productBrandCategoryWarrantyUnitListResponseModel;
+  List<StockLedger> stockLedgerList = [];
+  StockLedgerListResponseModel? stockLedgerListResponseModel;
 
   bool hasError = false;
 
@@ -51,10 +40,6 @@ class StockReportController extends GetxController {
 
     hasError = false; // Reset error before loading
     update(['stock_report_list']);
-    // EasyLoading.show(
-    //   status: "Loading..."
-    // );
-    RandomLottieLoader().show(context!);
     try {
       var response = await StockReportService.getStockReportList(
         usrToken: loginData!.token,
@@ -83,9 +68,58 @@ class StockReportController extends GetxController {
       } else {
         isLoadingMore = false;
       }
-      EasyLoading.dismiss();
-      RandomLottieLoader().hide();
       update(['stock_report_list']);
+    }
+  }
+
+
+  //Stock Ledger
+  Future<void> getStockLedgerList({
+    required int page,
+    required int storeId,
+    required int productId,
+    required String startDate,
+    required String endDate,
+  }) async {
+    if (page == 1) {
+      isStockLedgerListLoading = true;
+      stockLedgerList.clear();
+    } else {
+      isLoadingMore = true;
+    }
+
+    hasError = false;
+    update(['stock_ledger_list']);
+    try {
+      var response = await StockReportService.getStockLedgerList(
+        usrToken: loginData!.token,
+        page: page,
+        storeId: storeId,
+        productId: productId,
+        startDate: startDate,
+        endDate: endDate,
+      );
+
+      if (response != null) {
+        logger.d(response);
+        stockLedgerListResponseModel =
+            StockLedgerListResponseModel.fromJson(response);
+
+        if (stockLedgerListResponseModel != null) {
+          stockLedgerList.addAll(stockLedgerListResponseModel!.data.stockLedgerList);
+        } else {
+          hasError = true; // Error occurred while parsing data
+        }
+      } else {
+        hasError = true; // Error occurred with the response
+      }
+    } catch (e) {
+      hasError = true; // Handle any exceptions
+      logger.e(e);
+    } finally {
+      isStockLedgerListLoading = false;
+      isLoadingMore = false;
+      update(['stock_ledger_list']);
     }
   }
 
@@ -235,36 +269,6 @@ class StockReportController extends GetxController {
     }
   }
 
-  void generateBarcode({
-    required int id,
-  }) async {
-    // Perform necessary validations
-    generatedBarcode = "";
-    barcodeGenerationLoading = true;
-    update(['barcode_list']);
-    EasyLoading.show();
-    try {
-      var response = await ProductService.generateBarcode(
-        usrToken: loginData!.token,
-        id: id,
-      );
-
-      logger.i(response);
-      if (response != null && response['success']) {
-        EasyLoading.dismiss();
-        generatedBarcode = response['data'];
-        barcodeGenerationLoading = false;
-        update(['barcode_list']);
-      }
-    } catch (e) {
-      logger.e(e);
-      Methods.showSnackbar(msg: "An error occurred", isSuccess: false);
-    } finally {
-      EasyLoading.dismiss();
-    }
-  }
-
-
 
   void deleteProduct({
     required ProductInfo productInfo,
@@ -319,64 +323,6 @@ class StockReportController extends GetxController {
     }
     update(["stock_report_list"]);
     EasyLoading.dismiss();
-  }
-
-
-
-  Future<void> getCategoriesBrandWarrantyUnits() async {
-    hasError = false; // Reset error before loading
-    update(['filter_list']);
-
-    try {
-      var response = await ProductService.getCategoriesBrandWarrantyUnits(
-        usrToken: loginData!.token,
-      );
-
-      if (response != null) {
-        logger.d(response);
-        productBrandCategoryWarrantyUnitListResponseModel =
-            ProductBrandCategoryWarrantyUnitListResponseModel.fromJson(response);
-
-        if (productBrandCategoryWarrantyUnitListResponseModel != null) {
-          brands = productBrandCategoryWarrantyUnitListResponseModel!.data.brands.map((e) => e.name).toList();
-          categories = productBrandCategoryWarrantyUnitListResponseModel!.data.categories.map((e) => e.name).toList();
-        }
-      }
-    } catch (e) {
-      hasError = true; // Handle any exceptions
-      logger.e(e);
-    } finally {
-      update(['filter_list']);
-    }
-  }
-
-
-  void addFilterItem(List<String> item){
-    selectedFilterItems.addAll(item);
-    update(['filter_list']);
-    update(['filter_count']);
-  }
-
-  void deleteFilterItem(List<String> item){
-    item.forEach(selectedFilterItems.remove);
-    item.forEach(selectedCategories.remove);
-    item.forEach(selectedBrands.remove);
-    update(['filter_list']);
-    update(['filter_count']);
-  }
-
-  void clearFilterItems(){
-    selectedFilterItems.clear();
-    update(['filter_list']);
-    update(['filter_count']);
-  }
-
-  List<String> filterItems({required bool isBrand,required String search}){
-    if(isBrand){
-      return brands.where((e) => e.toLowerCase().contains(search.toLowerCase())).toList();
-    }else{
-      return categories.where((e) => e.toLowerCase().contains(search.toLowerCase())).toList();
-    }
   }
 
 }

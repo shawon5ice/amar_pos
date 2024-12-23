@@ -4,6 +4,7 @@ import 'package:amar_pos/features/config/data/model/employee/outlet_list_dd_resp
 import 'package:amar_pos/features/config/data/model/outlet/outlet_list_model_response.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
+import '../../../../core/data/model/outlet_model.dart';
 import '../../data/model/employee/employee_list_response_model.dart';
 import 'package:amar_pos/features/config/data/service/employee_service.dart';
 import 'package:amar_pos/features/config/data/service/supplier_service.dart';
@@ -21,8 +22,8 @@ class EmployeeController extends GetxController {
   List<Employee> employeeList = [];
   List<Employee> allEmployeeCopy = [];
 
-  List<OutletDD> outlets = [];
-  OutletDD? selectedOutlet;
+  List<OutletModel> outlets = [];
+  OutletModel? selectedOutlet;
   OutletListDDResponseModel? outletListDDResponseModel;
 
   EmployeeListModelResponse? employeeListModelResponse;

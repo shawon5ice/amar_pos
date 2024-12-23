@@ -6,9 +6,22 @@ import '../../../../../core/widgets/search_widget.dart';
 import '../stock_report_controller.dart';
 import '../widget/stock_report_item_widget.dart';
 
-class StockReportPage extends StatelessWidget {
+class StockReportPage extends StatefulWidget {
   const StockReportPage({super.key});
 
+  @override
+  State<StockReportPage> createState() => _StockReportPageState();
+}
+
+class _StockReportPageState extends State<StockReportPage> {
+
+  final StockReportController controller = Get.find();
+
+  @override
+  void initState() {
+    controller.getStockReportList(page: 1, context: context);
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Column(

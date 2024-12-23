@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:get/get.dart';
 import 'package:amar_pos/core/core.dart';
+import '../../../../core/data/model/outlet_model.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_text_field.dart';
 import '../../../../core/widgets/dotted_border_painter.dart';
@@ -269,7 +270,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                     GetBuilder<EmployeeController>(
                       id: 'outlet_dd',
                       builder: (controller) => DropdownButtonHideUnderline(
-                      child: DropdownButton2<OutletDD>(
+                      child: DropdownButton2<OutletModel>(
                         isExpanded: true,
                         hint: Text(
                           controller.outlets.isEmpty ? 'Loading...' : controller.outletListDDResponseModel == null ? AppStrings.kWentWrong : 'Select an outlet...',

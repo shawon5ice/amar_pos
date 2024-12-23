@@ -1,8 +1,6 @@
 import 'package:amar_pos/core/methods/helper_methods.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:intl/intl.dart';
-
 import '../constants/app_assets.dart';
 import '../responsive/pixel_perfect.dart';
 import 'custom_text_field.dart';

@@ -20,6 +20,29 @@ class StockReportService {
     return response;
   }
 
+  static Future<dynamic> getStockLedgerList({
+    required String usrToken,
+    required int page,
+    required int storeId,
+    required int productId,
+    required String startDate,
+    required String endDate,
+  }) async {
+    logger.d("Page: $page");
+    var response = await BaseClient.getData(
+        token: usrToken,
+        api: NetWorkStrings.getStockLedgerList,
+        parameter: {
+          "page": page,
+          "limit": 10,
+          "store_id": storeId,
+          "product_id": productId,
+          "start_date": startDate,
+          "end_date": endDate,
+        });
+    return response;
+  }
+
   static Future<dynamic> getCategoriesBrandWarrantyUnits({
     required String usrToken,
   }) async {
