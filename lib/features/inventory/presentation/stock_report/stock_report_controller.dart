@@ -3,10 +3,12 @@ import 'package:amar_pos/features/inventory/data/service/product_service.dart';
 import 'package:amar_pos/features/inventory/data/service/stock_report_service.dart';
 import 'package:amar_pos/features/inventory/data/stock_report/stock_ledger_list_response_model.dart';
 import 'package:amar_pos/features/inventory/data/stock_report/stock_report_list_reponse_model.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import '../../../../core/constants/logger/logger.dart';
+import '../../../../core/data/model/outlet_model.dart';
+import '../../../../core/data/model/product_model.dart';
 import '../../../../core/widgets/methods/helper_methods.dart';
 import '../../../auth/data/model/hive/login_data.dart';
 import '../../../auth/data/model/hive/login_data_helper.dart';
@@ -29,6 +31,41 @@ class StockReportController extends GetxController {
   StockLedgerListResponseModel? stockLedgerListResponseModel;
 
   bool hasError = false;
+
+  // Reactive Variables
+  Rx<DateTimeRange?> selectedDateTimeRange = Rx<DateTimeRange?>(null);
+  Rx<ProductModel?> selectedProduct = Rx<ProductModel?>(null);
+  Rx<OutletModel?> selectedOutlet = Rx<OutletModel?>(null);
+
+  // Clear Filters
+  void clearFilters() {
+    stockLedgerList.clear();
+    stockLedgerListResponseModel = null;
+    update(['stock_ledger_list']);
+    selectedDateTimeRange.value = null;
+    selectedProduct.value = null;
+    selectedOutlet.value = null;
+  }
+
+  // Setters
+  void setSelectedDateRange(DateTimeRange? range) {
+    selectedDateTimeRange.value = range;
+  }
+
+  void setSelectedProduct(ProductModel? product) {
+    selectedProduct.value = product;
+  }
+
+  void setSelectedOutlet(OutletModel? outlet) {
+    selectedOutlet.value = outlet;
+  }
+
+  // Apply Filters Logic
+  void applyFilters() {
+    // Logic to apply filters
+    print("Filters applied: Outlet: $selectedOutlet, Product: $selectedProduct, Date Range: $selectedDateTimeRange");
+  }
+
 
   Future<void> getStockReportList({required int page, BuildContext? context}) async {
     if (page == 1) {
@@ -76,10 +113,6 @@ class StockReportController extends GetxController {
   //Stock Ledger
   Future<void> getStockLedgerList({
     required int page,
-    required int storeId,
-    required int productId,
-    required String startDate,
-    required String endDate,
   }) async {
     if (page == 1) {
       isStockLedgerListLoading = true;
@@ -94,10 +127,10 @@ class StockReportController extends GetxController {
       var response = await StockReportService.getStockLedgerList(
         usrToken: loginData!.token,
         page: page,
-        storeId: storeId,
-        productId: productId,
-        startDate: startDate,
-        endDate: endDate,
+        storeId: selectedOutlet.value?.id,
+        productId: selectedProduct.value?.id,
+        startDate: selectedDateTimeRange.value?.start,
+        endDate: selectedDateTimeRange.value?.end,
       );
 
       if (response != null) {

@@ -81,4 +81,8 @@ class NetWorkStrings{
   //stock report
   static const String getStockReportList = "inventory/get-product-stock-report";
   static const String getStockLedgerList = "inventory/get-product-stock-ledger-report";
+
+
+  //Filter
+  static const String getProductListDD = "product/get-product-list";
 }

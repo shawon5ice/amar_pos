@@ -2,16 +2,20 @@ import 'package:amar_pos/core/methods/helper_methods.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import '../constants/app_assets.dart';
-import '../responsive/pixel_perfect.dart';
 import 'custom_text_field.dart';
-import 'field_title.dart';
+import 'methods/field_validator.dart';
 
 class CustomDateRangeSelectionFieldWidget extends StatefulWidget {
-  const CustomDateRangeSelectionFieldWidget({super.key, required this.onDateRangeSelection, required this.title, this.initialDate});
+  const CustomDateRangeSelectionFieldWidget({
+    super.key,
+    required this.onDateRangeSelection,
+    this.initialDate,
+    this.isMandatory,
+  });
 
-  final Function(DateTime? startDate, DateTime? endDate) onDateRangeSelection;
-  final String title;
+  final Function(DateTimeRange? dateRange) onDateRangeSelection;
   final DateTimeRange? initialDate;
+  final bool? isMandatory;
 
   @override
   State<CustomDateRangeSelectionFieldWidget> createState() =>
@@ -25,8 +29,29 @@ class _CustomDateRangeSelectionFieldWidgetState
   @override
   void initState() {
     _textEditingController = TextEditingController();
-    _textEditingController.text = widget.initialDate ?? '';
+    if (widget.initialDate != null) {
+      setDateString(widget.initialDate!);
+    }
     super.initState();
+  }
+
+  @override
+  void didUpdateWidget(covariant CustomDateRangeSelectionFieldWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    // Update the date string if the initialDate changes
+    if (widget.initialDate != null) {
+      setDateString(widget.initialDate!);
+    } else {
+      _textEditingController.clear();
+    }
+  }
+
+  void setDateString(DateTimeRange dateTimeRange) {
+    setState(() {
+      _textEditingController.text =
+      "${formatDate(dateTimeRange.start)} - ${formatDate(dateTimeRange.end)}";
+    });
   }
 
   @override
@@ -38,30 +63,46 @@ class _CustomDateRangeSelectionFieldWidgetState
   @override
   Widget build(BuildContext context) {
     return CustomTextField(
+      txtSize: 12,
       readOnly: true,
       onTap: () async {
         DateTimeRange? selectedDate = await showDateRangePicker(
-
           context: context,
-          firstDate: DateTime.now().subtract(Duration(days: 1000)),
-          lastDate: DateTime.now().add(Duration(days: 1000)),
+          firstDate: DateTime.now().subtract(const Duration(days: 1000)),
+          lastDate: DateTime.now().add(const Duration(days: 1000)),
           initialDateRange: widget.initialDate,
         );
-        if(selectedDate != null){
-          setState(() {
-            _textEditingController.text = formatDate(selectedDate);
-          });
-          // widget.onDateSelection(_textEditingController.text);
+        if (selectedDate != null) {
+          setDateString(selectedDate);
+          widget.onDateRangeSelection(selectedDate);
         }
       },
       textCon: _textEditingController,
-      suffixWidget: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: SvgPicture.asset(
-          AppAssets.calenderIcon,
+      suffixWidget: GestureDetector(
+        onTap: _textEditingController.text.isNotEmpty
+            ? () {
+          setState(() {
+            _textEditingController.clear();
+            widget.onDateRangeSelection(null);
+          });
+        }
+            : null,
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: _textEditingController.text.isNotEmpty
+              ? const Icon(
+            Icons.cancel_outlined,
+            color: Colors.red,
+          )
+              : SvgPicture.asset(
+            AppAssets.calenderIcon,
+          ),
         ),
       ),
-      hintText: "Select Manufacturing Date",
+      validator: widget.isMandatory != null ?  (value) =>
+          FieldValidator.nonNullableFieldValidator(
+              _textEditingController.text, "Date range") : null,
+      hintText: "Select date range",
       inputType: TextInputType.text,
     );
   }

@@ -4,3 +4,7 @@ String formatDate(DateTime date) {
   ];
   return "${date.day} ${months[date.month - 1]}, ${date.year}";
 }
+
+String basicFormatDate(DateTime date) {
+  return "${date.day}/${date.month}/${date.year}";
+}

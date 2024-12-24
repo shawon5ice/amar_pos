@@ -1,27 +1,22 @@
 import 'package:amar_pos/core/constants/app_colors.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-
-import '../../../../../core/responsive/pixel_perfect.dart';
 import '../../../../../core/widgets/field_title.dart';
 
 class CustomDropdownWithSearchWidget<T> extends StatefulWidget {
   final List<T> items;
   final T? value;
-  final String Function(T) itemLabel; // A function to extract display text
+  final String Function(T) itemLabel;
   final void Function(T?) onChanged;
   final String hintText;
   final String title;
   final String searchHintText;
   final bool isMandatory;
-  final bool? noTitle;
-
+  final bool noTitle;
   final String? Function(T?)? validator;
 
   const CustomDropdownWithSearchWidget({
     super.key,
-    this.noTitle,
     required this.items,
     required this.isMandatory,
     required this.title,
@@ -31,19 +26,22 @@ class CustomDropdownWithSearchWidget<T> extends StatefulWidget {
     required this.searchHintText,
     this.validator,
     this.value,
+    this.noTitle = false,
   });
 
   @override
-  State<CustomDropdownWithSearchWidget<T>> createState() => _CustomDropdownWithSearchWidgetState<T>();
+  State<CustomDropdownWithSearchWidget<T>> createState() =>
+      _CustomDropdownWithSearchWidgetState<T>();
 }
 
-class _CustomDropdownWithSearchWidgetState<T> extends State<CustomDropdownWithSearchWidget<T>> {
-  late final TextEditingController _textEditingController;
+class _CustomDropdownWithSearchWidgetState<T>
+    extends State<CustomDropdownWithSearchWidget<T>> {
+  late TextEditingController _textEditingController;
 
   @override
   void initState() {
-    _textEditingController = TextEditingController();
     super.initState();
+    _textEditingController = TextEditingController();
   }
 
   @override
@@ -52,19 +50,17 @@ class _CustomDropdownWithSearchWidgetState<T> extends State<CustomDropdownWithSe
     super.dispose();
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if(widget.noTitle == null)
-          Column(
-            children: [
-              addH(16.h),
-              widget.isMandatory ? RichFieldTitle(text: widget.title,) : FieldTitle(widget.title,),
-              addH(8.h),
-            ],
+        if (!widget.noTitle)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: widget.isMandatory
+                ? RichFieldTitle(text: widget.title)
+                : FieldTitle(widget.title),
           ),
         DropdownButtonHideUnderline(
           child: DropdownButtonFormField2<T>(
@@ -76,29 +72,59 @@ class _CustomDropdownWithSearchWidgetState<T> extends State<CustomDropdownWithSe
                 color: Theme.of(context).hintColor,
               ),
             ),
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               isDense: true,
-              border: InputBorder.none,
               contentPadding: EdgeInsets.zero,
+              border: OutlineInputBorder(
+                borderRadius: const BorderRadius.all(Radius.circular(8)),
+                borderSide: BorderSide(
+                  color: AppColors.inputBorderColor,
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: const BorderRadius.all(Radius.circular(8)),
+                borderSide: BorderSide(
+                  color: AppColors.inputBorderColor,
+                ),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderRadius: const BorderRadius.all(Radius.circular(8)),
+                borderSide: BorderSide(
+                  color: Colors.red, // Red border for error state
+                ),
+              ),
+              focusedErrorBorder: OutlineInputBorder(
+                borderRadius: const BorderRadius.all(Radius.circular(8)),
+                borderSide: BorderSide(
+                  color: Colors.red,
+                ),
+              ),
             ),
-            validator: widget.validator,
+            validator: widget.isMandatory
+                ? widget.validator ??
+                    (value) {
+                  if (value == null) {
+                    return "This field is required.";
+                  }
+                  return null;
+                }
+                : widget.validator,
             items: widget.items
                 .map(
                   (item) => DropdownMenuItem<T>(
-                    value: item,
-                    child: Text(
-                      widget.itemLabel(item),
-                      style: const TextStyle(
-                        fontSize: 14,
-                      ),
-                      // maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                )
+                value: item,
+                child: Text(
+                  widget.itemLabel(item),
+                  style: const TextStyle(fontSize: 14),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            )
                 .toList(),
             value: widget.value,
-            onChanged: widget.onChanged,
+            onChanged: (value) {
+              widget.onChanged(value);
+            },
             buttonStyleData: ButtonStyleData(
               height: 48,
               padding: EdgeInsets.zero,
@@ -120,24 +146,13 @@ class _CustomDropdownWithSearchWidgetState<T> extends State<CustomDropdownWithSe
             dropdownSearchData: DropdownSearchData(
               searchController: _textEditingController,
               searchInnerWidgetHeight: 58,
-              searchInnerWidget: Container(
-                height: 58,
-                padding: const EdgeInsets.only(
-                  top: 8,
-                  bottom: 4,
-                  right: 8,
-                  left: 8,
-                ),
+              searchInnerWidget: Padding(
+                padding:
+                const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
                 child: TextFormField(
-                  expands: true,
-                  maxLines: null,
                   controller: _textEditingController,
                   decoration: InputDecoration(
                     isDense: true,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 8,
-                    ),
                     hintText: widget.searchHintText,
                     hintStyle: const TextStyle(fontSize: 12),
                     border: OutlineInputBorder(
@@ -147,8 +162,7 @@ class _CustomDropdownWithSearchWidgetState<T> extends State<CustomDropdownWithSe
                 ),
               ),
               searchMatchFn: (item, searchValue) {
-                return widget
-                    .itemLabel(item.value!)
+                return widget.itemLabel(item.value!)
                     .toLowerCase()
                     .contains(searchValue.toLowerCase());
               },

@@ -1,14 +1,17 @@
 import 'package:amar_pos/core/constants/app_assets.dart';
 import 'package:amar_pos/core/widgets/reusable/outlet_dd/outlet_dd_controller.dart';
+import 'package:amar_pos/core/widgets/reusable/product_dd/products_dd_controller.dart';
 import 'package:amar_pos/features/inventory/presentation/stock_report/widget/stock_ledger_filter_widgert.dart';
+import 'package:amar_pos/features/inventory/presentation/stock_report/widget/stock_ledger_list_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import '../../../../../core/methods/helper_methods.dart';
 import '../../../../../core/responsive/pixel_perfect.dart';
 import '../../../../../core/widgets/pager_list_view.dart';
-import '../../../../../core/widgets/search_widget.dart';
 import '../stock_report_controller.dart';
-import '../widget/stock_report_item_widget.dart';
+import '../widget/custom_svg_icon_widget.dart';
+import '../widget/field_title_value_widget.dart';
 
 class StockLedgerPage extends StatefulWidget {
   const StockLedgerPage({super.key});
@@ -22,19 +25,22 @@ class _StockReportPageState extends State<StockLedgerPage> {
 
   @override
   void initState() {
+    controller.clearFilters();
+
     Get.put(OutletDDController());
+    Get.put(ProductsDDController());
     super.initState();
   }
 
   @override
   void dispose() {
     Get.delete<OutletDDController>();
+    Get.delete<ProductsDDController>();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Column(
       children: [
         Row(
@@ -44,43 +50,49 @@ class _StockReportPageState extends State<StockLedgerPage> {
                   onTap: () {
                     showModalBottomSheet(
                       context: context,
-                      builder: (context) => const StockLedgerFilterBottomSheet(),
+                      builder: (context) =>
+                          const StockLedgerFilterBottomSheet(),
                     );
                   },
                   child: Container(
-                    padding: const EdgeInsets.only(left: 20, right: 20, top: 12,bottom: 12),
-                    decoration: BoxDecoration(
+                    padding: const EdgeInsets.only(
+                        left: 20, right: 20, top: 12, bottom: 12),
+                    decoration: const BoxDecoration(
                       color: Colors.white,
-                      borderRadius: const BorderRadius.all(
+                      borderRadius: BorderRadius.all(
                         Radius.circular(20),
                       ),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text("Filter Product "),
-                        Spacer(),
-                        SvgPicture.asset(AppAssets.filterIcon, height: 20, width: 20,)
+                        const Text("Filter Product "),
+                        const Spacer(),
+                        SvgPicture.asset(
+                          AppAssets.filterIcon,
+                          height: 20,
+                          width: 20,
+                        )
                       ],
                     ),
                   )),
             ),
             addW(8),
             CustomSvgIconButton(
-              bgColor: Color(0xffEBFFDF),
-              onTap: (){},
+              bgColor: const Color(0xffEBFFDF),
+              onTap: () {},
               assetPath: AppAssets.excelIcon,
             ),
             addW(4),
             CustomSvgIconButton(
-              bgColor: Color(0xffE1F2FF),
-              onTap: (){},
+              bgColor: const Color(0xffE1F2FF),
+              onTap: () {},
               assetPath: AppAssets.downloadIcon,
             ),
             addW(4),
             CustomSvgIconButton(
-              bgColor: Color(0xffFFFCF8),
-              onTap: (){},
+              bgColor: const Color(0xffFFFCF8),
+              onTap: () {},
               assetPath: AppAssets.printIcon,
             )
           ],
@@ -97,56 +109,79 @@ class _StockReportPageState extends State<StockLedgerPage> {
               }
               return RefreshIndicator(
                 onRefresh: () async {
-                  controller.getStockReportList(page: 1);
+                  controller.getStockLedgerList(page: 1);
                 },
-                child: PagerListView(
-                  items: controller.stockLedgerList,
-                  itemBuilder: (_, item) {
-                    return Container();
-                  },
-                  isLoading: controller.isLoadingMore,
-                  hasError: controller.hasError,
-                  onNewLoad: (int nextPage) async {
-                    await controller.getStockReportList(page: nextPage);
-                  },
-                  totalPage: controller.stockLedgerListResponseModel?.data
-                          .pagination.lastPage ??
-                      0,
-                  totalSize: controller.stockLedgerListResponseModel?.data
-                          .pagination.total ??
-                      0,
-                  itemPerPage: 10,
-                ),
+                child: controller.stockLedgerList.isEmpty
+                    ? const Center(
+                        child: Text(
+                          "Please set filter to see stock ledger",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      )
+                    : Column(
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.symmetric(vertical: 8),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 12),
+                            decoration: const BoxDecoration(
+                                color: Colors.white,
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(20))),
+                            child: Column(
+                              children: [
+                                FieldTitleValueWidget(
+                                  title: "Product Name",
+                                  value:
+                                      controller.selectedProduct.value?.name ??
+                                          "--",
+                                ),
+                                addH(4),
+                                FieldTitleValueWidget(
+                                  title: "Date",
+                                  value:
+                                      "${formatDate(controller.selectedDateTimeRange.value!.start)} - ${formatDate(controller.selectedDateTimeRange.value!.end)}",
+                                ),
+                                addH(4),
+                                FieldTitleValueWidget(
+                                  title: "Outlet",
+                                  value: controller.selectedOutlet.value!.name
+                                      .toString(),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Expanded(
+                            child: PagerListView(
+                              items: controller.stockLedgerList,
+                              itemBuilder: (_, item) {
+                                return StockLedgerListItem(item: item);
+                              },
+                              isLoading: controller.isLoadingMore,
+                              hasError: controller.hasError,
+                              onNewLoad: (int nextPage) async {
+                                await controller.getStockLedgerList(
+                                    page: nextPage);
+                              },
+                              totalPage: controller.stockLedgerListResponseModel
+                                      ?.data.pagination.lastPage ??
+                                  0,
+                              totalSize: controller.stockLedgerListResponseModel
+                                      ?.data.pagination.total ??
+                                  0,
+                              itemPerPage: 10,
+                            ),
+                          ),
+                        ],
+                      ),
               );
             },
           ),
         )
       ],
-    );
-  }
-}
-
-class CustomSvgIconButton extends StatelessWidget {
-  const CustomSvgIconButton({
-    super.key,
-    required this.bgColor,
-    required this.onTap,
-    required this.assetPath,
-  });
-
-  final Color bgColor;
-  final String assetPath;
-  final Function()? onTap;
-
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: CircleAvatar(
-          radius: 24,
-          backgroundColor: bgColor,
-          child: SvgPicture.asset(assetPath)),
     );
   }
 }
