@@ -29,7 +29,7 @@ class RandomLottieLoader {
               child: Container(
                 width: 300,
                 height: 300,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.all(Radius.circular(16)),
                 ),

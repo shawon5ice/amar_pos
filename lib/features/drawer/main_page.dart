@@ -23,7 +23,7 @@ class MainPage extends StatelessWidget {
                   DrawerItems.overview
           ? false
           : true,
-      onPopInvokedWithResult: (value, v) {
+      onPopInvoked: (value) {
         if (menuController.isDrawerOpened.value) {
           // // If drawer is open on any screen, close the drawer
           // if (menuController.selectedMenuItem.value?.parent !=

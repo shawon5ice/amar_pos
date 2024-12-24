@@ -136,8 +136,7 @@ class _StockReportPageState extends State<StockLedgerPage> {
                                 FieldTitleValueWidget(
                                   title: "Product Name",
                                   value:
-                                      controller.selectedProduct.value?.name ??
-                                          "--",
+                                      controller.selectedProduct.value!.name,
                                 ),
                                 addH(4),
                                 FieldTitleValueWidget(

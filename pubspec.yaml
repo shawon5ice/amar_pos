@@ -55,6 +55,10 @@ dependencies:
   dropdown_button2:
   ai_barcode_scanner:
   lottie:
+  flutter_local_notifications:
+  permission_handler:
+  firebase_core:
+  firebase_messaging:
 
 dev_dependencies:
   flutter_test:
