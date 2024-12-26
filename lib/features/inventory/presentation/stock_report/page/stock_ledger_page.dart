@@ -80,13 +80,17 @@ class _StockReportPageState extends State<StockLedgerPage> {
             addW(8),
             CustomSvgIconButton(
               bgColor: const Color(0xffEBFFDF),
-              onTap: () {},
+              onTap: () {
+                controller.downloadStockLedgerReport(isPdf: false, context: context);
+              },
               assetPath: AppAssets.excelIcon,
             ),
             addW(4),
             CustomSvgIconButton(
               bgColor: const Color(0xffE1F2FF),
-              onTap: () {},
+              onTap: () {
+                controller.downloadStockLedgerReport(isPdf: true, context: context);
+              },
               assetPath: AppAssets.downloadIcon,
             ),
             addW(4),
@@ -123,36 +127,7 @@ class _StockReportPageState extends State<StockLedgerPage> {
                       )
                     : Column(
                         children: [
-                          Container(
-                            margin: const EdgeInsets.symmetric(vertical: 8),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 12),
-                            decoration: const BoxDecoration(
-                                color: Colors.white,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(20))),
-                            child: Column(
-                              children: [
-                                FieldTitleValueWidget(
-                                  title: "Product Name",
-                                  value:
-                                      controller.selectedProduct.value!.name,
-                                ),
-                                addH(4),
-                                FieldTitleValueWidget(
-                                  title: "Date",
-                                  value:
-                                      "${formatDate(controller.selectedDateTimeRange.value!.start)} - ${formatDate(controller.selectedDateTimeRange.value!.end)}",
-                                ),
-                                addH(4),
-                                FieldTitleValueWidget(
-                                  title: "Outlet",
-                                  value: controller.selectedOutlet.value!.name
-                                      .toString(),
-                                ),
-                              ],
-                            ),
-                          ),
+                          FilterStatusWidget(),
                           Expanded(
                             child: PagerListView(
                               items: controller.stockLedgerList,
@@ -184,3 +159,43 @@ class _StockReportPageState extends State<StockLedgerPage> {
     );
   }
 }
+
+class FilterStatusWidget extends StatelessWidget {
+  FilterStatusWidget({super.key});
+
+  final StockReportController controller = Get.find();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(
+          horizontal: 12, vertical: 12),
+      decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius:
+          BorderRadius.all(Radius.circular(20))),
+      child: Column(
+        children: [
+          FieldTitleValueWidget(
+            title: "Product Name",
+            value: controller.selectedProduct.value!.name,
+          ),
+          addH(4),
+          FieldTitleValueWidget(
+            title: "Date",
+            value:
+            "${formatDate(controller.selectedDateTimeRange.value!.start)} - ${formatDate(controller.selectedDateTimeRange.value!.end)}",
+          ),
+          addH(4),
+          FieldTitleValueWidget(
+            title: "Outlet",
+            value: controller.selectedOutlet.value!.name
+                .toString(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+

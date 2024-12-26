@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:amar_pos/core/core.dart';
 import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
@@ -42,7 +43,7 @@ class FileDownloader {
             : null,
         onReceiveProgress: (received, total) {
           if (total != -1) {
-            RandomLottieLoader().show(context);
+            RandomLottieLoader().show(context, (received / total).toDouble());
             // EasyLoading.showProgress(received / total,
             //     status: "Downloading...");
             print("${(received / total * 100).toStringAsFixed(0)}%");
@@ -54,9 +55,11 @@ class FileDownloader {
 
       await _showNotification(filePath, fileName);
     } catch (e) {
-      RandomLottieLoader().hide();
+      // RandomLottieLoader().hide();
       // Methods.hideLoading();
       print("Download failed: $e");
+    }finally{
+      RandomLottieLoader().hide(context);
     }
   }
 

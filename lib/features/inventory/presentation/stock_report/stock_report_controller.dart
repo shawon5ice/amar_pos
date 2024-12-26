@@ -1,18 +1,16 @@
 import 'dart:async';
-import 'package:amar_pos/features/inventory/data/service/product_service.dart';
+import 'package:amar_pos/core/methods/helper_methods.dart';
 import 'package:amar_pos/features/inventory/data/service/stock_report_service.dart';
 import 'package:amar_pos/features/inventory/data/stock_report/stock_ledger_list_response_model.dart';
 import 'package:amar_pos/features/inventory/data/stock_report/stock_report_list_reponse_model.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import '../../../../core/constants/logger/logger.dart';
 import '../../../../core/data/model/outlet_model.dart';
 import '../../../../core/data/model/product_model.dart';
-import '../../../../core/widgets/methods/helper_methods.dart';
+import '../../../../core/network/helpers/error_extractor.dart';
 import '../../../auth/data/model/hive/login_data.dart';
 import '../../../auth/data/model/hive/login_data_helper.dart';
-import '../../data/products/product_list_response_model.dart';
 
 class StockReportController extends GetxController {
   bool isStockReportListLoading = false;
@@ -22,7 +20,6 @@ class StockReportController extends GetxController {
   bool filterListLoading = false;
 
   LoginData? loginData = LoginDataBoxManager().loginData;
-
 
   StockReportListResponseModel? stockReportListResponseModel;
   List<StockReport> stockReportList = [];
@@ -63,11 +60,12 @@ class StockReportController extends GetxController {
   // Apply Filters Logic
   void applyFilters() {
     // Logic to apply filters
-    print("Filters applied: Outlet: $selectedOutlet, Product: $selectedProduct, Date Range: $selectedDateTimeRange");
+    print(
+        "Filters applied: Outlet: $selectedOutlet, Product: $selectedProduct, Date Range: $selectedDateTimeRange");
   }
 
-
-  Future<void> getStockReportList({required int page, BuildContext? context}) async {
+  Future<void> getStockReportList(
+      {required int page, BuildContext? context}) async {
     if (page == 1) {
       isStockReportListLoading = true;
       stockReportList.clear();
@@ -89,7 +87,8 @@ class StockReportController extends GetxController {
             StockReportListResponseModel.fromJson(response);
 
         if (stockReportListResponseModel != null) {
-          stockReportList.addAll(stockReportListResponseModel!.stockReportResponse.stockReportList);
+          stockReportList.addAll(stockReportListResponseModel!
+              .stockReportResponse.stockReportList);
         } else {
           hasError = true; // Error occurred while parsing data
         }
@@ -108,7 +107,6 @@ class StockReportController extends GetxController {
       update(['stock_report_list']);
     }
   }
-
 
   //Stock Ledger
   Future<void> getStockLedgerList({
@@ -139,7 +137,8 @@ class StockReportController extends GetxController {
             StockLedgerListResponseModel.fromJson(response);
 
         if (stockLedgerListResponseModel != null) {
-          stockLedgerList.addAll(stockLedgerListResponseModel!.data.stockLedgerList);
+          stockLedgerList
+              .addAll(stockLedgerListResponseModel!.data.stockLedgerList);
         } else {
           hasError = true; // Error occurred while parsing data
         }
@@ -156,206 +155,35 @@ class StockReportController extends GetxController {
     }
   }
 
+  Future<void> downloadStockLedgerReport({required bool isPdf, required BuildContext context}) async {
+    hasError = false;
 
-  //Add Product
-  void addProduct({
-    required String sku,
-    required String name,
-    int? brandId,
-    required int categoryId,
-    required int unitId,
-    int? warrantyId,
-    required num wholesalePrice,
-    required num mrpPrice,
-    num? vat,
-    num? alertQuantity,
-    String? mfgDate,
-    String? expiredDate,
-    String? photo,
-  }) async {
-    // Perform necessary validations
-
-    EasyLoading.show();
+    if (selectedOutlet.value == null ||
+        selectedProduct.value == null ||
+        selectedDateTimeRange.value == null) {
+      ErrorExtractor.showErrorDialog(Get.context!, {
+        "errors": {
+          "x": ["Please set a filter first to download your desired stock ledger report"],
+        },
+      });
+      return;
+    }
+    String fileName = "${selectedOutlet.value!.name}_${selectedProduct.value!.name}_${formatDate(selectedDateTimeRange.value!.start)}-${formatDate(selectedDateTimeRange.value!.end)}-${DateTime.now().microsecondsSinceEpoch.toString()}${isPdf? ".pdf":".xlsx"}";
     try {
-      var response = await ProductService.store(
-        token: loginData!.token,
-        sku: sku,
-        name: name,
-        brandId: brandId,
-        categoryId: categoryId,
-        unitId: unitId,
-        warrantyId: warrantyId,
-        wholesalePrice: wholesalePrice,
-        mrpPrice: mrpPrice,
-        vat: vat,
-        alertQuantity: alertQuantity,
-        mfgDate: mfgDate,
-        expiredDate: expiredDate,
-        photo: photo,
+      var response = await StockReportService.downloadStockLedgerReport(
+        isPdf: isPdf,
+        usrToken: loginData!.token,
+        storeId: selectedOutlet.value?.id,
+        productId: selectedProduct.value?.id,
+        startDate: selectedDateTimeRange.value?.start,
+        endDate: selectedDateTimeRange.value?.end,
+        fileName: fileName,
+        context: context,
       );
-
-      logger.i(response);
-      if (response != null && response['success']) {
-        EasyLoading.dismiss();
-        Get.back();
-        getStockReportList( page: 1);
-        Methods.showSnackbar(msg: response['message'], isSuccess: true);
-
-      }
     } catch (e) {
       logger.e(e);
-      Methods.showSnackbar(msg: "An error occurred", isSuccess: false);
     } finally {
-      EasyLoading.dismiss();
+
     }
   }
-
-
-
-  //Update product
-  void updateProduct({
-    required int id,
-    required String name,
-    required String sku,
-    int? brandId,
-    required int categoryId,
-    required int unitId,
-    int? warrantyId,
-    required num wholesalePrice,
-    required num mrpPrice,
-    num? vat,
-    num? alertQuantity,
-    String? mfgDate,
-    String? expiredDate,
-    String? photo,
-  }) async {
-    // Perform necessary validations
-
-    EasyLoading.show();
-    try {
-      var response = await ProductService.update(
-        token: loginData!.token,
-        id: id,
-        name: name,
-        brandId: brandId,
-        categoryId: categoryId,
-        unitId: unitId,
-        warrantyId: warrantyId,
-        wholesalePrice: wholesalePrice,
-        mrpPrice: mrpPrice,
-        vat: vat,
-        alertQuantity: alertQuantity,
-        mfgDate: mfgDate,
-        expiredDate: expiredDate,
-        photo: photo,
-      );
-
-      logger.i(response);
-      if (response != null && response['success']) {
-        EasyLoading.dismiss();
-        Get.back();
-        getStockReportList( page: 1);
-        Methods.showSnackbar(msg: response['message'], isSuccess: true);
-
-      }
-    } catch (e) {
-      logger.e(e);
-      Methods.showSnackbar(msg: "An error occurred", isSuccess: false);
-    } finally {
-      EasyLoading.dismiss();
-    }
-  }
-
-  void quickEditProduct({
-    required int id,
-    String? wholeSalePrice,
-    String? mrpPrice,
-    String? stockIn,
-    String? stockOut,
-  }) async {
-    // Perform necessary validations
-
-    EasyLoading.show();
-    try {
-      var response = await ProductService.quickEdit(
-        token: loginData!.token,
-        id: id,
-        wholeSalePrice: wholeSalePrice,
-        mrpPrice: mrpPrice,
-        stockOut: stockOut,
-        stockIn: stockIn,
-      );
-
-      logger.i(response);
-      if (response != null && response['success']) {
-        EasyLoading.dismiss();
-        Get.back();
-        getStockReportList( page: 1);
-        Methods.showSnackbar(msg: response['message'], isSuccess: true);
-
-      }
-    } catch (e) {
-      logger.e(e);
-      Methods.showSnackbar(msg: "An error occurred", isSuccess: false);
-    } finally {
-      EasyLoading.dismiss();
-    }
-  }
-
-
-  void deleteProduct({
-    required ProductInfo productInfo,
-  }) async {
-    isActionLoading = true;
-    update(["stock_report_list"]);
-    EasyLoading.show();
-    try{
-      var response = await ProductService.delete(
-        token: loginData!.token,
-        productId: productInfo.id,
-      );
-      if (response != null) {
-
-        if(response['success']){
-          getStockReportList(page: 1);
-        }
-        Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true: null );
-      }
-    }catch(e){
-      logger.e(e);
-    }finally{
-      isActionLoading = false;
-      update(['stock_report_list']);
-    }
-    update(["employee_list"]);
-    EasyLoading.dismiss();
-  }
-
-  void changeStatusOfProduct({
-    required ProductInfo productInfo,
-  }) async {
-    isActionLoading = true;
-    update(["stock_report_list"]);
-    EasyLoading.show();
-    try{
-      var response = await ProductService.changeStatus(
-        token: loginData!.token,
-        productId: productInfo.id,
-      );
-      if (response != null) {
-        if(response['success']){
-          getStockReportList(page: 1);
-        }
-        Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true: null );
-      }
-    }catch(e){
-      logger.e(e);
-    }finally{
-      isActionLoading = false;
-      update(['stock_report_list']);
-    }
-    update(["stock_report_list"]);
-    EasyLoading.dismiss();
-  }
-
 }

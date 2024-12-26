@@ -117,8 +117,7 @@ class MainPage extends StatelessWidget {
           if (isSameItemSelected) {
             menuController.closeDrawer();
           } else {
-            bool isParentWithChildren = (value?.parent == DrawerItems.sales ||
-                    value?.parent == DrawerItems.inventory) &&
+            bool isParentWithChildren = (value?.parent == DrawerItems.inventory) &&
                 value?.child == null;
             if (!isParentWithChildren) {
               menuController.selectedMenuItem.value = value;

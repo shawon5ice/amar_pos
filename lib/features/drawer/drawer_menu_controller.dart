@@ -1,3 +1,4 @@
+import 'package:amar_pos/core/constants/logger/logger.dart';
 import 'package:amar_pos/features/auth/data/model/hive/login_data.dart';
 import 'package:amar_pos/features/auth/data/model/hive/login_data_helper.dart';
 import 'package:amar_pos/features/inventory/presentation/products/products_screen.dart';
@@ -8,6 +9,8 @@ import 'package:amar_pos/features/config/presentation/configuration_screen.dart'
 import 'package:flutter/material.dart';
 import 'package:amar_pos/features/drawer/model/drawer_items.dart';
 import 'package:amar_pos/features/drawer/model/menu_selection.dart';
+
+import '../sales/presentation/sales_screen.dart';
 
 class DrawerMenuController extends GetxController {
   RxDouble xOffset = 0.0.obs;
@@ -69,14 +72,10 @@ class DrawerMenuController extends GetxController {
         }else{
           return Container();
         }
-        // Replace with the actual sales screen widget actual inventory screen widget
       case DrawerItems.sales:
-        if(selectedMenuItem.value?.child == "Product List"){
-          return ProductsScreen();
-        }else{
-          return Container();
-        }
-        // / Replace with the actual sales screen widget
+        logger.i("SALES");
+        currentScreen.value = SalesScreen.routeName;
+        return const SalesScreen();
       case DrawerItems.config:
         currentScreen.value = ConfigurationScreen.routeName;
         return ConfigurationScreen(); // Configuration screen widget
