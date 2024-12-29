@@ -6,7 +6,9 @@ import 'package:amar_pos/features/sales/data/models/create_order_model.dart';
 import 'package:amar_pos/features/sales/data/models/payment_method_tracker.dart';
 import 'package:amar_pos/features/sales/data/models/sales_service.dart';
 import 'package:amar_pos/features/sales/data/models/service_person_response_model.dart';
+import 'package:amar_pos/features/sales/presentation/widgets/billing_summary_payment_option_selection_widget.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/constants/logger/logger.dart';
 import '../../auth/data/model/hive/login_data.dart';
@@ -56,6 +58,7 @@ class SalesController extends GetxController {
   num totalVat = 0;
   int totalQTY = 0;
   num totalPaid = 0;
+  num totalDeu = 0;
 
   num paidAmount = 0;
 
@@ -82,14 +85,18 @@ class SalesController extends GetxController {
     paymentMethodTracker.add(PaymentMethodTracker(
       paidAmount: paidAmount - excludeAmount
     ));
+    calculateAmount();
     update(['billing_summary_form']);
   }
 
 
-  num getTotalPayable(){
-    return (totalAmount + totalVat - totalVat - totalDiscount + additionalExpense);
+  num getTotalPayable() {
+    return (totalAmount +
+        totalVat -
+        totalVat -
+        totalDiscount +
+        additionalExpense);
   }
-
 
   Future<void> getPaymentMethods() async {
     try {
@@ -115,7 +122,6 @@ class SalesController extends GetxController {
   }
 
   void addPlaceOrderProduct(ProductInfo product) {
-
     if (placeOrderProducts.any((e) => e.id == product.id)) {
       createOrderModel.products
           .firstWhere((e) => e.id == product.id)
@@ -132,17 +138,17 @@ class SalesController extends GetxController {
     update(['place_order_items', 'billing_summary_button']);
   }
 
-  void calculateAmount(){
+  void calculateAmount({bool? firstTime}) {
     num totalA = 0;
     num totalV = 0;
     int totalQ = 0;
     paidAmount = 0;
     num excludeAmount = 0;
-    for(var e in paymentMethodTracker){
+    for (var e in paymentMethodTracker) {
       excludeAmount += e.paidAmount ?? 0;
     }
     totalPaid = excludeAmount;
-    for(var e in createOrderModel.products){
+    for (var e in createOrderModel.products) {
       totalQ += e.quantity;
       totalV += e.vat * e.quantity;
       totalA += e.unitPrice * e.quantity;
@@ -151,7 +157,11 @@ class SalesController extends GetxController {
     totalVat = totalV;
     totalQTY = totalQ;
     paidAmount = totalAmount + totalVat + additionalExpense - totalDiscount;
-    update(['selling_party_selection']);
+    if(firstTime == null){
+      totalDeu =  paidAmount - totalPaid;
+    }
+
+    update(['selling_party_selection','change-due-amount']);
   }
 
   void changeQuantityOfProduct(int index, bool increase) {
@@ -168,13 +178,14 @@ class SalesController extends GetxController {
   void removePlaceOrderProduct(ProductInfo product) {
     placeOrderProducts.remove(product);
     createOrderModel.products.removeWhere((e) {
-      if(e.id == product.id){
+      if (e.id == product.id) {
         totalAmount -= product.mrpPrice * e.quantity;
-        totalQTY-= e.quantity;
+        totalQTY -= e.quantity;
         totalVat -= e.quantity * product.vat;
-        paidAmount = (totalAmount + totalVat - totalDiscount  - additionalExpense);
+        paidAmount =
+            (totalAmount + totalVat - totalDiscount - additionalExpense);
         return true;
-      }else{
+      } else {
         return false;
       }
     });
@@ -245,18 +256,19 @@ class SalesController extends GetxController {
     }
   }
 
-
   Future<void> getAllServiceStuff() async {
-
     serviceStuffListLoading = true;
     hasError.value = false;
     update(['service_stuff_list']);
 
     try {
-      var response = await SalesService.getAllServiceStuff(usrToken: loginData!.token,);
+      var response = await SalesService.getAllServiceStuff(
+        usrToken: loginData!.token,
+      );
 
       if (response != null && response['success']) {
-        serviceStuffList = ServicePersonResponseModel.fromJson(response).serviceStuffList;
+        serviceStuffList =
+            ServicePersonResponseModel.fromJson(response).serviceStuffList;
       } else {
         hasError.value = true;
       }
@@ -270,13 +282,14 @@ class SalesController extends GetxController {
   }
 
   Future<void> getAllClientList() async {
-
     clientListLoading = true;
     hasError.value = false;
     update(['client_list']);
 
     try {
-      var response = await SalesService.getAllClientList(usrToken: loginData!.token,);
+      var response = await SalesService.getAllClientList(
+        usrToken: loginData!.token,
+      );
 
       if (response != null && response['success']) {
         clientList = ClientListResponseModel.fromJson(response).data;

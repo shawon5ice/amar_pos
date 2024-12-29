@@ -16,7 +16,7 @@ import '../../data/models/billing_payment_methods.dart';
 
 class BillingSummaryPaymentOptionSelectionWidget extends StatefulWidget {
   const BillingSummaryPaymentOptionSelectionWidget(
-      {super.key, required this.paymentMethodTracker});
+      {super.key, required this.paymentMethodTracker,});
 
   final PaymentMethodTracker paymentMethodTracker;
 
@@ -39,6 +39,15 @@ class _BillingSummaryPaymentOptionSelectionWidgetState
     paidAmount = TextEditingController();
     paidAmount.text = widget.paymentMethodTracker.paidAmount.toString();
     super.initState();
+  }
+
+  @override
+  void didUpdateWidget(covariant BillingSummaryPaymentOptionSelectionWidget oldWidget) {
+    if(oldWidget.key != widget.key){
+      paidAmount.text = "";
+      controller.calculateAmount();
+    }
+    super.didUpdateWidget(oldWidget);
   }
 
   @override
@@ -94,7 +103,7 @@ class _BillingSummaryPaymentOptionSelectionWidgetState
                           }
                         },
                         buttonStyleData: ButtonStyleData(
-                          height: 56.sp,
+                          height: 48.sp,
                           padding: EdgeInsets.zero,
                           decoration: BoxDecoration(
                             border:
@@ -124,7 +133,7 @@ class _BillingSummaryPaymentOptionSelectionWidgetState
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    FieldTitle("Payable Amount"),
+                    FieldTitle("Paid Amount"),
                     addH(4),
                     CustomTextField(
                       readOnly: false,
@@ -136,15 +145,14 @@ class _BillingSummaryPaymentOptionSelectionWidgetState
                           try{
                             widget.paymentMethodTracker.paidAmount = num.parse(value);
                             controller.calculateAmount();
-                            controller.update(['billing_payment_methods', 'billing_summary_form']);
+                            controller.update(['change-due-amount']);
                           }catch(e){
                             Methods.showSnackbar(msg: "Please type a valid amount");
-                            // ErrorExtractor.showErrorDialog(context, {
-                            //   "errors" : {
-                            //     "x": ["Please type a valid amount"],
-                            //   }
-                            // });
                           }
+                        }else{
+                          widget.paymentMethodTracker.paidAmount = 0;
+                          controller.calculateAmount();
+                          controller.update(['change-due-amount']);
                         }
                       },
                       validator: (value) {
@@ -171,6 +179,8 @@ class _BillingSummaryPaymentOptionSelectionWidgetState
                 }else {
                   controller.paymentMethodTracker.remove(widget.paymentMethodTracker);
                 }
+
+                // controller.deletePaymentMethod(widget.key!);
                 controller.update(['billing_summary_form']);
               }, child: Padding(
                 padding: const EdgeInsets.only(top: 24),

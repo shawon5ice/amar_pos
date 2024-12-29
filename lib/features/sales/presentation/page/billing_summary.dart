@@ -50,9 +50,9 @@ class _BillingSummaryState extends State<BillingSummary> {
     customerPayableAmountEditingController = TextEditingController();
     customerChangeAmountEditingController = TextEditingController();
 
-    controller.calculateAmount();
-    controller.getPaymentMethods();
+    controller.calculateAmount(firstTime: true);
     controller.addPaymentMethod();
+    controller.getPaymentMethods();
 
     super.initState();
   }
@@ -120,74 +120,83 @@ class _BillingSummaryState extends State<BillingSummary> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        FieldTitle("${controller.isRetailSale?"Customer":"Client"} Name"),
+                        FieldTitle(
+                            "${controller.isRetailSale ? "Customer" : "Client"} Name"),
                         addH(4),
-                        controller.isRetailSale ? CustomTextField(
-                          enabledFlag: controller.isRetailSale,
-                          textCon: customerNameEditingController,
-                          hintText: "Type customer name",
-                          validator: (value) =>
-                              FieldValidator.nonNullableFieldValidator(
-                                  value, "Customer name"),
-                        ): GetBuilder<SalesController>(
-                          id: 'client_list',
-                          builder: (controller) => DropdownButtonHideUnderline(
-                            child: DropdownButton2<ClientData>(
-                              isExpanded: true,
-                              hint: Text(
-                                controller.clientList.isNotEmpty? "Select Client": "Loading...",
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Theme.of(context).hintColor,
-                                ),
-                              ),
-                              items: controller.clientList
-                                  .map((ClientData item) {
-                                return DropdownMenuItem<ClientData>(
-                                  value: item,
-                                  child: Text(
-                                    item.name,
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
+                        controller.isRetailSale
+                            ? CustomTextField(
+                                enabledFlag: controller.isRetailSale,
+                                textCon: customerNameEditingController,
+                                hintText: "Type customer name",
+                                validator: (value) =>
+                                    FieldValidator.nonNullableFieldValidator(
+                                        value, "Customer name"),
+                              )
+                            : GetBuilder<SalesController>(
+                                id: 'client_list',
+                                builder: (controller) =>
+                                    DropdownButtonHideUnderline(
+                                  child: DropdownButton2<ClientData>(
+                                    isExpanded: true,
+                                    hint: Text(
+                                      controller.clientList.isNotEmpty
+                                          ? "Select Client"
+                                          : "Loading...",
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Theme.of(context).hintColor,
+                                      ),
                                     ),
-                                    overflow: TextOverflow.ellipsis,
+                                    items: controller.clientList
+                                        .map((ClientData item) {
+                                      return DropdownMenuItem<ClientData>(
+                                        value: item,
+                                        child: Text(
+                                          item.name,
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      );
+                                    }).toList(),
+                                    value: controller.selectedClient,
+                                    onChanged: (value) {
+                                      if (value != null) {
+                                        controller.selectedClient = value;
+                                        customerPhoneNumberEditingController
+                                            .text = value.phone;
+                                        customerAddressEditingController.text =
+                                            value.address;
+                                        controller.update(['client_list']);
+                                      }
+                                    },
+                                    buttonStyleData: ButtonStyleData(
+                                      height: 56.sp,
+                                      padding: EdgeInsets.zero,
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                            color: AppColors.inputBorderColor),
+                                        borderRadius: const BorderRadius.all(
+                                            Radius.circular(8)),
+                                      ),
+                                    ),
+                                    dropdownStyleData: const DropdownStyleData(
+                                      maxHeight: 200,
+                                      offset: Offset(0, 4),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(8)),
+                                      ),
+                                    ),
+                                    menuItemStyleData: const MenuItemStyleData(
+                                      height: 40,
+                                    ),
                                   ),
-                                );
-                              })
-                                  .toList(),
-                              value: controller.selectedClient,
-                              onChanged: (value) {
-                                if (value != null) {
-                                  controller.selectedClient = value;
-                                  customerPhoneNumberEditingController.text = value.phone;
-                                  customerAddressEditingController.text = value.address;
-                                  controller.update(['client_list']);
-                                }
-                              },
-                              buttonStyleData: ButtonStyleData(
-                                height: 56.sp,
-                                padding: EdgeInsets.zero,
-                                decoration: BoxDecoration(
-                                  border:
-                                  Border.all(color: AppColors.inputBorderColor),
-                                  borderRadius:
-                                  const BorderRadius.all(Radius.circular(8)),
                                 ),
                               ),
-                              dropdownStyleData: const DropdownStyleData(
-                                maxHeight: 200,
-                                offset: Offset(0, 4),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.all(Radius.circular(8)),
-                                ),
-                              ),
-                              menuItemStyleData: const MenuItemStyleData(
-                                height: 40,
-                              ),
-                            ),
-                          ),),
                         addH(8),
                         FieldTitle("Phone Number"),
                         addH(4),
@@ -221,7 +230,8 @@ class _BillingSummaryState extends State<BillingSummary> {
                                   addH(4),
                                   CustomTextField(
                                     enabledFlag: false,
-                                    textCon: TextEditingController(text: controller.totalQTY.toString()),
+                                    textCon: TextEditingController(
+                                        text: controller.totalQTY.toString()),
                                     hintText: "Total quantity",
                                   ),
                                 ],
@@ -236,7 +246,9 @@ class _BillingSummaryState extends State<BillingSummary> {
                                   addH(4),
                                   CustomTextField(
                                     enabledFlag: false,
-                                    textCon: TextEditingController(text: controller.totalAmount.toString()),
+                                    textCon: TextEditingController(
+                                        text:
+                                            controller.totalAmount.toString()),
                                     hintText: "Type total amount",
                                   ),
                                 ],
@@ -258,20 +270,22 @@ class _BillingSummaryState extends State<BillingSummary> {
                                         customerAdditionalExpensesEditingController,
                                     hintText: "Type here",
                                     inputType: TextInputType.number,
-                                    onChanged: (value){
-                                      if(value.isEmpty){
+                                    onChanged: (value) {
+                                      if (value.isEmpty) {
                                         value = "0";
                                       }
-                                      controller.additionalExpense = num.parse(value);
+                                      controller.additionalExpense =
+                                          num.parse(value);
                                       controller.calculateAmount();
-                                      controller.update(['billing_summary_form']);
+                                      controller
+                                          .update(['billing_summary_form']);
                                     },
                                     validator: (value) {
-                                      try{
-                                        if(value != null && value.isNotEmpty){
+                                      try {
+                                        if (value != null && value.isNotEmpty) {
                                           var x = num.parse(value);
                                         }
-                                      }catch(e){
+                                      } catch (e) {
                                         return '⚠️ Please type a valid amount';
                                       }
                                       return null;
@@ -289,7 +303,8 @@ class _BillingSummaryState extends State<BillingSummary> {
                                   addH(4),
                                   CustomTextField(
                                     enabledFlag: false,
-                                    textCon: TextEditingController(text: controller.totalVat.toString()),
+                                    textCon: TextEditingController(
+                                        text: controller.totalVat.toString()),
                                     hintText: "VAT",
                                   ),
                                 ],
@@ -311,20 +326,22 @@ class _BillingSummaryState extends State<BillingSummary> {
                                         customerTotalDiscountEditingController,
                                     hintText: "Type here",
                                     inputType: TextInputType.number,
-                                    onChanged: (value){
-                                      if(value.isEmpty){
+                                    onChanged: (value) {
+                                      if (value.isEmpty) {
                                         value = "0";
                                       }
-                                      controller.totalDiscount = num.parse(value);
+                                      controller.totalDiscount =
+                                          num.parse(value);
                                       controller.calculateAmount();
-                                      controller.update(['billing_summary_form']);
+                                      controller
+                                          .update(['billing_summary_form']);
                                     },
                                     validator: (value) {
-                                      try{
-                                        if(value != null && value.isNotEmpty){
+                                      try {
+                                        if (value != null && value.isNotEmpty) {
                                           var x = num.parse(value);
                                         }
-                                      }catch(e){
+                                      } catch (e) {
                                         return '⚠️ Please type a valid amount';
                                       }
                                       return null;
@@ -342,7 +359,8 @@ class _BillingSummaryState extends State<BillingSummary> {
                                   addH(4),
                                   CustomTextField(
                                     enabledFlag: false,
-                                    textCon: TextEditingController(text: controller.paidAmount.toString()),
+                                    textCon: TextEditingController(
+                                        text: controller.paidAmount.toString()),
                                     hintText: "Type here",
                                   ),
                                 ],
@@ -357,15 +375,16 @@ class _BillingSummaryState extends State<BillingSummary> {
                           itemCount: controller.paymentMethodTracker.length,
                           itemBuilder: (context, index) =>
                               BillingSummaryPaymentOptionSelectionWidget(
-                                paymentMethodTracker:
+                                key: UniqueKey(),
+                            paymentMethodTracker:
                                 controller.paymentMethodTracker[index],
-                              ),
+                          ),
                         ),
-                       TextButton(
-                         style: ButtonStyle(
-                           foregroundColor: WidgetStatePropertyAll(AppColors.accent)
-                         ),
-                          child: Text("Add Multiple payment method"),
+                        TextButton(
+                          style: const ButtonStyle(
+                              foregroundColor:
+                                  WidgetStatePropertyAll(AppColors.accent)),
+                          child: const Text("Add Multiple payment method"),
                           onPressed: () {
                             controller.addPaymentMethod();
                           },
@@ -374,22 +393,25 @@ class _BillingSummaryState extends State<BillingSummary> {
                         Row(
                           children: [
                             Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  FieldTitle("${controller.paidAmount - controller.totalPaid<0? "Change": "Deo"} Amount"),
-                                  addH(4),
-                                  CustomTextField(
-                                    enabledFlag: false,
-                                    textCon: TextEditingController(text: (controller.paidAmount - controller.totalPaid).toString()),
-                                    hintText: "Type here",
-                                    inputType: TextInputType.number,
-                                    onChanged: (value){
-
-                                    },
-                                  ),
-                                ],
-                              ),
+                              child: GetBuilder<SalesController>(
+                                  id: "change-due-amount",
+                                  builder: (controller) => Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      FieldTitle(
+                                          "${controller.totalDeu < 0 ? "Change" : "Deo"} Amount"),
+                                      addH(4),
+                                      CustomTextField(
+                                            enabledFlag: false,
+                                            textCon: TextEditingController(
+                                                text: (controller.totalDeu)
+                                                    .toString()),
+                                            hintText: "Type here",
+                                            inputType: TextInputType.number,
+                                            onChanged: (value) {},
+                                          ),
+                                    ],
+                                  )),
                             ),
                             addW(8),
                             Expanded(
@@ -400,61 +422,71 @@ class _BillingSummaryState extends State<BillingSummary> {
                                   addH(4),
                                   GetBuilder<SalesController>(
                                     id: 'service_stuff_list',
-                                    builder: (controller) => DropdownButtonHideUnderline(
-                                    child: DropdownButton2<ServiceStuffInfo>(
-                                      isExpanded: true,
-                                      hint: Text(
-                                        controller.serviceStuffList.isNotEmpty? "Select Service Stuff": "Loading...",
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: Theme.of(context).hintColor,
-                                        ),
-                                      ),
-                                      items: controller.serviceStuffList
-                                          .map((ServiceStuffInfo item) {
-                                        return DropdownMenuItem<ServiceStuffInfo>(
-                                          value: item,
-                                          child: Text(
-                                            item.name,
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                            overflow: TextOverflow.ellipsis,
+                                    builder: (controller) =>
+                                        DropdownButtonHideUnderline(
+                                      child: DropdownButton2<ServiceStuffInfo>(
+                                        isExpanded: true,
+                                        hint: Text(
+                                          controller.serviceStuffList.isNotEmpty
+                                              ? "Select Service Stuff"
+                                              : "Loading...",
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Theme.of(context).hintColor,
                                           ),
-                                        );
-                                      })
-                                          .toList(),
-                                      value: controller.serviceStuffInfo,
-                                      onChanged: (value) {
-                                        if (value != null) {
-                                          controller.serviceStuffInfo = value;
-                                          controller.update(['service_stuff_list']);
-                                        }
-                                      },
-                                      buttonStyleData: ButtonStyleData(
-                                        height: 56.sp,
-                                        padding: EdgeInsets.zero,
-                                        decoration: BoxDecoration(
-                                          border:
-                                          Border.all(color: AppColors.inputBorderColor),
-                                          borderRadius:
-                                          const BorderRadius.all(Radius.circular(8)),
                                         ),
-                                      ),
-                                      dropdownStyleData: const DropdownStyleData(
-                                        maxHeight: 200,
-                                        offset: Offset(0, 4),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.all(Radius.circular(8)),
+                                        items: controller.serviceStuffList
+                                            .map((ServiceStuffInfo item) {
+                                          return DropdownMenuItem<
+                                              ServiceStuffInfo>(
+                                            value: item,
+                                            child: Text(
+                                              item.name,
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          );
+                                        }).toList(),
+                                        value: controller.serviceStuffInfo,
+                                        onChanged: (value) {
+                                          if (value != null) {
+                                            controller.serviceStuffInfo = value;
+                                            controller
+                                                .update(['service_stuff_list']);
+                                          }
+                                        },
+                                        buttonStyleData: ButtonStyleData(
+                                          height: 48.sp,
+                                          padding: EdgeInsets.zero,
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                                color:
+                                                    AppColors.inputBorderColor),
+                                            borderRadius:
+                                                const BorderRadius.all(
+                                                    Radius.circular(8)),
+                                          ),
                                         ),
-                                      ),
-                                      menuItemStyleData: const MenuItemStyleData(
-                                        height: 40,
+                                        dropdownStyleData:
+                                            const DropdownStyleData(
+                                          maxHeight: 200,
+                                          offset: Offset(0, 4),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(8)),
+                                          ),
+                                        ),
+                                        menuItemStyleData:
+                                            const MenuItemStyleData(
+                                          height: 40,
+                                        ),
                                       ),
                                     ),
-                                  ),)
+                                  )
                                 ],
                               ),
                             ),
@@ -472,32 +504,51 @@ class _BillingSummaryState extends State<BillingSummary> {
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: CustomButton(
-          onTap: (){
-
-            if(formKey.currentState!.validate()){
-              controller.createOrderModel.saleType = controller.isRetailSale? 1: 2;
-              controller.createOrderModel.amount = controller.totalAmount.toDouble();
-              controller.createOrderModel.expense = controller.additionalExpense.toDouble();
-              controller.createOrderModel.discount = controller.totalDiscount.toDouble();
-              controller.createOrderModel.payable = controller.paidAmount.toDouble();
-              controller.createOrderModel.name = controller.isRetailSale? customerNameEditingController.text : controller.selectedClient!.name;
-              controller.createOrderModel.phone = controller.isRetailSale? customerPhoneNumberEditingController.text : controller.selectedClient!.phone;
-              controller.createOrderModel.address = controller.isRetailSale? customerAddressEditingController.text : controller.selectedClient!.address;
-              if(controller.serviceStuffInfo == null){
+          onTap: () {
+            if (formKey.currentState!.validate()) {
+              controller.createOrderModel.saleType =
+                  controller.isRetailSale ? 1 : 2;
+              controller.createOrderModel.amount =
+                  controller.totalAmount.toDouble();
+              controller.createOrderModel.expense =
+                  controller.additionalExpense.toDouble();
+              controller.createOrderModel.discount =
+                  controller.totalDiscount.toDouble();
+              controller.createOrderModel.payable =
+                  controller.paidAmount.toDouble();
+              controller.createOrderModel.name = controller.isRetailSale
+                  ? customerNameEditingController.text
+                  : controller.selectedClient!.name;
+              controller.createOrderModel.phone = controller.isRetailSale
+                  ? customerPhoneNumberEditingController.text
+                  : controller.selectedClient!.phone;
+              controller.createOrderModel.address = controller.isRetailSale
+                  ? customerAddressEditingController.text
+                  : controller.selectedClient!.address;
+              if (controller.serviceStuffInfo == null) {
                 Methods.showSnackbar(msg: "Please select a service stuff");
                 return;
               }
-              controller.createOrderModel.serviceBy = controller.serviceStuffInfo!.id;
+              controller.createOrderModel.serviceBy =
+                  controller.serviceStuffInfo!.id;
 
-              for(var e in controller.paymentMethodTracker){
-                if(e.paymentMethod == null){
-                  Methods.showSnackbar(msg: "Please insert valid amount or remove not selected payment methods");
+              for (var e in controller.paymentMethodTracker) {
+                if (e.paymentMethod == null) {
+                  Methods.showSnackbar(
+                      msg:
+                          "Please insert valid amount or remove not selected payment methods");
                   return;
-                }else if(e.paymentMethod != null && e.paymentMethod!.paymentOptions.isNotEmpty && e.paymentOption == null){
-                  Methods.showSnackbar(msg: "Please select associate payment options");
+                } else if (e.paymentMethod != null &&
+                    e.paymentMethod!.paymentOptions.isNotEmpty &&
+                    e.paymentOption == null) {
+                  Methods.showSnackbar(
+                      msg: "Please select associate payment options");
                   return;
-                }else{
-                  controller.createOrderModel.payments.add(Payment(methodId: e.paymentMethod!.id, paid: e.paidAmount!.toDouble(), bankId: e.paymentOption?.id));
+                } else {
+                  controller.createOrderModel.payments.add(Payment(
+                      methodId: e.paymentMethod!.id,
+                      paid: e.paidAmount!.toDouble(),
+                      bankId: e.paymentOption?.id));
                 }
               }
               logger.i(controller.createOrderModel.toJson());
