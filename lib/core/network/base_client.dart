@@ -108,7 +108,7 @@ class BaseClient {
       if(response.data['success']){
         return response.data;
       }else{
-        ErrorExtractor.showErrorDialog(Get.context!, response.data);
+        // ErrorExtractor.showErrorDialog(Get.context!, response.data);
       }
     } on DioException catch (error) {
       logger.e(error);

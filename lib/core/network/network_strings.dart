@@ -85,4 +85,10 @@ class NetWorkStrings{
 
   //Filter
   static const String getProductListDD = "product/get-product-list";
+
+
+  //Sales
+  static const String getBillingPaymentMethods = "order/get-payment-methods";
+  static const String getAllServiceStuff = "order/get-all-service-person";
+  static const String getAllClientList = "client/get-client-list";
 }

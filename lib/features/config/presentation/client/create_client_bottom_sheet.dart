@@ -139,7 +139,7 @@ class _CreateClientBottomSheetState extends State<CreateClientBottomSheet> {
                       CustomTextField(
                         textCon: openingBalance,
                         hintText: "Type opening balance here...",
-                        enabledFlag: widget.client != null && (widget.client!.openingBalance > 0) ? false : null,
+                        enabledFlag: widget.client != null && (widget.client!.openingBalance > 0) ? false : true,
                         inputType: const TextInputType.numberWithOptions(signed: false,decimal: false),
                       ),
                     ],

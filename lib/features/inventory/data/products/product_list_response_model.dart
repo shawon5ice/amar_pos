@@ -9,7 +9,7 @@ class ProductsListResponseModel {
 
   ProductsListResponseModel.fromJson(Map<String, dynamic> json) {
     success = json['success'] ?? false;
-    data = json['data'] != null ? Data.fromJson(json['data']) : Data.empty();
+    data = json['data'] is Map<String, dynamic> ? Data.fromJson(json['data']) : Data.empty();
   }
 
   Map<String, dynamic> toJson() {

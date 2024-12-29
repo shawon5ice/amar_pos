@@ -72,29 +72,29 @@ class _CustomDropdownWithSearchWidgetState<T>
                 color: Theme.of(context).hintColor,
               ),
             ),
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               isDense: true,
               contentPadding: EdgeInsets.zero,
               border: OutlineInputBorder(
-                borderRadius: const BorderRadius.all(Radius.circular(8)),
+                borderRadius: BorderRadius.all(Radius.circular(8)),
                 borderSide: BorderSide(
                   color: AppColors.inputBorderColor,
                 ),
               ),
               enabledBorder: OutlineInputBorder(
-                borderRadius: const BorderRadius.all(Radius.circular(8)),
+                borderRadius: BorderRadius.all(Radius.circular(8)),
                 borderSide: BorderSide(
                   color: AppColors.inputBorderColor,
                 ),
               ),
               errorBorder: OutlineInputBorder(
-                borderRadius: const BorderRadius.all(Radius.circular(8)),
+                borderRadius: BorderRadius.all(Radius.circular(8)),
                 borderSide: BorderSide(
                   color: Colors.red, // Red border for error state
                 ),
               ),
               focusedErrorBorder: OutlineInputBorder(
-                borderRadius: const BorderRadius.all(Radius.circular(8)),
+                borderRadius: BorderRadius.all(Radius.circular(8)),
                 borderSide: BorderSide(
                   color: Colors.red,
                 ),

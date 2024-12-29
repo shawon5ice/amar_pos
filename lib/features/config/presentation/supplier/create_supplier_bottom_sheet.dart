@@ -134,7 +134,7 @@ class _CreateSupplierBottomSheetState extends State<CreateSupplierBottomSheet> {
                     CustomTextField(
                       textCon: _openingBalanceTextEditingController,
                       hintText: "Enter opening balance here...",
-                      enabledFlag: widget.supplier != null && (widget.supplier!.openingBalance! > 0) ? false : null,
+                      enabledFlag: widget.supplier != null && (widget.supplier!.openingBalance! > 0) ? false : true,
                       inputType: const TextInputType.numberWithOptions(signed: false,decimal: false),
                     ),
                     addH(16.h),
