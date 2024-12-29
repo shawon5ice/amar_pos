@@ -103,7 +103,7 @@ class AuthController extends GetxController{
         pass: passwordController.text.trim(),
       );
       logger.i(response);
-      if(response != null){
+      if(response != null && !response['success']){
         message.value = response['message'];
       }
       if (response['success']) {
@@ -124,7 +124,7 @@ class AuthController extends GetxController{
         Methods.showSnackbar(msg: message.value, isSuccess: isLoggedIn.value?true:null);
       }
       if(isLoggedIn.value){
-        Get.toNamed(MainPage.routeName);
+        Get.offAllNamed(MainPage.routeName);
       }
       loading(false);
       Methods.hideLoading();

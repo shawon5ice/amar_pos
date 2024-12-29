@@ -26,10 +26,7 @@ void main() async {
   await LoginDataBoxManager().initBox();
 
   runApp(
-    DevicePreview(
-      enabled: !kReleaseMode,
-      builder: (context) => MyApp(), // Wrap your app
-    ),
+    const MyApp(),
   );
 }
 
