@@ -7,6 +7,7 @@ import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/core/widgets/custom_button.dart';
 import 'package:amar_pos/core/widgets/custom_text_field.dart';
 import 'package:amar_pos/core/widgets/field_title.dart';
+import 'package:amar_pos/features/inventory/presentation/products/widgets/custom_dropdown_widget.dart';
 import 'package:amar_pos/features/sales/data/models/client_list_response_model.dart';
 import 'package:amar_pos/features/sales/data/models/create_order_model.dart';
 import 'package:amar_pos/features/sales/data/models/payment_method_tracker.dart';
@@ -375,7 +376,7 @@ class _BillingSummaryState extends State<BillingSummary> {
                           itemCount: controller.paymentMethodTracker.length,
                           itemBuilder: (context, index) =>
                               BillingSummaryPaymentOptionSelectionWidget(
-                                key: UniqueKey(),
+                            key: UniqueKey(),
                             paymentMethodTracker:
                                 controller.paymentMethodTracker[index],
                           ),
@@ -396,12 +397,14 @@ class _BillingSummaryState extends State<BillingSummary> {
                               child: GetBuilder<SalesController>(
                                   id: "change-due-amount",
                                   builder: (controller) => Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      FieldTitle(
-                                          "${controller.totalDeu < 0 ? "Change" : "Deo"} Amount"),
-                                      addH(4),
-                                      CustomTextField(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          addH(16.h),
+                                          FieldTitle(
+                                              "${controller.totalDeu < 0 ? "Change" : "Deo"} Amount"),
+                                          addH(4),
+                                          CustomTextField(
                                             enabledFlag: false,
                                             textCon: TextEditingController(
                                                 text: (controller.totalDeu)
@@ -410,85 +413,28 @@ class _BillingSummaryState extends State<BillingSummary> {
                                             inputType: TextInputType.number,
                                             onChanged: (value) {},
                                           ),
-                                    ],
-                                  )),
+                                        ],
+                                      )),
                             ),
                             addW(8),
                             Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  FieldTitle("Service Stuff"),
-                                  addH(4),
-                                  GetBuilder<SalesController>(
-                                    id: 'service_stuff_list',
-                                    builder: (controller) =>
-                                        DropdownButtonHideUnderline(
-                                      child: DropdownButton2<ServiceStuffInfo>(
-                                        isExpanded: true,
-                                        hint: Text(
-                                          controller.serviceStuffList.isNotEmpty
-                                              ? "Select Service Stuff"
-                                              : "Loading...",
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: Theme.of(context).hintColor,
-                                          ),
-                                        ),
-                                        items: controller.serviceStuffList
-                                            .map((ServiceStuffInfo item) {
-                                          return DropdownMenuItem<
-                                              ServiceStuffInfo>(
-                                            value: item,
-                                            child: Text(
-                                              item.name,
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          );
-                                        }).toList(),
-                                        value: controller.serviceStuffInfo,
-                                        onChanged: (value) {
-                                          if (value != null) {
-                                            controller.serviceStuffInfo = value;
-                                            controller
-                                                .update(['service_stuff_list']);
-                                          }
-                                        },
-                                        buttonStyleData: ButtonStyleData(
-                                          height: 48.sp,
-                                          padding: EdgeInsets.zero,
-                                          decoration: BoxDecoration(
-                                            border: Border.all(
-                                                color:
-                                                    AppColors.inputBorderColor),
-                                            borderRadius:
-                                                const BorderRadius.all(
-                                                    Radius.circular(8)),
-                                          ),
-                                        ),
-                                        dropdownStyleData:
-                                            const DropdownStyleData(
-                                          maxHeight: 200,
-                                          offset: Offset(0, 4),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(8)),
-                                          ),
-                                        ),
-                                        menuItemStyleData:
-                                            const MenuItemStyleData(
-                                          height: 40,
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
+                              child: CustomDropdown<ServiceStuffInfo>(
+                                  validator: (value) => value == null
+                                      ? "Please select a service stuff"
+                                      : null,
+                                  value: controller.serviceStuffInfo,
+                                  items: controller.serviceStuffList,
+                                  isMandatory: true,
+                                  title: "Service Stuff",
+                                  itemLabel: (ServiceStuffInfo stuffInfo) =>
+                                      stuffInfo.name,
+                                  onChanged: (value) {
+                                    controller.serviceStuffInfo = value;
+                                  },
+                                  hintText:
+                                      controller.serviceStuffList.isNotEmpty
+                                          ? "Select Service Stuff"
+                                          : "Loading..."),
                             ),
                           ],
                         ),
@@ -508,6 +454,9 @@ class _BillingSummaryState extends State<BillingSummary> {
             if (formKey.currentState!.validate()) {
               controller.createOrderModel.saleType =
                   controller.isRetailSale ? 1 : 2;
+              if(!controller.isRetailSale && controller.selectedClient != null){
+                controller.createOrderModel.customerId = controller.selectedClient!.id;
+              }
               controller.createOrderModel.amount =
                   controller.totalAmount.toDouble();
               controller.createOrderModel.expense =
@@ -551,7 +500,7 @@ class _BillingSummaryState extends State<BillingSummary> {
                       bankId: e.paymentOption?.id));
                 }
               }
-              logger.i(controller.createOrderModel.toJson());
+              controller.createSaleOrder(context);
             }
           },
           text: "Place Order",

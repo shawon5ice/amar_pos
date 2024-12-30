@@ -1,4 +1,4 @@
-class CreateOrderModel {
+class CreateSaleOrderModel {
   int saleType;
   String name;
   String phone;
@@ -10,8 +10,9 @@ class CreateOrderModel {
   double payable;
   List<Payment> payments;
   int serviceBy;
+  int? customerId;
 
-  CreateOrderModel({
+  CreateSaleOrderModel({
     required this.saleType,
     required this.name,
     required this.phone,
@@ -23,9 +24,10 @@ class CreateOrderModel {
     required this.payable,
     required this.payments,
     required this.serviceBy,
+    this.customerId,
   });
 
-  CreateOrderModel.defaultConstructor()
+  CreateSaleOrderModel.defaultConstructor()
       : saleType = 0,
         name = '',
         phone = '',
@@ -36,10 +38,11 @@ class CreateOrderModel {
         discount = 0.0,
         payable = 0.0,
         serviceBy = 0,
+        customerId = 0,
         payments = [];
 
-  factory CreateOrderModel.fromJson(Map<String, dynamic> json) {
-    return CreateOrderModel(
+  factory CreateSaleOrderModel.fromJson(Map<String, dynamic> json) {
+    return CreateSaleOrderModel(
       saleType: json['sale_type'],
       name: json['name'],
       phone: json['phone'],
@@ -52,6 +55,7 @@ class CreateOrderModel {
       discount: json['discount'].toDouble(),
       payable: json['payable'].toDouble(),
       serviceBy: json['service_by'],
+      customerId: json['customer_id'],
       payments: (json['payment'] as List)
           .map((paymentJson) => Payment.fromJson(paymentJson))
           .toList(),
@@ -70,6 +74,7 @@ class CreateOrderModel {
       'discount': discount,
       'payable': payable,
       'service_by': serviceBy,
+      'customer_id': customerId,
       'payment': payments.map((payment) => payment.toJson()).toList(),
     };
   }

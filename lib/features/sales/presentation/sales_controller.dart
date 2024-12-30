@@ -1,10 +1,11 @@
 import 'dart:async';
 import 'package:amar_pos/core/core.dart';
+import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:amar_pos/features/sales/data/models/billing_payment_methods.dart';
 import 'package:amar_pos/features/sales/data/models/client_list_response_model.dart';
 import 'package:amar_pos/features/sales/data/models/create_order_model.dart';
 import 'package:amar_pos/features/sales/data/models/payment_method_tracker.dart';
-import 'package:amar_pos/features/sales/data/models/sales_service.dart';
+import 'package:amar_pos/features/sales/data/service/sales_service.dart';
 import 'package:amar_pos/features/sales/data/models/service_person_response_model.dart';
 import 'package:amar_pos/features/sales/presentation/widgets/billing_summary_payment_option_selection_widget.dart';
 import 'package:flutter/cupertino.dart';
@@ -24,6 +25,8 @@ class SalesController extends GetxController {
   bool filterListLoading = false;
   String generatedBarcode = "";
   bool barcodeGenerationLoading = false;
+
+  bool createSaleOrderLoading = false;
   LoginData? loginData = LoginDataBoxManager().loginData;
 
   final isLoading = false.obs; // Tracks ongoing API calls
@@ -37,7 +40,7 @@ class SalesController extends GetxController {
 
   List<ProductInfo> placeOrderProducts = [];
 
-  CreateOrderModel createOrderModel = CreateOrderModel.defaultConstructor();
+  CreateSaleOrderModel createOrderModel = CreateSaleOrderModel.defaultConstructor();
 
   BillingPaymentMethods? billingPaymentMethods;
 
@@ -302,6 +305,36 @@ class SalesController extends GetxController {
     } finally {
       clientListLoading = false;
       update(['client_list']);
+    }
+  }
+
+
+  void createSaleOrder(BuildContext context) async {
+
+    createSaleOrderLoading = true;
+    update(["sales_product_list"]);
+    RandomLottieLoader().show(context,);
+    try{
+      var response = await SalesService.createSaleOrder(
+        usrToken: loginData!.token,
+        saleOrderModel: createOrderModel,
+      );
+      logger.e(response);
+      if (response != null) {
+        if(response['success']){
+          placeOrderProducts.clear();
+          RandomLottieLoader().hide(context);
+          Get.back();
+        }else{
+          RandomLottieLoader().hide(context);
+          Methods.showSnackbar(msg: response['message'], isSuccess: response['success']? true: null);
+        }
+      }
+    }catch(e){
+      logger.e(e);
+    }finally{
+      createSaleOrderLoading = false;
+      update(["sales_product_list"]);
     }
   }
 }

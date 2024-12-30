@@ -15,6 +15,8 @@ class ErrorExtractor {
           .expand((messages) => messages) // Flatten the lists
           .whereType<String>() // Ensure the values are strings
           .toList();
+    }else{
+      return [response["message"]];
     }
   }
 

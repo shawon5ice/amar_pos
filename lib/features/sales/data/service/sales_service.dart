@@ -1,6 +1,7 @@
 import '../../../../core/constants/logger/logger.dart';
 import '../../../../core/network/base_client.dart';
 import '../../../../core/network/network_strings.dart';
+import '../models/create_order_model.dart';
 
 class SalesService{
   static Future<dynamic> getSellingProductList({
@@ -51,6 +52,18 @@ class SalesService{
       parameter: {
           "status" : 1,
       }
+    );
+    return response;
+  }
+
+  static Future<dynamic> createSaleOrder({
+    required String usrToken,
+    required CreateSaleOrderModel saleOrderModel,
+  }) async {
+    var response = await BaseClient.postData(
+        token: usrToken,
+        api: NetWorkStrings.createSaleOrder,
+        body: saleOrderModel.toJson(),
     );
     return response;
   }

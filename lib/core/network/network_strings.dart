@@ -91,4 +91,5 @@ class NetWorkStrings{
   static const String getBillingPaymentMethods = "order/get-payment-methods";
   static const String getAllServiceStuff = "order/get-all-service-person";
   static const String getAllClientList = "client/get-client-list";
+  static const String createSaleOrder = "order/place-order";
 }

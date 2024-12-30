@@ -17,7 +17,7 @@ class RandomLottieLoader {
     'assets/lottie/loading3.json',
   ];
 
-  void show(BuildContext context, double? progress) {
+  void show(BuildContext context, {double? progress}) {
     // Prevent multiple overlays
     if (_overlayEntry.value != null) return;
 
@@ -52,9 +52,9 @@ class RandomLottieLoader {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       if(progress != null)Text(progress.toStringAsPrecision(2),
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontSize: 24, fontWeight: FontWeight.bold, color: Colors.red),),
-                      Text("Downloading..."),
+                      Text(progress != null ? "Downloading...": "Loading..."),
                     ],
                   ),
                 ),

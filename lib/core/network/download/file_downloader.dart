@@ -43,7 +43,7 @@ class FileDownloader {
             : null,
         onReceiveProgress: (received, total) {
           if (total != -1) {
-            RandomLottieLoader().show(context, (received / total).toDouble());
+            RandomLottieLoader().show(context, progress: (received / total).toDouble());
             // EasyLoading.showProgress(received / total,
             //     status: "Downloading...");
             print("${(received / total * 100).toStringAsFixed(0)}%");

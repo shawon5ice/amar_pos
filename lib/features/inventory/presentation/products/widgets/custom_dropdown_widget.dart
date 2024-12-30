@@ -59,7 +59,7 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>> {
             hint: Text(
               widget.hintText,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 12,
                 color: Theme.of(context).hintColor,
               ),
             ),
@@ -85,7 +85,7 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>> {
             value: widget.value,
             onChanged: widget.onChanged,
             buttonStyleData: ButtonStyleData(
-              height: 48,
+              height: 56,
               padding: EdgeInsets.zero,
               decoration: BoxDecoration(
                 border: Border.all(color: AppColors.inputBorderColor),

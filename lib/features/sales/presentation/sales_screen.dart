@@ -2,6 +2,7 @@ import 'package:amar_pos/core/constants/app_assets.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/core/widgets/custom_button.dart';
 import 'package:amar_pos/features/sales/presentation/page/place_order.dart';
+import 'package:amar_pos/features/sales/presentation/page/sold_history.dart';
 import 'package:amar_pos/features/sales/presentation/sales_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -97,7 +98,7 @@ class _SalesScreenState extends State<SalesScreen>
                   controller: _tabController,
                   children: [
                     PlaceOrder(),
-                    Container(),
+                    SoldHistory(),
                     Container(),
                   ],
                 ),
