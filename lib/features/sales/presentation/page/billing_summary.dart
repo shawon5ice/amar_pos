@@ -481,6 +481,7 @@ class _BillingSummaryState extends State<BillingSummary> {
               controller.createOrderModel.serviceBy =
                   controller.serviceStuffInfo!.id;
 
+              controller.createOrderModel.payments.clear();
               for (var e in controller.paymentMethodTracker) {
                 if (e.paymentMethod == null) {
                   Methods.showSnackbar(

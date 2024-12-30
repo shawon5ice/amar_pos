@@ -10,6 +10,7 @@ class CustomTextField extends StatefulWidget {
   final String? prefixIcon;
   final Widget? suffixWidget;
   final String hintText;
+  final Widget? prefixWidget;
   final bool isPassField;
   final bool readOnly;
   final TextInputType inputType;
@@ -37,6 +38,7 @@ class CustomTextField extends StatefulWidget {
     required this.textCon,
     required this.hintText,
     this.prefixIcon,
+    this.prefixWidget,
     this.suffixWidget,
     this.isPassField = false,
     this.readOnly = false,
@@ -121,6 +123,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
           widget.textCon.clear();
         }
       },
+
       onFieldSubmitted: (value) {
         if (widget.onSubmitted != null) {
           widget.onSubmitted!(value); // Trigger feedback callback
@@ -138,7 +141,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
       border: _getInputBorder(),
       enabledBorder: _getInputBorder(),
       focusedBorder: _getInputBorder(),
-      prefixIcon: widget.prefixIcon != null
+      prefixIcon: widget.prefixWidget != null ? widget.prefixWidget! : widget.prefixIcon != null
           ? Padding(
         padding: const EdgeInsets.all(10),
         child: SvgPicture.asset(

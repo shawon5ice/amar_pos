@@ -65,4 +65,10 @@ class AppAssets {
   static const String snAdd = "assets/icon/sn_add.svg";
 
 
+  static const List<String> lottieFiles = [
+    'assets/lottie/loading1.json',
+    'assets/lottie/loading2.json',
+    'assets/lottie/loading3.json',
+  ];
+
 }

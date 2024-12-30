@@ -9,6 +9,7 @@ class ProductService {
     required String usrToken,
     required bool activeStatus,
     required int page,
+    String? search,
   }) async {
     logger.d("Page: $page");
     var response = await BaseClient.getData(
@@ -18,6 +19,7 @@ class ProductService {
           "status": activeStatus ? 1 : 0,
           "page": page,
           "limit": 10,
+          "search": search,
         });
     return response;
   }
@@ -74,6 +76,13 @@ class ProductService {
         ),
       );
     }
+    var response = await BaseClient.postData(
+      token: token,
+      api: NetWorkStrings.addProduct,
+      body: formData,
+    );
+    return response;
+
   }
 
   static Future<dynamic> update({
