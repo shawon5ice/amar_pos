@@ -137,7 +137,7 @@ class BaseClient {
             : null,
       );
       logger.i('POST Response: ${response.statusCode}');
-      if(response.data['success'] || (!response.data['success'] && response.data['message'] != "")){
+      if(response.data['success'] || (!response.data['success'] && response.data['errors'] == null)){
         return response.data;
       }else{
         ErrorExtractor.showErrorDialog(Get.context!, response.data);

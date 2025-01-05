@@ -36,7 +36,7 @@ class ProductController extends GetxController {
   bool hasError = false;
 
   Future<void> getAllProducts(
-      {required bool activeStatus, required int page}) async {
+      {required bool activeStatus, required int page, String? search}) async {
     if (page == 1) {
       isProductListLoading = true;
       productList.clear();
@@ -44,7 +44,7 @@ class ProductController extends GetxController {
       isLoadingMore = true;
     }
 
-    hasError = false; // Reset error before loading
+    hasError = false;
     update(['product_list']);
 
     try {
@@ -52,6 +52,7 @@ class ProductController extends GetxController {
         usrToken: loginData!.token,
         activeStatus: activeStatus,
         page: page,
+        search: search,
       );
 
       if (response != null) {
@@ -71,11 +72,8 @@ class ProductController extends GetxController {
       hasError = true; // Handle any exceptions
       logger.e(e);
     } finally {
-      if (page == 1) {
-        isProductListLoading = false;
-      } else {
-        isLoadingMore = false;
-      }
+      isLoadingMore = false;
+      isProductListLoading = false;
       update(['product_list']);
     }
   }

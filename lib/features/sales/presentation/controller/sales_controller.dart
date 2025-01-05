@@ -336,8 +336,8 @@ class SalesController extends GetxController {
           Get.back();
         }else{
           RandomLottieLoader().hide(context);
-          Methods.showSnackbar(msg: response['message'], isSuccess: response['success']? true: null);
         }
+        Methods.showSnackbar(msg: response['message'], isSuccess: response['success']? true: null);
       }
     }catch(e){
       logger.e(e);

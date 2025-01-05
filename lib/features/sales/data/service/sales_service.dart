@@ -60,6 +60,7 @@ class SalesService{
     required String usrToken,
     required CreateSaleOrderModel saleOrderModel,
   }) async {
+    logger.i(saleOrderModel.toJson());
     var response = await BaseClient.postData(
         token: usrToken,
         api: NetWorkStrings.createSaleOrder,

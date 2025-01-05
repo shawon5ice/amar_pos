@@ -47,7 +47,11 @@ class _AddProductScreenState extends State<AddProductScreen> {
   String? fileName;
 
   Future<void> selectFile() async {
-    final result = await FilePicker.platform.pickFiles();
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+      withReadStream: true,
+      compressionQuality: 70,
+    );
     if (result != null) {
       setState(() {
         fileName = result.files.single.path;
