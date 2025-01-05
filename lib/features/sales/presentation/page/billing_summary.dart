@@ -12,7 +12,7 @@ import 'package:amar_pos/features/sales/data/models/client_list_response_model.d
 import 'package:amar_pos/features/sales/data/models/create_order_model.dart';
 import 'package:amar_pos/features/sales/data/models/payment_method_tracker.dart';
 import 'package:amar_pos/features/sales/data/models/service_person_response_model.dart';
-import 'package:amar_pos/features/sales/presentation/sales_controller.dart';
+import 'package:amar_pos/features/sales/presentation/controller/sales_controller.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

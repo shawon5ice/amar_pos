@@ -10,7 +10,8 @@ import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/dashed_line.dart';
 import '../../../../core/widgets/methods/helper_methods.dart';
 import '../../../../core/widgets/qr_code_scanner.dart';
-import '../sales_controller.dart';
+import '../../data/models/create_order_model.dart';
+import '../controller/sales_controller.dart';
 import 'package:get/get.dart';
 import '../../../inventory/data/products/product_list_response_model.dart';
 import '../widgets/sn_dialog_widget.dart';
@@ -28,6 +29,8 @@ class _PlaceOrderState extends State<PlaceOrder> {
   @override
   void initState() {
     suggestionEditingController = TextEditingController();
+    controller.createOrderModel = CreateSaleOrderModel.defaultConstructor();
+    controller.placeOrderProducts.clear();
     controller.getAllProducts(
       search: "",
       page: 1,
@@ -37,9 +40,18 @@ class _PlaceOrderState extends State<PlaceOrder> {
 
   late TextEditingController suggestionEditingController;
 
+
+  @override
+  void didUpdateWidget(covariant PlaceOrder oldWidget) {
+    if(widget != oldWidget){
+      FocusScope.of(context).unfocus();
+    }
+    super.didUpdateWidget(oldWidget);
+  }
+
+
   @override
   void dispose() {
-    suggestionEditingController.clear();
     super.dispose();
   }
 
@@ -65,6 +77,7 @@ class _PlaceOrderState extends State<PlaceOrder> {
                         builder: (context, textController, focusNode) {
                           suggestionEditingController = textController;
                           return TextField(
+                            autofocus: false,
                             controller: suggestionEditingController,
                             focusNode: focusNode,
                             decoration: InputDecoration(
@@ -476,8 +489,8 @@ class _PlaceOrderState extends State<PlaceOrder> {
                     addW(12),
                     Expanded(
                       child: CustomButton(
-                        onTap: () {
-                          Get.to(() => BillingSummary())?.then((value) {
+                        onTap: () async {
+                         await Get.to(() => const BillingSummary())?.then((value) {
                             FocusScope.of(context).unfocus();
                           });
                         },

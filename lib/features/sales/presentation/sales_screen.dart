@@ -3,12 +3,13 @@ import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/core/widgets/custom_button.dart';
 import 'package:amar_pos/features/sales/presentation/page/place_order.dart';
 import 'package:amar_pos/features/sales/presentation/page/sold_history.dart';
-import 'package:amar_pos/features/sales/presentation/sales_controller.dart';
+import 'package:amar_pos/features/sales/presentation/controller/sales_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../drawer/drawer_menu_controller.dart';
+import '../data/models/create_order_model.dart';
 
 class SalesScreen extends StatefulWidget {
   static String routeName = '/sales_screen';

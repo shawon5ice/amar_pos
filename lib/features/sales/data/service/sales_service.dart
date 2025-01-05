@@ -67,4 +67,27 @@ class SalesService{
     );
     return response;
   }
+
+  static Future<dynamic> getSoldHistory({
+    required String usrToken,
+    required int page,
+    String? search,
+    bool? saleType,
+    String? startDate,
+    String? endDate,
+  }) async {
+    logger.d("Page: $page");
+    var response = await BaseClient.getData(
+        token: usrToken,
+        api: NetWorkStrings.getAllOrderList,
+        parameter: {
+          "status": 1,
+          "page": page,
+          "search": search,
+          "start_date": startDate??'1/09/2024',
+          "end_date": endDate??'5/01/2025',
+          "sale_type": saleType,
+        });
+    return response;
+  }
 }

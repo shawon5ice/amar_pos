@@ -62,9 +62,14 @@ dependencies:
   firebase_messaging:
 
 
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+  json_annotation:
+  json_serializable:
+
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -75,7 +80,6 @@ dev_dependencies:
   logger:
   build_runner:
   hive_generator:
-  device_preview_plus:
   printing:
   flutter_typeahead:
 

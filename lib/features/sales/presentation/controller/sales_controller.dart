@@ -5,16 +5,19 @@ import 'package:amar_pos/features/sales/data/models/billing_payment_methods.dart
 import 'package:amar_pos/features/sales/data/models/client_list_response_model.dart';
 import 'package:amar_pos/features/sales/data/models/create_order_model.dart';
 import 'package:amar_pos/features/sales/data/models/payment_method_tracker.dart';
+import 'package:amar_pos/features/sales/data/models/sale_history/sold_history_response_model.dart';
 import 'package:amar_pos/features/sales/data/service/sales_service.dart';
 import 'package:amar_pos/features/sales/data/models/service_person_response_model.dart';
 import 'package:amar_pos/features/sales/presentation/widgets/billing_summary_payment_option_selection_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../core/constants/logger/logger.dart';
-import '../../auth/data/model/hive/login_data.dart';
-import '../../auth/data/model/hive/login_data_helper.dart';
-import '../../inventory/data/products/product_list_response_model.dart';
+import '../../../../core/constants/logger/logger.dart';
+import '../../../auth/data/model/hive/login_data.dart';
+import '../../../auth/data/model/hive/login_data_helper.dart';
+import '../../../inventory/data/products/product_list_response_model.dart';
+
+// part 'sold_history.dart';
 
 class SalesController extends GetxController {
   bool isProductListLoading = false;
@@ -31,8 +34,7 @@ class SalesController extends GetxController {
 
   final isLoading = false.obs; // Tracks ongoing API calls
   var lastFoundList = <ProductInfo>[].obs; // Previously found products
-  var currentSearchList =
-      <ProductInfo>[].obs; // Results from the ongoing search
+  var currentSearchList = <ProductInfo>[].obs; // Results from the ongoing search
   var isSearching = false.obs; // Indicates whether a search is ongoing
   var hasError = false.obs; // Tracks if an error occurred
   TextEditingController searchProductController = TextEditingController();
@@ -64,6 +66,13 @@ class SalesController extends GetxController {
   num totalDeu = 0;
 
   num paidAmount = 0;
+
+
+  //Sold History
+  SaleHistoryResponseModel? saleHistoryResponseModel;
+  List<SaleHistory> saleHistoryList = [];
+  bool isSaleHistoryListLoading = false;
+  bool isSaleHistoryLoadingMore = false;
 
   void changeSellingParties(bool value) {
     isRetailSale = value;
@@ -337,4 +346,47 @@ class SalesController extends GetxController {
       update(["sales_product_list"]);
     }
   }
+
+  Future<void> getSoldHistory({String? search,
+    int page = 1,
+  }) async {
+    isSaleHistoryListLoading = page == 1;
+    isSaleHistoryLoadingMore = page > 1;
+
+    if(page == 1){
+      saleHistoryList.clear();
+    }
+
+    hasError.value = false;
+    update(['sold_history_list']);
+
+    try {
+      var response = await SalesService.getSoldHistory(
+        usrToken: loginData!.token,
+        page: page,
+        search: search,
+      );
+
+      logger.i(response);
+      if (response != null && response['success']) {
+        saleHistoryResponseModel =
+            SaleHistoryResponseModel.fromJson(response);
+
+        if (saleHistoryResponseModel != null) {
+          saleHistoryList.addAll(saleHistoryResponseModel!.data.saleHistoryList);
+        }
+      } else {
+        hasError.value = true;
+      }
+    } catch (e) {
+      hasError.value = true;
+      saleHistoryList.clear();
+      logger.e(e);
+    } finally {
+      isSaleHistoryListLoading = false;
+      isSaleHistoryLoadingMore = false;
+      update(['sold_history_list']);
+    }
+  }
+
 }

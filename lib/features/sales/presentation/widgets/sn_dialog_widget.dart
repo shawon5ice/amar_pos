@@ -9,7 +9,7 @@ import '../../../../core/widgets/field_title.dart';
 import '../../../../core/widgets/qr_code_scanner.dart';
 import '../../../inventory/data/products/product_list_response_model.dart';
 import '../../data/models/create_order_model.dart';
-import '../sales_controller.dart';
+import '../controller/sales_controller.dart';
 
 class PlaceOrderProductSnSelectionDialog extends StatefulWidget {
   final SaleProductModel product;

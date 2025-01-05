@@ -92,4 +92,5 @@ class NetWorkStrings{
   static const String getAllServiceStuff = "order/get-all-service-person";
   static const String getAllClientList = "client/get-client-list";
   static const String createSaleOrder = "order/place-order";
+  static const String getAllOrderList = "order/get-all-order-list";
 }

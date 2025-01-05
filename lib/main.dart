@@ -8,7 +8,6 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'core/routes/router.dart';
 import 'core/theme/app_theme.dart';
-import 'package:device_preview_plus/device_preview_plus.dart';
 import 'features/splash/splash_screen.dart';
 import 'firebase_options.dart';
 
