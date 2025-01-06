@@ -39,6 +39,8 @@ class FileDownloader {
         options: token != null
             ? Options(headers: {
                 'Authorization': 'Bearer $token',
+                Headers.contentTypeHeader : 'multipart/form-data',
+                // Headers.contentTypeHeader : fileName.contains('.pdf')? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
               })
             : null,
         onReceiveProgress: (received, total) {
@@ -65,29 +67,42 @@ class FileDownloader {
 
   Future<void> _initializeNotifications() async {
     const initializationSettingsAndroid =
-        AndroidInitializationSettings('hrm_notification');
+    AndroidInitializationSettings('hrm_notification');
     const initializationSettingsDarwin = DarwinInitializationSettings();
     const initializationSettings = InitializationSettings(
       android: initializationSettingsAndroid,
       iOS: initializationSettingsDarwin,
     );
-    Permission.notification.request();
+
+    // Initialize notifications
     await _flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
       onDidReceiveNotificationResponse: (NotificationResponse notificationResponse) async {
         _handleNotificationTap(notificationResponse.payload);
       },
     );
+
+    // Request notification permission
+    await _requestPermissions();
   }
 
   Future<void> _requestPermissions() async {
     // Request notification permission
-    await Permission.notification.request();
-    // Handle permanently denied permission
-    if (await Permission.notification.isPermanentlyDenied) {
+    PermissionStatus status = await Permission.notification.request();
+
+    if (status.isGranted) {
+      // Permission granted, continue normal app flow
+      print("Notification permission granted");
+    } else if (status.isDenied) {
+      // Permission denied but not permanently
+      print("Notification permission denied");
+    } else if (status.isPermanentlyDenied) {
+      // Handle permanently denied permission
+      print("Notification permission permanently denied, opening app settings...");
       openAppSettings();
     }
   }
+
 
   Future<Directory> _getDownloadDirectory() async {
     if (Platform.isAndroid) {
