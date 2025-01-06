@@ -110,6 +110,7 @@ class MainPage extends StatelessWidget {
         },
       );
 
+
   Future<bool> showExitConfirmation(BuildContext context) async {
     return await showDialog<bool>(
           context: context,
