@@ -73,9 +73,9 @@ class SalesService{
     required String usrToken,
     required int page,
     String? search,
-    bool? saleType,
-    String? startDate,
-    String? endDate,
+    int? saleType,
+    DateTime? startDate,
+    DateTime? endDate,
   }) async {
     logger.d("Page: $page");
     var response = await BaseClient.getData(

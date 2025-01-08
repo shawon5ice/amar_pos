@@ -4,6 +4,7 @@ import 'package:amar_pos/core/widgets/custom_button.dart';
 import 'package:amar_pos/features/sales/presentation/page/place_order.dart';
 import 'package:amar_pos/features/sales/presentation/page/sold_history.dart';
 import 'package:amar_pos/features/sales/presentation/controller/sales_controller.dart';
+import 'package:amar_pos/features/sales/presentation/widgets/sold_history_filter_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -29,6 +30,11 @@ class _SalesScreenState extends State<SalesScreen>
   @override
   void initState() {
     _tabController = TabController(length: 3, vsync: this);
+    _tabController.addListener(() {
+      if (_tabController.index != _tabController.previousIndex) {
+        controller.update(['action_icon']);
+      }
+    });
     controller.getAllServiceStuff();
     controller.getAllClientList();
     super.initState();
@@ -51,8 +57,16 @@ class _SalesScreenState extends State<SalesScreen>
         ),
         title: const Text("Sales"),
         actions: [
-          GestureDetector(
-            child: SvgPicture.asset(AppAssets.pauseBillingIcon),
+          GetBuilder<SalesController>(
+            id: 'action_icon',
+            builder: (controller) => _tabController.index == 0? GestureDetector(
+              child: SvgPicture.asset(AppAssets.pauseBillingIcon),
+            ): GestureDetector(
+              onTap: (){
+                showModalBottomSheet(context: context, builder:(context) => SoldHistoryFilterBottomSheet());
+              },
+              child: SvgPicture.asset(AppAssets.filterIcon),
+            ),
           ),
           addW(12),
         ],

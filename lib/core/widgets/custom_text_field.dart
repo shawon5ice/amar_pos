@@ -30,6 +30,7 @@ class CustomTextField extends StatefulWidget {
   final void Function(String)? onSubmitted; // Updated to pass value
   final void Function()? onTap;
   final void Function(String)? onEditStop;
+  final bool? noInputBorder;
 
   final Duration debounceDuration; // New property for debounce duration
 
@@ -64,6 +65,7 @@ class CustomTextField extends StatefulWidget {
     this.onSubmitted,
     this.onTap,
     this.onEditStop,
+    this.noInputBorder,
     this.debounceDuration = const Duration(milliseconds: 300), // Default debounce duration
   });
 
@@ -172,7 +174,10 @@ class _CustomTextFieldState extends State<CustomTextField> {
     );
   }
 
-  OutlineInputBorder _getInputBorder() {
+  InputBorder _getInputBorder() {
+    if(widget.noInputBorder != null){
+      return InputBorder.none;
+    }
     return OutlineInputBorder(
       borderRadius: BorderRadius.circular(widget.brdrRadius),
       borderSide: BorderSide(

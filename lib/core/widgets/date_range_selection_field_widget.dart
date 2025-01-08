@@ -11,11 +11,15 @@ class CustomDateRangeSelectionFieldWidget extends StatefulWidget {
     required this.onDateRangeSelection,
     this.initialDate,
     this.isMandatory,
+    this.noInputBorder,
+    this.fontSize,
   });
 
   final Function(DateTimeRange? dateRange) onDateRangeSelection;
   final DateTimeRange? initialDate;
   final bool? isMandatory;
+  final bool? noInputBorder;
+  final double? fontSize;
 
   @override
   State<CustomDateRangeSelectionFieldWidget> createState() =>
@@ -63,7 +67,8 @@ class _CustomDateRangeSelectionFieldWidgetState
   @override
   Widget build(BuildContext context) {
     return CustomTextField(
-      txtSize: 12,
+      txtSize: widget.fontSize ??12,
+      noInputBorder: widget.noInputBorder,
       readOnly: true,
       onTap: () async {
         DateTimeRange? selectedDate = await showDateRangePicker(

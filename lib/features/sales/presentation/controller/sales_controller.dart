@@ -74,6 +74,22 @@ class SalesController extends GetxController {
   bool isSaleHistoryListLoading = false;
   bool isSaleHistoryLoadingMore = false;
 
+  Rx<DateTimeRange?> selectedDateTimeRange = Rx<DateTimeRange?>(null);
+  bool retailSale = false;
+  bool wholeSale = false;
+
+
+  void clearFilter(){
+    wholeSale = false;
+    retailSale = false;
+    selectedDateTimeRange.value = null;
+    update(['filter_view']);
+  }
+
+  void setSelectedDateRange(DateTimeRange? range) {
+    selectedDateTimeRange.value = range;
+  }
+
   void changeSellingParties(bool value) {
     isRetailSale = value;
     paymentMethodTracker.clear();
@@ -365,6 +381,9 @@ class SalesController extends GetxController {
         usrToken: loginData!.token,
         page: page,
         search: search,
+        startDate: selectedDateTimeRange.value?.start,
+        endDate: selectedDateTimeRange.value?.end,
+        saleType: retailSale && wholeSale? null : retailSale ? 1: wholeSale ? 2: null
       );
 
       logger.i(response);
