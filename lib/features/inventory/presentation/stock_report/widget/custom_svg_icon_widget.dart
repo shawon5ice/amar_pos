@@ -24,3 +24,39 @@ class CustomSvgIconButton extends StatelessWidget {
     );
   }
 }
+
+
+
+
+class CustomSvgSmallIconButton extends StatelessWidget {
+  const CustomSvgSmallIconButton({
+    super.key,
+    required this.bgColor,
+    required this.borderColor,
+    required this.onTap,
+    required this.assetPath,
+  });
+
+  final Color bgColor;
+  final Color borderColor;
+  final String assetPath;
+  final Function()? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 24,
+        height: 24,
+        // padding: EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          color: bgColor,
+          shape: BoxShape.circle,
+          border: Border.all(color: borderColor, width: .5)
+        ),
+        child: Center(child: SvgPicture.asset(assetPath,width: 12,height: 12,),),
+      ),
+    );
+  }
+}

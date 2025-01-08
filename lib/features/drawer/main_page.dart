@@ -33,56 +33,46 @@ class MainPage extends StatelessWidget {
         body: Stack(
           children: [
             buildDrawer(),
-            Obx(() {
-              // Navigate to the selected page
-              final routeName = menuController.getSelectedPage();
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (Get.currentRoute != routeName) {
-                  Get.offAllNamed(routeName); // Replace current screen with the new one
+            GestureDetector(
+              onTap: menuController.closeDrawer,
+              onHorizontalDragStart: (DragStartDetails details) {
+                menuController.isDragging = true;
+              },
+              onHorizontalDragUpdate: (DragUpdateDetails details) {
+                if (!menuController.isDragging) return;
+                const delta = 1;
+                if (details.delta.dx > delta) {
+                  menuController.openDrawer();
+                } else if (details.delta.dx < -delta) {
+                  menuController.closeDrawer();
                 }
-              });
-              return Container(); // Render a placeholder while navigation is performed
-            }),
-            // GestureDetector(
-            //   onTap: menuController.closeDrawer,
-            //   onHorizontalDragStart: (DragStartDetails details) {
-            //     menuController.isDragging = true;
-            //   },
-            //   onHorizontalDragUpdate: (DragUpdateDetails details) {
-            //     if (!menuController.isDragging) return;
-            //     const delta = 1;
-            //     if (details.delta.dx > delta) {
-            //       menuController.openDrawer();
-            //     } else if (details.delta.dx < -delta) {
-            //       menuController.closeDrawer();
-            //     }
-            //     menuController.isDragging = false;
-            //   },
-            //   child: Obx(() => AnimatedContainer(
-            //         duration: const Duration(milliseconds: 250),
-            //         transform: Matrix4.translationValues(
-            //             menuController.xOffset.value,
-            //             menuController.yOffset.value,
-            //             0)
-            //           ..scale(menuController.scaleFactor.value),
-            //         child: ClipRRect(
-            //           borderRadius: BorderRadius.all(Radius.circular(
-            //               menuController.isDrawerOpened.value ? 20 : 0)),
-            //           child: AbsorbPointer(
-            //             absorbing: menuController.isDrawerOpened.value,
-            //             child: Container(
-            //               decoration: BoxDecoration(
-            //                 color: menuController.isDrawerOpened.value
-            //                     ? Colors.white12
-            //                     : AppColors.scaffoldBackground,
-            //               ),
-            //               child: Obx(() => menuController
-            //                   .getSelectedPage()), // Dynamically show the selected page
-            //             ),
-            //           ),
-            //         ),
-            //       )),
-            // ),
+                menuController.isDragging = false;
+              },
+              child: Obx(() => AnimatedContainer(
+                    duration: const Duration(milliseconds: 250),
+                    transform: Matrix4.translationValues(
+                        menuController.xOffset.value,
+                        menuController.yOffset.value,
+                        0)
+                      ..scale(menuController.scaleFactor.value),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.all(Radius.circular(
+                          menuController.isDrawerOpened.value ? 20 : 0)),
+                      child: AbsorbPointer(
+                        absorbing: menuController.isDrawerOpened.value,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: menuController.isDrawerOpened.value
+                                ? Colors.white12
+                                : AppColors.scaffoldBackground,
+                          ),
+                          child: Obx(() => menuController
+                              .getSelectedPage()), // Dynamically show the selected page
+                        ),
+                      ),
+                    ),
+                  )),
+            ),
           ],
         ),
       ),

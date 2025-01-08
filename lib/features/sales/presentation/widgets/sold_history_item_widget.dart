@@ -6,7 +6,9 @@ import 'package:amar_pos/features/inventory/presentation/stock_report/stock_repo
 import 'package:amar_pos/features/sales/data/models/sale_history/sold_history_response_model.dart';
 import 'package:amar_pos/features/sales/presentation/controller/sales_controller.dart';
 import 'package:amar_pos/features/sales/presentation/page/sold_history.dart';
+import 'package:amar_pos/features/sales/presentation/widgets/sold_history_item_action_menu.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -50,9 +52,8 @@ class SoldHistoryItemWidget extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20)),
                 child: Text(
                   saleHistory.date,
-                  style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 12.sp),
+                  style:
+                      TextStyle(fontWeight: FontWeight.w500, fontSize: 12.sp),
                 ),
               ),
               addW(8.w),
@@ -75,7 +76,8 @@ class SoldHistoryItemWidget extends StatelessWidget {
               ),
               addW(8.w),
               Spacer(),
-              CustomSvgIconButton(
+              CustomSvgSmallIconButton(
+                borderColor: Color(0xff03346E),
                 bgColor: const Color(0xffE1F2FF),
                 onTap: () {
                   // controller.downloadStockLedgerReport(
@@ -83,17 +85,98 @@ class SoldHistoryItemWidget extends StatelessWidget {
                 },
                 assetPath: AppAssets.downloadIcon,
               ),
-              addW(4),
-              CustomSvgIconButton(
+              addW(8),
+              CustomSvgSmallIconButton(
+                borderColor: Color(0xffFF9000),
                 bgColor: const Color(0xffFFFCF8),
                 onTap: () {},
                 assetPath: AppAssets.printIcon,
-              )
+              ),
+              Spacer(),
+              SoldHistoryItemActionMenu(
+                onSelected: (value) {
+                  switch (value) {
+                    case "edit":
+                      break;
+                    case "delete":
+                      AwesomeDialog(
+                              context: context,
+                              dialogType: DialogType.error,
+                              title: "Are you sure?",
+                              desc:
+                                  "You are going to delete order no: ${saleHistory.orderNo}",
+                              btnOkOnPress: () {
+                                // controller.deleteProduct(
+                                //     productInfo: productInfo);
+                              },
+                              btnCancelOnPress: () {})
+                          .show();
+                      break;
+                  }
+                },
+              ),
             ],
           ),
-
+          addH(12),
+          Container(
+            padding: EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(10)),
+              color: Color(0xffF8F7F2),
+            ),
+            child: Column(
+              children: [
+                SaleHistoryItemTitleValueWidget(
+                  title: "Invoice Number",
+                  value: saleHistory.orderNo,
+                ),
+                SaleHistoryItemTitleValueWidget(
+                  title: "Customer Name",
+                  value: saleHistory.customer.name,
+                ),
+                SaleHistoryItemTitleValueWidget(
+                  title: "Phone Number",
+                  value: saleHistory.customer.phone,
+                ),
+                SaleHistoryItemTitleValueWidget(
+                  title: "Amount",
+                  value: Methods.getFormatedPrice(saleHistory.amount),
+                ),
+              ],
+            ),
+          )
         ],
       ),
+    );
+  }
+}
+
+class SaleHistoryItemTitleValueWidget extends StatelessWidget {
+  const SaleHistoryItemTitleValueWidget(
+      {super.key, required this.title, required this.value});
+
+  final String title;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+            flex: 2,
+            child: Text(
+              title,
+              style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w400),
+            )),
+        const Text(" : "),
+        Expanded(
+            flex: 3,
+            child: Text(
+              value,
+              textAlign: TextAlign.end,
+              style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w400),
+            )),
+      ],
     );
   }
 }

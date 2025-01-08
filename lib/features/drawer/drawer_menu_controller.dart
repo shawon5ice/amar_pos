@@ -58,43 +58,43 @@ class DrawerMenuController extends GetxController {
     closeDrawer();
   }
 
-  String getSelectedPage() {
-    // Return the route name or page identifier
-    switch (selectedMenuItem.value?.parent) {
-      case DrawerItems.overview:
-        return '/overview';
-      case DrawerItems.config:
-        return ConfigurationScreen.routeName;
-      case DrawerItems.reports:
-        return '/reports';
-      default:
-        return '/overview'; // Default route
-    }
-  }
-
-  // Returns the appropriate screen based on selectedMenuItem
-  // Widget getSelectedPage() {
+  // String getSelectedPage() {
+  //   // Return the route name or page identifier
   //   switch (selectedMenuItem.value?.parent) {
   //     case DrawerItems.overview:
-  //       currentScreen.value = HomeScreen.routeName;
-  //       return const HomeScreen(); // Default to HomeScreen
-  //     case DrawerItems.inventory:
-  //       if(selectedMenuItem.value?.child == "Product List"){
-  //         return const ProductsScreen();
-  //       }else if(selectedMenuItem.value?.child == "Stock Report"){
-  //         return const StockReportScreen();
-  //       }else{
-  //         return Container();
-  //       }
-  //     case DrawerItems.sales:
-  //       logger.i("SALES");
-  //       currentScreen.value = SalesScreen.routeName;
-  //       return const SalesScreen();
+  //       return '/overview';
   //     case DrawerItems.config:
-  //       currentScreen.value = ConfigurationScreen.routeName;
-  //       return ConfigurationScreen(); // Configuration screen widget
+  //       return ConfigurationScreen.routeName;
+  //     case DrawerItems.reports:
+  //       return '/reports';
   //     default:
-  //       return const HomeScreen(); // Fallback to HomeScreen
+  //       return '/overview'; // Default route
   //   }
   // }
+
+  // Returns the appropriate screen based on selectedMenuItem
+  Widget getSelectedPage() {
+    switch (selectedMenuItem.value?.parent) {
+      case DrawerItems.overview:
+        currentScreen.value = HomeScreen.routeName;
+        return const HomeScreen(); // Default to HomeScreen
+      case DrawerItems.inventory:
+        if(selectedMenuItem.value?.child == "Product List"){
+          return const ProductsScreen();
+        }else if(selectedMenuItem.value?.child == "Stock Report"){
+          return const StockReportScreen();
+        }else{
+          return Container();
+        }
+      case DrawerItems.sales:
+        logger.i("SALES");
+        currentScreen.value = SalesScreen.routeName;
+        return const SalesScreen();
+      case DrawerItems.config:
+        currentScreen.value = ConfigurationScreen.routeName;
+        return ConfigurationScreen(); // Configuration screen widget
+      default:
+        return const HomeScreen(); // Fallback to HomeScreen
+    }
+  }
 }
