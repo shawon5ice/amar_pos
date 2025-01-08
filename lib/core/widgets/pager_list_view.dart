@@ -35,15 +35,16 @@ class PagerListView<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     _scrollController.addListener(() {
-      if (_scrollController.position.atEdge &&
-          _scrollController.position.pixels > 0) {
-        _loadedItems += items.length;
+      if (isLoading || totalPage == 1 || totalSize <= itemPerPage) return;
 
-        int newLength = totalSize - _loadedItems;
-        if (newLength > itemPerPage && currentPage < totalPage) {
+      if (_scrollController.position.atEdge && _scrollController.position.pixels > 0) {
+        int newLength = totalSize % itemPerPage == 0 ? (totalSize - 1) - items.length : totalSize - items.length;
+        if (newLength > itemPerPage) {
           int nextPage = totalPage - (newLength / itemPerPage).floor();
-          currentPage = nextPage;
           onNewLoad(nextPage);
+        } else {
+          if (newLength <= 0) return;
+          onNewLoad(totalPage);
         }
       }
     });

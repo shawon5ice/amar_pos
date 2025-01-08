@@ -90,9 +90,10 @@ class SalesService{
           "status": 1,
           "page": page,
           "search": search,
-          "start_date": startDate??'1/09/2024',
-          "end_date": endDate??'5/01/2025',
+          "start_date": startDate,
+          "end_date": endDate,
           "sale_type": saleType,
+          "limit": 10,
         });
     return response;
   }

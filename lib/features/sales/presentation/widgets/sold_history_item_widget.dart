@@ -41,41 +41,53 @@ class SoldHistoryItemWidget extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                decoration: BoxDecoration(
-                    color: Color(0xffF6FFF6),
-                    border: Border.all(
-                      color: Color(0xff94DB8C),
-                      width: .5,
+              Flexible(
+                child: Row(
+                  children: [
+                    Container(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                          color: Color(0xffF6FFF6),
+                          border: Border.all(
+                            color: Color(0xff94DB8C),
+                            width: .5,
+                          ),
+                          borderRadius: BorderRadius.circular(20)),
+                      child: AutoSizeText(
+                        saleHistory.date,
+                        maxFontSize: 10,
+                        minFontSize: 8,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                     ),
-                    borderRadius: BorderRadius.circular(20)),
-                child: Text(
-                  saleHistory.date,
-                  style:
-                      TextStyle(fontWeight: FontWeight.w500, fontSize: 12.sp),
+                    addW(8.w),
+                    Container(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                          color: Color(0xffF2E8FF),
+                          border: Border.all(
+                            color: Color(0xff500DA0),
+                            width: .5,
+                          ),
+                          borderRadius: BorderRadius.circular(20)),
+                      child: AutoSizeText(
+                        saleHistory.saleType,
+                        minFontSize: 8,
+                        maxFontSize: 10,
+                        style: TextStyle(
+                          color: Color(0xff500DA0),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               addW(8.w),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                decoration: BoxDecoration(
-                    color: Color(0xffF2E8FF),
-                    border: Border.all(
-                      color: Color(0xff500DA0),
-                      width: .5,
-                    ),
-                    borderRadius: BorderRadius.circular(20)),
-                child: Text(
-                  saleHistory.saleType,
-                  style: TextStyle(
-                      color: Color(0xff500DA0),
-                      fontWeight: FontWeight.w500,
-                      fontSize: 12.sp),
-                ),
-              ),
-              addW(8.w),
-              Spacer(),
               CustomSvgSmallIconButton(
                 borderColor: Color(0xff03346E),
                 bgColor: const Color(0xffE1F2FF),
@@ -92,7 +104,7 @@ class SoldHistoryItemWidget extends StatelessWidget {
                 onTap: () {},
                 assetPath: AppAssets.printIcon,
               ),
-              Spacer(),
+              addW(8),
               SoldHistoryItemActionMenu(
                 onSelected: (value) {
                   switch (value) {

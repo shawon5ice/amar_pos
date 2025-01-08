@@ -78,7 +78,7 @@ SaleHistoryResponseModel _$SaleHistoryResponseModelFromJson(
         Map<String, dynamic> json) =>
     SaleHistoryResponseModel(
       success: json['success'] as bool,
-      data: Data.fromJson(json['data'] as Map<String, dynamic>),
+      data: json['data'] is Map ? Data.fromJson(json['data'] as Map<String, dynamic>) : Data(saleHistoryList: [], meta: Meta(currentPage: 0, from: 0, lastPage: 0, total: 0)),
       countTotal: (json['count_total'] as num).toInt(),
       amountTotal: (json['amount_total'] as num).toDouble(),
     );

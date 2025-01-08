@@ -98,13 +98,13 @@ class ProductInfo {
   late final int status;
 
   ProductInfo.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    business = json['business'];
-    sku = json['sku'];
-    name = json['name'];
-    slug = json['slug'];
-    image = json['image'];
-    thumbnailImage = json['thumbnail_image'];
+    id = json['id'] ?? 0;
+    business = json['business'] ?? '';
+    sku = json['sku'] ?? '';
+    name = json['name'] ?? '';
+    slug = json['slug'] ?? '';
+    image = json['image'] ?? '';
+    thumbnailImage = json['thumbnail_image'] ?? '';
     category =  json['category'] is Map<String, dynamic>? Category.fromJson(json['category']) : null;
     brand =  json['brand'] is Map<String, dynamic> ? Brand.fromJson(json['brand']): null;
     unit =  json['unit'] is Map<String, dynamic> ? Unit.fromJson(json['unit']) : null;
@@ -112,17 +112,17 @@ class ProductInfo {
     warranty = json['warranty'] is Map<String, dynamic>
         ? Warranty.fromJson(json['warranty'])
         : null;
-    mfgDate = json['mfg_date'];
-    expiredDate = json['expired_date'];
-    costingPrice = json['costing_price'];
-    wholesalePrice = json['wholesale_price'];
-    mrpPrice = json['mrp_price'];
-    vat = json['vat'];
-    alertQuantity = json['alert_quantity'];
-    stock = json['stock'];
-    totalCosting = json['total_costing'];
+    mfgDate = json['mfg_date'] ?? '';
+    expiredDate = json['expired_date'] ?? '';
+    costingPrice = json['costing_price'] ?? 0;
+    wholesalePrice = json['wholesale_price'] ?? 0;
+    mrpPrice = json['mrp_price'] ?? 0;
+    vat = json['vat'] ?? 0;
+    alertQuantity = json['alert_quantity'] ?? 0;
+    stock = json['stock'] ?? 0;
+    totalCosting = json['total_costing'] ?? 0;
     remarks = json['remarks'];
-    status = json['status'];
+    status = json['status'] ?? 0;
   }
 
   Map<String, dynamic> toJson() {

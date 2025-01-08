@@ -17,7 +17,7 @@ import '../../../../core/constants/logger/logger.dart';
 import '../../../auth/data/model/hive/login_data.dart';
 import '../../../auth/data/model/hive/login_data_helper.dart';
 import '../../../inventory/data/products/product_list_response_model.dart';
-
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 // part 'sold_history.dart';
 
 class SalesController extends GetxController {
@@ -57,6 +57,8 @@ class SalesController extends GetxController {
   List<ClientData> clientList = [];
   ClientData? selectedClient;
 
+  late final TextEditingController searchTextController;
+
   //billing summary
   num totalAmount = 0;
   num totalDiscount = 0;
@@ -79,8 +81,14 @@ class SalesController extends GetxController {
   bool retailSale = false;
   bool wholeSale = false;
 
+  @override
+  void onInit() {
+    searchProductController = TextEditingController();
+    super.onInit();
+  }
 
   void clearFilter(){
+    searchProductController.clear();
     wholeSale = false;
     retailSale = false;
     selectedDateTimeRange.value = null;
@@ -364,31 +372,30 @@ class SalesController extends GetxController {
     }
   }
 
-  Future<void> getSoldHistory({String? search,
-    int page = 1,
-  }) async {
+  Future<void> getSoldHistory({int page = 1}) async {
     isSaleHistoryListLoading = page == 1;
     isSaleHistoryLoadingMore = page > 1;
 
     if(page == 1){
+      saleHistoryResponseModel = null;
       saleHistoryList.clear();
     }
 
     hasError.value = false;
-    update(['sold_history_list']);
+
 
     try {
       var response = await SalesService.getSoldHistory(
         usrToken: loginData!.token,
         page: page,
-        search: search,
+        search: searchProductController.text,
         startDate: selectedDateTimeRange.value?.start,
         endDate: selectedDateTimeRange.value?.end,
         saleType: retailSale && wholeSale? null : retailSale ? 1: wholeSale ? 2: null
       );
 
       logger.i(response);
-      if (response != null && response['success']) {
+      if (response != null) {
         saleHistoryResponseModel =
             SaleHistoryResponseModel.fromJson(response);
 
@@ -396,7 +403,9 @@ class SalesController extends GetxController {
           saleHistoryList.addAll(saleHistoryResponseModel!.data.saleHistoryList);
         }
       } else {
-        hasError.value = true;
+        if(page != 1){
+          hasError.value = true;
+        }
       }
     } catch (e) {
       hasError.value = true;
@@ -405,9 +414,67 @@ class SalesController extends GetxController {
     } finally {
       isSaleHistoryListLoading = false;
       isSaleHistoryLoadingMore = false;
-      update(['sold_history_list']);
+      update(['sold_history_list','total_widget']);
     }
   }
+
+  // Future<void> getSoldHistory({
+  //   String? search,
+  //   int page = 1,
+  //   required PagingController<int, SaleHistory> pagingController,
+  // }) async {
+  //   // Only set loading flags for the first page to show the loading indicator
+  //   if (page == 1) {
+  //     isSaleHistoryListLoading = true;
+  //     saleHistoryList.clear();
+  //   }
+  //   hasError.value = false;
+  //   update(['sold_history_list']);
+  //
+  //   try {
+  //     // Call the API
+  //     var response = await SalesService.getSoldHistory(
+  //       usrToken: loginData!.token,
+  //       page: page,
+  //       search: search,
+  //       startDate: selectedDateTimeRange.value?.start,
+  //       endDate: selectedDateTimeRange.value?.end,
+  //       saleType: retailSale && wholeSale ? null : retailSale ? 1 : wholeSale ? 2 : null,
+  //     );
+  //
+  //     // Parse the response
+  //     if (response != null && response['success']) {
+  //       saleHistoryResponseModel = SaleHistoryResponseModel.fromJson(response);
+  //
+  //       if (saleHistoryResponseModel != null) {
+  //         final newItems = saleHistoryResponseModel!.data.saleHistoryList;
+  //
+  //         // Check if this is the last page
+  //         final isLastPage = page >= (saleHistoryResponseModel!.data.meta.lastPage);
+  //
+  //         if (isLastPage) {
+  //           pagingController.appendLastPage(newItems);
+  //         } else {
+  //           final nextPageKey = page + 1;
+  //           pagingController.appendPage(newItems, nextPageKey);
+  //         }
+  //       }
+  //     } else {
+  //       hasError.value = true;
+  //       pagingController.error = 'Error: Unable to fetch data';
+  //     }
+  //   } catch (e) {
+  //     hasError.value = true;
+  //     logger.e(e);
+  //     pagingController.error = e;
+  //   } finally {
+  //     isSaleHistoryListLoading = false;
+  //     isSaleHistoryLoadingMore = false;
+  //     update(['sold_history_list']);
+  //   }
+  // }
+
+
 
   Future<void> downloadStockLedgerReport({required bool isPdf, required SaleHistory saleHistory, required BuildContext context}) async {
     hasError.value = false;

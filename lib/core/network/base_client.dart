@@ -105,6 +105,7 @@ class BaseClient {
         queryParameters: parameter,
       );
       logger.i('GET Response: ${response.statusCode}');
+      return response.data;
       if(response.data['success']){
         return response.data;
       }else{

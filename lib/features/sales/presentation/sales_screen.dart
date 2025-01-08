@@ -32,11 +32,10 @@ class _SalesScreenState extends State<SalesScreen>
     _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(() {
       if (_tabController.index != _tabController.previousIndex) {
+        controller.searchProductController.clear();
         controller.update(['action_icon']);
       }
     });
-    controller.getAllServiceStuff();
-    controller.getAllClientList();
     super.initState();
   }
 
@@ -65,7 +64,7 @@ class _SalesScreenState extends State<SalesScreen>
               onTap: (){
                 showModalBottomSheet(context: context, builder:(context) => SoldHistoryFilterBottomSheet());
               },
-              child: SvgPicture.asset(AppAssets.filterIcon),
+              child: SvgPicture.asset(AppAssets.funnelFilter),
             ),
           ),
           addW(12),
@@ -110,6 +109,7 @@ class _SalesScreenState extends State<SalesScreen>
               addH(12),
               Expanded(
                 child: TabBarView(
+                  physics: NeverScrollableScrollPhysics(),
                   controller: _tabController,
                   children: [
                     PlaceOrder(),

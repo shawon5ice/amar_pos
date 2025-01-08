@@ -40,6 +40,8 @@ class _BillingSummaryState extends State<BillingSummary> {
 
   @override
   void initState() {
+    controller.getAllServiceStuff();
+    controller.getAllClientList();
     controller.serviceStuffInfo = null;
     controller.selectedClient = null;
     controller.isRetailSale = true;

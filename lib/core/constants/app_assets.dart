@@ -63,6 +63,10 @@ class AppAssets {
   static const String placeOrderBG = "assets/images/place_order.png";
   static const String deleteIc = "assets/icon/delete_icon.svg";
   static const String snAdd = "assets/icon/sn_add.svg";
+  static const String funnelFilter = "assets/icon/funnel_filter.svg";
+  static const String invoice = "assets/icon/invoice.svg";
+  static const String productBox = "assets/icon/product_box.svg";
+  static const String amount = "assets/icon/amount.svg";
 
 
   static const List<String> lottieFiles = [

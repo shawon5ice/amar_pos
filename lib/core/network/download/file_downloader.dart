@@ -30,11 +30,12 @@ class FileDownloader {
       await _requestPermissions();
 
       final directory = await _getDownloadDirectory();
-      logger.(directory);
+      logger.e(directory);
+      logger.e(token);
       final filePath = path.join(directory.path, fileName);
 
       logger.i(url);
-      // Methods.showLoading();
+      RandomLottieLoader().show(context);
       await _dio.download(
         url,
         filePath,
@@ -45,26 +46,18 @@ class FileDownloader {
                 // Headers.contentTypeHeader : fileName.contains('.pdf')? 'application/pdf' : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
               })
             : null,
-        onReceiveProgress: (received, total) {
-          if (total != -1) {
-            // RandomLottieLoader().show(context, progress: (received / total).toDouble());
-            EasyLoading.showProgress(received / total,
-                status: "Downloading...");
-            print("${(received / total * 100).toStringAsFixed(0)}%");
-          }
-        },
       );
 
       // Methods.hideLoading();
 
       await _showNotification(filePath, fileName);
     } catch (e) {
-      // RandomLottieLoader().hide();
-      Methods.hideLoading();
+      RandomLottieLoader().hide(context);
+      // Methods.hideLoading();
       print("Download failed: $e");
     }finally{
-      Methods.hideLoading();
-      // RandomLottieLoader().hide(context);
+      // Methods.hideLoading();
+      RandomLottieLoader().hide(context);
     }
   }
 
