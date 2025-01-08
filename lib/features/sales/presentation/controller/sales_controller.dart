@@ -11,6 +11,7 @@ import 'package:amar_pos/features/sales/data/models/service_person_response_mode
 import 'package:amar_pos/features/sales/presentation/widgets/billing_summary_payment_option_selection_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import '../../../../core/constants/logger/logger.dart';
 import '../../../auth/data/model/hive/login_data.dart';
@@ -407,5 +408,23 @@ class SalesController extends GetxController {
       update(['sold_history_list']);
     }
   }
+
+  Future<void> downloadStockLedgerReport({required bool isPdf, required SaleHistory saleHistory, required BuildContext context}) async {
+    hasError.value = false;
+
+    String fileName = "${saleHistory.orderNo}-${DateTime.now().microsecondsSinceEpoch.toString()}${isPdf? ".pdf":".xlsx"}";
+    try {
+      var response = await SalesService.downloadStockLedgerReport(
+       saleHistory: saleHistory,
+        usrToken: loginData!.token,
+        context: context,
+      );
+    } catch (e) {
+      logger.e(e);
+    } finally {
+
+    }
+  }
+
 
 }

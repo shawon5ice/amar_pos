@@ -80,8 +80,8 @@ class SoldHistoryItemWidget extends StatelessWidget {
                 borderColor: Color(0xff03346E),
                 bgColor: const Color(0xffE1F2FF),
                 onTap: () {
-                  // controller.downloadStockLedgerReport(
-                  //     isPdf: true, context: context);
+                  controller.downloadStockLedgerReport(
+                      isPdf: true, context: context, saleHistory: saleHistory);
                 },
                 assetPath: AppAssets.downloadIcon,
               ),

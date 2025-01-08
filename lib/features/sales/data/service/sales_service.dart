@@ -1,5 +1,10 @@
+
+import 'package:amar_pos/features/sales/data/models/sale_history/sold_history_response_model.dart';
+import 'package:flutter/material.dart';
+
 import '../../../../core/constants/logger/logger.dart';
 import '../../../../core/network/base_client.dart';
+import '../../../../core/network/download/file_downloader.dart';
 import '../../../../core/network/network_strings.dart';
 import '../models/create_order_model.dart';
 
@@ -90,5 +95,13 @@ class SalesService{
           "sale_type": saleType,
         });
     return response;
+  }
+
+  static downloadStockLedgerReport({required String usrToken, required BuildContext context, required SaleHistory saleHistory}) async {
+    // logger.d("PDF: $isPdf");
+
+    String downloadUrl =  "${NetWorkStrings.baseUrl}/download-order-invoice/${saleHistory.id}";
+
+    FileDownloader().downloadFile(url: downloadUrl, fileName: "${saleHistory.orderNo}.pdf" , context: context);
   }
 }

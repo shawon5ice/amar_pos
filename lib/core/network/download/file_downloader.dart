@@ -4,6 +4,7 @@ import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
@@ -29,6 +30,7 @@ class FileDownloader {
       await _requestPermissions();
 
       final directory = await _getDownloadDirectory();
+      logger.(directory);
       final filePath = path.join(directory.path, fileName);
 
       logger.i(url);
@@ -45,9 +47,9 @@ class FileDownloader {
             : null,
         onReceiveProgress: (received, total) {
           if (total != -1) {
-            RandomLottieLoader().show(context, progress: (received / total).toDouble());
-            // EasyLoading.showProgress(received / total,
-            //     status: "Downloading...");
+            // RandomLottieLoader().show(context, progress: (received / total).toDouble());
+            EasyLoading.showProgress(received / total,
+                status: "Downloading...");
             print("${(received / total * 100).toStringAsFixed(0)}%");
           }
         },
@@ -58,10 +60,11 @@ class FileDownloader {
       await _showNotification(filePath, fileName);
     } catch (e) {
       // RandomLottieLoader().hide();
-      // Methods.hideLoading();
+      Methods.hideLoading();
       print("Download failed: $e");
     }finally{
-      RandomLottieLoader().hide(context);
+      Methods.hideLoading();
+      // RandomLottieLoader().hide(context);
     }
   }
 

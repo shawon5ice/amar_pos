@@ -47,8 +47,8 @@ class CustomSvgSmallIconButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 24,
-        height: 24,
+        width: 28,
+        height: 28,
         // padding: EdgeInsets.all(4),
         decoration: BoxDecoration(
           color: bgColor,
