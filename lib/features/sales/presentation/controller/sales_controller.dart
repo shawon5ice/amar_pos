@@ -6,6 +6,7 @@ import 'package:amar_pos/features/sales/data/models/client_list_response_model.d
 import 'package:amar_pos/features/sales/data/models/create_order_model.dart';
 import 'package:amar_pos/features/sales/data/models/payment_method_tracker.dart';
 import 'package:amar_pos/features/sales/data/models/sale_history/sold_history_response_model.dart';
+import 'package:amar_pos/features/sales/data/models/sold_product/sold_product_response_model.dart';
 import 'package:amar_pos/features/sales/data/service/sales_service.dart';
 import 'package:amar_pos/features/sales/data/models/service_person_response_model.dart';
 import 'package:amar_pos/features/sales/presentation/widgets/billing_summary_payment_option_selection_widget.dart';
@@ -52,6 +53,7 @@ class SalesController extends GetxController {
   bool isRetailSale = true;
 
   List<ServiceStuffInfo> serviceStuffList = [];
+  bool serviceStuffLoading = false;
   ServiceStuffInfo? serviceStuffInfo;
 
   List<ClientData> clientList = [];
@@ -80,6 +82,12 @@ class SalesController extends GetxController {
   Rx<DateTimeRange?> selectedDateTimeRange = Rx<DateTimeRange?>(null);
   bool retailSale = false;
   bool wholeSale = false;
+
+  //Sold Products
+  SoldProductResponseModel? soldProductResponseModel;
+  List<SoldProductModel> soldProductList = [];
+  bool isSoldProductListLoading = false;
+  bool isSoldProductsLoadingMore = false;
 
   @override
   void onInit() {
@@ -383,6 +391,7 @@ class SalesController extends GetxController {
 
     hasError.value = false;
 
+    update(['sold_history_list','total_widget']);
 
     try {
       var response = await SalesService.getSoldHistory(
@@ -415,6 +424,53 @@ class SalesController extends GetxController {
       isSaleHistoryListLoading = false;
       isSaleHistoryLoadingMore = false;
       update(['sold_history_list','total_widget']);
+    }
+  }
+
+  Future<void> getSoldProducts({int page = 1}) async {
+    isSoldProductListLoading = page == 1;
+    isSoldProductsLoadingMore = page > 1;
+
+    if(page == 1){
+      soldProductResponseModel = null;
+      soldProductList.clear();
+    }
+
+    hasError.value = false;
+
+    update(['sold_product_list','total_widget']);
+
+    try {
+      var response = await SalesService.getSoldProducts(
+          usrToken: loginData!.token,
+          page: page,
+          search: searchProductController.text,
+          startDate: selectedDateTimeRange.value?.start,
+          endDate: selectedDateTimeRange.value?.end,
+          saleType: retailSale && wholeSale? null : retailSale ? 1: wholeSale ? 2: null
+      );
+
+      logger.i(response);
+      if (response != null) {
+        soldProductResponseModel =
+            SoldProductResponseModel.fromJson(response);
+
+        if (soldProductResponseModel != null) {
+          soldProductList.addAll(soldProductResponseModel!.data.soldProducts);
+        }
+      } else {
+        if(page != 1){
+          hasError.value = true;
+        }
+      }
+    } catch (e) {
+      hasError.value = true;
+      soldProductList.clear();
+      logger.e(e);
+    } finally {
+      isSoldProductListLoading = false;
+      isSoldProductsLoadingMore = false;
+      update(['sold_product_list','total_widget']);
     }
   }
 

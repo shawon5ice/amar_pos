@@ -66,7 +66,7 @@ class PagerListView<T> extends StatelessWidget {
         ),
         if (isLoading)
           Container(
-            color: Colors.white,
+            // color: Colors.white,
             height: 68,
             width: double.infinity,
             child: const Center(
@@ -93,7 +93,7 @@ class PagerListView<T> extends StatelessWidget {
           ),
         if (hasError)
           Container(
-            color: Colors.white,
+            // color: Colors.white,
             height: 68,
             width: double.infinity,
             child: Center(

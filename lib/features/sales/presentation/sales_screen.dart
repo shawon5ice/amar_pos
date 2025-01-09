@@ -4,6 +4,7 @@ import 'package:amar_pos/core/widgets/custom_button.dart';
 import 'package:amar_pos/features/sales/presentation/page/place_order.dart';
 import 'package:amar_pos/features/sales/presentation/page/sold_history.dart';
 import 'package:amar_pos/features/sales/presentation/controller/sales_controller.dart';
+import 'package:amar_pos/features/sales/presentation/page/sold_products.dart';
 import 'package:amar_pos/features/sales/presentation/widgets/sold_history_filter_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -114,7 +115,7 @@ class _SalesScreenState extends State<SalesScreen>
                   children: [
                     PlaceOrder(),
                     SoldHistory(),
-                    Container(),
+                    SoldProduct(),
                   ],
                 ),
               )

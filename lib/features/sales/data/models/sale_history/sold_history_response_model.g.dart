@@ -23,30 +23,29 @@ Map<String, dynamic> _$CustomerToJson(Customer instance) => <String, dynamic>{
 SaleHistory _$SaleHistoryFromJson(Map<String, dynamic> json) => SaleHistory(
       id: (json['id'] as num).toInt(),
       date: json['date'] as String,
-      orderNo: json['order_no'] as String,
-      saleType: json['sale_type'] as String,
+      orderNo: json['orderNo'] as String,
+      saleType: json['saleType'] as String,
       customer: Customer.fromJson(json['customer'] as Map<String, dynamic>),
       discount: (json['discount'] as num).toDouble(),
       amount: (json['amount'] as num).toDouble(),
-      paidAmount: (json['paid_amount'] as num).toDouble(),
+      paidAmount: (json['paidAmount'] as num).toDouble(),
       vat: (json['vat'] as num).toDouble(),
-      isActionable: json['is_actionable'] as bool,
+      isActionable: json['isActionable'] as bool,
     );
 
 Map<String, dynamic> _$SaleHistoryToJson(SaleHistory instance) =>
     <String, dynamic>{
       'id': instance.id,
       'date': instance.date,
-      'order_no': instance.orderNo,
-      'sale_type': instance.saleType,
+      'orderNo': instance.orderNo,
+      'saleType': instance.saleType,
       'customer': instance.customer,
       'discount': instance.discount,
       'amount': instance.amount,
-      'paid_amount': instance.paidAmount,
+      'paidAmount': instance.paidAmount,
       'vat': instance.vat,
-      'is_actionable': instance.isActionable,
+      'isActionable': instance.isActionable,
     };
-
 
 Meta _$MetaFromJson(Map<String, dynamic> json) => Meta(
       currentPage: (json['current_page'] as num).toInt(),
@@ -63,14 +62,14 @@ Map<String, dynamic> _$MetaToJson(Meta instance) => <String, dynamic>{
     };
 
 Data _$DataFromJson(Map<String, dynamic> json) => Data(
-      saleHistoryList: (json['data'] as List<dynamic>)
+      saleHistoryList: (json['saleHistoryList'] as List<dynamic>)
           .map((e) => SaleHistory.fromJson(e as Map<String, dynamic>))
           .toList(),
       meta: Meta.fromJson(json['meta'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$DataToJson(Data instance) => <String, dynamic>{
-      'data': instance.saleHistoryList,
+      'saleHistoryList': instance.saleHistoryList,
       'meta': instance.meta,
     };
 
@@ -78,7 +77,7 @@ SaleHistoryResponseModel _$SaleHistoryResponseModelFromJson(
         Map<String, dynamic> json) =>
     SaleHistoryResponseModel(
       success: json['success'] as bool,
-      data: json['data'] is Map ? Data.fromJson(json['data'] as Map<String, dynamic>) : Data(saleHistoryList: [], meta: Meta(currentPage: 0, from: 0, lastPage: 0, total: 0)),
+      data: Data.fromJson(json['data'] as Map<String, dynamic>),
       countTotal: (json['count_total'] as num).toInt(),
       amountTotal: (json['amount_total'] as num).toDouble(),
     );

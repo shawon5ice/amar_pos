@@ -1,31 +1,29 @@
-import 'package:amar_pos/core/constants/logger/logger.dart';
-import 'package:amar_pos/core/core.dart';
-import 'package:amar_pos/core/widgets/custom_text_field.dart';
-import 'package:amar_pos/features/sales/data/models/sale_history/sold_history_response_model.dart';
-import 'package:amar_pos/features/sales/presentation/controller/sales_controller.dart';
-import 'package:amar_pos/features/sales/presentation/widgets/sold_history_item_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-
 import '../../../../core/constants/app_assets.dart';
 import '../../../../core/responsive/pixel_perfect.dart';
+import '../../../../core/widgets/custom_text_field.dart';
+import '../../../../core/widgets/methods/helper_methods.dart';
 import '../../../../core/widgets/pager_list_view.dart';
 import '../../../inventory/presentation/stock_report/widget/custom_svg_icon_widget.dart';
+import '../../data/models/sold_product/sold_product_response_model.dart';
+import '../controller/sales_controller.dart';
+import '../widgets/sold_history_item_widget.dart';
 
-class SoldHistory extends StatefulWidget {
-  const SoldHistory({super.key});
+class SoldProduct extends StatefulWidget {
+  const SoldProduct({super.key});
 
   @override
-  State<SoldHistory> createState() => _SoldHistoryState();
+  State<SoldProduct> createState() => _SoldHistoryState();
 }
 
-class _SoldHistoryState extends State<SoldHistory> {
+class _SoldHistoryState extends State<SoldProduct> {
   final SalesController controller = Get.find();
 
   @override
   void initState() {
-    controller.getSoldHistory();
+    controller.getSoldProducts();
     super.initState();
   }
 
@@ -95,8 +93,8 @@ class _SoldHistoryState extends State<SoldHistory> {
                     title: 'Invoice',
                     value: controller.saleHistoryResponseModel != null
                         ? Methods.getFormattedNumber(controller
-                            .saleHistoryResponseModel!.countTotal
-                            .toDouble())
+                        .saleHistoryResponseModel!.countTotal
+                        .toDouble())
                         : null,
                     asset: AppAssets.invoice,
                   ),
@@ -107,8 +105,8 @@ class _SoldHistoryState extends State<SoldHistory> {
                     title: 'Sold Amount',
                     value: controller.saleHistoryResponseModel != null
                         ? Methods.getFormatedPrice(controller
-                            .saleHistoryResponseModel!.amountTotal
-                            .toDouble())
+                        .saleHistoryResponseModel!.amountTotal
+                        .toDouble())
                         : null,
                     asset: AppAssets.amount,
                   ),
@@ -118,17 +116,17 @@ class _SoldHistoryState extends State<SoldHistory> {
             addH(8),
             Expanded(
               child: GetBuilder<SalesController>(
-                id: 'sold_history_list',
+                id: 'sold_product_list',
                 builder: (controller) {
-                  if (controller.isSaleHistoryListLoading) {
+                  if (controller.isSoldProductListLoading) {
                     return const Center(
                       child: CircularProgressIndicator(),
                     );
-                  }else if(controller.saleHistoryResponseModel == null){
+                  }else if(controller.soldProductResponseModel == null){
                     return Center(
                       child: Text("Something went wrong", style: context.textTheme.titleLarge,),
                     );
-                  }else if(controller.saleHistoryResponseModel!.data.saleHistoryList.isEmpty){
+                  }else if(controller.soldProductResponseModel!.data.soldProducts.isEmpty){
                     return Center(
                       child: Text("No data found", style: context.textTheme.titleLarge,),
                     );
@@ -137,25 +135,26 @@ class _SoldHistoryState extends State<SoldHistory> {
                     onRefresh: () async {
                       controller.getSoldHistory();
                     },
-                    child: PagerListView<SaleHistory>(
+                    child: PagerListView<SoldProductModel>(
                       // scrollController: _scrollController,
-                      items: controller.saleHistoryList,
+                      items: controller.soldProductList,
                       itemBuilder: (_, item) {
-                        return SoldHistoryItemWidget(
-                          saleHistory: item,
+                        return Container(
+                          height: 100,
+                          margin: EdgeInsets.symmetric(vertical: 5),
                         );
                       },
-                      isLoading: controller.isSaleHistoryLoadingMore,
+                      isLoading: controller.isSoldProductsLoadingMore,
                       hasError: controller.hasError.value,
                       onNewLoad: (int nextPage) async {
-                        await controller.getSoldHistory(page: nextPage);
+                        await controller.getSoldProducts(page: nextPage);
                       },
                       totalPage: controller
-                              .saleHistoryResponseModel?.data.meta.lastPage ??
+                          .soldProductResponseModel?.data.meta.lastPage ??
                           0,
                       totalSize:
-                          controller.saleHistoryResponseModel?.data.meta.total ??
-                              0,
+                      controller.soldProductResponseModel?.data.meta.total ??
+                          0,
                       itemPerPage: 10,
                     ),
                   );
@@ -214,16 +213,16 @@ class TotalStatusWidget extends StatelessWidget {
               addH(12),
               isLoading
                   ? Container(
-                      height: 30.sp, width: 30.sp, child: CircularProgressIndicator())
+                  height: 30.sp, width: 30.sp, child: CircularProgressIndicator())
                   : Text(
-                      value != null ? value! : '--',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 20.sp,
-                        height: 1.5.sp
-                      ),
-                    )
+                value != null ? value! : '--',
+                style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 20.sp,
+                    height: 1.5.sp
+                ),
+              )
             ],
           ),
         ));

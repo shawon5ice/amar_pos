@@ -1,7 +1,4 @@
-import 'dart:ffi';
-
 import 'package:amar_pos/core/constants/app_colors.dart';
-import 'package:amar_pos/core/constants/logger/logger.dart';
 import 'package:amar_pos/core/core.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/core/widgets/custom_button.dart';
@@ -10,14 +7,11 @@ import 'package:amar_pos/core/widgets/field_title.dart';
 import 'package:amar_pos/features/inventory/presentation/products/widgets/custom_dropdown_widget.dart';
 import 'package:amar_pos/features/sales/data/models/client_list_response_model.dart';
 import 'package:amar_pos/features/sales/data/models/create_order_model.dart';
-import 'package:amar_pos/features/sales/data/models/payment_method_tracker.dart';
 import 'package:amar_pos/features/sales/data/models/service_person_response_model.dart';
 import 'package:amar_pos/features/sales/presentation/controller/sales_controller.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
-import '../../../../core/widgets/methods/field_validator.dart';
 import '../widgets/billing_summary_payment_option_selection_widget.dart';
 
 class BillingSummary extends StatefulWidget {
@@ -76,10 +70,6 @@ class _BillingSummaryState extends State<BillingSummary> {
     super.dispose();
   }
 
-  Map<String, num> paymentMethods = {
-    "Method 1": 123.45,
-  };
-
   final formKey = GlobalKey<FormState>();
 
   @override
@@ -87,7 +77,7 @@ class _BillingSummaryState extends State<BillingSummary> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text("Billing Summary"),
+        title: const Text("Billing Summary"),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -116,7 +106,7 @@ class _BillingSummaryState extends State<BillingSummary> {
                 GetBuilder<SalesController>(
                   id: "billing_summary_form",
                   builder: (controller) => Container(
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                     decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20)),
@@ -156,7 +146,7 @@ class _BillingSummaryState extends State<BillingSummary> {
                                         value: item,
                                         child: Text(
                                           item.name,
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                             fontSize: 12,
                                             fontWeight: FontWeight.bold,
                                           ),
@@ -201,7 +191,7 @@ class _BillingSummaryState extends State<BillingSummary> {
                                 ),
                               ),
                         addH(8),
-                        FieldTitle("Phone Number"),
+                        const FieldTitle("Phone Number"),
                         addH(4),
                         CustomTextField(
                           enabledFlag: controller.isRetailSale,
@@ -212,7 +202,7 @@ class _BillingSummaryState extends State<BillingSummary> {
                                   value, "Phone number"),
                         ),
                         addH(8),
-                        FieldTitle("Address"),
+                        const FieldTitle("Address"),
                         addH(4),
                         CustomTextField(
                           enabledFlag: controller.isRetailSale,
@@ -229,7 +219,7 @@ class _BillingSummaryState extends State<BillingSummary> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  FieldTitle("Total QTY"),
+                                  const FieldTitle("Total QTY"),
                                   addH(4),
                                   CustomTextField(
                                     enabledFlag: false,
@@ -245,7 +235,7 @@ class _BillingSummaryState extends State<BillingSummary> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  FieldTitle("Total Amount"),
+                                  const FieldTitle("Total Amount"),
                                   addH(4),
                                   CustomTextField(
                                     enabledFlag: false,
@@ -266,7 +256,7 @@ class _BillingSummaryState extends State<BillingSummary> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  FieldTitle("Additional expenses"),
+                                  const FieldTitle("Additional expenses"),
                                   addH(4),
                                   CustomTextField(
                                     textCon:
@@ -302,7 +292,7 @@ class _BillingSummaryState extends State<BillingSummary> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  FieldTitle("VAT"),
+                                  const FieldTitle("VAT"),
                                   addH(4),
                                   CustomTextField(
                                     enabledFlag: false,
@@ -322,7 +312,7 @@ class _BillingSummaryState extends State<BillingSummary> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  FieldTitle("Total Discount"),
+                                  const FieldTitle("Total Discount"),
                                   addH(4),
                                   CustomTextField(
                                     textCon:
@@ -358,7 +348,7 @@ class _BillingSummaryState extends State<BillingSummary> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  FieldTitle("Payable Amount"),
+                                  const FieldTitle("Payable Amount"),
                                   addH(4),
                                   CustomTextField(
                                     enabledFlag: false,
@@ -420,7 +410,10 @@ class _BillingSummaryState extends State<BillingSummary> {
                             ),
                             addW(8),
                             Expanded(
-                              child: CustomDropdown<ServiceStuffInfo>(
+                              child: GetBuilder<SalesController>(
+                                id: 'service_stuff_list',
+                                builder: (controller) =>
+                                    CustomDropdown<ServiceStuffInfo>(
                                   validator: (value) => value == null
                                       ? "Please select a service stuff"
                                       : null,
@@ -433,10 +426,11 @@ class _BillingSummaryState extends State<BillingSummary> {
                                   onChanged: (value) {
                                     controller.serviceStuffInfo = value;
                                   },
-                                  hintText:
-                                      controller.serviceStuffList.isNotEmpty
+                                  hintText:controller.serviceStuffListLoading? 'Loading...': controller.serviceStuffList.isNotEmpty
                                           ? "Select Service Stuff"
-                                          : "Loading..."),
+                                          : "No Stuff found!",
+                                ),
+                              ),
                             ),
                           ],
                         ),
@@ -456,8 +450,10 @@ class _BillingSummaryState extends State<BillingSummary> {
             if (formKey.currentState!.validate()) {
               controller.createOrderModel.saleType =
                   controller.isRetailSale ? 1 : 2;
-              if(!controller.isRetailSale && controller.selectedClient != null){
-                controller.createOrderModel.customerId = controller.selectedClient!.id;
+              if (!controller.isRetailSale &&
+                  controller.selectedClient != null) {
+                controller.createOrderModel.customerId =
+                    controller.selectedClient!.id;
               }
               controller.createOrderModel.amount =
                   controller.totalAmount.toDouble();
@@ -548,11 +544,11 @@ class CustomRadioButton extends StatelessWidget {
                 title,
                 style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
               ),
-              Spacer(),
+              const Spacer(),
               Radio(
                 visualDensity: VisualDensity.compact,
                 value: value,
-                activeColor: Color(0xff009D5D),
+                activeColor: const Color(0xff009D5D),
                 groupValue: controller.isRetailSale,
                 onChanged: (value) {
                   controller.changeSellingParties(value!);

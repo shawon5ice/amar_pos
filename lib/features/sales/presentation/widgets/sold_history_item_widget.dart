@@ -99,7 +99,7 @@ class SoldHistoryItemWidget extends StatelessWidget {
               ),
               addW(8),
               CustomSvgSmallIconButton(
-                borderColor: Color(0xffFF9000),
+                borderColor: const Color(0xffFF9000),
                 bgColor: const Color(0xffFFFCF8),
                 onTap: () {},
                 assetPath: AppAssets.printIcon,

@@ -98,6 +98,30 @@ class SalesService{
     return response;
   }
 
+  static Future<dynamic> getSoldProducts({
+    required String usrToken,
+    required int page,
+    String? search,
+    int? saleType,
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
+    logger.d("Page: $page");
+    var response = await BaseClient.getData(
+        token: usrToken,
+        api: NetWorkStrings.getAllSoldProductList,
+        parameter: {
+          "status": 1,
+          "page": page,
+          "search": search,
+          "start_date": startDate,
+          "end_date": endDate,
+          "sale_type": saleType,
+          "limit": 10,
+        });
+    return response;
+  }
+
   static downloadStockLedgerReport({required String usrToken, required BuildContext context, required SaleHistory saleHistory}) async {
     // logger.d("PDF: $isPdf");
 
