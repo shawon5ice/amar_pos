@@ -94,4 +94,6 @@ class NetWorkStrings{
   static const String createSaleOrder = "order/place-order";
   static const String getAllOrderList = "order/get-all-order-list";
   static const String getAllSoldProductList = "order/get-sold-product-list";
+
+  //Return
 }

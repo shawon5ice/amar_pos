@@ -10,7 +10,7 @@ class StockReportListResponseModel {
   late final bool success;
   late final StockReportResponse stockReportResponse;
   late final int totalStock;
-  late final int totalValue;
+  late final num totalValue;
 
   StockReportListResponseModel.fromJson(Map<String, dynamic> json){
     success = json['success'];
@@ -86,15 +86,15 @@ class StockReport {
   late final Brand? brand;
   late final Unit? unit;
   late final Warranty? warranty;
-  late final String mfgDate;
-  late final String expiredDate;
-  late final int costingPrice;
-  late final int wholesalePrice;
-  late final int mrpPrice;
-  late final int vat;
+  late final String? mfgDate;
+  late final String? expiredDate;
+  late final num costingPrice;
+  late final num wholesalePrice;
+  late final num mrpPrice;
+  late final num vat;
   late final int alertQuantity;
   late final int stock;
-  late final int totalCosting;
+  late final num totalCosting;
   late final String? remarks;
   late final int status;
 

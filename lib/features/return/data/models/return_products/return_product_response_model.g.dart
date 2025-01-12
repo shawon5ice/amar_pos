@@ -1,39 +1,39 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'sold_product_response_model.dart';
+part of 'return_product_response_model.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-SoldProductResponseModel _$SoldProductResponseModelFromJson(
+ReturnProductResponseModel _$ReturnProductResponseModelFromJson(
         Map<String, dynamic> json) =>
-    SoldProductResponseModel(
+    ReturnProductResponseModel(
       success: json['success'] as bool,
       data: Data.fromJson(json['data'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$SoldProductResponseModelToJson(
-        SoldProductResponseModel instance) =>
+Map<String, dynamic> _$ReturnProductResponseModelToJson(
+        ReturnProductResponseModel instance) =>
     <String, dynamic>{
       'success': instance.success,
       'data': instance.data,
     };
 
 Data _$DataFromJson(Map<String, dynamic> json) => Data(
-      soldProducts: (json['data'] as List<dynamic>)
-          .map((e) => SoldProductModel.fromJson(e as Map<String, dynamic>))
+      returnProducts: (json['data'] as List<dynamic>)
+          .map((e) => ReturnProduct.fromJson(e as Map<String, dynamic>))
           .toList(),
       meta: Meta.fromJson(json['meta'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$DataToJson(Data instance) => <String, dynamic>{
-      'data': instance.soldProducts,
+      'data': instance.returnProducts,
       'meta': instance.meta,
     };
 
-SoldProductModel _$SoldProductModelFromJson(Map<String, dynamic> json) =>
-    SoldProductModel(
+ReturnProduct _$ReturnProductFromJson(Map<String, dynamic> json) =>
+    ReturnProduct(
       id: (json['id'] as num).toInt(),
       category: json['category'] as String,
       brand: json['brand'] as String,
@@ -42,7 +42,7 @@ SoldProductModel _$SoldProductModelFromJson(Map<String, dynamic> json) =>
       soldPrice: json['sold_price'] as num,
     );
 
-Map<String, dynamic> _$SoldProductModelToJson(SoldProductModel instance) =>
+Map<String, dynamic> _$ReturnProductToJson(ReturnProduct instance) =>
     <String, dynamic>{
       'id': instance.id,
       'category': instance.category,

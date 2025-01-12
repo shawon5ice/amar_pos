@@ -2,32 +2,32 @@ import 'dart:convert';
 
 import 'package:json_annotation/json_annotation.dart';
 
-part 'sold_product_response_model.g.dart'; // This is the generated file.
+part 'return_product_response_model.g.dart'; // This is the generated file.
 
 @JsonSerializable()
-class SoldProductResponseModel {
+class ReturnProductResponseModel {
   final bool success;
   final Data data;
 
-  SoldProductResponseModel({
+  ReturnProductResponseModel({
     required this.success,
     required this.data,
   });
 
-  factory SoldProductResponseModel.fromJson(Map<String, dynamic> json) =>
-      _$SoldProductResponseModelFromJson(json);
+  factory ReturnProductResponseModel.fromJson(Map<String, dynamic> json) =>
+      _$ReturnProductResponseModelFromJson(json);
 
-  Map<String, dynamic> toJson() => _$SoldProductResponseModelToJson(this);
+  Map<String, dynamic> toJson() => _$ReturnProductResponseModelToJson(this);
 }
 
 @JsonSerializable()
 class Data {
   @JsonKey(name: 'data')
-  final List<SoldProductModel> soldProducts;
+  final List<ReturnProduct> returnProducts; // Fixed type to match the intended model.
   final Meta meta;
 
   Data({
-    required this.soldProducts,
+    required this.returnProducts,
     required this.meta,
   });
 
@@ -37,7 +37,7 @@ class Data {
 }
 
 @JsonSerializable()
-class SoldProductModel {
+class ReturnProduct {
   final int id;
   final String category;
   final String brand;
@@ -46,7 +46,7 @@ class SoldProductModel {
   @JsonKey(name: 'sold_price')
   final num soldPrice;
 
-  SoldProductModel({
+  ReturnProduct({
     required this.id,
     required this.category,
     required this.brand,
@@ -55,11 +55,11 @@ class SoldProductModel {
     required this.soldPrice,
   });
 
-  factory SoldProductModel.fromJson(Map<String, dynamic> json) => _$SoldProductModelFromJson(json);
+  factory ReturnProduct.fromJson(Map<String, dynamic> json) =>
+      _$ReturnProductFromJson(json);
 
-  Map<String, dynamic> toJson() => _$SoldProductModelToJson(this);
+  Map<String, dynamic> toJson() => _$ReturnProductToJson(this);
 }
-
 
 @JsonSerializable()
 class Meta {

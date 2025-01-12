@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'sold_history_response_model.dart';
+part of 'return_history_response_model.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
@@ -20,7 +20,8 @@ Map<String, dynamic> _$CustomerToJson(Customer instance) => <String, dynamic>{
       'address': instance.address,
     };
 
-SaleHistory _$SaleHistoryFromJson(Map<String, dynamic> json) => SaleHistory(
+ReturnHistory _$ReturnHistoryFromJson(Map<String, dynamic> json) =>
+    ReturnHistory(
       id: (json['id'] as num).toInt(),
       date: json['date'] as String,
       orderNo: json['order_no'] as String,
@@ -33,7 +34,7 @@ SaleHistory _$SaleHistoryFromJson(Map<String, dynamic> json) => SaleHistory(
       isActionable: json['is_actionable'] as bool,
     );
 
-Map<String, dynamic> _$SaleHistoryToJson(SaleHistory instance) =>
+Map<String, dynamic> _$ReturnHistoryToJson(ReturnHistory instance) =>
     <String, dynamic>{
       'id': instance.id,
       'date': instance.date,
@@ -62,28 +63,28 @@ Map<String, dynamic> _$MetaToJson(Meta instance) => <String, dynamic>{
     };
 
 Data _$DataFromJson(Map<String, dynamic> json) => Data(
-      saleHistoryList: (json['data'] as List<dynamic>)
-          .map((e) => SaleHistory.fromJson(e as Map<String, dynamic>))
+      returnHistoryList: (json['data'] as List<dynamic>)
+          .map((e) => ReturnHistory.fromJson(e as Map<String, dynamic>))
           .toList(),
       meta: Meta.fromJson(json['meta'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$DataToJson(Data instance) => <String, dynamic>{
-      'data': instance.saleHistoryList,
+      'data': instance.returnHistoryList,
       'meta': instance.meta,
     };
 
-SaleHistoryResponseModel _$SaleHistoryResponseModelFromJson(
+ReturnHistoryResponseModel _$ReturnHistoryResponseModelFromJson(
         Map<String, dynamic> json) =>
-    SaleHistoryResponseModel(
+    ReturnHistoryResponseModel(
       success: json['success'] as bool,
       data: Data.fromJson(json['data'] as Map<String, dynamic>),
       countTotal: (json['count_total'] as num).toInt(),
       amountTotal: (json['amount_total'] as num).toDouble(),
     );
 
-Map<String, dynamic> _$SaleHistoryResponseModelToJson(
-        SaleHistoryResponseModel instance) =>
+Map<String, dynamic> _$ReturnHistoryResponseModelToJson(
+        ReturnHistoryResponseModel instance) =>
     <String, dynamic>{
       'success': instance.success,
       'data': instance.data,

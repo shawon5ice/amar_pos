@@ -1,6 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 
-part 'sold_history_response_model.g.dart';
+part 'return_history_response_model.g.dart';
 
 @JsonSerializable()
 class Customer {
@@ -21,7 +21,7 @@ class Customer {
 }
 
 @JsonSerializable()
-class SaleHistory {
+class ReturnHistory {
   final int id;
   final String date;
   @JsonKey(name: 'order_no')
@@ -37,7 +37,7 @@ class SaleHistory {
   @JsonKey(name: 'is_actionable')
   final bool isActionable;
 
-  SaleHistory({
+  ReturnHistory({
     required this.id,
     required this.date,
     required this.orderNo,
@@ -50,8 +50,8 @@ class SaleHistory {
     required this.isActionable,
   });
 
-  factory SaleHistory.fromJson(Map<String, dynamic> json) => _$SaleHistoryFromJson(json);
-  Map<String, dynamic> toJson() => _$SaleHistoryToJson(this);
+  factory ReturnHistory.fromJson(Map<String, dynamic> json) => _$ReturnHistoryFromJson(json);
+  Map<String, dynamic> toJson() => _$ReturnHistoryToJson(this);
 }
 
 
@@ -79,11 +79,11 @@ class Meta {
 @JsonSerializable()
 class Data {
   @JsonKey(name: 'data')
-  final List<SaleHistory> saleHistoryList;
+  final List<ReturnHistory> returnHistoryList;
   final Meta meta;
 
   Data({
-    required this.saleHistoryList,
+    required this.returnHistoryList,
     required this.meta,
   });
 
@@ -92,7 +92,7 @@ class Data {
 }
 
 @JsonSerializable()
-class SaleHistoryResponseModel {
+class ReturnHistoryResponseModel {
   final bool success;
   final Data data;
   @JsonKey(name: 'count_total')
@@ -100,13 +100,13 @@ class SaleHistoryResponseModel {
   @JsonKey(name: 'amount_total')
   final double amountTotal;
 
-  SaleHistoryResponseModel({
+  ReturnHistoryResponseModel({
     required this.success,
     required this.data,
     required this.countTotal,
     required this.amountTotal,
   });
 
-  factory SaleHistoryResponseModel.fromJson(Map<String, dynamic> json) => _$SaleHistoryResponseModelFromJson(json);
-  Map<String, dynamic> toJson() => _$SaleHistoryResponseModelToJson(this);
+  factory ReturnHistoryResponseModel.fromJson(Map<String, dynamic> json) => _$ReturnHistoryResponseModelFromJson(json);
+  Map<String, dynamic> toJson() => _$ReturnHistoryResponseModelToJson(this);
 }

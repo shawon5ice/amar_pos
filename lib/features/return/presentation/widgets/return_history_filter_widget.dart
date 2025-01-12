@@ -7,25 +7,26 @@ import 'package:amar_pos/core/widgets/date_range_selection_field_widget.dart';
 import 'package:amar_pos/core/widgets/reusable/outlet_dd/outlet_dropdown_widget.dart';
 import 'package:amar_pos/core/widgets/reusable/product_dd/products_dropdown_widget.dart';
 import 'package:amar_pos/features/inventory/presentation/stock_report/stock_report_controller.dart';
+import 'package:amar_pos/features/return/presentation/controller/return_controller.dart';
 import 'package:amar_pos/features/sales/presentation/controller/sales_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class SoldHistoryFilterBottomSheet extends StatefulWidget {
+class ReturnHistoryFilterBottomSheet extends StatefulWidget {
   final bool saleHistory;
-  const SoldHistoryFilterBottomSheet({
+  const ReturnHistoryFilterBottomSheet({
     super.key,
     required this.saleHistory,
   });
 
   @override
-  State<SoldHistoryFilterBottomSheet> createState() =>
+  State<ReturnHistoryFilterBottomSheet> createState() =>
       _ProductListFilterBottomSheetState();
 }
 
 class _ProductListFilterBottomSheetState
-    extends State<SoldHistoryFilterBottomSheet> {
-  SalesController controller = Get.find();
+    extends State<ReturnHistoryFilterBottomSheet> {
+  ReturnController controller = Get.find();
 
   final formKey = GlobalKey<FormState>();
 
@@ -117,7 +118,7 @@ class _ProductListFilterBottomSheetState
                             color: Color(0xffB1B1B1),
                             thickness: .5,
                           ),
-                          GetBuilder<SalesController>(
+                          GetBuilder<ReturnController>(
                             id: 'filter_view',
                             builder: (controller) => Column(
                               children: [
@@ -165,9 +166,9 @@ class _ProductListFilterBottomSheetState
                     if(formKey.currentState!.validate()){
                       Get.back();
                       if(widget.saleHistory){
-                        controller.getSoldHistory();
+                        controller.getReturnHistory();
                       }else{
-                        controller.getSoldProducts();
+                        controller.getReturnProducts();
                       }
                     }
                   },

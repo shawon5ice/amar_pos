@@ -1,4 +1,5 @@
 
+import 'package:amar_pos/features/return/data/models/return_history/return_history_response_model.dart';
 import 'package:amar_pos/features/sales/data/models/sale_history/sold_history_response_model.dart';
 import 'package:flutter/material.dart';
 
@@ -6,9 +7,9 @@ import '../../../../core/constants/logger/logger.dart';
 import '../../../../core/network/base_client.dart';
 import '../../../../core/network/download/file_downloader.dart';
 import '../../../../core/network/network_strings.dart';
-import '../models/create_order_model.dart';
+import '../models/create_return_order_model.dart';
 
-class SalesService{
+class ReturnServices{
   static Future<dynamic> getSellingProductList({
     required String usrToken,
     required int page,
@@ -61,20 +62,20 @@ class SalesService{
     return response;
   }
 
-  static Future<dynamic> createSaleOrder({
+  static Future<dynamic> createReturnOrder({
     required String usrToken,
-    required CreateSaleOrderModel saleOrderModel,
+    required CreateReturnOrderModel returnOrderModel,
   }) async {
-    logger.i(saleOrderModel.toJson());
+    logger.i(returnOrderModel.toJson());
     var response = await BaseClient.postData(
         token: usrToken,
-        api: NetWorkStrings.createSaleOrder,
-        body: saleOrderModel.toJson(),
+        api: 'return/create',
+        body: returnOrderModel.toJson(),
     );
     return response;
   }
 
-  static Future<dynamic> getSoldHistory({
+  static Future<dynamic> getReturnHistory({
     required String usrToken,
     required int page,
     String? search,
@@ -85,7 +86,7 @@ class SalesService{
     logger.d("Page: $page");
     var response = await BaseClient.getData(
         token: usrToken,
-        api: 'return/get-all-return-list',
+        api: NetWorkStrings.getAllOrderList,
         parameter: {
           "status": 1,
           "page": page,
@@ -98,7 +99,7 @@ class SalesService{
     return response;
   }
 
-  static Future<dynamic> getSoldProducts({
+  static Future<dynamic> getReturnProducts({
     required String usrToken,
     required int page,
     String? search,
@@ -122,12 +123,20 @@ class SalesService{
     return response;
   }
 
+  static Future<dynamic> deleteReturnHistory({
+    required String usrToken,
+    required ReturnHistory returnHistory}) async {
+    var response = await BaseClient.deleteData(
+        token: usrToken,
+        api: 'return/delete/${returnHistory.id}',);
+    return response;
+  }
 
-  static downloadStockLedgerReport({required String usrToken, required BuildContext context, required SaleHistory saleHistory}) async {
+  static downloadStockLedgerReport({required String usrToken, required BuildContext context, required ReturnHistory returnHistory}) async {
     // logger.d("PDF: $isPdf");
 
-    String downloadUrl =  "${NetWorkStrings.baseUrl}/download-order-invoice/${saleHistory.id}";
+    String downloadUrl =  "${NetWorkStrings.baseUrl}/download-order-invoice/${returnHistory.id}";
 
-    FileDownloader().downloadFile(url: downloadUrl, fileName: "${saleHistory.orderNo}.pdf" , context: context);
+    FileDownloader().downloadFile(url: downloadUrl, fileName: "${returnHistory.orderNo}.pdf" , context: context);
   }
 }

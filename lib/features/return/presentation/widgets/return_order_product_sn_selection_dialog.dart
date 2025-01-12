@@ -1,5 +1,6 @@
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/core/widgets/custom_button.dart';
+import 'package:amar_pos/features/return/presentation/controller/return_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/constants/app_colors.dart';
@@ -8,15 +9,14 @@ import '../../../../core/widgets/dashed_line.dart';
 import '../../../../core/widgets/field_title.dart';
 import '../../../../core/widgets/qr_code_scanner.dart';
 import '../../../inventory/data/products/product_list_response_model.dart';
-import '../../data/models/create_order_model.dart';
-import '../controller/sales_controller.dart';
+import '../../data/models/create_return_order_model.dart';
 
-class PlaceOrderProductSnSelectionDialog extends StatefulWidget {
-  final SaleProductModel product;
+class ReturnOrderProductSnSelectionDialog extends StatefulWidget {
+  final ReturnProductModel product;
   final ProductInfo productInfo;
-  final SalesController controller;
+  final ReturnController controller;
 
-  const PlaceOrderProductSnSelectionDialog({
+  const ReturnOrderProductSnSelectionDialog({
     super.key,
     required this.product,
     required this.productInfo,
@@ -24,13 +24,13 @@ class PlaceOrderProductSnSelectionDialog extends StatefulWidget {
   });
 
   @override
-  State<PlaceOrderProductSnSelectionDialog> createState() =>
-      _PlaceOrderProductSnSelectionDialogState();
+  State<ReturnOrderProductSnSelectionDialog> createState() =>
+      _ReturnOrderProductSnSelectionDialogState();
 }
 
-class _PlaceOrderProductSnSelectionDialogState
-    extends State<PlaceOrderProductSnSelectionDialog> {
-  final SalesController controller = Get.find();
+class _ReturnOrderProductSnSelectionDialogState
+    extends State<ReturnOrderProductSnSelectionDialog> {
+  final ReturnController controller = Get.find();
   late final TextEditingController textEditingController;
 
   @override
@@ -50,7 +50,7 @@ class _PlaceOrderProductSnSelectionDialogState
     return Padding(
       padding: EdgeInsets.only(
         bottom:
-            MediaQuery.of(context).viewInsets.bottom, // Adjusts for keyboard
+        MediaQuery.of(context).viewInsets.bottom, // Adjusts for keyboard
       ),
       child: SingleChildScrollView(
         child: Padding(
@@ -96,11 +96,11 @@ class _PlaceOrderProductSnSelectionDialogState
                       fontWeight: FontWeight.bold,
                     ),
                     const SizedBox(height: 8),
-                    GetBuilder<SalesController>(
+                    GetBuilder<ReturnController>(
                       id: 'sn_input_field',
                       builder: (controller) => CustomTextField(
                         enabledFlag: widget.product.quantity <=
-                                widget.product.serialNo.length
+                            widget.product.serialNo.length
                             ? false
                             : true,
                         onSubmitted: (value) {
@@ -143,7 +143,7 @@ class _PlaceOrderProductSnSelectionDialogState
                         children: [
                           const DashedLine(),
                           const SizedBox(height: 8),
-                          GetBuilder<SalesController>(
+                          GetBuilder<ReturnController>(
                             id: 'create_order_product_sn_list',
                             builder: (controller) => ConstrainedBox(
                               constraints: BoxConstraints(maxHeight: 150),
@@ -153,22 +153,22 @@ class _PlaceOrderProductSnSelectionDialogState
                                   children: widget.product.serialNo
                                       .map(
                                         (e) => Chip(
-                                          elevation: 4,
-                                          label: Text(
-                                            e,
-                                            style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 14.sp),
-                                          ),
-                                          onDeleted: () {
-                                            widget.product.serialNo.remove(e);
-                                            controller.update([
-                                              'create_order_product_sn_list',
-                                              'sn_input_field'
-                                            ]);
-                                          },
-                                        ),
-                                      )
+                                      elevation: 4,
+                                      label: Text(
+                                        e,
+                                        style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 14.sp),
+                                      ),
+                                      onDeleted: () {
+                                        widget.product.serialNo.remove(e);
+                                        controller.update([
+                                          'create_order_product_sn_list',
+                                          'sn_input_field'
+                                        ]);
+                                      },
+                                    ),
+                                  )
                                       .toList(),
                                 ),
                               ),

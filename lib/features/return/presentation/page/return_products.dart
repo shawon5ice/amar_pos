@@ -1,3 +1,6 @@
+import 'package:amar_pos/features/return/data/models/return_products/return_product_response_model.dart';
+import 'package:amar_pos/features/return/presentation/controller/return_controller.dart';
+import 'package:amar_pos/features/return/presentation/widgets/return_product_item_widget.dart';
 import 'package:amar_pos/features/sales/presentation/widgets/sold_product_list_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -5,26 +8,23 @@ import 'package:get/get.dart';
 import '../../../../core/constants/app_assets.dart';
 import '../../../../core/responsive/pixel_perfect.dart';
 import '../../../../core/widgets/custom_text_field.dart';
-import '../../../../core/widgets/methods/helper_methods.dart';
 import '../../../../core/widgets/pager_list_view.dart';
 import '../../../inventory/presentation/stock_report/widget/custom_svg_icon_widget.dart';
-import '../../data/models/sold_product/sold_product_response_model.dart';
-import '../controller/sales_controller.dart';
-import '../widgets/sold_history_item_widget.dart';
 
-class SoldProduct extends StatefulWidget {
-  const SoldProduct({super.key});
+
+class ReturnProducts extends StatefulWidget {
+  const ReturnProducts({super.key});
 
   @override
-  State<SoldProduct> createState() => _SoldHistoryState();
+  State<ReturnProducts> createState() => _SoldHistoryState();
 }
 
-class _SoldHistoryState extends State<SoldProduct> {
-  final SalesController controller = Get.find();
+class _SoldHistoryState extends State<ReturnProducts> {
+  final ReturnController controller = Get.find();
 
   @override
   void initState() {
-    controller.getSoldProducts();
+    controller.getReturnProducts();
     super.initState();
   }
 
@@ -53,7 +53,7 @@ class _SoldHistoryState extends State<SoldProduct> {
                     brdrRadius: 40,
                     prefixWidget: Icon(Icons.search),
                     onChanged: (value){
-                      controller.getSoldProducts();
+                      controller.getReturnProducts();
                     },
                   ),
                 ),
@@ -84,13 +84,13 @@ class _SoldHistoryState extends State<SoldProduct> {
               ],
             ),
             addH(8.px),
-            GetBuilder<SalesController>(
+            GetBuilder<ReturnController>(
               id: 'total_status_widget',
               builder: (controller) => Row(
                 children: [
                   TotalStatusWidget(
                     flex: 3,
-                    isLoading: controller.isSaleHistoryListLoading,
+                    isLoading: controller.isReturnHistoryListLoading,
                     title: 'Total QTY',
                     value: null,
                     asset: AppAssets.productBox,
@@ -98,7 +98,7 @@ class _SoldHistoryState extends State<SoldProduct> {
                   addW(12),
                   TotalStatusWidget(
                     flex: 4,
-                    isLoading: controller.isSaleHistoryListLoading,
+                    isLoading: controller.isReturnHistoryListLoading,
                     title: 'Sold Amount',
                     value: null,
                     asset: AppAssets.amount,
@@ -108,42 +108,42 @@ class _SoldHistoryState extends State<SoldProduct> {
             ),
             addH(8),
             Expanded(
-              child: GetBuilder<SalesController>(
-                id: 'sold_product_list',
+              child: GetBuilder<ReturnController>(
+                id: 'return_product_list',
                 builder: (controller) {
-                  if (controller.isSoldProductListLoading) {
+                  if (controller.isReturnProductListLoading) {
                     return const Center(
                       child: CircularProgressIndicator(),
                     );
-                  }else if(controller.soldProductResponseModel == null){
+                  }else if(controller.returnProductResponseModel == null){
                     return Center(
                       child: Text("Something went wrong", style: context.textTheme.titleLarge,),
                     );
-                  }else if(controller.soldProductResponseModel!.data.soldProducts.isEmpty){
+                  }else if(controller.returnProductResponseModel!.data.returnProducts.isEmpty){
                     return Center(
                       child: Text("No data found", style: context.textTheme.titleLarge,),
                     );
                   }
                   return RefreshIndicator(
                     onRefresh: () async {
-                      controller.getSoldHistory();
+                      controller.getReturnProducts();
                     },
-                    child: PagerListView<SoldProductModel>(
+                    child: PagerListView<ReturnProduct>(
                       // scrollController: _scrollController,
                       items: controller.soldProductList,
                       itemBuilder: (_, item) {
-                        return SoldProductListItem(productInfo: item);
+                        return ReturnProductListItem(productInfo: item);
                       },
-                      isLoading: controller.isSoldProductsLoadingMore,
+                      isLoading: controller.isReturnProductListLoading,
                       hasError: controller.hasError.value,
                       onNewLoad: (int nextPage) async {
-                        await controller.getSoldProducts(page: nextPage);
+                        await controller.getReturnProducts(page: nextPage);
                       },
                       totalPage: controller
-                          .soldProductResponseModel?.data.meta.lastPage ??
+                          .returnProductResponseModel?.data.meta.lastPage ??
                           0,
                       totalSize:
-                      controller.soldProductResponseModel?.data.meta.total ??
+                      controller.returnProductResponseModel?.data.meta.total ??
                           0,
                       itemPerPage: 10,
                     ),

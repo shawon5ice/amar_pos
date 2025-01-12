@@ -1,6 +1,11 @@
 import 'package:amar_pos/core/constants/app_assets.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/core/widgets/custom_button.dart';
+import 'package:amar_pos/features/return/presentation/controller/return_controller.dart';
+import 'package:amar_pos/features/return/presentation/page/return_history.dart';
+import 'package:amar_pos/features/return/presentation/page/return_page.dart';
+import 'package:amar_pos/features/return/presentation/page/return_products.dart';
+import 'package:amar_pos/features/return/presentation/widgets/return_history_filter_widget.dart';
 import 'package:amar_pos/features/sales/presentation/page/place_order.dart';
 import 'package:amar_pos/features/sales/presentation/page/sold_history.dart';
 import 'package:amar_pos/features/sales/presentation/controller/sales_controller.dart';
@@ -11,22 +16,22 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../drawer/drawer_menu_controller.dart';
-import '../data/models/create_order_model.dart';
+import '../data/models/create_return_order_model.dart';
 
-class SalesScreen extends StatefulWidget {
+class ReturnScreen extends StatefulWidget {
   static String routeName = '/sales_screen';
 
-  const SalesScreen({super.key});
+  const ReturnScreen({super.key});
 
   @override
-  State<SalesScreen> createState() => _SalesScreenState();
+  State<ReturnScreen> createState() => _SalesScreenState();
 }
 
-class _SalesScreenState extends State<SalesScreen>
+class _SalesScreenState extends State<ReturnScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
-  SalesController controller = Get.put(SalesController());
+  ReturnController controller = Get.put(ReturnController());
 
   @override
   void initState() {
@@ -42,7 +47,7 @@ class _SalesScreenState extends State<SalesScreen>
 
   @override
   void dispose() {
-    Get.delete<SalesController>();
+    Get.delete<ReturnController>();
     super.dispose();
   }
 
@@ -55,15 +60,13 @@ class _SalesScreenState extends State<SalesScreen>
         leading: DrawerButton(
           onPressed: drawerMenuController.openDrawer,
         ),
-        title: const Text("Sales"),
+        title: const Text("Return"),
         actions: [
-          GetBuilder<SalesController>(
+          GetBuilder<ReturnController>(
             id: 'action_icon',
-            builder: (controller) => _tabController.index == 0? GestureDetector(
-              child: SvgPicture.asset(AppAssets.pauseBillingIcon),
-            ): GestureDetector(
+            builder: (controller) => _tabController.index == 0? SizedBox(): GestureDetector(
               onTap: (){
-                showModalBottomSheet(context: context, builder:(context) => SoldHistoryFilterBottomSheet(
+                showModalBottomSheet(context: context, builder:(context) => ReturnHistoryFilterBottomSheet(
                   saleHistory: _tabController.index == 1,
                 ));
               },
@@ -102,22 +105,22 @@ class _SalesScreenState extends State<SalesScreen>
                   unselectedLabelColor: Colors.black,
                   tabs: const [
                     Tab(
-                      text: 'Place Order',
+                      text: 'Return',
                     ),
-                    Tab(text: 'Sold History'),
-                    Tab(text: 'Sold Products'),
+                    Tab(text: 'Return History'),
+                    Tab(text: 'Return Products'),
                   ],
                 ),
               ),
               addH(12),
               Expanded(
                 child: TabBarView(
-                  physics: NeverScrollableScrollPhysics(),
+                  physics: const NeverScrollableScrollPhysics(),
                   controller: _tabController,
                   children: [
-                    PlaceOrder(),
-                    SoldHistory(),
-                    SoldProduct(),
+                    ReturnPage(),
+                    ReturnHistoryScreen(),
+                    ReturnProducts(),
                   ],
                 ),
               )
