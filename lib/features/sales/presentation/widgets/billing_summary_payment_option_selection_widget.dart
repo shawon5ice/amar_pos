@@ -84,7 +84,7 @@ class _BillingSummaryPaymentOptionSelectionWidgetState
                                   value: item,
                                   child: Text(
                                     item.name,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -96,6 +96,15 @@ class _BillingSummaryPaymentOptionSelectionWidgetState
                         value: widget.paymentMethodTracker.paymentMethod,
                         onChanged: (value) {
                           if (value != null) {
+                            if(value.name.toLowerCase().contains("cash") && controller.cashSelected || value.name.toLowerCase().contains("credit") && controller.creditSelected ){
+                              Methods.showSnackbar(msg: "Please select another payment method");
+                              return;
+                            }
+                            if(value.name.toLowerCase().contains("cash")){
+                              controller.cashSelected =true;
+                            }else if(value.name.toLowerCase().contains("credit")){
+                              controller.creditSelected = true;
+                            }
                             widget.paymentMethodTracker.paymentOption = null;
                             widget.paymentMethodTracker.paymentMethod = value;
                             controller.update(

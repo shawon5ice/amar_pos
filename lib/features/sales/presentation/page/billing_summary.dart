@@ -57,6 +57,8 @@ class _BillingSummaryState extends State<BillingSummary> {
       controller.getAllClientList();
       controller.getPaymentMethods();
     }else{
+      controller.creditSelected = false;
+      controller.cashSelected = false;
       customerNameEditingController.text = controller.createOrderModel.name;
       customerPhoneNumberEditingController.text = controller.createOrderModel.phone;
       customerAddressEditingController.text = controller.createOrderModel.address;

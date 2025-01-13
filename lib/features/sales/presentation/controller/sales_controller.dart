@@ -39,6 +39,10 @@ class SalesController extends GetxController {
       .obs; // Results from the ongoing search
   var isSearching = false.obs; // Indicates whether a search is ongoing
   var hasError = false.obs; // Tracks if an error occurred
+
+  bool cashSelected = false;
+  bool creditSelected = false;
+
   TextEditingController searchProductController = TextEditingController();
   ProductsListResponseModel? productsListResponseModel;
 
