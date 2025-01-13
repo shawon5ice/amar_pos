@@ -1,3 +1,4 @@
+import 'package:amar_pos/features/inventory/presentation/products/add_product_screen.dart';
 import 'package:amar_pos/features/sales/presentation/page/billing_summary.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -74,6 +75,7 @@ class _PlaceOrderState extends State<PlaceOrder> {
                       return TypeAheadField<ProductInfo>(
                         hideOnUnfocus: true,
                         hideOnSelect: true,
+                        showOnFocus: true,
                         builder: (context, textController, focusNode) {
                           suggestionEditingController = textController;
                           return TextField(
@@ -116,7 +118,7 @@ class _PlaceOrderState extends State<PlaceOrder> {
                                   )),
                               hintText: "Scan / Type ID or name",
                               contentPadding:
-                                  const EdgeInsets.symmetric(horizontal: 20),
+                              const EdgeInsets.symmetric(horizontal: 20),
                               hintStyle: const TextStyle(color: Colors.grey),
                             ),
                           );
@@ -184,7 +186,9 @@ class _PlaceOrderState extends State<PlaceOrder> {
                   child: CircleAvatar(
                     backgroundColor: AppColors.accent,
                     child: IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Get.to(AddProductScreen());
+                      },
                       icon: const Icon(Icons.add),
                     ),
                   ),
@@ -490,7 +494,8 @@ class _PlaceOrderState extends State<PlaceOrder> {
                     Expanded(
                       child: CustomButton(
                         onTap: () async {
-                         await Get.to(() => const BillingSummary())?.then((value) {
+                          FocusScope.of(context).unfocus();
+                         await Get.to(() => BillingSummary())?.then((value) {
                             FocusScope.of(context).unfocus();
                           });
                         },

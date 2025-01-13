@@ -25,7 +25,7 @@ class AddProductScreen extends StatefulWidget {
 }
 
 class _AddProductScreenState extends State<AddProductScreen> {
-  final ProductController controller = Get.find();
+  final ProductController controller = Get.put(ProductController());
 
   late TextEditingController productNameController;
   late TextEditingController productIdController;

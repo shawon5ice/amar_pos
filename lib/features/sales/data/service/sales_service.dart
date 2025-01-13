@@ -1,4 +1,3 @@
-
 import 'package:amar_pos/features/sales/data/models/sale_history/sold_history_response_model.dart';
 import 'package:flutter/material.dart';
 
@@ -8,7 +7,7 @@ import '../../../../core/network/download/file_downloader.dart';
 import '../../../../core/network/network_strings.dart';
 import '../models/create_order_model.dart';
 
-class SalesService{
+class SalesService {
   static Future<dynamic> getSellingProductList({
     required String usrToken,
     required int page,
@@ -26,15 +25,13 @@ class SalesService{
     return response;
   }
 
-  static Future<dynamic> getBillingPaymentMethods({
-    required String usrToken,
-    required bool isRetailSale
-  }) async {
+  static Future<dynamic> getBillingPaymentMethods(
+      {required String usrToken, required bool isRetailSale}) async {
     var response = await BaseClient.getData(
         token: usrToken,
         api: NetWorkStrings.getBillingPaymentMethods,
         parameter: {
-          "sale_type": isRetailSale ? "retail_sale": "wholesale",
+          "sale_type": isRetailSale ? "retail_sale" : "wholesale",
         });
     return response;
   }
@@ -43,8 +40,9 @@ class SalesService{
     required String usrToken,
   }) async {
     var response = await BaseClient.getData(
-        token: usrToken,
-        api: NetWorkStrings.getAllServiceStuff,);
+      token: usrToken,
+      api: NetWorkStrings.getAllServiceStuff,
+    );
     return response;
   }
 
@@ -54,10 +52,9 @@ class SalesService{
     var response = await BaseClient.getData(
         token: usrToken,
         api: NetWorkStrings.getAllClientList,
-      parameter: {
-          "status" : 1,
-      }
-    );
+        parameter: {
+          "status": 1,
+        });
     return response;
   }
 
@@ -67,9 +64,23 @@ class SalesService{
   }) async {
     logger.i(saleOrderModel.toJson());
     var response = await BaseClient.postData(
-        token: usrToken,
-        api: NetWorkStrings.createSaleOrder,
-        body: saleOrderModel.toJson(),
+      token: usrToken,
+      api: NetWorkStrings.createSaleOrder,
+      body: saleOrderModel.toJson(),
+    );
+    return response;
+  }
+
+  static Future<dynamic> updateSaleOrder({
+    required String usrToken,
+    required CreateSaleOrderModel saleOrderModel,
+    required int orderId,
+  }) async {
+    logger.i(saleOrderModel.toJson());
+    var response = await BaseClient.postData(
+      token: usrToken,
+      api: 'order/update-order/$orderId',
+      body: saleOrderModel.toJson(),
     );
     return response;
   }
@@ -85,7 +96,7 @@ class SalesService{
     logger.d("Page: $page");
     var response = await BaseClient.getData(
         token: usrToken,
-        api: 'return/get-all-return-list',
+        api: NetWorkStrings.getAllOrderList,
         parameter: {
           "status": 1,
           "page": page,
@@ -122,12 +133,45 @@ class SalesService{
     return response;
   }
 
-
-  static downloadStockLedgerReport({required String usrToken, required BuildContext context, required SaleHistory saleHistory}) async {
+  static downloadStockLedgerReport(
+      {required String usrToken,
+      required BuildContext context,
+      required SaleHistory saleHistory}) async {
     // logger.d("PDF: $isPdf");
 
-    String downloadUrl =  "${NetWorkStrings.baseUrl}/download-order-invoice/${saleHistory.id}";
+    String downloadUrl =
+        "${NetWorkStrings.baseUrl}/download-order-invoice/${saleHistory.id}";
 
-    FileDownloader().downloadFile(url: downloadUrl, fileName: "${saleHistory.orderNo}.pdf" , context: context);
+    FileDownloader().downloadFile(
+        url: downloadUrl,
+        fileName: "${saleHistory.orderNo}.pdf",
+        context: context);
+  }
+
+  static downloadSaleHistory(
+      {required String usrToken,
+      required BuildContext context,
+      required SaleHistory saleHistory}) async {
+    // logger.d("PDF: $isPdf");
+
+    String downloadUrl =
+        "${NetWorkStrings.baseUrl}/order/download-order-invoice/${saleHistory.id}";
+
+    FileDownloader().downloadFile(
+        url: downloadUrl,
+        token: usrToken,
+        fileName: "${saleHistory.orderNo}.pdf",
+        context: context);
+  }
+
+  static Future<dynamic> getSoldHistoryDetails({
+    required String usrToken,
+    required int id,
+  }) async {
+    var response = await BaseClient.getData(
+      token: usrToken,
+      api: "order/get-order-details/$id",
+    );
+    return response;
   }
 }

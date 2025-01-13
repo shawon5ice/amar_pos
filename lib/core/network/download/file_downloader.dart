@@ -35,7 +35,7 @@ class FileDownloader {
       final filePath = path.join(directory.path, fileName);
 
       logger.i(url);
-      RandomLottieLoader().show(context);
+      RandomLottieLoader.show();
       await _dio.download(
         url,
         filePath,
@@ -52,12 +52,12 @@ class FileDownloader {
 
       await _showNotification(filePath, fileName);
     } catch (e) {
-      RandomLottieLoader().hide(context);
+      RandomLottieLoader.hide();
       // Methods.hideLoading();
       print("Download failed: $e");
     }finally{
       // Methods.hideLoading();
-      RandomLottieLoader().hide(context);
+      RandomLottieLoader.hide();
     }
   }
 

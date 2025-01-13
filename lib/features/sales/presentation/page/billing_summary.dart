@@ -1,4 +1,5 @@
 import 'package:amar_pos/core/constants/app_colors.dart';
+import 'package:amar_pos/core/constants/logger/logger.dart';
 import 'package:amar_pos/core/core.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/core/widgets/custom_button.dart';
@@ -34,11 +35,7 @@ class _BillingSummaryState extends State<BillingSummary> {
 
   @override
   void initState() {
-    controller.getAllServiceStuff();
-    controller.getAllClientList();
-    controller.serviceStuffInfo = null;
-    controller.selectedClient = null;
-    controller.isRetailSale = true;
+
     customerNameEditingController = TextEditingController();
     customerPhoneNumberEditingController = TextEditingController();
     customerAddressEditingController = TextEditingController();
@@ -47,9 +44,30 @@ class _BillingSummaryState extends State<BillingSummary> {
     customerPayableAmountEditingController = TextEditingController();
     customerChangeAmountEditingController = TextEditingController();
 
+    if(!controller.isEditing){
+      controller.paymentMethodTracker.clear();
+      controller.totalDiscount = 0;
+      controller.additionalExpense = 0;
+      controller.paidAmount = 0;
+      controller.isRetailSale = true;
+      controller.redefinePrice();
+      controller.serviceStuffInfo = null;
+      controller.selectedClient = null;
+      controller.getAllServiceStuff();
+      controller.getAllClientList();
+      controller.getPaymentMethods();
+    }else{
+      customerNameEditingController.text = controller.createOrderModel.name;
+      customerPhoneNumberEditingController.text = controller.createOrderModel.phone;
+      customerAddressEditingController.text = controller.createOrderModel.address;
+      customerTotalDiscountEditingController.text = controller.saleHistoryDetailsResponseModel!.data.discount.toString();
+      customerAdditionalExpensesEditingController.text = controller.saleHistoryDetailsResponseModel!.data.expense.toString();
+      customerChangeAmountEditingController.text = controller.totalDeu.toString();
+    }
+
+
+
     controller.calculateAmount(firstTime: true);
-    controller.addPaymentMethod();
-    controller.getPaymentMethods();
 
     super.initState();
   }
@@ -63,10 +81,6 @@ class _BillingSummaryState extends State<BillingSummary> {
     customerTotalDiscountEditingController.dispose();
     customerPayableAmountEditingController.dispose();
     customerChangeAmountEditingController.dispose();
-    controller.paymentMethodTracker.clear();
-    controller.totalDiscount = 0;
-    controller.additionalExpense = 0;
-    controller.paidAmount = 0;
     super.dispose();
   }
 
@@ -499,10 +513,15 @@ class _BillingSummaryState extends State<BillingSummary> {
                       bankId: e.paymentOption?.id));
                 }
               }
-              controller.createSaleOrder(context);
+              if(controller.isEditing){
+                controller.updateSaleOrder(context);
+              }else{
+                controller.createSaleOrder(context);
+              }
+
             }
           },
-          text: "Place Order",
+          text: controller.isEditing ? "Update Order" : "Place Order",
         ),
       ),
     );

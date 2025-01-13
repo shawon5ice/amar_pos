@@ -14,7 +14,9 @@ import '../../../../core/widgets/pager_list_view.dart';
 import '../../../inventory/presentation/stock_report/widget/custom_svg_icon_widget.dart';
 
 class SoldHistory extends StatefulWidget {
-  const SoldHistory({super.key});
+  SoldHistory({super.key,required this.onChange});
+
+  Function(int value) onChange;
 
   @override
   State<SoldHistory> createState() => _SoldHistoryState();
@@ -143,6 +145,9 @@ class _SoldHistoryState extends State<SoldHistory> {
                       itemBuilder: (_, item) {
                         return SoldHistoryItemWidget(
                           saleHistory: item,
+                          onChange: (value) {
+                            widget.onChange(value);
+                          },
                         );
                       },
                       isLoading: controller.isSaleHistoryLoadingMore,

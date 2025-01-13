@@ -351,7 +351,7 @@ class ReturnController extends GetxController {
 
     createReturnOrderLoading = true;
     update(["sales_product_list"]);
-    RandomLottieLoader().show(context,);
+    RandomLottieLoader.show();
     try{
       var response = await ReturnServices.createReturnOrder(
         usrToken: loginData!.token,
@@ -361,10 +361,10 @@ class ReturnController extends GetxController {
       if (response != null) {
         if(response['success']){
           returnOrderProducts.clear();
-          RandomLottieLoader().hide(context);
+          RandomLottieLoader.hide();
           Get.back();
         }else{
-          RandomLottieLoader().hide(context);
+          RandomLottieLoader.hide();
         }
         Methods.showSnackbar(msg: response['message'], isSuccess: response['success']? true: null);
       }

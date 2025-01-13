@@ -1,6 +1,6 @@
 import 'package:amar_pos/core/constants/app_assets.dart';
+import 'package:amar_pos/core/constants/logger/logger.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
-import 'package:amar_pos/core/widgets/custom_button.dart';
 import 'package:amar_pos/features/sales/presentation/page/place_order.dart';
 import 'package:amar_pos/features/sales/presentation/page/sold_history.dart';
 import 'package:amar_pos/features/sales/presentation/controller/sales_controller.dart';
@@ -11,7 +11,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../drawer/drawer_menu_controller.dart';
-import '../data/models/create_order_model.dart';
 
 class SalesScreen extends StatefulWidget {
   static String routeName = '/sales_screen';
@@ -26,15 +25,75 @@ class _SalesScreenState extends State<SalesScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
+  int _currentIndex = 0;
+
+
   SalesController controller = Get.put(SalesController());
+
+  // Future<bool> _onWillPop() async {
+  //   if (hasUnsavedChanges) {
+  //     return await _showUnsavedChangesDialog();
+  //   }
+  //   return true;
+  // }
+
+  Future<bool> showDiscardDialog(BuildContext context) async {
+    bool value = false;
+    return await showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Warning"),
+          content: Text("Do you want to discard your current operation?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                value = false;
+                Navigator.of(context).pop(false);
+              }, // Return `false` for "No"
+              child: Text("No"),
+            ),
+            TextButton(
+              onPressed: () {
+                value = true;
+                Navigator.of(context).pop(true);
+              }, // Return `true` for "Yes"
+              child: Text("Yes"),
+            ),
+          ],
+        );
+      },
+    ) ?? value;
+  }
+
 
   @override
   void initState() {
     _tabController = TabController(length: 3, vsync: this);
-    _tabController.addListener(() {
+    _tabController.addListener(() async {
       if (_tabController.index != _tabController.previousIndex) {
         controller.searchProductController.clear();
-        controller.update(['action_icon']);
+
+        // Check if the user is editing and is leaving the first tab
+        if (controller.isEditing && _tabController.previousIndex == 0) {
+          // Store the new index
+          int newIndex = _tabController.index;
+
+          // Revert the tab index temporarily
+          _tabController.index = _tabController.previousIndex;
+
+          // Show the discard dialog
+          bool discard = await showDiscardDialog(context);
+          logger.d(discard);
+
+          if (discard) {
+            controller.clearEditing();
+            _tabController.animateTo(newIndex);
+          }
+        }
+
+        controller.update(['action_icon']); // Update the specific UI element
       }
     });
     super.initState();
@@ -49,79 +108,106 @@ class _SalesScreenState extends State<SalesScreen>
   @override
   Widget build(BuildContext context) {
     final DrawerMenuController drawerMenuController = Get.find();
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        leading: DrawerButton(
-          onPressed: drawerMenuController.openDrawer,
-        ),
-        title: const Text("Sales"),
-        actions: [
-          GetBuilder<SalesController>(
-            id: 'action_icon',
-            builder: (controller) => _tabController.index == 0? GestureDetector(
-              child: SvgPicture.asset(AppAssets.pauseBillingIcon),
-            ): GestureDetector(
-              onTap: (){
-                showModalBottomSheet(context: context, builder:(context) => SoldHistoryFilterBottomSheet(
-                  saleHistory: _tabController.index == 1,
-                ));
-              },
-              child: SvgPicture.asset(AppAssets.funnelFilter),
-            ),
+    return PopScope(
+      onPopInvoked: (value) async {
+        if(controller.isEditing){
+          drawerMenuController.closeDrawer();
+          bool val = await showDiscardDialog(context);
+          if(val){
+            controller.clearEditing();
+            _tabController.animateTo(1);
+          }
+        }
+      },
+      canPop: false,
+      child: Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          leading: DrawerButton(
+            onPressed: () async {
+              if(controller.isEditing){
+                bool openDrawer = await showDiscardDialog(context);
+                if(openDrawer){
+                  controller.clearEditing();
+                  drawerMenuController.openDrawer();
+                }
+              }else{
+                drawerMenuController.openDrawer();
+              }
+            },
           ),
-          addW(12),
-        ],
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          child: Column(
-            children: [
-              Container(
-                height: 40.h,
-                padding: const EdgeInsets.all(4),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(20)),
-                ),
-                child: TabBar(
-                  dividerHeight: 0,
-                  controller: _tabController,
-                  indicatorSize: TabBarIndicatorSize.tab,
-                  labelStyle:
-                      TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp),
-                  indicator: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  unselectedLabelStyle:
-                      const TextStyle(fontWeight: FontWeight.normal),
-                  labelColor: Colors.white,
-                  splashBorderRadius: BorderRadius.circular(20),
-                  unselectedLabelColor: Colors.black,
-                  tabs: const [
-                    Tab(
-                      text: 'Place Order',
-                    ),
-                    Tab(text: 'Sold History'),
-                    Tab(text: 'Sold Products'),
-                  ],
-                ),
+          title: const Text("Sales"),
+          actions: [
+            GetBuilder<SalesController>(
+              id: 'action_icon',
+              builder: (controller) => _tabController.index == 0? GestureDetector(
+                child: SvgPicture.asset(AppAssets.pauseBillingIcon),
+              ): GestureDetector(
+                onTap: (){
+                  showModalBottomSheet(context: context, builder:(context) => SoldHistoryFilterBottomSheet(
+                    saleHistory: _tabController.index == 1,
+                  ));
+                },
+                child: SvgPicture.asset(AppAssets.funnelFilter),
               ),
-              addH(12),
-              Expanded(
-                child: TabBarView(
-                  physics: NeverScrollableScrollPhysics(),
-                  controller: _tabController,
-                  children: [
-                    PlaceOrder(),
-                    SoldHistory(),
-                    SoldProduct(),
-                  ],
+            ),
+            addW(12),
+          ],
+        ),
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: Column(
+              children: [
+                Container(
+                  height: 40.h,
+                  padding: const EdgeInsets.all(4),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                  ),
+                  child: TabBar(
+                    dividerHeight: 0,
+                    controller: _tabController,
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    labelStyle:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp),
+                    indicator: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    unselectedLabelStyle:
+                        const TextStyle(fontWeight: FontWeight.normal),
+                    labelColor: Colors.white,
+                    splashBorderRadius: BorderRadius.circular(20),
+                    unselectedLabelColor: Colors.black,
+                    tabs: const [
+                      Tab(
+                        text: 'Place Order',
+                      ),
+                      Tab(text: 'Sold History'),
+                      Tab(text: 'Sold Products'),
+                    ],
+                  ),
                 ),
-              )
-            ],
+                addH(12),
+                Expanded(
+                  child: TabBarView(
+                    physics: NeverScrollableScrollPhysics(),
+                    controller: _tabController,
+                    children: [
+                      PlaceOrder(),
+                      SoldHistory(
+                        onChange: (value){
+                          _tabController.index = value;
+                        },
+                      ),
+                      SoldProduct(),
+                    ],
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       ),

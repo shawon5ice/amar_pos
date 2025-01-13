@@ -85,7 +85,7 @@ class _SoldHistoryState extends State<SoldProduct> {
             ),
             addH(8.px),
             GetBuilder<SalesController>(
-              id: 'total_status_widget',
+              id: 'total_products_status_widget',
               builder: (controller) => Row(
                 children: [
                   TotalStatusWidget(

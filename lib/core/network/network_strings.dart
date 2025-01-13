@@ -96,4 +96,5 @@ class NetWorkStrings{
   static const String getAllSoldProductList = "order/get-sold-product-list";
 
   //Return
+  static const String getAllReturnOrderList = "return/get-all-return-list";
 }

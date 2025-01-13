@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:get/get.dart';
 
 class RandomLottieLoader {
   static final RandomLottieLoader _instance = RandomLottieLoader._internal();
@@ -9,7 +10,7 @@ class RandomLottieLoader {
 
   RandomLottieLoader._internal();
 
-  final _overlayEntry = ValueNotifier<OverlayEntry?>(null);
+  bool _isDialogVisible = false; // Track dialog visibility
 
   final List<String> lottieFiles = [
     'assets/lottie/loading1.json',
@@ -17,109 +18,79 @@ class RandomLottieLoader {
     'assets/lottie/loading3.json',
   ];
 
-  void show(BuildContext context, {double? progress}) {
-    // Prevent multiple overlays
-    if (_overlayEntry.value != null) return;
+  // Static method to show the loader
+  static void show({double? progress}) {
+    // Call the instance's show method
+    _instance._show(progress: progress);
+  }
+
+  // Instance method to handle the actual showing logic
+  void _show({double? progress}) {
+    if (_isDialogVisible) return;
+
+    _isDialogVisible = true;
 
     final randomIndex = Random().nextInt(lottieFiles.length);
 
-    // Create the overlay
-    showDialog(
-        barrierDismissible: false,
-        context: context, builder: (context) =>
-        Center(
-          child: Container(
-            width: 300,
-            height: 300,
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.all(Radius.circular(16)),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(height: 50),
-                Center(
-                  child: Lottie.asset(
-                    lottieFiles[randomIndex],
-                    width: 150,
-                    height: 150,
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      if(progress != null)Text(progress.toStringAsPrecision(2),
-                        style: const TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.bold, color: Colors.red),),
-                      Text(progress != null ? "Downloading...": "Loading..."),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+    Get.dialog(
+      Center(
+        child: Container(
+          width: 300,
+          height: 300,
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.all(Radius.circular(16)),
           ),
-        ));
-    // final overlay = OverlayEntry(
-    //   builder: (context) => Material(
-    //     color: Colors.black.withOpacity(0.5),
-    //     child: Stack(
-    //       children: [
-    //         Center(
-    //           child: Container(
-    //             width: 300,
-    //             height: 300,
-    //             decoration: const BoxDecoration(
-    //               color: Colors.white,
-    //               borderRadius: BorderRadius.all(Radius.circular(16)),
-    //             ),
-    //             child: Column(
-    //               mainAxisSize: MainAxisSize.min,
-    //               children: [
-    //                 SizedBox(height: 50),
-    //                 Center(
-    //                   child: Lottie.asset(
-    //                     lottieFiles[randomIndex],
-    //                     width: 150,
-    //                     height: 150,
-    //                   ),
-    //                 ),
-    //                 const Align(
-    //                   alignment: Alignment.bottomCenter,
-    //                   child: Text("Downloading..."),
-    //                 ),
-    //               ],
-    //             ),
-    //           ),
-    //         ),
-    //         // Block interaction
-    //         Positioned.fill(
-    //           child: GestureDetector(
-    //             onTap: () {},
-    //             behavior: HitTestBehavior.opaque,
-    //             child: Container(),
-    //           ),
-    //         ),
-    //       ],
-    //     ),
-    //   ),
-    // );
-
-    // _overlayEntry.value = overlay;
-
-    // Insert the overlay immediately
-    // Overlay.of(context).insert(overlay);
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 50),
+              Center(
+                child: Lottie.asset(
+                  lottieFiles[randomIndex],
+                  width: 150,
+                  height: 150,
+                ),
+              ),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    if (progress != null)
+                      Text(
+                        progress.toStringAsPrecision(2),
+                        style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.red),
+                      ),
+                    Text(progress != null ? "Downloading..." : "Loading..."),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      barrierDismissible: false,
+    );
   }
 
+  // Static method to hide the loader
+  static void hide() {
+    // Call the instance's hide method
+    _instance._hide();
+  }
 
-  void hide(BuildContext context) {
+  // Instance method to handle the actual hiding logic
+  void _hide() {
+    if (!_isDialogVisible) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Navigator.of(context).pop();
-      // _overlayEntry.value?.remove();
-      // _overlayEntry.value = null;
+      if (Get.isDialogOpen ?? false) {
+        Get.back();
+      }
+      _isDialogVisible = false;
     });
   }
-
 }

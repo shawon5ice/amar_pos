@@ -6,10 +6,11 @@ import 'package:amar_pos/features/sales/data/models/client_list_response_model.d
 import 'package:amar_pos/features/sales/data/models/create_order_model.dart';
 import 'package:amar_pos/features/sales/data/models/payment_method_tracker.dart';
 import 'package:amar_pos/features/sales/data/models/sale_history/sold_history_response_model.dart';
+import 'package:amar_pos/features/sales/data/models/sale_history_details_response_model.dart';
 import 'package:amar_pos/features/sales/data/models/sold_product/sold_product_response_model.dart';
 import 'package:amar_pos/features/sales/data/service/sales_service.dart';
 import 'package:amar_pos/features/sales/data/models/service_person_response_model.dart';
-import 'package:amar_pos/features/sales/presentation/widgets/billing_summary_payment_option_selection_widget.dart';
+import 'package:amar_pos/features/sales/presentation/page/sold_history.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -18,8 +19,6 @@ import '../../../../core/constants/logger/logger.dart';
 import '../../../auth/data/model/hive/login_data.dart';
 import '../../../auth/data/model/hive/login_data_helper.dart';
 import '../../../inventory/data/products/product_list_response_model.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-// part 'sold_history.dart';
 
 class SalesController extends GetxController {
   bool isProductListLoading = false;
@@ -36,15 +35,33 @@ class SalesController extends GetxController {
 
   final isLoading = false.obs; // Tracks ongoing API calls
   var lastFoundList = <ProductInfo>[].obs; // Previously found products
-  var currentSearchList = <ProductInfo>[].obs; // Results from the ongoing search
+  var currentSearchList = <ProductInfo>[]
+      .obs; // Results from the ongoing search
   var isSearching = false.obs; // Indicates whether a search is ongoing
   var hasError = false.obs; // Tracks if an error occurred
   TextEditingController searchProductController = TextEditingController();
   ProductsListResponseModel? productsListResponseModel;
 
+  void clearEditing(){
+    isEditing = false;
+    retailSale = false;
+    wholeSale = false;
+    selectedDateTimeRange.value = null;
+    isRetailSale = true;
+    selectedClient = null;
+    serviceStuffInfo = null;
+    paymentMethodTracker.clear();
+    placeOrderProducts.clear();
+    soldProductList.clear();
+    saleHistoryList.clear();
+    createOrderModel = CreateSaleOrderModel.defaultConstructor();
+    update(['place_order_items', 'billing_summary_button']);
+  }
+
   List<ProductInfo> placeOrderProducts = [];
 
-  CreateSaleOrderModel createOrderModel = CreateSaleOrderModel.defaultConstructor();
+  CreateSaleOrderModel createOrderModel = CreateSaleOrderModel
+      .defaultConstructor();
 
   BillingPaymentMethods? billingPaymentMethods;
 
@@ -95,7 +112,7 @@ class SalesController extends GetxController {
     super.onInit();
   }
 
-  void clearFilter(){
+  void clearFilter() {
     searchProductController.clear();
     wholeSale = false;
     retailSale = false;
@@ -109,38 +126,39 @@ class SalesController extends GetxController {
 
   void changeSellingParties(bool value) {
     isRetailSale = value;
+    redefinePrice();
+    calculateAmount();
     paymentMethodTracker.clear();
     getPaymentMethods();
-    calculateAmount();
     addPaymentMethod();
     update(['selling_party_selection', 'billing_summary_form']);
   }
 
+  void redefinePrice() {
+    for (int i = 0; i < placeOrderProducts.length; i++) {
+      createOrderModel.products[i].unitPrice = isRetailSale
+          ? placeOrderProducts[i].mrpPrice.toDouble()
+          : placeOrderProducts[i].wholesalePrice.toDouble();
+      logger.e("$i : ${createOrderModel.products[i].unitPrice}");
+    }
+  }
 
-  void addPaymentMethod(){
+
+  void addPaymentMethod() {
     num excludeAmount = 0;
-    for(var e in paymentMethodTracker){
+    for (var e in paymentMethodTracker) {
       excludeAmount += e.paidAmount ?? 0;
     }
     totalPaid = excludeAmount;
-    if(totalPaid>=paidAmount){
+    if (totalPaid >= paidAmount) {
       Methods.showSnackbar(msg: "Full amount already distributed");
       return;
     }
     paymentMethodTracker.add(PaymentMethodTracker(
-      paidAmount: paidAmount - excludeAmount
+        paidAmount: paidAmount - excludeAmount
     ));
     calculateAmount();
     update(['billing_summary_form']);
-  }
-
-
-  num getTotalPayable() {
-    return (totalAmount +
-        totalVat -
-        totalVat -
-        totalDiscount +
-        additionalExpense);
   }
 
   Future<void> getPaymentMethods() async {
@@ -163,10 +181,11 @@ class SalesController extends GetxController {
     } finally {
       isPaymentMethodListLoading = false;
       update(['billing_payment_methods']);
+      addPaymentMethod();
     }
   }
 
-  void addPlaceOrderProduct(ProductInfo product) {
+  void addPlaceOrderProduct(ProductInfo product, {List<String>? snNo}) {
     if (placeOrderProducts.any((e) => e.id == product.id)) {
       createOrderModel.products
           .firstWhere((e) => e.id == product.id)
@@ -175,10 +194,11 @@ class SalesController extends GetxController {
       placeOrderProducts.add(product);
       createOrderModel.products.add(SaleProductModel(
           id: product.id,
-          unitPrice: product.mrpPrice.toDouble(),
+          unitPrice: isRetailSale ? product.mrpPrice.toDouble() : product
+              .wholesalePrice.toDouble(),
           quantity: 1,
           vat: product.vat.toDouble(),
-          serialNo: []));
+          serialNo: snNo ?? []));
     }
     update(['place_order_items', 'billing_summary_button']);
   }
@@ -202,11 +222,11 @@ class SalesController extends GetxController {
     totalVat = totalV;
     totalQTY = totalQ;
     paidAmount = totalAmount + totalVat + additionalExpense - totalDiscount;
-    if(firstTime == null){
-      totalDeu =  paidAmount - totalPaid;
+    if (firstTime == null) {
+      totalDeu = paidAmount - totalPaid;
     }
 
-    update(['selling_party_selection','change-due-amount']);
+    update(['selling_party_selection', 'change-due-amount','billing_summary_form']);
   }
 
   void changeQuantityOfProduct(int index, bool increase) {
@@ -228,7 +248,7 @@ class SalesController extends GetxController {
         totalQTY -= e.quantity;
         totalVat -= e.quantity * product.vat;
         paidAmount =
-            (totalAmount + totalVat - totalDiscount - additionalExpense);
+        (totalAmount + totalVat - totalDiscount - additionalExpense);
         return true;
       } else {
         return false;
@@ -313,7 +333,9 @@ class SalesController extends GetxController {
 
       if (response != null && response['success']) {
         serviceStuffList =
-            ServicePersonResponseModel.fromJson(response).serviceStuffList;
+            ServicePersonResponseModel
+                .fromJson(response)
+                .serviceStuffList;
       } else {
         hasError.value = true;
       }
@@ -337,7 +359,9 @@ class SalesController extends GetxController {
       );
 
       if (response != null && response['success']) {
-        clientList = ClientListResponseModel.fromJson(response).data;
+        clientList = ClientListResponseModel
+            .fromJson(response)
+            .data;
       } else {
         hasError.value = true;
       }
@@ -352,30 +376,62 @@ class SalesController extends GetxController {
 
 
   void createSaleOrder(BuildContext context) async {
-
     createSaleOrderLoading = true;
     update(["sales_product_list"]);
-    RandomLottieLoader().show(context,);
-    try{
+    RandomLottieLoader.show();
+    try {
       var response = await SalesService.createSaleOrder(
         usrToken: loginData!.token,
         saleOrderModel: createOrderModel,
       );
       logger.e(response);
       if (response != null) {
-        if(response['success']){
+        if (response['success']) {
           placeOrderProducts.clear();
-          RandomLottieLoader().hide(context);
+          RandomLottieLoader.hide();
           Get.back();
-        }else{
-          RandomLottieLoader().hide(context);
+        } else {
+          RandomLottieLoader.hide();
         }
-        Methods.showSnackbar(msg: response['message'], isSuccess: response['success']? true: null);
+        Methods.showSnackbar(msg: response['message'],
+            isSuccess: response['success'] ? true : null);
       }
-    }catch(e){
+    } catch (e) {
       logger.e(e);
-    }finally{
+    } finally {
       createSaleOrderLoading = false;
+      update(["sales_product_list"]);
+    }
+  }
+
+  void updateSaleOrder(BuildContext context) async {
+    createSaleOrderLoading = true;
+    update(["sales_product_list"]);
+    RandomLottieLoader.show();
+    try {
+      var response = await SalesService.updateSaleOrder(
+        usrToken: loginData!.token,
+        saleOrderModel: createOrderModel,
+        orderId: saleHistoryDetailsResponseModel!.data.id,
+      );
+      logger.e(response);
+      if (response != null) {
+        if (response['success']) {
+          placeOrderProducts.clear();
+          RandomLottieLoader.hide();
+          Get.back();
+          Get.back();
+        } else {
+          RandomLottieLoader.hide();
+        }
+        Methods.showSnackbar(msg: response['message'],
+            isSuccess: response['success'] ? true : null);
+      }
+    } catch (e) {
+      logger.e(e);
+    } finally {
+      createSaleOrderLoading = false;
+      isEditing = false;
       update(["sales_product_list"]);
     }
   }
@@ -384,23 +440,25 @@ class SalesController extends GetxController {
     isSaleHistoryListLoading = page == 1;
     isSaleHistoryLoadingMore = page > 1;
 
-    if(page == 1){
+    if (page == 1) {
       saleHistoryResponseModel = null;
       saleHistoryList.clear();
     }
 
     hasError.value = false;
 
-    update(['sold_history_list','total_widget']);
+    update(['sold_history_list', 'total_widget']);
 
     try {
       var response = await SalesService.getSoldHistory(
-        usrToken: loginData!.token,
-        page: page,
-        search: searchProductController.text,
-        startDate: selectedDateTimeRange.value?.start,
-        endDate: selectedDateTimeRange.value?.end,
-        saleType: retailSale && wholeSale? null : retailSale ? 1: wholeSale ? 2: null
+          usrToken: loginData!.token,
+          page: page,
+          search: searchProductController.text,
+          startDate: selectedDateTimeRange.value?.start,
+          endDate: selectedDateTimeRange.value?.end,
+          saleType: retailSale && wholeSale ? null : retailSale ? 1 : wholeSale
+              ? 2
+              : null
       );
 
       logger.i(response);
@@ -409,10 +467,11 @@ class SalesController extends GetxController {
             SaleHistoryResponseModel.fromJson(response);
 
         if (saleHistoryResponseModel != null) {
-          saleHistoryList.addAll(saleHistoryResponseModel!.data.saleHistoryList);
+          saleHistoryList.addAll(
+              saleHistoryResponseModel!.data.saleHistoryList);
         }
       } else {
-        if(page != 1){
+        if (page != 1) {
           hasError.value = true;
         }
       }
@@ -423,7 +482,7 @@ class SalesController extends GetxController {
     } finally {
       isSaleHistoryListLoading = false;
       isSaleHistoryLoadingMore = false;
-      update(['sold_history_list','total_widget']);
+      update(['sold_history_list', 'total_widget']);
     }
   }
 
@@ -431,14 +490,14 @@ class SalesController extends GetxController {
     isSoldProductListLoading = page == 1;
     isSoldProductsLoadingMore = page > 1;
 
-    if(page == 1){
+    if (page == 1) {
       soldProductResponseModel = null;
       soldProductList.clear();
     }
 
     hasError.value = false;
 
-    update(['sold_product_list','total_widget']);
+    update(['sold_product_list', 'total_products_status_widget']);
 
     try {
       var response = await SalesService.getSoldProducts(
@@ -447,7 +506,9 @@ class SalesController extends GetxController {
           search: searchProductController.text,
           startDate: selectedDateTimeRange.value?.start,
           endDate: selectedDateTimeRange.value?.end,
-          saleType: retailSale && wholeSale? null : retailSale ? 1: wholeSale ? 2: null
+          saleType: retailSale && wholeSale ? null : retailSale ? 1 : wholeSale
+              ? 2
+              : null
       );
 
       logger.i(response);
@@ -459,7 +520,7 @@ class SalesController extends GetxController {
           soldProductList.addAll(soldProductResponseModel!.data.soldProducts);
         }
       } else {
-        if(page != 1){
+        if (page != 1) {
           hasError.value = true;
         }
       }
@@ -470,7 +531,7 @@ class SalesController extends GetxController {
     } finally {
       isSoldProductListLoading = false;
       isSoldProductsLoadingMore = false;
-      update(['sold_product_list','total_widget']);
+      update(['sold_product_list', 'total_products_status_widget']);
     }
   }
 
@@ -531,14 +592,17 @@ class SalesController extends GetxController {
   // }
 
 
-
-  Future<void> downloadStockLedgerReport({required bool isPdf, required SaleHistory saleHistory, required BuildContext context}) async {
+  Future<void> downloadStockLedgerReport(
+      {required bool isPdf, required SaleHistory saleHistory, required BuildContext context}) async {
     hasError.value = false;
 
-    String fileName = "${saleHistory.orderNo}-${DateTime.now().microsecondsSinceEpoch.toString()}${isPdf? ".pdf":".xlsx"}";
+    String fileName = "${saleHistory.orderNo}-${DateTime
+        .now()
+        .microsecondsSinceEpoch
+        .toString()}${isPdf ? ".pdf" : ".xlsx"}";
     try {
       var response = await SalesService.downloadStockLedgerReport(
-       saleHistory: saleHistory,
+        saleHistory: saleHistory,
         usrToken: loginData!.token,
         context: context,
       );
@@ -549,5 +613,155 @@ class SalesController extends GetxController {
     }
   }
 
+
+  Future<void> downloadSaleHistory(
+      {required bool isPdf, required SaleHistory saleHistory, required BuildContext context}) async {
+    hasError.value = false;
+
+    String fileName = "${saleHistory.orderNo}-${DateTime
+        .now()
+        .microsecondsSinceEpoch
+        .toString()}${isPdf ? ".pdf" : ".xlsx"}";
+    try {
+      var response = await SalesService.downloadSaleHistory(
+        saleHistory: saleHistory,
+        usrToken: loginData!.token,
+        context: context,
+      );
+    } catch (e) {
+      logger.e(e);
+    } finally {
+
+    }
+  }
+
+  bool detailsLoading =false;
+  SaleHistoryDetailsResponseModel? saleHistoryDetailsResponseModel;
+
+  Future<void> getSoldHistoryDetails(BuildContext context, SaleHistory saleHistory) async {
+    detailsLoading = true;
+    saleHistoryDetailsResponseModel = null;
+    update(['sold_history_details']);
+    try {
+      var response = await SalesService.getSoldHistoryDetails(
+          usrToken: loginData!.token,
+          id: saleHistory.id,
+      );
+
+      logger.i(response);
+      if (response != null) {
+        saleHistoryDetailsResponseModel =
+            SaleHistoryDetailsResponseModel.fromJson(response);
+      }
+    } catch (e) {
+      hasError.value = true;
+    } finally {
+      detailsLoading = false;
+      update(['sold_history_details']);
+    }
+  }
+
+  bool editSoldHistoryItemLoading = false;
+
+  bool isEditing = false;
+
+  Future<void> processEdit({required SaleHistory saleHistory,required BuildContext context}) async{
+    editSoldHistoryItemLoading = true;
+    isEditing = true;
+    RandomLottieLoader.show();
+    selectedClient = null;
+    serviceStuffInfo = null;
+    paymentMethodTracker.clear();
+    createOrderModel = CreateSaleOrderModel.defaultConstructor();
+
+    // Methods.showLoading();
+    update(['edit_sold_history_item']);
+    try {
+      var response = await SalesService.getSoldHistoryDetails(
+        usrToken: loginData!.token,
+        id: saleHistory.id,
+      );
+
+      logger.i(response);
+      if (response != null) {
+        getAllProducts(search: '', page: 1);
+        
+        saleHistoryDetailsResponseModel =
+            SaleHistoryDetailsResponseModel.fromJson(response);
+
+        isRetailSale = saleHistoryDetailsResponseModel!.data.saleType.toLowerCase().contains("retail");
+        await getPaymentMethods();
+
+        if(clientList.isEmpty){
+          await getAllClientList();
+        }
+
+        if(serviceStuffList.isEmpty){
+          await getAllServiceStuff();
+        }
+
+        //selecting products
+        for (var e in saleHistoryDetailsResponseModel!.data.orderDetails) {
+          ProductInfo productInfo = productsListResponseModel!.data.productList.singleWhere((f) => f.id == e.id);
+          addPlaceOrderProduct(productInfo, snNo: e.snNo.map((e) => e.serialNo).toList());
+        }
+
+        //Payment Methods
+        for (var e in saleHistoryDetailsResponseModel!.data.paymentDetails) {
+          PaymentMethod paymentMethod = billingPaymentMethods!.data.singleWhere((f) => f.id == e.id);
+          PaymentOption? paymentOption;
+
+          if(e.bank != null){
+            paymentOption = paymentMethod.paymentOptions.singleWhere((f) => f.id == e.bank!.id);
+          }
+
+          paymentMethodTracker.add(PaymentMethodTracker(
+            paymentMethod: paymentMethod,
+            paidAmount: e.amount.toDouble(),
+            paymentOption: paymentOption,
+          ));
+          logger.i(paymentMethodTracker);
+        }
+
+        //Selecting client
+        selectedClient = clientList.firstWhereOrNull((e) => e.id == saleHistoryDetailsResponseModel!.data.customer.id);
+        createOrderModel.address = selectedClient?.address ?? saleHistoryDetailsResponseModel!.data.customer.address;
+        createOrderModel.name = selectedClient?.address ?? saleHistoryDetailsResponseModel!.data.customer.name;
+        createOrderModel.phone = selectedClient?.address ?? saleHistoryDetailsResponseModel!.data.customer.phone;
+        // if(!isRetailSale){
+        //   for(var e in clientList){
+        //     if(e.id == saleHistoryDetailsResponseModel!.data.serviceBy.id){
+        //       serviceStuffInfo = e;
+        //       break;
+        //     }
+        //   }
+        //   selectedClient = clientList.firstWhereOrNull((e) => e.id == saleHistoryDetailsResponseModel!.data.customer.id);
+        //
+        //
+        // }else{
+        //   createOrderModel.address = saleHistoryDetailsResponseModel!.data.customer.address;
+        //   createOrderModel.name = saleHistoryDetailsResponseModel!.data.customer.name;
+        //   createOrderModel.phone = saleHistoryDetailsResponseModel!.data.customer.phone;
+        // }
+
+        //service stuff
+        serviceStuffInfo = serviceStuffList.firstWhereOrNull((e) => e.id == saleHistoryDetailsResponseModel!.data.serviceBy.id);
+
+
+        totalPaid = saleHistoryDetailsResponseModel!.data.payable;
+        totalDiscount = saleHistoryDetailsResponseModel!.data.discount;
+        additionalExpense = saleHistoryDetailsResponseModel!.data.expense;
+        totalDeu = saleHistoryDetailsResponseModel!.data.changeAmount * -1;
+      }
+    } catch (e) {
+      hasError.value = true;
+    } finally {
+
+      editSoldHistoryItemLoading = false;
+      update(['edit_sold_history_item']);
+      // Methods.hideLoading();
+      RandomLottieLoader.hide();
+    }
+  }
 
 }

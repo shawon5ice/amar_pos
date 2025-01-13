@@ -7,6 +7,7 @@ import 'package:amar_pos/features/sales/data/models/sale_history/sold_history_re
 import 'package:amar_pos/features/sales/presentation/controller/sales_controller.dart';
 import 'package:amar_pos/features/sales/presentation/page/sold_history.dart';
 import 'package:amar_pos/features/sales/presentation/widgets/sold_history_item_action_menu.dart';
+import 'package:amar_pos/features/sales/presentation/widgets/solde_history_details_view.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +17,9 @@ import '../../../../core/constants/app_assets.dart';
 import '../../../inventory/presentation/stock_report/widget/custom_svg_icon_widget.dart';
 
 class SoldHistoryItemWidget extends StatelessWidget {
-  SoldHistoryItemWidget({super.key, required this.saleHistory});
+  SoldHistoryItemWidget({super.key, required this.saleHistory,required this.onChange});
+
+  Function(int value) onChange;
 
   final SalesController controller = Get.find();
 
@@ -24,140 +27,147 @@ class SoldHistoryItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 5.h),
-      padding: const EdgeInsets.all(10),
-      foregroundDecoration: !saleHistory.isActionable
-          ? BoxDecoration(
-              color: const Color(0xff7c7c7c).withOpacity(.3),
-              borderRadius: BorderRadius.all(Radius.circular(20.r)),
-            )
-          : null,
-      decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.all(Radius.circular(20.r))),
-      child: Column(
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Flexible(
-                child: Row(
-                  children: [
-                    Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                      decoration: BoxDecoration(
-                          color: Color(0xffF6FFF6),
-                          border: Border.all(
-                            color: Color(0xff94DB8C),
-                            width: .5,
-                          ),
-                          borderRadius: BorderRadius.circular(20)),
-                      child: AutoSizeText(
-                        saleHistory.date,
-                        maxFontSize: 10,
-                        minFontSize: 8,
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                    addW(8.w),
-                    Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                      decoration: BoxDecoration(
-                          color: Color(0xffF2E8FF),
-                          border: Border.all(
-                            color: Color(0xff500DA0),
-                            width: .5,
-                          ),
-                          borderRadius: BorderRadius.circular(20)),
-                      child: AutoSizeText(
-                        saleHistory.saleType,
-                        minFontSize: 8,
-                        maxFontSize: 10,
-                        style: TextStyle(
-                          color: Color(0xff500DA0),
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              addW(8.w),
-              CustomSvgSmallIconButton(
-                borderColor: Color(0xff03346E),
-                bgColor: const Color(0xffE1F2FF),
-                onTap: () {
-                  controller.downloadStockLedgerReport(
-                      isPdf: true, context: context, saleHistory: saleHistory);
-                },
-                assetPath: AppAssets.downloadIcon,
-              ),
-              addW(8),
-              CustomSvgSmallIconButton(
-                borderColor: const Color(0xffFF9000),
-                bgColor: const Color(0xffFFFCF8),
-                onTap: () {},
-                assetPath: AppAssets.printIcon,
-              ),
-              addW(8),
-              SoldHistoryItemActionMenu(
-                onSelected: (value) {
-                  switch (value) {
-                    case "edit":
-                      break;
-                    case "delete":
-                      AwesomeDialog(
-                              context: context,
-                              dialogType: DialogType.error,
-                              title: "Are you sure?",
-                              desc:
-                                  "You are going to delete order no: ${saleHistory.orderNo}",
-                              btnOkOnPress: () {
-                                // controller.deleteProduct(
-                                //     productInfo: productInfo);
-                              },
-                              btnCancelOnPress: () {})
-                          .show();
-                      break;
-                  }
-                },
-              ),
-            ],
-          ),
-          addH(12),
-          Container(
-            padding: EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(10)),
-              color: Color(0xffF8F7F2),
-            ),
-            child: Column(
+    return GestureDetector(
+      onTap: (){
+        Get.to(()=> InvoiceWidget(saleHistory: saleHistory));
+      },
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical: 5.h),
+        padding: const EdgeInsets.all(10),
+        foregroundDecoration: !saleHistory.isActionable
+            ? BoxDecoration(
+                color: const Color(0xff7c7c7c).withOpacity(.3),
+                borderRadius: BorderRadius.all(Radius.circular(20.r)),
+              )
+            : null,
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.all(Radius.circular(20.r))),
+        child: Column(
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SaleHistoryItemTitleValueWidget(
-                  title: "Invoice Number",
-                  value: saleHistory.orderNo,
+                Flexible(
+                  child: Row(
+                    children: [
+                      Container(
+                        padding:
+                            const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                            color: const Color(0xffF6FFF6),
+                            border: Border.all(
+                              color: const Color(0xff94DB8C),
+                              width: .5,
+                            ),
+                            borderRadius: BorderRadius.circular(20)),
+                        child: AutoSizeText(
+                          saleHistory.date,
+                          maxFontSize: 10,
+                          minFontSize: 8,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      addW(8.w),
+                      Container(
+                        padding:
+                            const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                            color: const Color(0xffF2E8FF),
+                            border: Border.all(
+                              color: const Color(0xff500DA0),
+                              width: .5,
+                            ),
+                            borderRadius: BorderRadius.circular(20)),
+                        child: AutoSizeText(
+                          saleHistory.saleType,
+                          minFontSize: 8,
+                          maxFontSize: 10,
+                          style: const TextStyle(
+                            color: Color(0xff500DA0),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                SaleHistoryItemTitleValueWidget(
-                  title: "Customer Name",
-                  value: saleHistory.customer.name,
+                addW(8.w),
+                CustomSvgSmallIconButton(
+                  borderColor: const Color(0xff03346E),
+                  bgColor: const Color(0xffE1F2FF),
+                  onTap: () {
+                    controller.downloadSaleHistory(
+                        isPdf: true, context: context, saleHistory: saleHistory);
+                  },
+                  assetPath: AppAssets.downloadIcon,
                 ),
-                SaleHistoryItemTitleValueWidget(
-                  title: "Phone Number",
-                  value: saleHistory.customer.phone,
+                addW(8),
+                CustomSvgSmallIconButton(
+                  borderColor: const Color(0xffFF9000),
+                  bgColor: const Color(0xffFFFCF8),
+                  onTap: () {},
+                  assetPath: AppAssets.printIcon,
                 ),
-                SaleHistoryItemTitleValueWidget(
-                  title: "Amount",
-                  value: Methods.getFormatedPrice(saleHistory.amount),
+                addW(8),
+                SoldHistoryItemActionMenu(
+                  onSelected: (value) {
+                    switch (value) {
+                      case "edit":
+                        controller.processEdit(saleHistory: saleHistory,context: context);
+                        onChange(0);
+                        break;
+                      case "delete":
+                        AwesomeDialog(
+                                context: context,
+                                dialogType: DialogType.error,
+                                title: "Are you sure?",
+                                desc:
+                                    "You are going to delete order no: ${saleHistory.orderNo}",
+                                btnOkOnPress: () {
+                                  // controller.deleteProduct(
+                                  //     productInfo: productInfo);
+                                },
+                                btnCancelOnPress: () {})
+                            .show();
+                        break;
+                    }
+                  },
                 ),
               ],
             ),
-          )
-        ],
+            addH(12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: const BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                color: Color(0xffF8F7F2),
+              ),
+              child: Column(
+                children: [
+                  SaleHistoryItemTitleValueWidget(
+                    title: "Invoice Number",
+                    value: saleHistory.orderNo,
+                  ),
+                  SaleHistoryItemTitleValueWidget(
+                    title: "Customer Name",
+                    value: saleHistory.customer.name,
+                  ),
+                  SaleHistoryItemTitleValueWidget(
+                    title: "Phone Number",
+                    value: saleHistory.customer.phone,
+                  ),
+                  SaleHistoryItemTitleValueWidget(
+                    title: "Amount",
+                    value: Methods.getFormatedPrice(saleHistory.amount),
+                  ),
+                ],
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
