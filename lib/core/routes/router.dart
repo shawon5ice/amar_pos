@@ -3,6 +3,7 @@ import 'package:amar_pos/features/auth/presentation/ui/login_screen.dart';
 import 'package:amar_pos/features/config/presentation/configuration_screen.dart';
 import 'package:amar_pos/features/drawer/main_page.dart';
 import 'package:amar_pos/features/home/presentation/home_screen.dart';
+import 'package:amar_pos/features/inventory/presentation/products/add_product_screen.dart';
 import 'package:amar_pos/features/inventory/presentation/products/products_screen.dart';
 import 'package:amar_pos/features/splash/splash_screen.dart';
 import 'package:get/get.dart';
@@ -58,6 +59,12 @@ class AppRoutes {
       name: ProductsScreen.routeName,
       page: () => ProductsScreen(),
       binding: ProductsBinding(),
+    ),
+
+    GetPage(
+      name: AddProductScreen.routeName,
+      page: () => const AddProductScreen(),
+      binding: AddProductBinding(),
     ),
 
   ];

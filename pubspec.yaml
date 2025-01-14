@@ -43,7 +43,7 @@ dependencies:
   auto_size_text:
   file_picker:
   get_storage:
-  dio:
+  dio: ^5.7.0
   awesome_dialog:
   intl:
   photo_view:
@@ -60,7 +60,7 @@ dependencies:
   permission_handler:
   firebase_core:
   firebase_messaging:
-
+  dio_cache_interceptor: ^3.5.1
 
 
 dev_dependencies:
