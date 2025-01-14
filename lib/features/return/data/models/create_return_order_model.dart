@@ -7,6 +7,7 @@ class CreateReturnOrderModel {
   double returnAmount;
   double deduction;
   double amount;
+  double vat;
   List<Payment> payments;
   int serviceBy;
   int? customerId;
@@ -19,6 +20,7 @@ class CreateReturnOrderModel {
     required this.products,
     required this.returnAmount,
     required this.deduction,
+    required this.vat,
     required this.amount,
     required this.payments,
     required this.serviceBy,
@@ -33,6 +35,7 @@ class CreateReturnOrderModel {
         products = [],
         returnAmount = 0.0,
         deduction = 0.0,
+        vat = 0.0,
         amount = 0.0,
         serviceBy = 0,
         customerId = 0,
@@ -49,6 +52,7 @@ class CreateReturnOrderModel {
           .toList(),
       returnAmount: json['return_amount'].toDouble(),
       deduction: json['deduction'].toDouble(),
+      vat: json['vat'].toDouble(),
       amount: json['amount'].toDouble(),
       serviceBy: json['service_by'],
       customerId: json['customer_id'],
@@ -68,6 +72,7 @@ class CreateReturnOrderModel {
       'return_amount': returnAmount,
       'deduction': deduction,
       'amount': amount,
+      'vat': vat,
       'service_by': serviceBy,
       'customer_id': customerId,
       'payment': payments.map((payment) => payment.toJson()).toList(),

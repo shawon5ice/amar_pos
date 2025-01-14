@@ -127,8 +127,8 @@ class SoldHistoryItemWidget extends StatelessWidget {
                                 desc:
                                     "You are going to delete order no: ${saleHistory.orderNo}",
                                 btnOkOnPress: () {
-                                  // controller.deleteProduct(
-                                  //     productInfo: productInfo);
+                                  controller.deleteSoldOrder(
+                                      saleHistory: saleHistory);
                                 },
                                 btnCancelOnPress: () {})
                             .show();

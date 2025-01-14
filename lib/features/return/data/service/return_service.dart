@@ -75,6 +75,20 @@ class ReturnServices{
     return response;
   }
 
+  static Future<dynamic> updateReturnOrder({
+    required String usrToken,
+    required CreateReturnOrderModel returnOrderModel,
+    required int orderId,
+  }) async {
+    logger.i(returnOrderModel.toJson());
+    var response = await BaseClient.postData(
+      token: usrToken,
+      api: 'return/update/$orderId',
+      body: returnOrderModel.toJson(),
+    );
+    return response;
+  }
+
   static Future<dynamic> getReturnHistory({
     required String usrToken,
     required int page,
@@ -132,11 +146,70 @@ class ReturnServices{
     return response;
   }
 
-  static downloadStockLedgerReport({required String usrToken, required BuildContext context, required ReturnHistory returnHistory}) async {
+
+  static Future<void> downloadList({required bool isPdf,required bool returnHistory, required String fileName,
+    required String usrToken,
+    required DateTime? startDate,
+    required DateTime? endDate,
+    required String? search,
+    required int? saleType,
+
+  }) async {
     // logger.d("PDF: $isPdf");
 
-    String downloadUrl =  "${NetWorkStrings.baseUrl}/download-order-invoice/${returnHistory.id}";
+    Map<String, dynamic> query = {
+      "start_date": startDate,
+      "end_date": endDate,
+      "search": search,
+      "sale_type": saleType,
+    };
 
-    FileDownloader().downloadFile(url: downloadUrl, fileName: "${returnHistory.orderNo}.pdf" , context: context);
+    String downloadUrl = "";
+
+    if(returnHistory){
+      if(isPdf){
+        downloadUrl = "${NetWorkStrings.baseUrl}/return/download-pdf-return-list/";
+      }else{
+        downloadUrl = "${NetWorkStrings.baseUrl}/return/download-pdf-return-list/";
+      }
+    }else{
+      if(isPdf){
+        downloadUrl = "${NetWorkStrings.baseUrl}/return/download-pdf-return-product/";
+      }else{
+        downloadUrl = "${NetWorkStrings.baseUrl}/return/download-excel-return-product/";
+      }
+    }
+
+
+    FileDownloader().downloadFile(
+      url: downloadUrl,
+      token: usrToken,
+      query: query,
+      fileName: fileName,);
+  }
+
+  static downloadReturnHistory(
+      {required String usrToken,
+        required ReturnHistory returnHistory}) async {
+
+    String downloadUrl =
+        "${NetWorkStrings.baseUrl}/return/download-return-invoice/${returnHistory.id}";
+
+    FileDownloader().downloadFile(
+      url: downloadUrl,
+      token: usrToken,
+      fileName: "${returnHistory.orderNo}.pdf",);
+  }
+
+
+  static Future<dynamic> getReturnHistoryDetails({
+    required String usrToken,
+    required int id,
+  }) async {
+    var response = await BaseClient.getData(
+      token: usrToken,
+      api: "return/get-return-details/$id",
+    );
+    return response;
   }
 }

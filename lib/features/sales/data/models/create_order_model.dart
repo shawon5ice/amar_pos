@@ -7,6 +7,7 @@ class CreateSaleOrderModel {
   double amount;
   double expense;
   double discount;
+  double vat;
   double payable;
   List<Payment> payments;
   int serviceBy;
@@ -21,6 +22,7 @@ class CreateSaleOrderModel {
     required this.amount,
     required this.expense,
     required this.discount,
+    required this.vat,
     required this.payable,
     required this.payments,
     required this.serviceBy,
@@ -36,6 +38,7 @@ class CreateSaleOrderModel {
         amount = 0.0,
         expense = 0.0,
         discount = 0.0,
+        vat = 0.0,
         payable = 0.0,
         serviceBy = 0,
         customerId = 0,
@@ -53,6 +56,7 @@ class CreateSaleOrderModel {
       amount: json['amount'].toDouble(),
       expense: json['expense'].toDouble(),
       discount: json['discount'].toDouble(),
+      vat: json['vat'].toDouble(),
       payable: json['payable'].toDouble(),
       serviceBy: json['service_by'],
       customerId: json['customer_id'],
@@ -71,6 +75,7 @@ class CreateSaleOrderModel {
       'product': products.map((product) => product.toJson()).toList(),
       'amount': amount,
       'expense': expense,
+      'vat': vat,
       'discount': discount,
       'payable': payable,
       'service_by': serviceBy,

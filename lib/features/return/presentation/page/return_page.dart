@@ -15,6 +15,7 @@ import '../../../../core/widgets/dashed_line.dart';
 import '../../../../core/widgets/methods/helper_methods.dart';
 import '../../../../core/widgets/qr_code_scanner.dart';
 import '../../../inventory/data/products/product_list_response_model.dart';
+import '../../../inventory/presentation/products/add_product_screen.dart';
 import '../../../sales/presentation/widgets/sn_dialog_widget.dart';
 
 class ReturnPage extends StatefulWidget {
@@ -53,6 +54,7 @@ class _ReturnPageState extends State<ReturnPage> {
                       return TypeAheadField<ProductInfo>(
                         hideOnUnfocus: true,
                         hideOnSelect: true,
+                        showOnFocus: true,
                         builder: (context, textController, focusNode) {
                           suggestionEditingController = textController;
                           return TextField(
@@ -163,7 +165,9 @@ class _ReturnPageState extends State<ReturnPage> {
                   child: CircleAvatar(
                     backgroundColor: AppColors.accent,
                     child: IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Get.to(AddProductScreen());
+                      },
                       icon: const Icon(Icons.add),
                     ),
                   ),
@@ -301,7 +305,7 @@ class _ReturnPageState extends State<ReturnPage> {
                                         )),
                                     Expanded(
                                         child: Text(
-                                          "Vat : ${Methods.getFormatedPrice(controller.returnOrderProducts[index].vat.toDouble())}",
+                                          "Vat : ${Methods.getFormatedPrice((controller.returnOrderProducts[index].vat*(controller.returnOrderProducts[index].mrpPrice/100)).toDouble())}",
                                           style: const TextStyle(
                                               color: AppColors.primary),
                                         )),

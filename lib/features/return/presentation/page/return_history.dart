@@ -15,7 +15,8 @@ import '../../../inventory/presentation/stock_report/widget/custom_svg_icon_widg
 import '../../data/models/return_history/return_history_response_model.dart';
 
 class ReturnHistoryScreen extends StatefulWidget {
-  const ReturnHistoryScreen({super.key});
+  ReturnHistoryScreen({super.key, required this.onChange});
+  Function(int value) onChange;
 
   @override
   State<ReturnHistoryScreen> createState() => _ReturnHistoryScreenState();
@@ -63,6 +64,7 @@ class _ReturnHistoryScreenState extends State<ReturnHistoryScreen> {
                 CustomSvgIconButton(
                   bgColor: const Color(0xffEBFFDF),
                   onTap: () {
+                    controller.downloadList(isPdf: false, returnHistory: true);
                     // controller.downloadStockLedgerReport(
                     //     isPdf: false, context: context);
                   },
@@ -72,8 +74,7 @@ class _ReturnHistoryScreenState extends State<ReturnHistoryScreen> {
                 CustomSvgIconButton(
                   bgColor: const Color(0xffE1F2FF),
                   onTap: () {
-                    // controller.downloadStockLedgerReport(
-                    //     isPdf: true, context: context);
+                    controller.downloadList(isPdf: true, returnHistory: true);
                   },
                   assetPath: AppAssets.downloadIcon,
                 ),
@@ -142,7 +143,9 @@ class _ReturnHistoryScreenState extends State<ReturnHistoryScreen> {
                       // scrollController: _scrollController,
                       items: controller.returnHistoryList,
                       itemBuilder: (_, item) {
-                        return ReturnHistoryItemWidget(returnHistory: item,);
+                        return ReturnHistoryItemWidget(returnHistory: item,onChange: (value) {
+                          widget.onChange(value);
+                        },);
                       },
                       isLoading: controller.isReturnHistoryLoadingMore,
                       hasError: controller.hasError.value,

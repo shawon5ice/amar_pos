@@ -13,8 +13,9 @@ import '../../../../core/constants/app_assets.dart';
 import '../../../inventory/presentation/stock_report/widget/custom_svg_icon_widget.dart';
 
 class ReturnHistoryItemWidget extends StatelessWidget {
-  ReturnHistoryItemWidget({super.key, required this.returnHistory});
+  ReturnHistoryItemWidget({super.key, required this.returnHistory, required this.onChange});
 
+  Function(int value) onChange;
   final ReturnController controller = Get.find();
 
   final ReturnHistory returnHistory;
@@ -90,7 +91,7 @@ class ReturnHistoryItemWidget extends StatelessWidget {
                 bgColor: const Color(0xffE1F2FF),
                 onTap: () {
                   controller.downloadReturnHistory(
-                      isPdf: true, context: context, returnHistory: returnHistory);
+                      isPdf: true, returnHistory: returnHistory);
                 },
                 assetPath: AppAssets.downloadIcon,
               ),
@@ -106,6 +107,8 @@ class ReturnHistoryItemWidget extends StatelessWidget {
                 onSelected: (value) {
                   switch (value) {
                     case "edit":
+                      controller.processEdit(returnHistory: returnHistory, context: context);
+                      onChange(0);
                       break;
                     case "delete":
                       AwesomeDialog(

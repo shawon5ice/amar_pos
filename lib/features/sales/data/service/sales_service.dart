@@ -133,21 +133,6 @@ class SalesService {
     return response;
   }
 
-  static downloadStockLedgerReport(
-      {required String usrToken,
-      required BuildContext context,
-      required SaleHistory saleHistory}) async {
-    // logger.d("PDF: $isPdf");
-
-    String downloadUrl =
-        "${NetWorkStrings.baseUrl}/download-order-invoice/${saleHistory.id}";
-
-    FileDownloader().downloadFile(
-        url: downloadUrl,
-        fileName: "${saleHistory.orderNo}.pdf",
-        context: context);
-  }
-
   static downloadSaleHistory(
       {required String usrToken,
       required BuildContext context,
@@ -160,8 +145,7 @@ class SalesService {
     FileDownloader().downloadFile(
         url: downloadUrl,
         token: usrToken,
-        fileName: "${saleHistory.orderNo}.pdf",
-        context: context);
+        fileName: "${saleHistory.orderNo}.pdf",);
   }
 
   static Future<dynamic> getSoldHistoryDetails({
@@ -173,5 +157,56 @@ class SalesService {
       api: "order/get-order-details/$id",
     );
     return response;
+  }
+
+  static Future<dynamic> deleteSaleHistory({
+    required String usrToken,
+    required SaleHistory saleHistory}) async {
+    var response = await BaseClient.deleteData(
+      token: usrToken,
+      api: 'order/delete-order/${saleHistory.id}',);
+    return response;
+  }
+
+
+  static Future<void> downloadList({required bool isPdf,required bool saleHistory, required String fileName,
+      required String usrToken,
+    required DateTime? startDate,
+    required DateTime? endDate,
+    required String? search,
+    required int? saleType,
+
+  }) async {
+    // logger.d("PDF: $isPdf");
+
+    Map<String, dynamic> query = {
+      "start_date": startDate,
+      "end_date": endDate,
+      "search": search,
+      "sale_type": saleType,
+    };
+
+    String downloadUrl = "";
+
+    if(saleHistory){
+      if(isPdf){
+        downloadUrl = "${NetWorkStrings.baseUrl}/order/download-pdf-order-list/";
+      }else{
+        downloadUrl = "${NetWorkStrings.baseUrl}/order/download-excel-order-list/";
+      }
+    }else{
+      if(isPdf){
+        downloadUrl = "${NetWorkStrings.baseUrl}/order/download-pdf-sold-product/";
+      }else{
+        downloadUrl = "${NetWorkStrings.baseUrl}/order/download-excel-sold-product/";
+      }
+    }
+
+
+    FileDownloader().downloadFile(
+        url: downloadUrl,
+        token: usrToken,
+        query: query,
+        fileName: fileName,);
   }
 }

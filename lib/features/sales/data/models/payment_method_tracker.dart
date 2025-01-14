@@ -1,14 +1,16 @@
 import 'billing_payment_methods.dart';
 
 class PaymentMethodTracker {
+  final int id;
   PaymentMethod? paymentMethod;
   PaymentOption? paymentOption;
   num? paidAmount;
 
-  PaymentMethodTracker({this.paymentMethod, this.paymentOption, this.paidAmount});
+  PaymentMethodTracker({required this.id, this.paymentMethod, this.paymentOption, this.paidAmount});
 
   factory PaymentMethodTracker.fromJson(Map<String, dynamic> json) {
     return PaymentMethodTracker(
+      id: json['id'],
       paymentMethod: json['paymentMethod'] != null
           ? PaymentMethod.fromJson(json['paymentMethod'])
           : null,
@@ -21,6 +23,7 @@ class PaymentMethodTracker {
 
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'paymentMethod': paymentMethod?.toJson(),
       'paymentOption': paymentOption?.toJson(),
       'paidAmount': paidAmount,

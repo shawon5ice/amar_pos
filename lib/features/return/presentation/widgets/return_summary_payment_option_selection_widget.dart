@@ -1,7 +1,6 @@
 import 'package:amar_pos/core/core.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/features/return/presentation/controller/return_controller.dart';
-import 'package:amar_pos/features/sales/presentation/controller/sales_controller.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -16,8 +15,9 @@ import '../../data/models/return_payment_methods.dart';
 
 class ReturnSummaryPaymentOptionSelectionWidget extends StatefulWidget {
   const ReturnSummaryPaymentOptionSelectionWidget(
-      {super.key, required this.paymentMethodTracker,});
+      {super.key, required this.paymentMethodTracker,required this.onDeleteTap});
 
+  final void Function() onDeleteTap;
   final ReturnPaymentMethodTracker paymentMethodTracker;
 
   @override
@@ -96,10 +96,20 @@ class _ReturnSummaryPaymentOptionSelectionWidgetState
                         value: widget.paymentMethodTracker.paymentMethod,
                         onChanged: (value) {
                           if (value != null) {
+                            if(value.name.toLowerCase().contains("cash") && controller.cashSelected || value.name.toLowerCase().contains("credit") && controller.creditSelected ){
+                              Methods.showSnackbar(msg: "Please select another payment method");
+                              return;
+                            }
+                            if(value.name.toLowerCase().contains("cash")){
+                              controller.cashSelected =true;
+                            }else if(value.name.toLowerCase().contains("credit")){
+                              controller.creditSelected = true;
+                            }
                             widget.paymentMethodTracker.paymentOption = null;
                             widget.paymentMethodTracker.paymentMethod = value;
                             controller.update(
-                                ['billing_payment_methods', 'payments','billing_summary_form']);
+                                ['billing_payment_methods', 'payments','return_summary_form']);
+                            controller.calculateAmount();
                           }
                         },
                         buttonStyleData: ButtonStyleData(
@@ -145,14 +155,12 @@ class _ReturnSummaryPaymentOptionSelectionWidgetState
                           try{
                             widget.paymentMethodTracker.paidAmount = num.parse(value);
                             controller.calculateAmount();
-                            controller.update(['change-due-amount']);
                           }catch(e){
                             Methods.showSnackbar(msg: "Please type a valid amount");
                           }
                         }else{
                           widget.paymentMethodTracker.paidAmount = 0;
                           controller.calculateAmount();
-                          controller.update(['change-due-amount']);
                         }
                       },
                       validator: (value) {
@@ -177,9 +185,9 @@ class _ReturnSummaryPaymentOptionSelectionWidgetState
                   paidAmount.text = "";
                   controller.calculateAmount();
                 }else {
-                  controller.paymentMethodTracker.remove(widget.paymentMethodTracker);
+                  widget.paymentMethodTracker.paidAmount = 0;
+                  widget.onDeleteTap();
                 }
-
                 // controller.deletePaymentMethod(widget.key!);
                 controller.update(['billing_summary_form']);
               }, child: Padding(

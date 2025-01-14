@@ -1,14 +1,16 @@
 import 'return_payment_methods.dart';
 
 class ReturnPaymentMethodTracker {
+  final int id;
   PaymentMethod? paymentMethod;
   PaymentOption? paymentOption;
   num? paidAmount;
 
-  ReturnPaymentMethodTracker({this.paymentMethod, this.paymentOption, this.paidAmount});
+  ReturnPaymentMethodTracker({required this.id, this.paymentMethod, this.paymentOption, this.paidAmount});
 
   factory ReturnPaymentMethodTracker.fromJson(Map<String, dynamic> json) {
     return ReturnPaymentMethodTracker(
+      id: json['id'],
       paymentMethod: json['paymentMethod'] != null
           ? PaymentMethod.fromJson(json['paymentMethod'])
           : null,
@@ -21,6 +23,7 @@ class ReturnPaymentMethodTracker {
 
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'paymentMethod': paymentMethod?.toJson(),
       'paymentOption': paymentOption?.toJson(),
       'paidAmount': paidAmount,

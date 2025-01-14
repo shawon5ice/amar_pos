@@ -96,9 +96,9 @@ class SaleHistoryResponseModel {
   final bool success;
   final Data data;
   @JsonKey(name: 'count_total')
-  final int countTotal;
+  int countTotal;
   @JsonKey(name: 'amount_total')
-  final double amountTotal;
+  double amountTotal;
 
   SaleHistoryResponseModel({
     required this.success,

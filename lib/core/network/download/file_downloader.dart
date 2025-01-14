@@ -1,11 +1,13 @@
 import 'dart:io';
 import 'package:amar_pos/core/core.dart';
+import 'package:amar_pos/core/network/helpers/error_extractor.dart';
 import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:permission_handler/permission_handler.dart';
@@ -24,7 +26,7 @@ class FileDownloader {
   }
 
   Future<void> downloadFile(
-      {required String url, required String fileName, String? token, required BuildContext context}) async {
+      {required String url, required String fileName, String? token, Map<String, dynamic>? query}) async {
     try {
       // Request necessary permissions
       await _requestPermissions();
@@ -39,6 +41,7 @@ class FileDownloader {
       await _dio.download(
         url,
         filePath,
+        queryParameters: query,
         options: token != null
             ? Options(headers: {
                 'Authorization': 'Bearer $token',
@@ -140,7 +143,12 @@ class FileDownloader {
       try {
         await platform.invokeMethod('openFile', {'filePath': payload});
       } on PlatformException catch (e) {
-        print("Failed to open file: '${e.message}'.");
+        ErrorExtractor.showErrorDialog(Get.context!, {
+          "errors": {
+            "x": ["Failed to open downloaded file.\nPlease download associated software to view this."],
+          },
+        });
+        print("Failed to open downloaded file.\nPlease download associated software to view this'.");
       }
     }
   }

@@ -64,8 +64,7 @@ class _SoldHistoryState extends State<SoldHistory> {
                 CustomSvgIconButton(
                   bgColor: const Color(0xffEBFFDF),
                   onTap: () {
-                    // controller.downloadStockLedgerReport(
-                    //     isPdf: false, context: context);
+                    controller.downloadList(isPdf: false, saleHistory: true);
                   },
                   assetPath: AppAssets.excelIcon,
                 ),
@@ -73,8 +72,7 @@ class _SoldHistoryState extends State<SoldHistory> {
                 CustomSvgIconButton(
                   bgColor: const Color(0xffE1F2FF),
                   onTap: () {
-                    // controller.downloadStockLedgerReport(
-                    //     isPdf: true, context: context);
+                    controller.downloadList(isPdf: true, saleHistory: true);
                   },
                   assetPath: AppAssets.downloadIcon,
                 ),

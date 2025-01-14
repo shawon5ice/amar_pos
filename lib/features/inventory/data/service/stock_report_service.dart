@@ -55,6 +55,6 @@ class StockReportService {
 
     String downloadUrl =  "${NetWorkStrings.baseUrl}/inventory/${isPdf? "download-pdf-product-stock-ledger": "download-excel-product-stock-ledger"}?store_id=$storeId&product_id=$productId&start_date=${formatDate(startDate!)}&end_date=${formatDate(endDate!)}";
 
-    FileDownloader().downloadFile(url: downloadUrl, fileName: fileName , context: context);
+    FileDownloader().downloadFile(url: downloadUrl, fileName: fileName);
   }
 }

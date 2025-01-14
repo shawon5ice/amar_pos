@@ -325,7 +325,7 @@ class _PlaceOrderState extends State<PlaceOrder> {
                                     )),
                                     Expanded(
                                         child: Text(
-                                      "Vat : ${Methods.getFormatedPrice(controller.placeOrderProducts[index].vat.toDouble())}",
+                                      "Vat : ${Methods.getFormatedPrice((controller.placeOrderProducts[index].vat*(controller.placeOrderProducts[index].mrpPrice/100)).toDouble())}",
                                       style: const TextStyle(
                                           color: AppColors.primary),
                                     )),

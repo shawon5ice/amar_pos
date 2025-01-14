@@ -36,11 +36,6 @@ class _ReturnSummaryState extends State<ReturnSummary> {
 
   @override
   void initState() {
-    controller.getAllServiceStuff();
-    controller.getAllClientList();
-    controller.serviceStuffInfo = null;
-    controller.selectedClient = null;
-    controller.isRetailSale = true;
     customerNameEditingController = TextEditingController();
     customerPhoneNumberEditingController = TextEditingController();
     customerAddressEditingController = TextEditingController();
@@ -49,9 +44,28 @@ class _ReturnSummaryState extends State<ReturnSummary> {
     customerPayableAmountEditingController = TextEditingController();
     customerChangeAmountEditingController = TextEditingController();
 
+    if(!controller.isEditing){
+      controller.paymentMethodTracker.clear();
+      controller.totalDiscount = 0;
+      controller.additionalExpense = 0;
+      controller.paidAmount = 0;
+      controller.isRetailSale = true;
+      controller.redefinePrice();
+      controller.serviceStuffInfo = null;
+      controller.selectedClient = null;
+      controller.getAllServiceStuff();
+      controller.getAllClientList();
+      controller.getPaymentMethods();
+    }else{
+      customerNameEditingController.text = controller.createOrderModel.name;
+      customerPhoneNumberEditingController.text = controller.createOrderModel.phone;
+      customerAddressEditingController.text = controller.createOrderModel.address;
+      customerTotalDiscountEditingController.text = controller.saleHistoryDetailsResponseModel!.data.discount.toString();
+      customerAdditionalExpensesEditingController.text = controller.saleHistoryDetailsResponseModel!.data.expense.toString();
+      customerChangeAmountEditingController.text = controller.totalDeu.toString();
+    }
+
     controller.calculateAmount(firstTime: true);
-    controller.addPaymentMethod();
-    controller.getPaymentMethods();
 
     super.initState();
   }
@@ -65,10 +79,6 @@ class _ReturnSummaryState extends State<ReturnSummary> {
     customerTotalDiscountEditingController.dispose();
     customerPayableAmountEditingController.dispose();
     customerChangeAmountEditingController.dispose();
-    controller.paymentMethodTracker.clear();
-    controller.totalDiscount = 0;
-    controller.additionalExpense = 0;
-    controller.paidAmount = 0;
     super.dispose();
   }
 
@@ -252,6 +262,15 @@ class _ReturnSummaryState extends State<ReturnSummary> {
                           ],
                         ),
                         addH(8),
+                        const FieldTitle("VAT"),
+                        addH(4),
+                        CustomTextField(
+                          enabledFlag: false,
+                          textCon: TextEditingController(
+                              text: controller.totalVat.toString()),
+                          hintText: "VAT",
+                        ),
+                        addH(8),
                         Row(
                           children: [
                             Expanded(
@@ -314,9 +333,13 @@ class _ReturnSummaryState extends State<ReturnSummary> {
                           itemCount: controller.paymentMethodTracker.length,
                           itemBuilder: (context, index) =>
                               ReturnSummaryPaymentOptionSelectionWidget(
-                            key: UniqueKey(),
+                            key: ValueKey(controller.paymentMethodTracker[index]),
                             paymentMethodTracker:
                                 controller.paymentMethodTracker[index],
+                            onDeleteTap: (){
+                              controller.paymentMethodTracker.removeAt(index);
+                              controller.calculateAmount();
+                            },
                           ),
                         ),
                         TextButton(
@@ -407,6 +430,8 @@ class _ReturnSummaryState extends State<ReturnSummary> {
                   controller.totalDiscount.toDouble();
               controller.createOrderModel.amount =
                   controller.paidAmount.toDouble();
+              controller.createOrderModel.vat =
+                  controller.totalVat.toDouble();
               controller.createOrderModel.name = controller.isRetailSale
                   ? customerNameEditingController.text
                   : controller.selectedClient!.name;
@@ -443,10 +468,15 @@ class _ReturnSummaryState extends State<ReturnSummary> {
                       bankId: e.paymentOption?.id));
                 }
               }
-              controller.createReturnOrder(context);
+              if(controller.isEditing){
+                controller.updateReturnOrder(context);
+              }else{
+                controller.createReturnOrder(context);
+              }
+
             }
           },
-          text: "Create Return",
+          text:  controller.isEditing ? "Update Order" : "Place Order",
         ),
       ),
     );

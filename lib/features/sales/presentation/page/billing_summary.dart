@@ -57,8 +57,6 @@ class _BillingSummaryState extends State<BillingSummary> {
       controller.getAllClientList();
       controller.getPaymentMethods();
     }else{
-      controller.creditSelected = false;
-      controller.cashSelected = false;
       customerNameEditingController.text = controller.createOrderModel.name;
       customerPhoneNumberEditingController.text = controller.createOrderModel.phone;
       customerAddressEditingController.text = controller.createOrderModel.address;
@@ -384,9 +382,13 @@ class _BillingSummaryState extends State<BillingSummary> {
                           itemCount: controller.paymentMethodTracker.length,
                           itemBuilder: (context, index) =>
                               BillingSummaryPaymentOptionSelectionWidget(
-                            key: UniqueKey(),
+                            key: ValueKey(controller.paymentMethodTracker[index]),
                             paymentMethodTracker:
                                 controller.paymentMethodTracker[index],
+                                onDeleteTap: (){
+                                  controller.paymentMethodTracker.removeAt(index);
+                                  controller.calculateAmount();
+                                },
                           ),
                         ),
                         TextButton(
@@ -477,6 +479,8 @@ class _BillingSummaryState extends State<BillingSummary> {
                   controller.additionalExpense.toDouble();
               controller.createOrderModel.discount =
                   controller.totalDiscount.toDouble();
+              controller.createOrderModel.vat =
+                  controller.totalVat.toDouble();
               controller.createOrderModel.payable =
                   controller.paidAmount.toDouble();
               controller.createOrderModel.name = controller.isRetailSale

@@ -15,9 +15,10 @@ import '../../../../core/widgets/field_title.dart';
 import '../../data/models/billing_payment_methods.dart';
 
 class BillingSummaryPaymentOptionSelectionWidget extends StatefulWidget {
-  const BillingSummaryPaymentOptionSelectionWidget(
-      {super.key, required this.paymentMethodTracker,});
+  BillingSummaryPaymentOptionSelectionWidget(
+      {super.key, required this.paymentMethodTracker,required this.onDeleteTap});
 
+  final void Function() onDeleteTap;
   final PaymentMethodTracker paymentMethodTracker;
 
   @override
@@ -108,7 +109,8 @@ class _BillingSummaryPaymentOptionSelectionWidgetState
                             widget.paymentMethodTracker.paymentOption = null;
                             widget.paymentMethodTracker.paymentMethod = value;
                             controller.update(
-                                ['billing_payment_methods', 'payments','billing_summary_form']);
+                                ['billing_payment_methods', 'payments','return_summary_form']);
+                            controller.calculateAmount();
                           }
                         },
                         buttonStyleData: ButtonStyleData(
@@ -154,14 +156,12 @@ class _BillingSummaryPaymentOptionSelectionWidgetState
                           try{
                             widget.paymentMethodTracker.paidAmount = num.parse(value);
                             controller.calculateAmount();
-                            controller.update(['change-due-amount']);
                           }catch(e){
                             Methods.showSnackbar(msg: "Please type a valid amount");
                           }
                         }else{
                           widget.paymentMethodTracker.paidAmount = 0;
                           controller.calculateAmount();
-                          controller.update(['change-due-amount']);
                         }
                       },
                       validator: (value) {
@@ -186,7 +186,8 @@ class _BillingSummaryPaymentOptionSelectionWidgetState
                   paidAmount.text = "";
                   controller.calculateAmount();
                 }else {
-                  controller.paymentMethodTracker.remove(widget.paymentMethodTracker);
+                  widget.paymentMethodTracker.paidAmount = 0;
+                  widget.onDeleteTap();
                 }
 
                 // controller.deletePaymentMethod(widget.key!);

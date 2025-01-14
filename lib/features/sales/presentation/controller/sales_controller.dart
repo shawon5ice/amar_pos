@@ -130,11 +130,10 @@ class SalesController extends GetxController {
 
   void changeSellingParties(bool value) {
     isRetailSale = value;
+    paymentMethodTracker.clear();
     redefinePrice();
     calculateAmount();
-    paymentMethodTracker.clear();
     getPaymentMethods();
-    addPaymentMethod();
     update(['selling_party_selection', 'billing_summary_form']);
   }
 
@@ -143,6 +142,7 @@ class SalesController extends GetxController {
       createOrderModel.products[i].unitPrice = isRetailSale
           ? placeOrderProducts[i].mrpPrice.toDouble()
           : placeOrderProducts[i].wholesalePrice.toDouble();
+      createOrderModel.products[i].vat = (placeOrderProducts[i].vat * (isRetailSale ? placeOrderProducts[i].mrpPrice.toDouble()/100 : placeOrderProducts[i].wholesalePrice.toDouble()/100)).toDouble();
       logger.e("$i : ${createOrderModel.products[i].unitPrice}");
     }
   }
@@ -159,6 +159,7 @@ class SalesController extends GetxController {
       return;
     }
     paymentMethodTracker.add(PaymentMethodTracker(
+      id: paymentMethodTracker.length + 1,
         paidAmount: paidAmount - excludeAmount
     ));
     calculateAmount();
@@ -167,6 +168,8 @@ class SalesController extends GetxController {
 
   Future<void> getPaymentMethods() async {
     try {
+      cashSelected = false;
+      creditSelected = false;
       isPaymentMethodListLoading = true;
       hasError.value = false;
       billingPaymentMethods = null;
@@ -185,11 +188,14 @@ class SalesController extends GetxController {
     } finally {
       isPaymentMethodListLoading = false;
       update(['billing_payment_methods']);
-      addPaymentMethod();
+      if(!isEditing){
+        addPaymentMethod();
+      }
     }
   }
 
-  void addPlaceOrderProduct(ProductInfo product, {List<String>? snNo}) {
+
+  void addPlaceOrderProduct(ProductInfo product, {List<String>? snNo, int? quantity}) {
     if (placeOrderProducts.any((e) => e.id == product.id)) {
       createOrderModel.products
           .firstWhere((e) => e.id == product.id)
@@ -200,8 +206,9 @@ class SalesController extends GetxController {
           id: product.id,
           unitPrice: isRetailSale ? product.mrpPrice.toDouble() : product
               .wholesalePrice.toDouble(),
-          quantity: 1,
-          vat: product.vat.toDouble(),
+          quantity:quantity?? 1,
+          vat: (product.vat/100 * (isRetailSale ? product.mrpPrice.toDouble() : product
+              .wholesalePrice.toDouble())).toDouble(),
           serialNo: snNo ?? []));
     }
     update(['place_order_items', 'billing_summary_button']);
@@ -213,9 +220,21 @@ class SalesController extends GetxController {
     int totalQ = 0;
     paidAmount = 0;
     num excludeAmount = 0;
+    bool cash = false;
+    bool credit = false;
     for (var e in paymentMethodTracker) {
       excludeAmount += e.paidAmount ?? 0;
+      if(e.paymentMethod != null){
+        if(e.paymentMethod!.name.toLowerCase().contains("cash")){
+          cash = true;
+        }
+        if(e.paymentMethod!.name.toLowerCase().contains("credit")){
+          credit = true;
+        }
+      }
     }
+    creditSelected = credit;
+    cashSelected = cash;
     totalPaid = excludeAmount;
     for (var e in createOrderModel.products) {
       totalQ += e.quantity;
@@ -250,7 +269,7 @@ class SalesController extends GetxController {
       if (e.id == product.id) {
         totalAmount -= product.mrpPrice * e.quantity;
         totalQTY -= e.quantity;
-        totalVat -= e.quantity * product.vat;
+        totalVat -= e.quantity * product.vat * (isRetailSale ? product.mrpPrice : product.wholesalePrice) / 100;
         paidAmount =
         (totalAmount + totalVat - totalDiscount - additionalExpense);
         return true;
@@ -393,6 +412,7 @@ class SalesController extends GetxController {
         if (response['success']) {
           placeOrderProducts.clear();
           RandomLottieLoader.hide();
+          Get.back();
           Get.back();
         } else {
           RandomLottieLoader.hide();
@@ -539,84 +559,6 @@ class SalesController extends GetxController {
     }
   }
 
-  // Future<void> getSoldHistory({
-  //   String? search,
-  //   int page = 1,
-  //   required PagingController<int, SaleHistory> pagingController,
-  // }) async {
-  //   // Only set loading flags for the first page to show the loading indicator
-  //   if (page == 1) {
-  //     isSaleHistoryListLoading = true;
-  //     saleHistoryList.clear();
-  //   }
-  //   hasError.value = false;
-  //   update(['sold_history_list']);
-  //
-  //   try {
-  //     // Call the API
-  //     var response = await SalesService.getSoldHistory(
-  //       usrToken: loginData!.token,
-  //       page: page,
-  //       search: search,
-  //       startDate: selectedDateTimeRange.value?.start,
-  //       endDate: selectedDateTimeRange.value?.end,
-  //       saleType: retailSale && wholeSale ? null : retailSale ? 1 : wholeSale ? 2 : null,
-  //     );
-  //
-  //     // Parse the response
-  //     if (response != null && response['success']) {
-  //       saleHistoryResponseModel = SaleHistoryResponseModel.fromJson(response);
-  //
-  //       if (saleHistoryResponseModel != null) {
-  //         final newItems = saleHistoryResponseModel!.data.saleHistoryList;
-  //
-  //         // Check if this is the last page
-  //         final isLastPage = page >= (saleHistoryResponseModel!.data.meta.lastPage);
-  //
-  //         if (isLastPage) {
-  //           pagingController.appendLastPage(newItems);
-  //         } else {
-  //           final nextPageKey = page + 1;
-  //           pagingController.appendPage(newItems, nextPageKey);
-  //         }
-  //       }
-  //     } else {
-  //       hasError.value = true;
-  //       pagingController.error = 'Error: Unable to fetch data';
-  //     }
-  //   } catch (e) {
-  //     hasError.value = true;
-  //     logger.e(e);
-  //     pagingController.error = e;
-  //   } finally {
-  //     isSaleHistoryListLoading = false;
-  //     isSaleHistoryLoadingMore = false;
-  //     update(['sold_history_list']);
-  //   }
-  // }
-
-
-  Future<void> downloadStockLedgerReport(
-      {required bool isPdf, required SaleHistory saleHistory, required BuildContext context}) async {
-    hasError.value = false;
-
-    String fileName = "${saleHistory.orderNo}-${DateTime
-        .now()
-        .microsecondsSinceEpoch
-        .toString()}${isPdf ? ".pdf" : ".xlsx"}";
-    try {
-      var response = await SalesService.downloadStockLedgerReport(
-        saleHistory: saleHistory,
-        usrToken: loginData!.token,
-        context: context,
-      );
-    } catch (e) {
-      logger.e(e);
-    } finally {
-
-    }
-  }
-
 
   Future<void> downloadSaleHistory(
       {required bool isPdf, required SaleHistory saleHistory, required BuildContext context}) async {
@@ -707,7 +649,7 @@ class SalesController extends GetxController {
         //selecting products
         for (var e in saleHistoryDetailsResponseModel!.data.orderDetails) {
           ProductInfo productInfo = productsListResponseModel!.data.productList.singleWhere((f) => f.id == e.id);
-          addPlaceOrderProduct(productInfo, snNo: e.snNo.map((e) => e.serialNo).toList());
+          addPlaceOrderProduct(productInfo, snNo: e.snNo.map((e) => e.serialNo).toList(), quantity: e.quantity);
         }
 
         //Payment Methods
@@ -715,11 +657,19 @@ class SalesController extends GetxController {
           PaymentMethod paymentMethod = billingPaymentMethods!.data.singleWhere((f) => f.id == e.id);
           PaymentOption? paymentOption;
 
+          if(paymentMethod.name.toLowerCase().contains("cash")){
+            cashSelected = true;
+          }
+          if(paymentMethod.name.toLowerCase().contains("credit")){
+            creditSelected = true;
+          }
+
           if(e.bank != null){
             paymentOption = paymentMethod.paymentOptions.singleWhere((f) => f.id == e.bank!.id);
           }
 
           paymentMethodTracker.add(PaymentMethodTracker(
+            id: e.id,
             paymentMethod: paymentMethod,
             paidAmount: e.amount.toDouble(),
             paymentOption: paymentOption,
@@ -765,6 +715,66 @@ class SalesController extends GetxController {
       update(['edit_sold_history_item']);
       // Methods.hideLoading();
       RandomLottieLoader.hide();
+    }
+  }
+
+  Future<void> deleteSoldOrder({
+    required SaleHistory saleHistory,
+  }) async {
+
+    hasError.value = false;
+    update(['sold_history_list']);
+
+    try {
+      // Call the API
+      var response = await SalesService.deleteSaleHistory(
+        usrToken: loginData!.token,
+        saleHistory: saleHistory,
+      );
+
+      // Parse the response
+      if (response != null && response['success']) {
+        // Remove the item from the list
+        saleHistoryList.remove(saleHistory);
+        saleHistoryResponseModel?.amountTotal -= saleHistory.amount;
+        saleHistoryResponseModel?.countTotal -= 1;
+        Methods.showSnackbar(msg: response['message'], isSuccess: true);
+      } else {
+        Methods.showSnackbar(msg: 'Error: Unable to delete the item');
+      }
+    } catch (e) {
+      hasError.value = true;
+      logger.e(e);
+      Methods.showSnackbar(msg: 'Error: something went wrong while deleting the item');
+    } finally {
+      update(['sold_history_list', 'total_widget']);
+    }
+  }
+
+  Future<void> downloadList({required bool isPdf,required bool saleHistory}) async {
+    hasError.value = false;
+
+    String fileName = "${saleHistory? "Sale Order history": "Sale Product History"}-${
+    selectedDateTimeRange.value != null ? "${selectedDateTimeRange.value!.start.toIso8601String().split("T")[0]}-${selectedDateTimeRange.value!.end.toIso8601String().split("T")[0]}": DateTime.now().toIso8601String().split("T")[0]
+        .toString()
+    }${isPdf ? ".pdf" : ".xlsx"}";
+    try {
+      var response = await SalesService.downloadList(
+        saleHistory: saleHistory,
+        usrToken: loginData!.token,
+        isPdf: isPdf,
+        search: searchProductController.text,
+        startDate: selectedDateTimeRange.value?.start,
+        endDate: selectedDateTimeRange.value?.end,
+        saleType: retailSale && wholeSale ? null : retailSale ? 1 : wholeSale
+            ? 2
+            : null,
+        fileName: fileName,
+      );
+    } catch (e) {
+      logger.e(e);
+    } finally {
+
     }
   }
 

@@ -3,6 +3,7 @@ import 'package:amar_pos/core/core.dart';
 import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:amar_pos/features/return/data/models/create_return_order_model.dart';
 import 'package:amar_pos/features/return/data/models/return_history/return_history_response_model.dart';
+import 'package:amar_pos/features/return/data/models/return_history_details_response_model.dart';
 import 'package:amar_pos/features/return/data/models/return_payment_method_tracker.dart';
 import 'package:amar_pos/features/return/data/models/return_payment_methods.dart';
 import 'package:amar_pos/features/return/data/service/return_service.dart';
@@ -67,6 +68,8 @@ class ReturnController extends GetxController {
   num totalDeu = 0;
 
   num paidAmount = 0;
+  bool cashSelected = false;
+  bool creditSelected = false;
 
 
   //Sold History
@@ -99,6 +102,22 @@ class ReturnController extends GetxController {
     update(['filter_view']);
   }
 
+  void clearEditing(){
+    isEditing = false;
+    retailSale = false;
+    wholeSale = false;
+    selectedDateTimeRange.value = null;
+    isRetailSale = true;
+    selectedClient = null;
+    serviceStuffInfo = null;
+    paymentMethodTracker.clear();
+    returnOrderProducts.clear();
+    soldProductList.clear();
+    returnHistoryList.clear();
+    createOrderModel = CreateReturnOrderModel.defaultConstructor();
+    update(['place_order_items', 'billing_summary_button']);
+  }
+
   void setSelectedDateRange(DateTimeRange? range) {
     selectedDateTimeRange.value = range;
   }
@@ -106,11 +125,22 @@ class ReturnController extends GetxController {
   void changeSellingParties(bool value) {
     isRetailSale = value;
     paymentMethodTracker.clear();
-    getPaymentMethods();
+    redefinePrice();
     calculateAmount();
-    addPaymentMethod();
+    getPaymentMethods();
     update(['selling_party_selection', 'return_summary_form']);
   }
+
+  void redefinePrice() {
+    for (int i = 0; i < returnOrderProducts.length; i++) {
+      createOrderModel.products[i].unitPrice = isRetailSale
+          ? returnOrderProducts[i].mrpPrice.toDouble()
+          : returnOrderProducts[i].wholesalePrice.toDouble();
+      createOrderModel.products[i].vat = (returnOrderProducts[i].vat * (isRetailSale ? returnOrderProducts[i].mrpPrice.toDouble()/100 : returnOrderProducts[i].wholesalePrice.toDouble()/100)).toDouble();
+      logger.e("$i : ${createOrderModel.products[i].unitPrice}");
+    }
+  }
+
 
 
   void addPaymentMethod(){
@@ -124,6 +154,7 @@ class ReturnController extends GetxController {
       return;
     }
     paymentMethodTracker.add(ReturnPaymentMethodTracker(
+        id: paymentMethodTracker.length + 1,
       paidAmount: paidAmount - excludeAmount
     ));
     calculateAmount();
@@ -159,10 +190,13 @@ class ReturnController extends GetxController {
     } finally {
       isPaymentMethodListLoading = false;
       update(['billing_payment_methods']);
+      if(!isEditing){
+        addPaymentMethod();
+      }
     }
   }
 
-  void addPlaceOrderProduct(ProductInfo product) {
+  void addPlaceOrderProduct(ProductInfo product, {List<String>? snNo, int? quantity}) {
     if (returnOrderProducts.any((e) => e.id == product.id)) {
       createOrderModel.products
           .firstWhere((e) => e.id == product.id)
@@ -171,10 +205,11 @@ class ReturnController extends GetxController {
       returnOrderProducts.add(product);
       createOrderModel.products.add(ReturnProductModel(
           id: product.id,
-          unitPrice: product.mrpPrice.toDouble(),
-          quantity: 1,
-          vat: product.vat.toDouble(),
-          serialNo: []));
+          unitPrice: isRetailSale ? product.mrpPrice.toDouble() : product.wholesalePrice.toDouble(),
+          quantity: quantity?? 1,
+          vat: (product.vat/100 * (isRetailSale ? product.mrpPrice.toDouble() : product
+              .wholesalePrice.toDouble())).toDouble(),
+          serialNo: snNo ?? []));
     }
     update(['place_order_items', 'billing_summary_button']);
   }
@@ -184,10 +219,22 @@ class ReturnController extends GetxController {
     num totalV = 0;
     int totalQ = 0;
     paidAmount = 0;
+    bool cash = false;
+    bool credit = false;
     num excludeAmount = 0;
     for (var e in paymentMethodTracker) {
       excludeAmount += e.paidAmount ?? 0;
+      if(e.paymentMethod != null){
+        if(e.paymentMethod!.name.toLowerCase().contains("cash")){
+          cash = true;
+        }
+        if(e.paymentMethod!.name.toLowerCase().contains("credit")){
+          credit = true;
+        }
+      }
     }
+    creditSelected = credit;
+    cashSelected = cash;
     totalPaid = excludeAmount;
     for (var e in createOrderModel.products) {
       totalQ += e.quantity;
@@ -202,7 +249,7 @@ class ReturnController extends GetxController {
       totalDeu =  paidAmount - totalPaid;
     }
 
-    update(['selling_party_selection','change-due-amount']);
+    update(['selling_party_selection','change-due-amount', 'return_summary_form']);
   }
 
   void changeQuantityOfProduct(int index, bool increase) {
@@ -222,7 +269,7 @@ class ReturnController extends GetxController {
       if (e.id == product.id) {
         totalAmount -= product.mrpPrice * e.quantity;
         totalQTY -= e.quantity;
-        totalVat -= e.quantity * product.vat;
+        totalVat -= e.quantity * product.vat * (isRetailSale ? product.mrpPrice : product.wholesalePrice) / 100;
         paidAmount =
             (totalAmount + totalVat - totalDiscount - additionalExpense);
         return true;
@@ -350,7 +397,7 @@ class ReturnController extends GetxController {
   void createReturnOrder(BuildContext context) async {
 
     createReturnOrderLoading = true;
-    update(["sales_product_list"]);
+    update(["return_product_list"]);
     RandomLottieLoader.show();
     try{
       var response = await ReturnServices.createReturnOrder(
@@ -363,6 +410,7 @@ class ReturnController extends GetxController {
           returnOrderProducts.clear();
           RandomLottieLoader.hide();
           Get.back();
+          Get.back();
         }else{
           RandomLottieLoader.hide();
         }
@@ -372,7 +420,40 @@ class ReturnController extends GetxController {
       logger.e(e);
     }finally{
       createReturnOrderLoading = false;
-      update(["sales_product_list"]);
+      update(["return_product_list"]);
+    }
+  }
+
+
+  void updateReturnOrder(BuildContext context) async {
+    createReturnOrderLoading = true;
+    update(["return_product_list"]);
+    RandomLottieLoader.show();
+    try {
+      var response = await ReturnServices.updateReturnOrder(
+        usrToken: loginData!.token,
+        returnOrderModel: createOrderModel,
+        orderId: saleHistoryDetailsResponseModel!.data.id,
+      );
+      logger.e(response);
+      if (response != null) {
+        if (response['success']) {
+          returnOrderProducts.clear();
+          RandomLottieLoader.hide();
+          Get.back();
+          Get.back();
+        } else {
+          RandomLottieLoader.hide();
+        }
+        Methods.showSnackbar(msg: response['message'],
+            isSuccess: response['success'] ? true : null);
+      }
+    } catch (e) {
+      logger.e(e);
+    } finally {
+      createReturnOrderLoading = false;
+      isEditing = false;
+      update(["return_product_list"]);
     }
   }
 
@@ -503,20 +584,163 @@ class ReturnController extends GetxController {
 
 
 
-  Future<void> downloadReturnHistory({required bool isPdf, required ReturnHistory returnHistory, required BuildContext context}) async {
+  Future<void> downloadReturnHistory(
+      {required bool isPdf, required ReturnHistory returnHistory,}) async {
     hasError.value = false;
 
-    String fileName = "${returnHistory.orderNo}-${DateTime.now().microsecondsSinceEpoch.toString()}${isPdf? ".pdf":".xlsx"}";
+    String fileName = "${returnHistory.orderNo}-${DateTime
+        .now()
+        .microsecondsSinceEpoch
+        .toString()}${isPdf ? ".pdf" : ".xlsx"}";
     try {
-      var response = await ReturnServices.downloadStockLedgerReport(
-       returnHistory: returnHistory,
+      var response = await ReturnServices.downloadReturnHistory(
+        returnHistory: returnHistory,
         usrToken: loginData!.token,
-        context: context,
       );
     } catch (e) {
       logger.e(e);
     } finally {
 
+    }
+  }
+
+  Future<void> downloadList({required bool isPdf,required bool returnHistory}) async {
+    hasError.value = false;
+
+    String fileName = "${returnHistory? "Return Order history": "Return Product History"}-${
+        selectedDateTimeRange.value != null ? "${selectedDateTimeRange.value!.start.toIso8601String().split("T")[0]}-${selectedDateTimeRange.value!.end.toIso8601String().split("T")[0]}": DateTime.now().toIso8601String().split("T")[0]
+            .toString()
+    }${isPdf ? ".pdf" : ".xlsx"}";
+    try {
+      var response = await ReturnServices.downloadList(
+        returnHistory: returnHistory,
+        usrToken: loginData!.token,
+        isPdf: isPdf,
+        search: searchProductController.text,
+        startDate: selectedDateTimeRange.value?.start,
+        endDate: selectedDateTimeRange.value?.end,
+        saleType: retailSale && wholeSale ? null : retailSale ? 1 : wholeSale
+            ? 2
+            : null,
+        fileName: fileName,
+      );
+    } catch (e) {
+      logger.e(e);
+    } finally {
+
+    }
+  }
+
+  bool isEditing = false;
+  bool detailsLoading =false;
+  bool editReturnHistoryItemLoading = true;
+
+  ReturnHistoryDetailsResponseModel? saleHistoryDetailsResponseModel;
+
+  Future<void> processEdit({required ReturnHistory returnHistory,required BuildContext context}) async{
+    editReturnHistoryItemLoading = true;
+    isEditing = true;
+    RandomLottieLoader.show();
+    selectedClient = null;
+    serviceStuffInfo = null;
+    paymentMethodTracker.clear();
+    createOrderModel = CreateReturnOrderModel.defaultConstructor();
+
+    // Methods.showLoading();
+    update(['edit_sold_history_item']);
+    try {
+      var response = await ReturnServices.getReturnHistoryDetails(
+        usrToken: loginData!.token,
+        id: returnHistory.id,
+      );
+
+      logger.i(response);
+      if (response != null) {
+        getAllProducts(search: '', page: 1);
+
+        saleHistoryDetailsResponseModel =
+            ReturnHistoryDetailsResponseModel.fromJson(response);
+
+        isRetailSale = saleHistoryDetailsResponseModel!.data.saleType.toLowerCase().contains("retail");
+        await getPaymentMethods();
+
+        if(clientList.isEmpty){
+          await getAllClientList();
+        }
+
+        if(serviceStuffList.isEmpty){
+          await getAllServiceStuff();
+        }
+
+        //selecting products
+        for (var e in saleHistoryDetailsResponseModel!.data.orderDetails) {
+          ProductInfo productInfo = productsListResponseModel!.data.productList.singleWhere((f) => f.id == e.id);
+          addPlaceOrderProduct(productInfo, snNo: e.snNo.map((e) => e.serialNo).toList(), quantity:  e.quantity);
+        }
+
+        //Payment Methods
+        for (var e in saleHistoryDetailsResponseModel!.data.paymentDetails) {
+          PaymentMethod paymentMethod = returnPaymentMethods!.data.singleWhere((f) => f.id == e.id);
+          PaymentOption? paymentOption;
+
+          if(paymentMethod.name.toLowerCase().contains("cash")){
+            cashSelected = true;
+          }
+          if(paymentMethod.name.toLowerCase().contains("credit")){
+            creditSelected = true;
+          }
+
+          if(e.bank != null){
+            paymentOption = paymentMethod.paymentOptions.singleWhere((f) => f.id == e.bank!.id);
+          }
+
+          paymentMethodTracker.add(ReturnPaymentMethodTracker(
+            id: e.id,
+            paymentMethod: paymentMethod,
+            paidAmount: e.amount.toDouble(),
+            paymentOption: paymentOption,
+          ));
+          logger.i(paymentMethodTracker);
+        }
+
+        //Selecting client
+        selectedClient = clientList.firstWhereOrNull((e) => e.id == saleHistoryDetailsResponseModel!.data.customer.id);
+        createOrderModel.address = selectedClient?.address ?? saleHistoryDetailsResponseModel!.data.customer.address;
+        createOrderModel.name = selectedClient?.address ?? saleHistoryDetailsResponseModel!.data.customer.name;
+        createOrderModel.phone = selectedClient?.address ?? saleHistoryDetailsResponseModel!.data.customer.phone;
+        // if(!isRetailSale){
+        //   for(var e in clientList){
+        //     if(e.id == saleHistoryDetailsResponseModel!.data.serviceBy.id){
+        //       serviceStuffInfo = e;
+        //       break;
+        //     }
+        //   }
+        //   selectedClient = clientList.firstWhereOrNull((e) => e.id == saleHistoryDetailsResponseModel!.data.customer.id);
+        //
+        //
+        // }else{
+        //   createOrderModel.address = saleHistoryDetailsResponseModel!.data.customer.address;
+        //   createOrderModel.name = saleHistoryDetailsResponseModel!.data.customer.name;
+        //   createOrderModel.phone = saleHistoryDetailsResponseModel!.data.customer.phone;
+        // }
+
+        //service stuff
+        serviceStuffInfo = serviceStuffList.firstWhereOrNull((e) => e.id == saleHistoryDetailsResponseModel!.data.serviceBy.id);
+
+
+        totalPaid = saleHistoryDetailsResponseModel!.data.payable;
+        totalDiscount = saleHistoryDetailsResponseModel!.data.discount;
+        additionalExpense = saleHistoryDetailsResponseModel!.data.expense;
+        totalDeu = saleHistoryDetailsResponseModel!.data.changeAmount * -1;
+      }
+    } catch (e) {
+      hasError.value = true;
+    } finally {
+
+      editReturnHistoryItemLoading = false;
+      update(['edit_sold_history_item']);
+      // Methods.hideLoading();
+      RandomLottieLoader.hide();
     }
   }
 
