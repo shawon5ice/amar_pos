@@ -1,6 +1,7 @@
 import 'package:amar_pos/core/constants/logger/logger.dart';
 import 'package:amar_pos/features/auth/data/model/hive/login_data.dart';
 import 'package:amar_pos/features/auth/data/model/hive/login_data_helper.dart';
+import 'package:amar_pos/features/exchange/exchange_screen.dart';
 import 'package:amar_pos/features/inventory/presentation/products/products_screen.dart';
 import 'package:amar_pos/features/inventory/presentation/stock_report/stock_report.dart';
 import 'package:amar_pos/features/return/presentation/return_screen.dart';
@@ -92,9 +93,13 @@ class DrawerMenuController extends GetxController {
         currentScreen.value = SalesScreen.routeName;
         return const SalesScreen();
       case DrawerItems.returnAndExchange:
-        logger.i("RETURN");
-        currentScreen.value = ReturnScreen.routeName;
-        return const ReturnScreen();
+        if(selectedMenuItem.value?.child == "Return"){
+          return const ReturnScreen();
+        }else if(selectedMenuItem.value?.child == "Exchange"){
+          return const ExchangeScreen();
+        }else{
+          return Container();
+        }
       case DrawerItems.config:
         currentScreen.value = ConfigurationScreen.routeName;
         return ConfigurationScreen(); // Configuration screen widget

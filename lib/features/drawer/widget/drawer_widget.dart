@@ -152,7 +152,20 @@ class _DrawerWidgetState extends State<DrawerWidget> {
               //   onParentTap: () => onParentTap(DrawerItems.sales),
               //   onChildTap: (child) => onChildTap(DrawerItems.sales, child),
               // ),
-              buildDrawerItems(context, DrawerItems.returnAndExchange),
+              ExpandableDrawerWidget(
+                item: DrawerItems.returnAndExchange,
+                children: const ["Return", "Exchange",],
+                expanded: (bool isExpanded) {
+                  setState(() {
+                    if (isExpanded) selectedParentItem = DrawerItems.returnAndExchange;
+                  });
+                },
+                isExpanded: isExpanded && selectedParentItem == DrawerItems.returnAndExchange,
+                selectedChild: selectedChildItem,
+                onParentTap: () => onParentTap(DrawerItems.returnAndExchange),
+                onChildTap: (child) => onChildTap(DrawerItems.returnAndExchange, child),
+              ),
+              // buildDrawerItems(context, DrawerItems.returnAndExchange),
               buildDrawerItems(context, DrawerItems.purchase),
               buildDrawerItems(context, DrawerItems.accounting),
               buildDrawerItems(context, DrawerItems.reports),
