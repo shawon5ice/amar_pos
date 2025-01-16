@@ -17,6 +17,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.ios);
   // FirebaseService().initNotification();
+  BaseClient.addCacheClient();
   final directory = await getApplicationDocumentsDirectory();
   Hive.init(directory.path);
 
