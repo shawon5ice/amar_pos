@@ -1,7 +1,6 @@
 import 'package:amar_pos/core/constants/logger/logger.dart';
 import 'package:amar_pos/core/widgets/methods/helper_methods.dart';
 import 'package:amar_pos/features/config/data/model/customer/customer_list_model_response.dart';
-import 'package:amar_pos/features/config/data/service/client_service.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import '../../../auth/data/model/hive/login_data.dart';

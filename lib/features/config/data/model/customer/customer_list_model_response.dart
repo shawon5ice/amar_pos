@@ -35,10 +35,10 @@ class Customer {
 
   Customer.fromJson(Map<String, dynamic> json){
     id = json['id'];
-    business = json['business'];
-    name = json['name'];
-    phone = json['phone'];
-    address = json['address'];
+    business = json['business']??'--';
+    name = json['name']??'--';
+    phone = json['phone']??'--';
+    address = json['address']??'--';
   }
 
   Map<String, dynamic> toJson() {

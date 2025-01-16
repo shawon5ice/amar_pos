@@ -18,6 +18,7 @@ import '../../../../core/widgets/qr_code_scanner.dart';
 import '../../data/products/product_list_response_model.dart';
 
 class AddProductScreen extends StatefulWidget {
+  static const String routeName = "/add-product-screen";
   const AddProductScreen({super.key});
 
   @override
@@ -25,7 +26,7 @@ class AddProductScreen extends StatefulWidget {
 }
 
 class _AddProductScreenState extends State<AddProductScreen> {
-  final ProductController controller = Get.put(ProductController());
+  final ProductController controller = Get.find();
 
   late TextEditingController productNameController;
   late TextEditingController productIdController;
@@ -500,7 +501,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                     }
                   },
                 )
-              : SizedBox.shrink(),
+              : const SizedBox.shrink(),
     );
   }
 }

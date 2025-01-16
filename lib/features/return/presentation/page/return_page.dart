@@ -166,7 +166,7 @@ class _ReturnPageState extends State<ReturnPage> {
                     backgroundColor: AppColors.accent,
                     child: IconButton(
                       onPressed: () {
-                        Get.to(AddProductScreen());
+                        Get.toNamed(AddProductScreen.routeName);
                       },
                       icon: const Icon(Icons.add),
                     ),

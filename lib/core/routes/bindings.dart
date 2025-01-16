@@ -25,3 +25,10 @@ class ProductsBinding extends Bindings{
     Get.lazyPut(()=> ProductController());
   }
 }
+
+class AddProductBinding extends Bindings{
+  @override
+  void dependencies() {
+    Get.lazyPut(()=> ProductController());
+  }
+}

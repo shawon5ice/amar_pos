@@ -137,7 +137,7 @@ class ProductListItemWidget extends StatelessWidget {
                   onSelected: (value) {
                     switch (value) {
                       case "edit":
-                        Get.to(const AddProductScreen(), arguments: productInfo);
+                        Get.toNamed(AddProductScreen.routeName, arguments: productInfo);
                         break;
                       case "change-status":
                         AwesomeDialog(

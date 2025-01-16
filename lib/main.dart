@@ -1,3 +1,4 @@
+import 'package:amar_pos/core/network/base_client.dart';
 import 'package:amar_pos/features/auth/data/model/hive/login_data_helper.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
