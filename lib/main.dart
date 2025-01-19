@@ -11,13 +11,13 @@ import 'core/routes/router.dart';
 import 'core/theme/app_theme.dart';
 import 'features/splash/splash_screen.dart';
 import 'firebase_options.dart';
-
+import 'package:flutter/rendering.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // debugPaintSizeEnabled = true;
   await Firebase.initializeApp(options: DefaultFirebaseOptions.ios);
   // FirebaseService().initNotification();
-  BaseClient.addCacheClient();
   final directory = await getApplicationDocumentsDirectory();
   Hive.init(directory.path);
 

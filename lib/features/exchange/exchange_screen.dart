@@ -2,11 +2,18 @@ import 'package:amar_pos/core/constants/app_colors.dart';
 import 'package:amar_pos/core/widgets/custom_button.dart';
 import 'package:amar_pos/core/widgets/custom_text_field.dart';
 import 'package:amar_pos/core/widgets/field_title.dart';
+import 'package:amar_pos/features/exchange/exchange_controller.dart';
+import 'package:amar_pos/features/exchange/presentation/exchange_steps/exchange_product_selection_step.dart';
+import 'package:amar_pos/features/exchange/presentation/exchange_steps/exchange_view.dart';
+import 'package:amar_pos/features/exchange/presentation/exchange_steps/return_product_selection_step.dart';
 import 'package:amar_pos/features/inventory/presentation/products/widgets/custom_dropdown_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import '../../core/constants/logger/logger.dart';
 import '../../core/responsive/pixel_perfect.dart';
+import '../drawer/drawer_menu_controller.dart';
 
 class ExchangeScreen extends StatefulWidget {
   const ExchangeScreen({super.key});
@@ -15,161 +22,158 @@ class ExchangeScreen extends StatefulWidget {
   State<ExchangeScreen> createState() => _ExchangeScreenState();
 }
 
-class _ExchangeScreenState extends State<ExchangeScreen> {
-  int _currentStep = 0;
+class _ExchangeScreenState extends State<ExchangeScreen> with SingleTickerProviderStateMixin{
+  late TabController _tabController;
 
-  void _onStepContinue() {
-    if (_currentStep < 2) {
-      setState(() {
-        _currentStep++;
-      });
-    }
-  }
+  ExchangeController controller = Get.put(ExchangeController());
 
-  void _onStepCancel() {
-    if (_currentStep > 0) {
-      setState(() {
-        _currentStep--;
-      });
-    }
-  }
-
-  void _onSubmit() {
-    showDialog(
+  Future<bool> showDiscardDialog(BuildContext context) async {
+    bool value = false;
+    return await showDialog(
+      barrierDismissible: false,
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text("Submission"),
-        content: Text("Form submitted successfully!"),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text("OK"),
-          ),
-        ],
-      ),
-    );
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Warning"),
+          content: Text("Do you want to discard your current operation?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                value = false;
+                Navigator.of(context).pop(false);
+              }, // Return `false` for "No"
+              child: Text("No"),
+            ),
+            TextButton(
+              onPressed: () {
+                value = true;
+                controller.clearExchange();
+                Navigator.of(context).pop(true);
+              }, // Return `true` for "Yes"
+              child: Text("Yes"),
+            ),
+          ],
+        );
+      },
+    ) ?? value;
   }
 
-  ControlsDetails controlsDetails = ControlsDetails(currentStep: 0, stepIndex: 0);
+  @override
+  void initState() {
+    _tabController = TabController(length: 3, vsync: this);
+    _tabController.addListener(() async {
+      if ((controller.returnOrderProducts.isNotEmpty || controller.exchangeProducts.isNotEmpty) && _tabController.previousIndex == 0) {
+        // Store the new index
+        int newIndex = _tabController.index;
+
+        // Revert the tab index temporarily
+        _tabController.index = _tabController.previousIndex;
+
+        // Show the discard dialog
+        bool discard = await showDiscardDialog(context);
+        logger.d(discard);
+
+        if (discard) {
+          controller.returnOrderProducts.clear();
+          controller.exchangeProducts.clear();
+          _tabController.animateTo(newIndex);
+        }
+        controller.update(['action_icon']);
+      }
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    controller.clearExchange();
+    super.dispose();
+  }
+
+  final DrawerMenuController drawerMenuController = Get.find();
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Custom Stepper'),
-      ),
-      body: Column(
-        children: [
-          Expanded(child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Stepper(
-              elevation: 0,
-              connectorColor: WidgetStatePropertyAll(AppColors.primary),
-              type: StepperType.horizontal,
-              currentStep: _currentStep,
-              onStepContinue: _currentStep == 2 ? _onSubmit : _onStepContinue,
-              onStepCancel: _onStepCancel,
+    return GestureDetector(
+      onTap: (){
+        FocusScope.of(context).unfocus();
+      },
+      child: PopScope(
+        canPop: false,
+        child: Scaffold(
+          appBar:  AppBar(
+            centerTitle: true,
+            leading: DrawerButton(
+              onPressed: () async {
 
-              onStepTapped: (index) {
-                setState(() {
-                  _currentStep = index;
-                });
-              },
-              steps: [
-                Step(
-                    title: SizedBox.shrink(),
-                    content: _buildStepContent("Return Products Selection"),
-                    state: _currentStep > 0
-                        ? StepState.complete
-                        : StepState.indexed,
-                    isActive: _currentStep == 0,
-                    stepStyle: StepStyle(
-
-                    ),
-                    label: Text("Return")
-                ),
-                Step(
-                  label: Text("Exchange"),
-                  title: SizedBox.shrink(),
-                  content: _buildStepContent("Exchange Products Selection"),
-                  state: _currentStep > 1
-                      ? StepState.complete
-                      : StepState.indexed,
-                  isActive: _currentStep == 1,
-                ),
-                Step(
-                  label: Text("Calculate"),
-                  title: SizedBox.shrink(),
-                  content: _buildStepContent("Calculation"),
-                  state: StepState.indexed,
-                  isActive: _currentStep == 2,
-                ),
-              ],
-              controlsBuilder: (BuildContext context, ControlsDetails details) {
-                controlsDetails = details;
-                return SizedBox.shrink();
+                if ((controller.returnOrderProducts.isNotEmpty || controller.exchangeProducts.isNotEmpty) && _tabController.previousIndex == 0) {
+                  bool discard = await showDiscardDialog(context);
+                  logger.d(discard);
+                  if(discard){
+                    drawerMenuController.openDrawer();
+                  }
+                }
+                // if(controller.isEditing){
+                //   bool openDrawer = await showDiscardDialog(context);
+                //   if(openDrawer){
+                //     controller.clearEditing();
+                //     drawerMenuController.openDrawer();
+                //   }
+                // }else{
+                //   drawerMenuController.openDrawer();
+                // }
               },
             ),
-          ))
-        ],
-      ),
-      bottomNavigationBar: _buildCustomButtons(controlsDetails),
-    );
-  }
-
-  Widget _buildStepContent(String text) {
-    return Center(
-      child: Text(
-        text,
-        style: TextStyle(fontSize: 18),
-      ),
-    );
-  }
-
-  Widget _buildCustomButtons(ControlsDetails details) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          if (_currentStep > 0)
-            Expanded(
-              child: Row(
-                children: [
-                  Expanded(
-                    child: CustomButton(
-                      onTap: details.onStepCancel,
-                      text: 'Back',
-                      color: Colors.grey,
-                    ),
+            title: const Text("Exchange"),
+          ),
+          body: Column(
+            children: [
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                height: 40.h,
+                padding: const EdgeInsets.all(4),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
+                ),
+                child: TabBar(
+                  dividerHeight: 0,
+                  controller: _tabController,
+                  indicatorSize: TabBarIndicatorSize.tab,
+                  labelStyle:
+                  TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp),
+                  indicator: BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(20),
                   ),
-                  addW(10),
-                ],
-              ),
-            ),
-
-          if (_currentStep < 2)
-            Expanded(
-              child: CustomButton(
-                onTap: details.onStepContinue,
-                text: 'Next',
-              ),
-            ),
-          if (_currentStep == 2)
-            Expanded(
-              child: Row(
-                children: [
-                  addW(10),
-                  Expanded(
-                    child: CustomButton(
-                      onTap: _onSubmit,
-                      text: 'Submit',
+                  unselectedLabelStyle:
+                  const TextStyle(fontWeight: FontWeight.normal),
+                  labelColor: Colors.white,
+                  splashBorderRadius: BorderRadius.circular(20),
+                  unselectedLabelColor: Colors.black,
+                  tabs: const [
+                    Tab(
+                      text: 'Exchange',
                     ),
-                  ),
-                ],
+                    Tab(text: 'Ex. History'),
+                    Tab(text: 'Ex. Products'),
+                  ],
+                ),
               ),
-            ),
-        ],
+              addH(12),
+              Expanded(
+                child: TabBarView(
+                  physics: NeverScrollableScrollPhysics(),
+                    controller: _tabController,
+                    children: [
+                  ExchangeView(),
+                  Container(),
+                  Placeholder()
+                ]),
+              )
+            ],
+          ),
+        ),
       ),
     );
   }

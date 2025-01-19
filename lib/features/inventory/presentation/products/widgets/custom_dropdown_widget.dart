@@ -13,12 +13,14 @@ class CustomDropdown<T> extends StatefulWidget {
   final String hintText;
   final String title;
   final bool isMandatory;
+  final bool? noTitle;
 
   final String? Function(T?)? validator;
 
   const CustomDropdown({
     super.key,
     required this.items,
+    this.noTitle,
     required this.isMandatory,
     required this.title,
     required this.itemLabel,
@@ -50,9 +52,13 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        addH(16.h),
-        widget.isMandatory ? RichFieldTitle(text: widget.title,) : FieldTitle(widget.title,),
-        addH(8.h),
+        if(widget.noTitle == null)Column(
+          children: [
+            addH(16.h),
+            widget.isMandatory ? RichFieldTitle(text: widget.title,) : FieldTitle(widget.title,),
+            addH(8.h),
+          ],
+        ),
         DropdownButtonHideUnderline(
           child: DropdownButtonFormField2<T>(
             isExpanded: true,

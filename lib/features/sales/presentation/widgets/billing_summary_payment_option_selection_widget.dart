@@ -1,5 +1,4 @@
 import 'package:amar_pos/core/core.dart';
-import 'package:amar_pos/core/network/helpers/error_extractor.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/features/sales/data/models/payment_method_tracker.dart';
 import 'package:amar_pos/features/sales/presentation/controller/sales_controller.dart';
@@ -7,12 +6,10 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-
 import '../../../../core/constants/app_assets.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/widgets/custom_text_field.dart';
 import '../../../../core/widgets/field_title.dart';
-import '../../data/models/billing_payment_methods.dart';
 
 class BillingSummaryPaymentOptionSelectionWidget extends StatefulWidget {
   BillingSummaryPaymentOptionSelectionWidget(

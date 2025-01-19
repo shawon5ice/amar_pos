@@ -1,15 +1,15 @@
 import 'package:amar_pos/core/core.dart';
 
-class ReturnPaymentMethodTracker {
+class ExchangePaymentMethodTracker {
   final int id;
   PaymentMethod? paymentMethod;
   PaymentOption? paymentOption;
   num? paidAmount;
 
-  ReturnPaymentMethodTracker({required this.id, this.paymentMethod, this.paymentOption, this.paidAmount});
+  ExchangePaymentMethodTracker({required this.id, this.paymentMethod, this.paymentOption, this.paidAmount});
 
-  factory ReturnPaymentMethodTracker.fromJson(Map<String, dynamic> json) {
-    return ReturnPaymentMethodTracker(
+  factory ExchangePaymentMethodTracker.fromJson(Map<String, dynamic> json) {
+    return ExchangePaymentMethodTracker(
       id: json['id'],
       paymentMethod: json['paymentMethod'] != null
           ? PaymentMethod.fromJson(json['paymentMethod'])

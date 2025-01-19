@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'package:amar_pos/core/core.dart';
+import 'package:amar_pos/core/data/data.dart';
 import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:amar_pos/features/return/data/models/create_return_order_model.dart';
 import 'package:amar_pos/features/return/data/models/return_history/return_history_response_model.dart';
 import 'package:amar_pos/features/return/data/models/return_history_details_response_model.dart';
 import 'package:amar_pos/features/return/data/models/return_payment_method_tracker.dart';
-import 'package:amar_pos/features/return/data/models/return_payment_methods.dart';
 import 'package:amar_pos/features/return/data/service/return_service.dart';
 import 'package:amar_pos/features/sales/data/service/sales_service.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +16,6 @@ import '../../../auth/data/model/hive/login_data_helper.dart';
 import '../../../inventory/data/products/product_list_response_model.dart';
 import '../../data/models/client_list_response_model.dart';
 import '../../data/models/return_products/return_product_response_model.dart';
-import '../../data/models/service_person_response_model.dart';
 
 class ReturnController extends GetxController {
   bool isProductListLoading = false;
@@ -43,7 +42,7 @@ class ReturnController extends GetxController {
 
   CreateReturnOrderModel createOrderModel = CreateReturnOrderModel.defaultConstructor();
 
-  ReturnPaymentMethods? returnPaymentMethods;
+  PaymentMethodsResponseModel? returnPaymentMethods;
 
   List<ReturnPaymentMethodTracker> paymentMethodTracker = [];
 
@@ -180,7 +179,7 @@ class ReturnController extends GetxController {
           usrToken: loginData!.token, isRetailSale: isRetailSale);
 
       if (response != null && response['success']) {
-        returnPaymentMethods = ReturnPaymentMethods.fromJson(response);
+        returnPaymentMethods = PaymentMethodsResponseModel.fromJson(response);
       } else {
         hasError.value = true;
       }

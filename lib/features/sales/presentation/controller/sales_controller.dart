@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:amar_pos/core/core.dart';
+import 'package:amar_pos/core/data/data.dart';
 import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
-import 'package:amar_pos/features/sales/data/models/billing_payment_methods.dart';
 import 'package:amar_pos/features/sales/data/models/client_list_response_model.dart';
 import 'package:amar_pos/features/sales/data/models/create_order_model.dart';
 import 'package:amar_pos/features/sales/data/models/payment_method_tracker.dart';
@@ -9,11 +9,7 @@ import 'package:amar_pos/features/sales/data/models/sale_history/sold_history_re
 import 'package:amar_pos/features/sales/data/models/sale_history_details_response_model.dart';
 import 'package:amar_pos/features/sales/data/models/sold_product/sold_product_response_model.dart';
 import 'package:amar_pos/features/sales/data/service/sales_service.dart';
-import 'package:amar_pos/features/sales/data/models/service_person_response_model.dart';
-import 'package:amar_pos/features/sales/presentation/page/sold_history.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import '../../../../core/constants/logger/logger.dart';
 import '../../../auth/data/model/hive/login_data.dart';
@@ -67,7 +63,7 @@ class SalesController extends GetxController {
   CreateSaleOrderModel createOrderModel = CreateSaleOrderModel
       .defaultConstructor();
 
-  BillingPaymentMethods? billingPaymentMethods;
+  PaymentMethodsResponseModel? billingPaymentMethods;
 
   List<PaymentMethodTracker> paymentMethodTracker = [];
 
@@ -178,7 +174,7 @@ class SalesController extends GetxController {
           usrToken: loginData!.token, isRetailSale: isRetailSale);
 
       if (response != null && response['success']) {
-        billingPaymentMethods = BillingPaymentMethods.fromJson(response);
+        billingPaymentMethods = PaymentMethodsResponseModel.fromJson(response);
       } else {
         hasError.value = true;
       }

@@ -7,7 +7,6 @@ import 'package:amar_pos/core/widgets/field_title.dart';
 import 'package:amar_pos/features/inventory/presentation/products/widgets/custom_dropdown_widget.dart';
 import 'package:amar_pos/features/sales/data/models/client_list_response_model.dart';
 import 'package:amar_pos/features/sales/data/models/create_order_model.dart';
-import 'package:amar_pos/features/sales/data/models/service_person_response_model.dart';
 import 'package:amar_pos/features/sales/presentation/controller/sales_controller.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
