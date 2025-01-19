@@ -1,5 +1,5 @@
-import 'package:amar_pos/core/data/model/reusable/customer_list_response_model.dart';
 import 'package:amar_pos/features/exchange/exchange_controller.dart';
+import 'package:amar_pos/features/exchange/presentation/widgets/exchange_summary_payment_option_selection_widget.dart';
 import 'package:amar_pos/features/inventory/presentation/products/widgets/custom_dropdown_widget.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +12,6 @@ import '../../../../core/widgets/field_title.dart';
 import '../../../../core/widgets/methods/field_validator.dart';
 import 'package:get/get.dart';
 
-import '../../../inventory/presentation/products/add_product_screen.dart';
 
 class ExchangeSummary extends StatefulWidget {
   const ExchangeSummary({super.key});
@@ -43,6 +42,9 @@ class _ExchangeSummaryState extends State<ExchangeSummary> {
     customerTotalDiscountEditingController = TextEditingController();
     customerPayableAmountEditingController = TextEditingController();
     customerChangeAmountEditingController = TextEditingController();
+    controller.clearPaymentAndOtherIssues();
+    controller.getPaymentMethods();
+    controller.addPaymentMethod(addForceFully: true);
     controller.calculateAmount(firstTime: true);
     super.initState();
   }
@@ -50,7 +52,7 @@ class _ExchangeSummaryState extends State<ExchangeSummary> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      physics: ClampingScrollPhysics(),
+      physics: const ClampingScrollPhysics(),
       child: Form(
         key: formKey,
         child: Column(
@@ -66,7 +68,7 @@ class _ExchangeSummaryState extends State<ExchangeSummary> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    RichFieldTitle(text: "Customer Name",),
+                    const RichFieldTitle(text: "Customer Name",),
                     addH(4),
                     CustomTextField(
                       enabledFlag: controller.isRetailSale,
@@ -77,7 +79,7 @@ class _ExchangeSummaryState extends State<ExchangeSummary> {
                               value, "Customer name"),
                     ),
                     addH(8),
-                    RichFieldTitle(text: "Phone Number",),
+                    const RichFieldTitle(text: "Phone Number",),
                     addH(4),
                     CustomTextField(
                       textCon: customerPhoneNumberEditingController,
@@ -87,7 +89,7 @@ class _ExchangeSummaryState extends State<ExchangeSummary> {
                               value, "Phone number"),
                     ),
                     addH(8),
-                    RichFieldTitle(text: "Address",),
+                    const RichFieldTitle(text: "Address",),
                     addH(4),
                     CustomTextField(
                       textCon: customerAddressEditingController,
@@ -222,30 +224,30 @@ class _ExchangeSummaryState extends State<ExchangeSummary> {
                       ],
                     ),
                     addH(8),
-                    // ListView.builder(
-                    //   physics: const NeverScrollableScrollPhysics(),
-                    //   shrinkWrap: true,
-                    //   itemCount: controller.paymentMethodTracker.length,
-                    //   itemBuilder: (context, index) =>
-                    //       ReturnSummaryPaymentOptionSelectionWidget(
-                    //         key: ValueKey(controller.paymentMethodTracker[index]),
-                    //         paymentMethodTracker:
-                    //         controller.paymentMethodTracker[index],
-                    //         onDeleteTap: (){
-                    //           controller.paymentMethodTracker.removeAt(index);
-                    //           controller.calculateAmount();
-                    //         },
-                    //       ),
-                    // ),
-                    // TextButton(
-                    //   style: const ButtonStyle(
-                    //       foregroundColor:
-                    //       WidgetStatePropertyAll(AppColors.accent)),
-                    //   child: const Text("Add Multiple payment method"),
-                    //   onPressed: () {
-                    //     controller.addPaymentMethod();
-                    //   },
-                    // ),
+                    ListView.builder(
+                      physics: const NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: controller.paymentMethodTracker.length,
+                      itemBuilder: (context, index) =>
+                          ExchangeSummaryPaymentOptionSelectionWidget(
+                            key: ValueKey(controller.paymentMethodTracker[index]),
+                            paymentMethodTracker:
+                            controller.paymentMethodTracker[index],
+                            onDeleteTap: (){
+                              controller.paymentMethodTracker.removeAt(index);
+                              controller.calculateAmount();
+                            },
+                          ),
+                    ),
+                    TextButton(
+                      style: const ButtonStyle(
+                          foregroundColor:
+                          WidgetStatePropertyAll(AppColors.accent)),
+                      child: const Text("Add Multiple payment method"),
+                      onPressed: () {
+                        controller.addPaymentMethod();
+                      },
+                    ),
                     addH(8),
                     Row(
                       children: [
@@ -257,8 +259,7 @@ class _ExchangeSummaryState extends State<ExchangeSummary> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       addH(16.h),
-                                      FieldTitle(
-                                          "${controller.totalDeu < 0 ? "Change" : "Deo"} Amount"),
+                                      const FieldTitle("Change Amount"),
                                       addH(4),
                                       CustomTextField(
                                         enabledFlag: false,
@@ -345,7 +346,7 @@ class CustomRadioButton extends StatelessWidget {
                 title,
                 minFontSize: 8,
                 maxFontSize: 14,
-                style: TextStyle(fontWeight: FontWeight.bold),
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               const Spacer(),
               Radio(

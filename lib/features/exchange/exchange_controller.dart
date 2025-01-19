@@ -131,7 +131,6 @@ class ExchangeController extends GetxController{
     searchProductController = TextEditingController();
     getAllProducts(search: '',page: 1);
     getAllServiceStuff();
-    getPaymentMethods();
     super.onInit();
   }
 
@@ -177,19 +176,19 @@ class ExchangeController extends GetxController{
 
 
 
-  void addPaymentMethod(){
+  void addPaymentMethod({bool? addForceFully}){
     num excludeAmount = 0;
     for(var e in paymentMethodTracker){
       excludeAmount += e.paidAmount ?? 0;
     }
     totalPaid = excludeAmount;
-    if(totalPaid>=paidAmount){
+    if(totalPaid>=paidAmount && addForceFully == null){
       Methods.showSnackbar(msg: "Full amount already distributed");
       return;
     }
     paymentMethodTracker.add(ExchangePaymentMethodTracker(
         id: paymentMethodTracker.length + 1,
-        paidAmount: paidAmount - excludeAmount
+        paidAmount: addForceFully != null ? 0 : paidAmount - excludeAmount
     ));
     calculateAmount();
     update(['summary_form']);
@@ -199,6 +198,13 @@ class ExchangeController extends GetxController{
   num getTotalPayable() {
     return (totalExchangeAmount +
         - totalReturnAmount - totalDiscount);
+  }
+
+
+  void clearPaymentAndOtherIssues(){
+    paymentMethodTracker.clear();
+    totalDiscount = 0;
+    totalDeu = 0;
   }
 
   Future<void> getPaymentMethods() async {
@@ -266,12 +272,14 @@ class ExchangeController extends GetxController{
     int totalQ = 0;
     paidAmount = 0;
     bool cash = false;
+    num cashPaid = 0;
     bool credit = false;
     num excludeAmount = 0;
     for (var e in paymentMethodTracker) {
       excludeAmount += e.paidAmount ?? 0;
       if(e.paymentMethod != null){
         if(e.paymentMethod!.name.toLowerCase().contains("cash")){
+          cashPaid = e.paidAmount ?? 0;
           cash = true;
         }
         if(e.paymentMethod!.name.toLowerCase().contains("credit")){
@@ -305,9 +313,15 @@ class ExchangeController extends GetxController{
 
     paidAmount = totalExchangeAmount - totalReturnAmount - totalDiscount;
 
-
+    logger.i(paidAmount);
+    logger.i(totalPaid);
+    logger.e(cashPaid);
     if(firstTime == null){
-      totalDeu =  paidAmount - totalPaid;
+      if(cashPaid>0){
+        totalDeu = cashPaid - paidAmount + (totalPaid-cashPaid);
+      }else{
+        totalDeu = 0;
+      }
     }
 
     update(['change-due-amount', 'summary_form']);
