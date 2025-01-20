@@ -175,7 +175,7 @@ class ReturnController extends GetxController {
       hasError.value = false;
       returnPaymentMethods = null;
       update(['billing_payment_methods']);
-      var response = await SalesService.getBillingPaymentMethods(
+      var response = await ReturnServices.getBillingPaymentMethods(
           usrToken: loginData!.token, isRetailSale: isRetailSale);
 
       if (response != null && response['success']) {
@@ -310,7 +310,7 @@ class ReturnController extends GetxController {
     update(['sales_product_list']);
 
     try {
-      var response = await SalesService.getSellingProductList(
+      var response = await ReturnServices.getSellingProductList(
         usrToken: loginData!.token,
         page: page,
         search: search,
@@ -349,7 +349,7 @@ class ReturnController extends GetxController {
     update(['service_stuff_list']);
 
     try {
-      var response = await SalesService.getAllServiceStuff(
+      var response = await ReturnServices.getAllServiceStuff(
         usrToken: loginData!.token,
       );
 
@@ -374,7 +374,7 @@ class ReturnController extends GetxController {
     update(['client_list']);
 
     try {
-      var response = await SalesService.getAllClientList(
+      var response = await ReturnServices.getAllClientList(
         usrToken: loginData!.token,
       );
 

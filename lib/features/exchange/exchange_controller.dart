@@ -2,9 +2,11 @@ import 'dart:async';
 import 'package:amar_pos/core/data/model/model.dart';
 import 'package:amar_pos/features/exchange/data/exchange_service.dart';
 import 'package:amar_pos/features/exchange/data/models/create_exchange_request_model.dart';
+import 'package:amar_pos/features/exchange/data/models/exchange_history_response_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../core/constants/logger/logger.dart';
+import '../../core/widgets/loading/random_lottie_loader.dart';
 import '../../core/widgets/methods/helper_methods.dart';
 import '../auth/data/model/hive/login_data.dart';
 import '../auth/data/model/hive/login_data_helper.dart';
@@ -12,6 +14,9 @@ import '../inventory/data/products/product_list_response_model.dart';
 import 'data/models/exchange_payment_method_tracker.dart';
 
 class ExchangeController extends GetxController{
+  final summaryFormKey = GlobalKey<FormState>();
+
+
   bool isProductListLoading = false;
   bool isPaymentMethodListLoading = false;
   bool isLoadingMore = false;
@@ -94,29 +99,84 @@ class ExchangeController extends GetxController{
     update(['exchange_view_controller','exchange_view']);
   }
 
-  void onSubmit() {
-    showDialog(
-      context: Get.context!,
-      builder: (context) => AlertDialog(
-        title: Text("Submission"),
-        content: Text("Form submitted successfully!"),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text("OK"),
-          ),
-        ],
-      ),
-    );
+  void processData(){
+    if (summaryFormKey.currentState!.validate()) {
+      exchangeRequestModel.saleType = 5;
+      exchangeRequestModel.returnAmount = totalReturnAmount.toDouble();
+      exchangeRequestModel.exchangeAmount = totalExchangeAmount.toDouble();
+      exchangeRequestModel.discount = totalDiscount.toDouble();
+      exchangeRequestModel.payable = paidAmount.toDouble();
+
+      if (serviceStuffInfo == null) {
+        Methods.showSnackbar(msg: "Please select a service stuff");
+        return;
+      }
+      exchangeRequestModel.serviceBy = serviceStuffInfo!.id;
+
+      exchangeRequestModel.payments.clear();
+      for (var e in paymentMethodTracker) {
+        if (e.paymentMethod == null) {
+          Methods.showSnackbar(
+              msg:
+              "Please insert valid amount or remove not selected payment methods");
+          return;
+        } else if (e.paymentMethod != null &&
+            e.paymentMethod!.paymentOptions.isNotEmpty &&
+            e.paymentOption == null) {
+          Methods.showSnackbar(
+              msg: "Please select associate payment options");
+          return;
+        } else {
+          exchangeRequestModel.payments.add(Payment(
+              methodId: e.paymentMethod!.id,
+              paid: e.paidAmount!.toDouble(),
+              bankId: e.paymentOption?.id));
+        }
+      }
+    }
   }
 
-  //Sold History
-  // ReturnHistoryResponseModel? returnHistoryResponseModel;
-  // List<ReturnHistory> returnHistoryList = [];
-  // bool isReturnHistoryListLoading = false;
-  // bool isReturnHistoryLoadingMore = false;
+  Future<void> onSubmit() async{
+    processData();
+    createReturnOrderLoading = true;
+    update(["return_product_list"]);
+    RandomLottieLoader.show();
+    try{
+      var response = await ExchangeService.createExchange(
+        usrToken: loginData!.token,
+        request: exchangeRequestModel,
+      );
+      logger.e(response);
+      if (response != null) {
+        if(response['success']){
+          returnOrderProducts.clear();
+          exchangeRequestModel = CreateExchangeRequestModel.defaultConstructor();
+          exchangeProducts.clear();
+          RandomLottieLoader.hide();
+          Get.back();
+          currentStep = 0;
+          update(['exchange_view_controller','exchange_view']);
+        }else{
+          RandomLottieLoader.hide();
+        }
+        Methods.showSnackbar(msg: response['message'], isSuccess: response['success']? true: null);
+      }
+    }catch(e){
+      logger.e(e);
+    }finally{
+      createReturnOrderLoading = false;
+      update(['exchange_view_controller','exchange_view']);
+    }
+    logger.e(exchangeRequestModel.toJson());
+  }
+
+  //Exchange History
+  ExchangeHistoryResponseModel? exchangeHistoryResponseModel;
+  List<ExchangeOrderInfo> exchangeHistoryList = [];
+  bool isExchangeHistoryListLoading = false;
+  bool isReturnHistoryLoadingMore = false;
   //
-  // Rx<DateTimeRange?> selectedDateTimeRange = Rx<DateTimeRange?>(null);
+  Rx<DateTimeRange?> selectedDateTimeRange = Rx<DateTimeRange?>(null);
   // bool retailSale = false;
   // bool wholeSale = false;
   //
@@ -164,7 +224,7 @@ class ExchangeController extends GetxController{
   //   paymentMethodTracker.clear();
   //   returnOrderProducts.clear();
   //   soldProductList.clear();
-  //   returnHistoryList.clear();
+  //   exchangeHistoryList.clear();
   //   createOrderModel = CreateReturnOrderModel.defaultConstructor();
   //   update(['place_order_items', 'billing_summary_button']);
   // }
@@ -549,52 +609,51 @@ class ExchangeController extends GetxController{
   //   }
   // }
   //
-  // Future<void> getReturnHistory({int page = 1}) async {
-  //   isReturnHistoryListLoading = page == 1;
-  //   isReturnHistoryLoadingMore = page > 1;
-  //
-  //   if(page == 1){
-  //     returnHistoryResponseModel = null;
-  //     returnHistoryList.clear();
-  //   }
-  //
-  //   hasError.value = false;
-  //
-  //   update(['return_history_list','total_widget']);
-  //
-  //   try {
-  //     var response = await ReturnServices.getReturnHistory(
-  //         usrToken: loginData!.token,
-  //         page: page,
-  //         search: searchProductController.text,
-  //         startDate: selectedDateTimeRange.value?.start,
-  //         endDate: selectedDateTimeRange.value?.end,
-  //         saleType: retailSale && wholeSale? null : retailSale ? 3: wholeSale ? 4: null
-  //     );
-  //
-  //     logger.i(response);
-  //     if (response != null) {
-  //       returnHistoryResponseModel =
-  //           ReturnHistoryResponseModel.fromJson(response);
-  //
-  //       if (returnHistoryResponseModel != null) {
-  //         returnHistoryList.addAll(returnHistoryResponseModel!.data.returnHistoryList);
-  //       }
-  //     } else {
-  //       if(page != 1){
-  //         hasError.value = true;
-  //       }
-  //     }
-  //   } catch (e) {
-  //     hasError.value = true;
-  //     returnHistoryList.clear();
-  //     logger.e(e);
-  //   } finally {
-  //     isReturnHistoryListLoading = false;
-  //     isReturnHistoryLoadingMore = false;
-  //     update(['return_history_list','total_widget']);
-  //   }
-  // }
+  Future<void> getExchangeHistory({int page = 1}) async {
+    isExchangeHistoryListLoading = page == 1;
+    isReturnHistoryLoadingMore = page > 1;
+
+    if(page == 1){
+      exchangeHistoryResponseModel = null;
+      exchangeHistoryList.clear();
+    }
+
+    hasError.value = false;
+
+    update(['return_history_list','total_widget']);
+
+    try {
+      var response = await ExchangeService.getExchangeHistory(
+          usrToken: loginData!.token,
+          page: page,
+          search: searchProductController.text,
+          startDate: selectedDateTimeRange.value?.start,
+          endDate: selectedDateTimeRange.value?.end,
+      );
+
+      logger.i(response);
+      if (response != null) {
+        exchangeHistoryResponseModel =
+            ExchangeHistoryResponseModel.fromJson(response);
+
+        if (exchangeHistoryResponseModel != null) {
+          exchangeHistoryList.addAll(exchangeHistoryResponseModel!.data.exchangeHistoryList);
+        }
+      } else {
+        if(page != 1){
+          hasError.value = true;
+        }
+      }
+    } catch (e) {
+      hasError.value = true;
+      exchangeHistoryList.clear();
+      logger.e(e);
+    } finally {
+      isExchangeHistoryListLoading = false;
+      isReturnHistoryLoadingMore = false;
+      update(['return_history_list','total_widget']);
+    }
+  }
   //
   // Future<void> getReturnProducts({int page = 1}) async {
   //   isReturnProductListLoading = page == 1;
@@ -676,53 +735,51 @@ class ExchangeController extends GetxController{
   //
   //
   //
-  // Future<void> downloadReturnHistory(
-  //     {required bool isPdf, required ReturnHistory returnHistory,}) async {
-  //   hasError.value = false;
-  //
-  //   String fileName = "${returnHistory.orderNo}-${DateTime
-  //       .now()
-  //       .microsecondsSinceEpoch
-  //       .toString()}${isPdf ? ".pdf" : ".xlsx"}";
-  //   try {
-  //     var response = await ReturnServices.downloadReturnHistory(
-  //       returnHistory: returnHistory,
-  //       usrToken: loginData!.token,
-  //     );
-  //   } catch (e) {
-  //     logger.e(e);
-  //   } finally {
-  //
-  //   }
-  // }
-  //
-  // Future<void> downloadList({required bool isPdf,required bool returnHistory}) async {
-  //   hasError.value = false;
-  //
-  //   String fileName = "${returnHistory? "Return Order history": "Return Product History"}-${
-  //       selectedDateTimeRange.value != null ? "${selectedDateTimeRange.value!.start.toIso8601String().split("T")[0]}-${selectedDateTimeRange.value!.end.toIso8601String().split("T")[0]}": DateTime.now().toIso8601String().split("T")[0]
-  //           .toString()
-  //   }${isPdf ? ".pdf" : ".xlsx"}";
-  //   try {
-  //     var response = await ReturnServices.downloadList(
-  //       returnHistory: returnHistory,
-  //       usrToken: loginData!.token,
-  //       isPdf: isPdf,
-  //       search: searchProductController.text,
-  //       startDate: selectedDateTimeRange.value?.start,
-  //       endDate: selectedDateTimeRange.value?.end,
-  //       saleType: retailSale && wholeSale ? null : retailSale ? 1 : wholeSale
-  //           ? 2
-  //           : null,
-  //       fileName: fileName,
-  //     );
-  //   } catch (e) {
-  //     logger.e(e);
-  //   } finally {
-  //
-  //   }
-  // }
-  //
+  Future<void> downloadReturnHistory(
+      {required bool isPdf, required ExchangeOrderInfo exchangeOrderInfo,}) async {
+    hasError.value = false;
+
+    String fileName = "${exchangeOrderInfo.orderNo}-${DateTime
+        .now()
+        .microsecondsSinceEpoch
+        .toString()}${isPdf ? ".pdf" : ".xlsx"}";
+    try {
+      var response = await ExchangeService.deleteReturnHistory(
+        exchangeOrderInfo: exchangeOrderInfo,
+        usrToken: loginData!.token,
+      );
+    } catch (e) {
+      logger.e(e);
+    } finally {
+
+    }
+  }
+
+  Future<void> downloadList({required bool isPdf,required bool returnHistory}) async {
+    hasError.value = false;
+
+    String fileName = "${returnHistory? "Exchange Order history": "Exchange Product History"}-${
+        selectedDateTimeRange.value != null ? "${selectedDateTimeRange.value!.start.toIso8601String().split("T")[0]}-${selectedDateTimeRange.value!.end.toIso8601String().split("T")[0]}": DateTime.now().toIso8601String().split("T")[0]
+            .toString()
+    }${isPdf ? ".pdf" : ".xlsx"}";
+    try {
+      var response = await ExchangeService.downloadList(
+        returnHistory: returnHistory,
+        usrToken: loginData!.token,
+        isPdf: isPdf,
+        search: searchProductController.text,
+        startDate: selectedDateTimeRange.value?.start,
+        endDate: selectedDateTimeRange.value?.end,
+        fileName: fileName,
+      );
+    } catch (e) {
+      logger.e(e);
+    } finally {
+
+    }
+  }
+
+
   bool isEditing = false;
   bool detailsLoading =false;
   bool editReturnHistoryItemLoading = true;

@@ -15,18 +15,16 @@ import 'package:get/get.dart';
 
 class ExchangeSummary extends StatefulWidget {
   const ExchangeSummary({super.key});
-
   @override
   State<ExchangeSummary> createState() => _ExchangeSummaryState();
 }
 
 class _ExchangeSummaryState extends State<ExchangeSummary> {
-  final formKey = GlobalKey<FormState>();
+
 
   late final TextEditingController customerNameEditingController;
   late final TextEditingController customerPhoneNumberEditingController;
   late final TextEditingController customerAddressEditingController;
-  late final TextEditingController customerAdditionalExpensesEditingController;
   late final TextEditingController customerTotalDiscountEditingController;
   late final TextEditingController customerPayableAmountEditingController;
   late final TextEditingController customerChangeAmountEditingController;
@@ -38,7 +36,6 @@ class _ExchangeSummaryState extends State<ExchangeSummary> {
     customerNameEditingController = TextEditingController();
     customerPhoneNumberEditingController = TextEditingController();
     customerAddressEditingController = TextEditingController();
-    customerAdditionalExpensesEditingController = TextEditingController();
     customerTotalDiscountEditingController = TextEditingController();
     customerPayableAmountEditingController = TextEditingController();
     customerChangeAmountEditingController = TextEditingController();
@@ -54,7 +51,7 @@ class _ExchangeSummaryState extends State<ExchangeSummary> {
     return SingleChildScrollView(
       physics: const ClampingScrollPhysics(),
       child: Form(
-        key: formKey,
+        key: controller.summaryFormKey,
         child: Column(
           children: [
             GetBuilder<ExchangeController>(
@@ -74,6 +71,9 @@ class _ExchangeSummaryState extends State<ExchangeSummary> {
                       enabledFlag: controller.isRetailSale,
                       textCon: customerNameEditingController,
                       hintText: "Type customer name",
+                      onChanged: (value){
+                        controller.exchangeRequestModel.name = value;
+                      },
                       validator: (value) =>
                           FieldValidator.nonNullableFieldValidator(
                               value, "Customer name"),
@@ -84,6 +84,9 @@ class _ExchangeSummaryState extends State<ExchangeSummary> {
                     CustomTextField(
                       textCon: customerPhoneNumberEditingController,
                       hintText: "Type phone number",
+                      onChanged: (value){
+                        controller.exchangeRequestModel.phone = value;
+                      },
                       validator: (value) =>
                           FieldValidator.nonNullableFieldValidator(
                               value, "Phone number"),
@@ -94,6 +97,9 @@ class _ExchangeSummaryState extends State<ExchangeSummary> {
                     CustomTextField(
                       textCon: customerAddressEditingController,
                       hintText: "Type customer address",
+                      onChanged: (value){
+                        controller.exchangeRequestModel.address = value;
+                      },
                       validator: (value) =>
                           FieldValidator.nonNullableFieldValidator(
                               value, "Address"),
@@ -304,62 +310,6 @@ class _ExchangeSummaryState extends State<ExchangeSummary> {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class CustomRadioButton extends StatelessWidget {
-  CustomRadioButton({
-    super.key,
-    required this.title,
-    required this.value,
-    this.result,
-  });
-
-  final bool value;
-
-  final String title;
-  final Function()? result;
-
-  final ExchangeController controller = Get.find();
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: () {
-          // controller.changeSellingParties(value);
-        },
-        child: Container(
-          height: 40.sp,
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: AppColors.lightGreen),
-              borderRadius: BorderRadius.circular(20)),
-          child: Row(
-            children: [
-              AutoSizeText(
-                title,
-                minFontSize: 8,
-                maxFontSize: 14,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const Spacer(),
-              Radio(
-                visualDensity: VisualDensity.compact,
-                value: value,
-                activeColor: const Color(0xff009D5D),
-                groupValue: controller.isRetailSale,
-                onChanged: (value) {
-                  // controller.changeSellingParties(value!);
-                },
-              )
-            ],
-          ),
         ),
       ),
     );

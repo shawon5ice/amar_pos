@@ -6,9 +6,9 @@ class CreateExchangeRequestModel {
   List<ProductModel> returnProducts;
   List<ProductModel> exchangeProducts;
   double returnAmount;
-  double deduction;
-  double amount;
-  double vat;
+  double exchangeAmount;
+  double discount;
+  double payable;
   List<Payment> payments;
   int serviceBy;
   int? customerId;
@@ -21,9 +21,9 @@ class CreateExchangeRequestModel {
     required this.returnProducts,
     required this.exchangeProducts,
     required this.returnAmount,
-    required this.deduction,
-    required this.vat,
-    required this.amount,
+    required this.exchangeAmount,
+    required this.discount,
+    required this.payable,
     required this.payments,
     required this.serviceBy,
     this.customerId,
@@ -37,9 +37,9 @@ class CreateExchangeRequestModel {
         returnProducts = [],
         exchangeProducts = [],
         returnAmount = 0.0,
-        deduction = 0.0,
-        vat = 0.0,
-        amount = 0.0,
+        exchangeAmount = 0.0,
+        discount = 0.0,
+        payable = 0.0,
         serviceBy = 0,
         customerId = 0,
         payments = [];
@@ -57,9 +57,9 @@ class CreateExchangeRequestModel {
           .map((productJson) => ProductModel.fromJson(productJson))
           .toList(),
       returnAmount: json['return_amount'].toDouble(),
-      deduction: json['deduction'].toDouble(),
-      vat: json['vat'].toDouble(),
-      amount: json['amount'].toDouble(),
+      exchangeAmount: json['exchange_amount'].toDouble(),
+      discount: json['discount'].toDouble(),
+      payable: json['payable'].toDouble(),
       serviceBy: json['service_by'],
       customerId: json['customer_id'],
       payments: (json['payment'] as List)
@@ -77,9 +77,9 @@ class CreateExchangeRequestModel {
       'return_product': returnProducts.map((product) => product.toJson()).toList(),
       'exchange_product': exchangeProducts.map((product) => product.toJson()).toList(),
       'return_amount': returnAmount,
-      'deduction': deduction,
-      'amount': amount,
-      'vat': vat,
+      'exchange_amount': exchangeAmount,
+      'discount': discount,
+      'payable': payable,
       'service_by': serviceBy,
       'customer_id': customerId,
       'payment': payments.map((payment) => payment.toJson()).toList(),
@@ -122,7 +122,7 @@ class ProductModel {
       'quantity': quantity,
       'vat': vat,
       'discount': discount,
-      'serial_no': serialNo,
+      'serial_no': serialNo.isEmpty ? null : serialNo,
     };
   }
 }

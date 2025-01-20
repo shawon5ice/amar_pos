@@ -1,19 +1,13 @@
 import 'package:amar_pos/core/constants/app_colors.dart';
-import 'package:amar_pos/core/widgets/custom_button.dart';
-import 'package:amar_pos/core/widgets/custom_text_field.dart';
-import 'package:amar_pos/core/widgets/field_title.dart';
 import 'package:amar_pos/features/exchange/exchange_controller.dart';
-import 'package:amar_pos/features/exchange/presentation/exchange_steps/exchange_product_selection_step.dart';
 import 'package:amar_pos/features/exchange/presentation/exchange_steps/exchange_view.dart';
-import 'package:amar_pos/features/exchange/presentation/exchange_steps/return_product_selection_step.dart';
-import 'package:amar_pos/features/inventory/presentation/products/widgets/custom_dropdown_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:hive/hive.dart';
 import '../../core/constants/logger/logger.dart';
 import '../../core/responsive/pixel_perfect.dart';
 import '../drawer/drawer_menu_controller.dart';
+import 'presentation/exchange_history.dart';
 
 class ExchangeScreen extends StatefulWidget {
   const ExchangeScreen({super.key});
@@ -167,7 +161,7 @@ class _ExchangeScreenState extends State<ExchangeScreen> with SingleTickerProvid
                     controller: _tabController,
                     children: [
                   ExchangeView(),
-                  Container(),
+                  ExchangeHistoryScreen(),
                   Placeholder()
                 ]),
               )
