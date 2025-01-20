@@ -39,10 +39,18 @@ class _ExchangeSummaryState extends State<ExchangeSummary> {
     customerTotalDiscountEditingController = TextEditingController();
     customerPayableAmountEditingController = TextEditingController();
     customerChangeAmountEditingController = TextEditingController();
-    controller.clearPaymentAndOtherIssues();
-    controller.getPaymentMethods();
-    controller.addPaymentMethod(addForceFully: true);
-    controller.calculateAmount(firstTime: true);
+
+    if(!controller.isEditing){
+      controller.clearPaymentAndOtherIssues();
+      controller.getPaymentMethods();
+      controller.addPaymentMethod(addForceFully: true);
+      controller.calculateAmount(firstTime: true);
+    }else{
+      customerNameEditingController.text = controller.exchangeRequestModel.name;
+      customerPhoneNumberEditingController.text = controller.exchangeRequestModel.phone;
+      customerAddressEditingController.text = controller.exchangeRequestModel.address;
+      customerTotalDiscountEditingController.text = controller.totalDiscount.toString();
+    }
     super.initState();
   }
 

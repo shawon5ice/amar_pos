@@ -69,7 +69,7 @@ class ExchangeService{
     return response;
   }
 
-  static Future<dynamic> updateReturnOrder({
+  static Future<dynamic> updateExchangeHistory({
     required String usrToken,
     required CreateExchangeRequestModel exchangeRequest,
     required int orderId,
@@ -77,7 +77,7 @@ class ExchangeService{
     logger.i(exchangeRequest.toJson());
     var response = await BaseClient.postData(
       token: usrToken,
-      api: 'return/update/$orderId',
+      api: 'exchange/update/$orderId',
       body: exchangeRequest.toJson(),
     );
     return response;
@@ -129,7 +129,7 @@ class ExchangeService{
     return response;
   }
 
-  static Future<dynamic> deleteReturnHistory({
+  static Future<dynamic> deleteExchangeHistory({
     required String usrToken,
     required ExchangeOrderInfo exchangeOrderInfo}) async {
     var response = await BaseClient.deleteData(
@@ -158,9 +158,9 @@ class ExchangeService{
 
     if(returnHistory){
       if(isPdf){
-        downloadUrl = "${NetWorkStrings.baseUrl}/exchange/download-pdf-exchange-list/";
+        downloadUrl = "${NetWorkStrings.baseUrl}/exchange/download-pdf-exchange-list";
       }else{
-        downloadUrl = "${NetWorkStrings.baseUrl}/exchange/download-excel-exchange-list/";
+        downloadUrl = "${NetWorkStrings.baseUrl}/exchange/download-excel-exchange-list";
       }
     }else{
       if(isPdf){
@@ -192,7 +192,7 @@ class ExchangeService{
   }
 
 
-  static Future<dynamic> getReturnHistoryDetails({
+  static Future<dynamic> getExchangeOrderDetails({
     required String usrToken,
     required int id,
   }) async {

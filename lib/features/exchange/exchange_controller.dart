@@ -11,6 +11,7 @@ import '../../core/widgets/methods/helper_methods.dart';
 import '../auth/data/model/hive/login_data.dart';
 import '../auth/data/model/hive/login_data_helper.dart';
 import '../inventory/data/products/product_list_response_model.dart';
+import 'data/models/exchange_order_details_response_model.dart';
 import 'data/models/exchange_payment_method_tracker.dart';
 
 class ExchangeController extends GetxController{
@@ -142,10 +143,20 @@ class ExchangeController extends GetxController{
     update(["return_product_list"]);
     RandomLottieLoader.show();
     try{
-      var response = await ExchangeService.createExchange(
-        usrToken: loginData!.token,
-        request: exchangeRequestModel,
-      );
+      var response;
+      if(isEditing){
+        response = await ExchangeService.updateExchangeHistory(
+          usrToken: loginData!.token,
+          exchangeRequest: exchangeRequestModel,
+          orderId: exchangeOrderDetailsResponseModel!.data.id
+        );
+      }else{
+        response = await ExchangeService.createExchange(
+          usrToken: loginData!.token,
+          request: exchangeRequestModel,
+        );
+      }
+
       logger.e(response);
       if (response != null) {
         if(response['success']){
@@ -189,11 +200,15 @@ class ExchangeController extends GetxController{
   @override
   void onInit() {
     searchProductController = TextEditingController();
-    getAllProducts(search: '',page: 1);
-    getAllServiceStuff();
     super.onInit();
   }
 
+  @override
+  void onReady() {
+    getAllProducts(search: '',page: 1);
+    getAllServiceStuff();
+    super.onReady();
+  }
   void clearFilter(){
     searchProductController.clear();
     // wholeSale = false;
@@ -702,37 +717,37 @@ class ExchangeController extends GetxController{
   //   }
   // }
   //
-  // Future<void> deleteReturnOrder({
-  //   required ReturnHistory returnHistory,
-  // }) async {
-  //
-  //   hasError.value = false;
-  //   update(['return_history_list']);
-  //
-  //   try {
-  //     // Call the API
-  //     var response = await ReturnServices.deleteReturnHistory(
-  //       usrToken: loginData!.token,
-  //       returnHistory: returnHistory,
-  //     );
-  //
-  //     // Parse the response
-  //     if (response != null && response['success']) {
-  //       // Remove the item from the list
-  //       returnHistoryList.remove(returnHistory);
-  //       Methods.showSnackbar(msg: response['message'], isSuccess: true);
-  //     } else {
-  //       Methods.showSnackbar(msg: 'Error: Unable to delete the item');
-  //     }
-  //   } catch (e) {
-  //     hasError.value = true;
-  //     logger.e(e);
-  //     Methods.showSnackbar(msg: 'Error: something went wrong while deleting the item');
-  //   } finally {
-  //     update(['return_history_list']);
-  //   }
-  // }
-  //
+  Future<void> deleteExchangeOrder({
+    required ExchangeOrderInfo exchangeOrderInfo,
+  }) async {
+
+    hasError.value = false;
+    update(['return_history_list']);
+
+    try {
+      // Call the API
+      var response = await ExchangeService.deleteExchangeHistory(
+        usrToken: loginData!.token,
+        exchangeOrderInfo: exchangeOrderInfo,
+      );
+
+      // Parse the response
+      if (response != null && response['success']) {
+        // Remove the item from the list
+        exchangeHistoryList.remove(exchangeOrderInfo);
+        Methods.showSnackbar(msg: response['message'], isSuccess: true);
+      } else {
+        Methods.showSnackbar(msg: 'Error: Unable to delete the item');
+      }
+    } catch (e) {
+      hasError.value = true;
+      logger.e(e);
+      Methods.showSnackbar(msg: 'Error: something went wrong while deleting the item');
+    } finally {
+      update(['return_history_list']);
+    }
+  }
+
   //
   //
   Future<void> downloadReturnHistory(
@@ -744,7 +759,7 @@ class ExchangeController extends GetxController{
         .microsecondsSinceEpoch
         .toString()}${isPdf ? ".pdf" : ".xlsx"}";
     try {
-      var response = await ExchangeService.deleteReturnHistory(
+      var response = await ExchangeService.downloadExchangeInvoice(
         exchangeOrderInfo: exchangeOrderInfo,
         usrToken: loginData!.token,
       );
@@ -784,112 +799,96 @@ class ExchangeController extends GetxController{
   bool detailsLoading =false;
   bool editReturnHistoryItemLoading = true;
   //
-  // ReturnHistoryDetailsResponseModel? saleHistoryDetailsResponseModel;
+  ExchangeOrderDetailsResponseModel? exchangeOrderDetailsResponseModel;
   //
-  // Future<void> processEdit({required ReturnHistory returnHistory,required BuildContext context}) async{
-  //   editReturnHistoryItemLoading = true;
-  //   isEditing = true;
-  //   RandomLottieLoader.show();
-  //   selectedClient = null;
-  //   serviceStuffInfo = null;
-  //   paymentMethodTracker.clear();
-  //   createOrderModel = CreateReturnOrderModel.defaultConstructor();
-  //
-  //   // Methods.showLoading();
-  //   update(['edit_sold_history_item']);
-  //   try {
-  //     var response = await ReturnServices.getReturnHistoryDetails(
-  //       usrToken: loginData!.token,
-  //       id: returnHistory.id,
-  //     );
-  //
-  //     logger.i(response);
-  //     if (response != null) {
-  //       getAllProducts(search: '', page: 1);
-  //
-  //       saleHistoryDetailsResponseModel =
-  //           ReturnHistoryDetailsResponseModel.fromJson(response);
-  //
-  //       isRetailSale = saleHistoryDetailsResponseModel!.data.saleType.toLowerCase().contains("retail");
-  //       await getPaymentMethods();
-  //
-  //       if(clientList.isEmpty){
-  //         await getAllClientList();
-  //       }
-  //
-  //       if(serviceStuffList.isEmpty){
-  //         await getAllServiceStuff();
-  //       }
-  //
-  //       //selecting products
-  //       for (var e in saleHistoryDetailsResponseModel!.data.orderDetails) {
-  //         ProductInfo productInfo = productsListResponseModel!.data.productList.singleWhere((f) => f.id == e.id);
-  //         addPlaceOrderProduct(productInfo, snNo: e.snNo.map((e) => e.serialNo).toList(), quantity:  e.quantity);
-  //       }
-  //
-  //       //Payment Methods
-  //       for (var e in saleHistoryDetailsResponseModel!.data.paymentDetails) {
-  //         PaymentMethod paymentMethod = returnPaymentMethods!.data.singleWhere((f) => f.id == e.id);
-  //         PaymentOption? paymentOption;
-  //
-  //         if(paymentMethod.name.toLowerCase().contains("cash")){
-  //           cashSelected = true;
-  //         }
-  //         if(paymentMethod.name.toLowerCase().contains("credit")){
-  //           creditSelected = true;
-  //         }
-  //
-  //         if(e.bank != null){
-  //           paymentOption = paymentMethod.paymentOptions.singleWhere((f) => f.id == e.bank!.id);
-  //         }
-  //
-  //         paymentMethodTracker.add(ReturnPaymentMethodTracker(
-  //           id: e.id,
-  //           paymentMethod: paymentMethod,
-  //           paidAmount: e.amount.toDouble(),
-  //           paymentOption: paymentOption,
-  //         ));
-  //         logger.i(paymentMethodTracker);
-  //       }
-  //
-  //       //Selecting client
-  //       selectedClient = clientList.firstWhereOrNull((e) => e.id == saleHistoryDetailsResponseModel!.data.customer.id);
-  //       createOrderModel.address = selectedClient?.address ?? saleHistoryDetailsResponseModel!.data.customer.address;
-  //       createOrderModel.name = selectedClient?.address ?? saleHistoryDetailsResponseModel!.data.customer.name;
-  //       createOrderModel.phone = selectedClient?.address ?? saleHistoryDetailsResponseModel!.data.customer.phone;
-  //       // if(!isRetailSale){
-  //       //   for(var e in clientList){
-  //       //     if(e.id == saleHistoryDetailsResponseModel!.data.serviceBy.id){
-  //       //       serviceStuffInfo = e;
-  //       //       break;
-  //       //     }
-  //       //   }
-  //       //   selectedClient = clientList.firstWhereOrNull((e) => e.id == saleHistoryDetailsResponseModel!.data.customer.id);
-  //       //
-  //       //
-  //       // }else{
-  //       //   createOrderModel.address = saleHistoryDetailsResponseModel!.data.customer.address;
-  //       //   createOrderModel.name = saleHistoryDetailsResponseModel!.data.customer.name;
-  //       //   createOrderModel.phone = saleHistoryDetailsResponseModel!.data.customer.phone;
-  //       // }
-  //
-  //       //service stuff
-  //       serviceStuffInfo = serviceStuffList.firstWhereOrNull((e) => e.id == saleHistoryDetailsResponseModel!.data.serviceBy.id);
-  //
-  //
-  //       totalPaid = saleHistoryDetailsResponseModel!.data.payable;
-  //       totalDiscount = saleHistoryDetailsResponseModel!.data.discount;
-  //       additionalExpense = saleHistoryDetailsResponseModel!.data.expense;
-  //       totalDeu = saleHistoryDetailsResponseModel!.data.changeAmount * -1;
-  //     }
-  //   } catch (e) {
-  //     hasError.value = true;
-  //   } finally {
-  //
-  //     editReturnHistoryItemLoading = false;
-  //     update(['edit_sold_history_item']);
-  //     // Methods.hideLoading();
-  //     RandomLottieLoader.hide();
-  //   }
-  // }
+  Future<void> processEdit({required ExchangeOrderInfo exchangeOrderInfo,required BuildContext context}) async{
+    editReturnHistoryItemLoading = true;
+    isEditing = true;
+    RandomLottieLoader.show();
+    serviceStuffInfo = null;
+    paymentMethodTracker.clear();
+    exchangeRequestModel = CreateExchangeRequestModel.defaultConstructor();
+
+    // Methods.showLoading();
+    update(['edit_sold_history_item']);
+    try {
+      var response = await ExchangeService.getExchangeOrderDetails(
+        usrToken: loginData!.token,
+        id: exchangeOrderInfo.id,
+      );
+
+      logger.i(response);
+      if (response != null) {
+        getAllProducts(search: '', page: 1);
+
+        exchangeOrderDetailsResponseModel =
+            ExchangeOrderDetailsResponseModel.fromJson(response);
+
+        if(paymentMethodsResponseModel == null){
+          await getPaymentMethods();
+        }
+
+
+
+        if(serviceStuffList.isEmpty){
+          await getAllServiceStuff();
+        }
+
+        //selecting products
+        for (var e in exchangeOrderDetailsResponseModel!.data.returnDetails) {
+          ProductInfo productInfo = productsListResponseModel!.data.productList.singleWhere((f) => f.id == e.id);
+          addProduct(productInfo, snNo: e.snNo.map((e) => e.serialNo).toList(), quantity:  e.quantity, isReturn: true);
+        }
+
+        for (var e in exchangeOrderDetailsResponseModel!.data.exchangeDetails) {
+          ProductInfo productInfo = productsListResponseModel!.data.productList.singleWhere((f) => f.id == e.id);
+          addProduct(productInfo, snNo: e.snNo.map((e) => e.serialNo).toList(), quantity:  e.quantity, isReturn: false);
+        }
+
+        //Payment Methods
+        for (var e in exchangeOrderDetailsResponseModel!.data.paymentDetails) {
+          PaymentMethod paymentMethod = paymentMethodsResponseModel!.data.singleWhere((f) => f.id == e.id);
+          PaymentOption? paymentOption;
+
+          if(paymentMethod.name.toLowerCase().contains("cash")){
+            cashSelected = true;
+          }
+          if(paymentMethod.name.toLowerCase().contains("credit")){
+            creditSelected = true;
+          }
+
+          if(e.bank != null){
+            paymentOption = paymentMethod.paymentOptions.singleWhere((f) => f.id == e.bank!.id);
+          }
+
+          paymentMethodTracker.add(ExchangePaymentMethodTracker(
+            id: e.id,
+            paymentMethod: paymentMethod,
+            paidAmount: e.amount.toDouble(),
+            paymentOption: paymentOption,
+          ));
+          logger.i(paymentMethodTracker);
+        }
+
+        exchangeRequestModel.address = exchangeOrderDetailsResponseModel!.data.customer.address;
+        exchangeRequestModel.name = exchangeOrderDetailsResponseModel!.data.customer.name;
+        exchangeRequestModel.phone = exchangeOrderDetailsResponseModel!.data.customer.phone;
+        //service stuff
+        serviceStuffInfo = serviceStuffList.firstWhereOrNull((e) => e.id == exchangeOrderDetailsResponseModel!.data.serviceBy.id);
+
+
+        totalPaid = exchangeOrderDetailsResponseModel!.data.payable;
+        totalDiscount = exchangeOrderDetailsResponseModel!.data.discount;
+        totalDeu = exchangeOrderDetailsResponseModel!.data.changeAmount;
+      }
+    } catch (e) {
+      hasError.value = true;
+    } finally {
+
+      editReturnHistoryItemLoading = false;
+      update(['edit_sold_history_item']);
+      // Methods.hideLoading();
+      RandomLottieLoader.hide();
+    }
+  }
 }

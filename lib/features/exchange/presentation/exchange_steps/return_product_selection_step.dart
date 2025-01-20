@@ -1,4 +1,5 @@
 import 'package:amar_pos/features/exchange/exchange_controller.dart';
+import 'package:amar_pos/features/exchange/presentation/widgets/exchange_product_sn_selection_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_svg/svg.dart';
@@ -394,15 +395,15 @@ class _ReturnProductSelectionStepState extends State<ReturnProductSelectionStep>
                                               top: Radius.circular(20)),
                                         ),
                                         builder: (context) {
-                                          return SizedBox.shrink();
-                                          // return ReturnOrderProductSnSelectionDialog(
-                                          //   product: controller
-                                          //       .exchangeRequestModel
-                                          //       .products[index],
-                                          //   productInfo: controller
-                                          //       .returnOrderProducts[index],
-                                          //   controller: controller,
-                                          // );
+                                          // return SizedBox.shrink();
+                                          return ExchangeProductSnSelectionDialog(
+                                            product: controller
+                                                .exchangeRequestModel
+                                                .returnProducts[index],
+                                            productInfo: controller
+                                                .returnOrderProducts[index],
+                                            controller: controller,
+                                          );
                                         },
                                       );
                                     },

@@ -13,6 +13,7 @@ import '../../../../core/widgets/qr_code_scanner.dart';
 import '../../../inventory/data/products/product_list_response_model.dart';
 import '../../../inventory/presentation/products/add_product_screen.dart';
 import '../../../return/presentation/widgets/return_order_product_sn_selection_dialog.dart';
+import '../widgets/exchange_product_sn_selection_widget.dart';
 
 class ExchangeProductSelectionStep extends StatefulWidget {
   const ExchangeProductSelectionStep({super.key});
@@ -394,15 +395,14 @@ class _ExchangeProductSelectionStepState extends State<ExchangeProductSelectionS
                                               top: Radius.circular(20)),
                                         ),
                                         builder: (context) {
-                                          return SizedBox.shrink();
-                                          // return ReturnOrderProductSnSelectionDialog(
-                                          //   product: controller
-                                          //       .exchangeRequestModel
-                                          //       .products[index],
-                                          //   productInfo: controller
-                                          //       .returnOrderProducts[index],
-                                          //   controller: controller,
-                                          // );
+                                          return ExchangeProductSnSelectionDialog(
+                                            product: controller
+                                                .exchangeRequestModel
+                                                .exchangeProducts[index],
+                                            productInfo: controller
+                                                .exchangeProducts[index],
+                                            controller: controller,
+                                          );
                                         },
                                       );
                                     },

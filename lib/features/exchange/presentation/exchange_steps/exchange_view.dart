@@ -153,7 +153,7 @@ class _ExchangeViewState extends State<ExchangeView> {
                       Expanded(
                         child: CustomButton(
                           onTap: controller.onSubmit,
-                          text: 'Submit',
+                          text: controller.isEditing ? 'Update' : 'Submit',
                         ),
                       ),
                     ],

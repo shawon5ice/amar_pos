@@ -80,7 +80,7 @@ class _ExchangeScreenState extends State<ExchangeScreen> with SingleTickerProvid
 
   @override
   void dispose() {
-    controller.clearExchange();
+    Get.delete<ExchangeController>();
     super.dispose();
   }
 
@@ -161,7 +161,11 @@ class _ExchangeScreenState extends State<ExchangeScreen> with SingleTickerProvid
                     controller: _tabController,
                     children: [
                   ExchangeView(),
-                  ExchangeHistoryScreen(),
+                  ExchangeHistoryScreen(
+                    onChange: (value){
+                      _tabController.animateTo(value);
+                    },
+                  ),
                   Placeholder()
                 ]),
               )
