@@ -3,6 +3,7 @@ import 'package:amar_pos/core/data/model/model.dart';
 import 'package:amar_pos/features/exchange/data/exchange_service.dart';
 import 'package:amar_pos/features/exchange/data/models/create_exchange_request_model.dart';
 import 'package:amar_pos/features/exchange/data/models/exchange_history_response_model.dart';
+import 'package:amar_pos/features/exchange/data/models/exchange_product_response_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../core/constants/logger/logger.dart';
@@ -140,7 +141,7 @@ class ExchangeController extends GetxController{
   Future<void> onSubmit() async{
     processData();
     createReturnOrderLoading = true;
-    update(["return_product_list"]);
+    update(["exchange_product_list"]);
     RandomLottieLoader.show();
     try{
       var response;
@@ -192,10 +193,10 @@ class ExchangeController extends GetxController{
   // bool wholeSale = false;
   //
   // //Return Products
-  // ReturnProductResponseModel? returnProductResponseModel;
-  // List<ReturnProduct> soldProductList = [];
-  // bool isReturnProductListLoading = false;
-  // bool isReturnProductsLoadingMore = false;
+  ExchangeProductResponseModel? exchangeProductResponseModel;
+  List<ExchangeProduct> exchangeProductList = [];
+  bool isExchangeProductListLoading = false;
+  bool isExchangeProductsLoadingMore = false;
 
   @override
   void onInit() {
@@ -213,7 +214,7 @@ class ExchangeController extends GetxController{
     searchProductController.clear();
     // wholeSale = false;
     // retailSale = false;
-    // selectedDateTimeRange.value = null;
+    selectedDateTimeRange.value = null;
     update(['filter_view']);
   }
 
@@ -238,16 +239,16 @@ class ExchangeController extends GetxController{
   //   serviceStuffInfo = null;
   //   paymentMethodTracker.clear();
   //   returnOrderProducts.clear();
-  //   soldProductList.clear();
+  //   exchangeProductList.clear();
   //   exchangeHistoryList.clear();
   //   createOrderModel = CreateReturnOrderModel.defaultConstructor();
   //   update(['place_order_items', 'billing_summary_button']);
   // }
   //
-  // void setSelectedDateRange(DateTimeRange? range) {
-  //   selectedDateTimeRange.value = range;
-  // }
-  //
+  void setSelectedDateRange(DateTimeRange? range) {
+    selectedDateTimeRange.value = range;
+  }
+
 
 
 
@@ -564,7 +565,7 @@ class ExchangeController extends GetxController{
   // void createReturnOrder(BuildContext context) async {
   //
   //   createReturnOrderLoading = true;
-  //   update(["return_product_list"]);
+  //   update(["exchange_product_list"]);
   //   RandomLottieLoader.show();
   //   try{
   //     var response = await ReturnServices.createReturnOrder(
@@ -587,14 +588,14 @@ class ExchangeController extends GetxController{
   //     logger.e(e);
   //   }finally{
   //     createReturnOrderLoading = false;
-  //     update(["return_product_list"]);
+  //     update(["exchange_product_list"]);
   //   }
   // }
   //
   //
   // void updateReturnOrder(BuildContext context) async {
   //   createReturnOrderLoading = true;
-  //   update(["return_product_list"]);
+  //   update(["exchange_product_list"]);
   //   RandomLottieLoader.show();
   //   try {
   //     var response = await ReturnServices.updateReturnOrder(
@@ -620,7 +621,7 @@ class ExchangeController extends GetxController{
   //   } finally {
   //     createReturnOrderLoading = false;
   //     isEditing = false;
-  //     update(["return_product_list"]);
+  //     update(["exchange_product_list"]);
   //   }
   // }
   //
@@ -660,7 +661,7 @@ class ExchangeController extends GetxController{
         }
       }
     } catch (e) {
-      hasError.value = true;
+      // hasError.value = true;
       exchangeHistoryList.clear();
       logger.e(e);
     } finally {
@@ -670,53 +671,52 @@ class ExchangeController extends GetxController{
     }
   }
   //
-  // Future<void> getReturnProducts({int page = 1}) async {
-  //   isReturnProductListLoading = page == 1;
-  //   isReturnProductsLoadingMore = page > 1;
-  //
-  //   if(page == 1){
-  //     returnProductResponseModel = null;
-  //     soldProductList.clear();
-  //   }
-  //
-  //   hasError.value = false;
-  //
-  //   update(['return_product_list','total_status_widget']);
-  //
-  //   try {
-  //     var response = await ReturnServices.getReturnProducts(
-  //         usrToken: loginData!.token,
-  //         page: page,
-  //         search: searchProductController.text,
-  //         startDate: selectedDateTimeRange.value?.start,
-  //         endDate: selectedDateTimeRange.value?.end,
-  //         saleType: retailSale && wholeSale? null : retailSale ? 1: wholeSale ? 2: null
-  //     );
-  //
-  //     logger.i(response);
-  //     if (response != null) {
-  //       returnProductResponseModel =
-  //           ReturnProductResponseModel.fromJson(response);
-  //
-  //       if (returnProductResponseModel != null) {
-  //         soldProductList.addAll(returnProductResponseModel!.data.returnProducts);
-  //       }
-  //     } else {
-  //       if(page != 1){
-  //         hasError.value = true;
-  //       }
-  //     }
-  //   } catch (e) {
-  //     hasError.value = true;
-  //     soldProductList.clear();
-  //     logger.e(e);
-  //   } finally {
-  //     isReturnProductListLoading = false;
-  //     isReturnProductsLoadingMore = false;
-  //     update(['return_product_list','total_status_widget']);
-  //   }
-  // }
-  //
+  Future<void> getExchangeProducts({int page = 1}) async {
+    isExchangeProductListLoading = page == 1;
+    isExchangeProductsLoadingMore = page > 1;
+
+    if(page == 1){
+      exchangeProductResponseModel = null;
+      exchangeProductList.clear();
+    }
+
+    hasError.value = false;
+
+    update(['exchange_product_list','total_status_widget']);
+
+    try {
+      var response = await ExchangeService.getExchangeProducts(
+          usrToken: loginData!.token,
+          page: page,
+          search: searchProductController.text,
+          startDate: selectedDateTimeRange.value?.start,
+          endDate: selectedDateTimeRange.value?.end,
+      );
+
+      logger.i(response);
+      if (response != null) {
+        exchangeProductResponseModel =
+            ExchangeProductResponseModel.fromJson(response);
+
+        if (exchangeProductResponseModel != null) {
+          exchangeProductList.addAll(exchangeProductResponseModel!.data.exchangeProducts);
+        }
+      } else {
+        if(page != 1){
+          hasError.value = true;
+        }
+      }
+    } catch (e) {
+      hasError.value = true;
+      exchangeProductList.clear();
+      logger.e(e);
+    } finally {
+      isExchangeProductListLoading = false;
+      isExchangeProductsLoadingMore = false;
+      update(['exchange_product_list','total_status_widget']);
+    }
+  }
+
   Future<void> deleteExchangeOrder({
     required ExchangeOrderInfo exchangeOrderInfo,
   }) async {

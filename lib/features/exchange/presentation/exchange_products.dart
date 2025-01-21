@@ -1,36 +1,36 @@
-import 'package:amar_pos/core/constants/app_colors.dart';
-import 'package:amar_pos/features/exchange/data/models/exchange_history_response_model.dart';
-import 'package:amar_pos/features/exchange/exchange_controller.dart';
+import 'package:amar_pos/features/exchange/data/models/exchange_product_response_model.dart';
+import 'package:amar_pos/features/exchange/presentation/widgets/exchange_product_item_widget.dart';
+import 'package:amar_pos/features/return/data/models/return_products/return_product_response_model.dart';
+import 'package:amar_pos/features/return/presentation/controller/return_controller.dart';
+import 'package:amar_pos/features/return/presentation/widgets/return_product_item_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import '../../../core/constants/app_assets.dart';
-import '../../../core/responsive/pixel_perfect.dart';
-import '../../../core/widgets/custom_text_field.dart';
-import '../../../core/widgets/pager_list_view.dart';
+import '../../../../core/constants/app_assets.dart';
+import '../../../../core/responsive/pixel_perfect.dart';
+import '../../../../core/widgets/custom_text_field.dart';
+import '../../../../core/widgets/pager_list_view.dart';
 import '../../inventory/presentation/stock_report/widget/custom_svg_icon_widget.dart';
-import 'widgets/exchange_history_item_widget.dart';
+import '../exchange_controller.dart';
 
-class ExchangeHistoryScreen extends StatefulWidget {
-  final Function(int value) onChange;
-  const ExchangeHistoryScreen({super.key, required this.onChange});
+
+class ExchangeProducts extends StatefulWidget {
+  const ExchangeProducts({super.key});
 
   @override
-  State<ExchangeHistoryScreen> createState() => _ExchangeHistoryScreenState();
+  State<ExchangeProducts> createState() => _SoldHistoryState();
 }
 
-class _ExchangeHistoryScreenState extends State<ExchangeHistoryScreen> {
+class _SoldHistoryState extends State<ExchangeProducts> {
   final ExchangeController controller = Get.find();
 
   @override
   void initState() {
-    controller.getExchangeHistory();
+    controller.getExchangeProducts();
     super.initState();
   }
 
   TextEditingController textEditingController = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -57,7 +57,7 @@ class _ExchangeHistoryScreenState extends State<ExchangeHistoryScreen> {
                       brdrRadius: 40,
                       prefixWidget: Icon(Icons.search),
                       onChanged: (value){
-                        controller.getExchangeHistory();
+                        controller.getExchangeProducts();
                       },
                     ),
                   ),
@@ -65,9 +65,7 @@ class _ExchangeHistoryScreenState extends State<ExchangeHistoryScreen> {
                   CustomSvgIconButton(
                     bgColor: const Color(0xffEBFFDF),
                     onTap: () {
-                      controller.downloadList(isPdf: false, returnHistory: true);
-                      // controller.downloadStockLedgerReport(
-                      //     isPdf: false, context: context);
+                      controller.downloadList(isPdf: false, returnHistory: false);
                     },
                     assetPath: AppAssets.excelIcon,
                   ),
@@ -75,7 +73,7 @@ class _ExchangeHistoryScreenState extends State<ExchangeHistoryScreen> {
                   CustomSvgIconButton(
                     bgColor: const Color(0xffE1F2FF),
                     onTap: () {
-                      controller.downloadList(isPdf: true, returnHistory: true);
+                      controller.downloadList(isPdf: true, returnHistory: false);
                     },
                     assetPath: AppAssets.downloadIcon,
                   ),
@@ -87,77 +85,67 @@ class _ExchangeHistoryScreenState extends State<ExchangeHistoryScreen> {
                   )
                 ],
               ),
-              // addH(8.px),
-              // GetBuilder<ExchangeController>(
-              //   id: 'total_widget',
-              //   builder: (controller) => Row(
-              //     children: [
-              //       TotalStatusWidget(
-              //         flex: 3,
-              //         isLoading: controller.isExchangeHistoryListLoading,
-              //         title: 'Invoice',
-              //         value: controller.exchangeHistoryResponseModel != null
-              //             ? Methods.getFormattedNumber(controller
-              //             .exchangeHistoryResponseModel!.data.exchangeHistoryList.length
-              //             .toDouble())
-              //             : null,
-              //         asset: AppAssets.invoice,
-              //       ),
-              //       addW(12),
-              //       TotalStatusWidget(
-              //         flex: 4,
-              //         isLoading: controller.isReturnHistoryListLoading,
-              //         title: 'Returned Amount',
-              //         value: controller.returnHistoryResponseModel != null
-              //             ? Methods.getFormatedPrice(controller
-              //             .returnHistoryResponseModel!.amountTotal
-              //             .toDouble())
-              //             : null,
-              //         asset: AppAssets.amount,
-              //       ),
-              //     ],
-              //   ),
-              // ),
+              addH(8.px),
+              GetBuilder<ExchangeController>(
+                id: 'total_status_widget',
+                builder: (controller) => Row(
+                  children: [
+                    TotalStatusWidget(
+                      flex: 3,
+                      isLoading: controller.isExchangeProductListLoading,
+                      title: 'Total QTY',
+                      value: null,
+                      asset: AppAssets.productBox,
+                    ),
+                    addW(12),
+                    TotalStatusWidget(
+                      flex: 4,
+                      isLoading: controller.isExchangeProductListLoading,
+                      title: 'Sold Amount',
+                      value: null,
+                      asset: AppAssets.amount,
+                    ),
+                  ],
+                ),
+              ),
               addH(8),
               Expanded(
                 child: GetBuilder<ExchangeController>(
-                  id: 'return_history_list',
+                  id: 'exchange_product_list',
                   builder: (controller) {
-                    if (controller.isExchangeHistoryListLoading) {
+                    if (controller.isExchangeProductListLoading) {
                       return const Center(
-                        child: SpinKitPulse(color: AppColors.primary),
+                        child: CircularProgressIndicator(),
                       );
-                    }else if(controller.exchangeHistoryList.isEmpty){
+                    }else if(controller.exchangeProductList.isEmpty){
                       return Center(
                         child: Text("No data found", style: context.textTheme.titleLarge,),
                       );
-                    }else if(controller.exchangeHistoryResponseModel == null){
+                    }else if(controller.exchangeProductResponseModel == null){
                       return Center(
                         child: Text("Something went wrong", style: context.textTheme.titleLarge,),
                       );
                     }
                     return RefreshIndicator(
                       onRefresh: () async {
-                        controller.getExchangeHistory(page: 1);
+                        controller.getExchangeProducts();
                       },
-                      child: PagerListView<ExchangeOrderInfo>(
+                      child: PagerListView<ExchangeProduct>(
                         // scrollController: _scrollController,
-                        items: controller.exchangeHistoryList,
+                        items: controller.exchangeProductList,
                         itemBuilder: (_, item) {
-                          return ExchangeHistoryItemWidget(exchangeOrderInfo: item,onChange: (value){
-                            widget.onChange(value);
-                          },);
+                          return ExchangeProductListItem(productInfo: item);
                         },
-                        isLoading: controller.isReturnHistoryLoadingMore,
+                        isLoading: controller.isExchangeProductsLoadingMore,
                         hasError: controller.hasError.value,
                         onNewLoad: (int nextPage) async {
-                          await controller.getExchangeHistory(page: nextPage);
+                          await controller.getExchangeProducts(page: nextPage);
                         },
                         totalPage: controller
-                            .exchangeHistoryResponseModel?.data.meta.lastPage ??
+                            .exchangeProductResponseModel?.data.meta.lastPage ??
                             0,
                         totalSize:
-                        controller.exchangeHistoryResponseModel?.data.meta.total ??
+                        controller.exchangeProductResponseModel?.data.meta.total ??
                             0,
                         itemPerPage: 10,
                       ),
@@ -218,7 +206,7 @@ class TotalStatusWidget extends StatelessWidget {
               addH(12),
               isLoading
                   ? Container(
-                  height: 30.sp, width: 30.sp, child: SpinKitFadingGrid(color: Colors.black,size: 20,))
+                  height: 30.sp, width: 30.sp, child: CircularProgressIndicator())
                   : Text(
                 value != null ? value! : '--',
                 style: TextStyle(

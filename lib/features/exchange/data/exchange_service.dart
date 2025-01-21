@@ -105,11 +105,10 @@ class ExchangeService{
     return response;
   }
 
-  static Future<dynamic> getReturnProducts({
+  static Future<dynamic> getExchangeProducts({
     required String usrToken,
     required int page,
     String? search,
-    int? saleType,
     DateTime? startDate,
     DateTime? endDate,
   }) async {
@@ -123,7 +122,7 @@ class ExchangeService{
           "search": search,
           "start_date": startDate,
           "end_date": endDate,
-          "sale_type": saleType,
+          "product_type": 3,
           "limit": 10,
         });
     return response;

@@ -1,13 +1,17 @@
 import 'package:amar_pos/core/constants/app_colors.dart';
 import 'package:amar_pos/features/exchange/exchange_controller.dart';
+import 'package:amar_pos/features/exchange/presentation/exchange_products.dart';
 import 'package:amar_pos/features/exchange/presentation/exchange_steps/exchange_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import '../../core/constants/app_assets.dart';
 import '../../core/constants/logger/logger.dart';
 import '../../core/responsive/pixel_perfect.dart';
 import '../drawer/drawer_menu_controller.dart';
 import 'presentation/exchange_history.dart';
+import 'presentation/widgets/exchange_filter_widget.dart';
 
 class ExchangeScreen extends StatefulWidget {
   const ExchangeScreen({super.key});
@@ -72,8 +76,11 @@ class _ExchangeScreenState extends State<ExchangeScreen> with SingleTickerProvid
           controller.exchangeProducts.clear();
           _tabController.animateTo(newIndex);
         }
-        controller.update(['action_icon']);
       }
+      if(_tabController.indexIsChanging && _tabController.index != _tabController.previousIndex){
+        controller.clearFilter();
+      }
+      controller.update(['action_icon']);
     });
     super.initState();
   }
@@ -106,6 +113,8 @@ class _ExchangeScreenState extends State<ExchangeScreen> with SingleTickerProvid
                   if(discard){
                     drawerMenuController.openDrawer();
                   }
+                }else{
+                  drawerMenuController.openDrawer();
                 }
                 // if(controller.isEditing){
                 //   bool openDrawer = await showDiscardDialog(context);
@@ -119,6 +128,20 @@ class _ExchangeScreenState extends State<ExchangeScreen> with SingleTickerProvid
               },
             ),
             title: const Text("Exchange"),
+            actions: [
+              GetBuilder<ExchangeController>(
+                id: 'action_icon',
+                builder: (controller) => _tabController.index == 0? const SizedBox(): GestureDetector(
+                  onTap: (){
+                    showModalBottomSheet(context: context, builder:(context) => ExchangeFilterBottomSheet(
+                      exchangeHistory: _tabController.index == 1,
+                    ));
+                  },
+                  child: SvgPicture.asset(AppAssets.funnelFilter),
+                ),
+              ),
+              addW(12),
+            ],
           ),
           body: Column(
             children: [
@@ -166,7 +189,7 @@ class _ExchangeScreenState extends State<ExchangeScreen> with SingleTickerProvid
                       _tabController.animateTo(value);
                     },
                   ),
-                  Placeholder()
+                  ExchangeProducts()
                 ]),
               )
             ],

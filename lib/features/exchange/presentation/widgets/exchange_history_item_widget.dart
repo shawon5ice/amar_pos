@@ -141,20 +141,24 @@ class ExchangeHistoryItemWidget extends StatelessWidget {
             ),
             child: Column(
               children: [
-                SaleHistoryItemTitleValueWidget(
+                ExchangeHistoryItemTitleValueWidget(
                   title: "Invoice Number",
                   value: exchangeOrderInfo.orderNo,
                 ),
-                SaleHistoryItemTitleValueWidget(
+                ExchangeHistoryItemTitleValueWidget(
                   title: "Customer Name",
                   value: exchangeOrderInfo.customer.name,
                 ),
-                SaleHistoryItemTitleValueWidget(
+                ExchangeHistoryItemTitleValueWidget(
                   title: "Phone Number",
                   value: exchangeOrderInfo.customer.phone,
                 ),
-                SaleHistoryItemTitleValueWidget(
-                  title: "Amount",
+                ExchangeHistoryItemTitleValueWidget(
+                  title: "Discount",
+                  value: Methods.getFormatedPrice(exchangeOrderInfo.discount.toDouble()),
+                ),
+                ExchangeHistoryItemTitleValueWidget(
+                  title: "Paid Amount",
                   value: Methods.getFormatedPrice(exchangeOrderInfo.paidAmount.toDouble()),
                 ),
               ],
@@ -166,8 +170,8 @@ class ExchangeHistoryItemWidget extends StatelessWidget {
   }
 }
 
-class SaleHistoryItemTitleValueWidget extends StatelessWidget {
-  const SaleHistoryItemTitleValueWidget(
+class ExchangeHistoryItemTitleValueWidget extends StatelessWidget {
+  const ExchangeHistoryItemTitleValueWidget(
       {super.key, required this.title, required this.value});
 
   final String title;
