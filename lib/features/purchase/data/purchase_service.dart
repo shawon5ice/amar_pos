@@ -26,12 +26,12 @@ class PurchaseService {
   }
 
   static Future<dynamic> getBillingPaymentMethods(
-      {required String usrToken, required bool isRetailSale}) async {
+      {required String usrToken}) async {
     var response = await BaseClient.getData(
         token: usrToken,
         api: NetWorkStrings.getBillingPaymentMethods,
         parameter: {
-          "sale_type": isRetailSale ? "retail_sale" : "wholesale",
+          "sale_type" : "wholesale",
         });
     return response;
   }
@@ -46,12 +46,12 @@ class PurchaseService {
     return response;
   }
 
-  static Future<dynamic> getAllClientList({
+  static Future<dynamic> getAllSupplierList({
     required String usrToken,
   }) async {
     var response = await BaseClient.getData(
         token: usrToken,
-        api: NetWorkStrings.getAllClientList,
+        api: NetWorkStrings.getAllSupplierList,
         parameter: {
           "status": 1,
         });

@@ -1,65 +1,45 @@
 class CreatePurchaseOrderModel {
-  int saleType;
-  String name;
-  String phone;
-  String address;
+  int purchaseType;
+  int supplierId;
   List<SaleProductModel> products;
   double amount;
   double expense;
   double discount;
-  double vat;
   double payable;
   List<Payment> payments;
-  int serviceBy;
-  int? customerId;
 
   CreatePurchaseOrderModel({
-    required this.saleType,
-    required this.name,
-    required this.phone,
-    required this.address,
+    required this.purchaseType,
+    required this.supplierId,
     required this.products,
     required this.amount,
     required this.expense,
     required this.discount,
-    required this.vat,
     required this.payable,
     required this.payments,
-    required this.serviceBy,
-    this.customerId,
   });
 
   CreatePurchaseOrderModel.defaultConstructor()
-      : saleType = 0,
-        name = '',
-        phone = '',
-        address = '',
+      : purchaseType = 1,
+        supplierId = 0,
         products = [],
         amount = 0.0,
         expense = 0.0,
         discount = 0.0,
-        vat = 0.0,
         payable = 0.0,
-        serviceBy = 0,
-        customerId = 0,
         payments = [];
 
   factory CreatePurchaseOrderModel.fromJson(Map<String, dynamic> json) {
     return CreatePurchaseOrderModel(
-      saleType: json['sale_type'],
-      name: json['name'],
-      phone: json['phone'],
-      address: json['address'],
+      purchaseType: json['purchase_type'],
+      supplierId: json['supplier_id'],
       products: (json['product'] as List)
           .map((productJson) => SaleProductModel.fromJson(productJson))
           .toList(),
       amount: json['amount'].toDouble(),
       expense: json['expense'].toDouble(),
       discount: json['discount'].toDouble(),
-      vat: json['vat'].toDouble(),
       payable: json['payable'].toDouble(),
-      serviceBy: json['service_by'],
-      customerId: json['customer_id'],
       payments: (json['payment'] as List)
           .map((paymentJson) => Payment.fromJson(paymentJson))
           .toList(),
@@ -68,18 +48,13 @@ class CreatePurchaseOrderModel {
 
   Map<String, dynamic> toJson() {
     return {
-      'sale_type': saleType,
-      'name': name,
-      'phone': phone,
-      'address': address,
+      'purchase_type': purchaseType,
+      'supplier_id' : supplierId,
       'product': products.map((product) => product.toJson()).toList(),
       'amount': amount,
       'expense': expense,
-      'vat': vat,
       'discount': discount,
       'payable': payable,
-      'service_by': serviceBy,
-      'customer_id': customerId,
       'payment': payments.map((payment) => payment.toJson()).toList(),
     };
   }
@@ -120,7 +95,7 @@ class SaleProductModel {
       'quantity': quantity,
       'vat': vat,
       'discount': discount,
-      'serial_no': serialNo,
+      'serial_no': serialNo.isEmpty ? null : serialNo,
     };
   }
 }

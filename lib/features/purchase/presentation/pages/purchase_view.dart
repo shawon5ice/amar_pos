@@ -1,5 +1,6 @@
 import 'package:amar_pos/features/inventory/presentation/products/add_product_screen.dart';
 import 'package:amar_pos/features/purchase/data/models/create_purchase_order_model.dart';
+import 'package:amar_pos/features/purchase/presentation/pages/purchase_summary.dart';
 import 'package:amar_pos/features/purchase/presentation/purchase_controller.dart';
 import 'package:amar_pos/features/sales/presentation/page/billing_summary.dart';
 import 'package:flutter/material.dart';
@@ -556,7 +557,7 @@ class _PurchaseViewState extends State<PurchaseView> {
                       child: CustomButton(
                         onTap: () async {
                           FocusScope.of(context).unfocus();
-                         await Get.to(() => BillingSummary())?.then((value) {
+                         await Get.to(() => PurchaseSummary())?.then((value) {
                             FocusScope.of(context).unfocus();
                           });
                         },

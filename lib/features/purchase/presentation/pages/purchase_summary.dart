@@ -1,18 +1,21 @@
 import 'package:amar_pos/core/constants/app_colors.dart';
+import 'package:amar_pos/core/constants/logger/logger.dart';
 import 'package:amar_pos/core/core.dart';
+import 'package:amar_pos/core/data/model/reusable/supplier_list_response_model.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/core/widgets/custom_button.dart';
 import 'package:amar_pos/core/widgets/custom_text_field.dart';
 import 'package:amar_pos/core/widgets/field_title.dart';
 import 'package:amar_pos/features/exchange/exchange_controller.dart';
 import 'package:amar_pos/features/inventory/presentation/products/widgets/custom_dropdown_widget.dart';
+import 'package:amar_pos/features/purchase/presentation/purchase_controller.dart';
 import 'package:amar_pos/features/purchase/presentation/widgets/purchase_summary_payment_option_selection_widget.dart';
-import 'package:amar_pos/features/sales/data/models/client_list_response_model.dart';
-import 'package:amar_pos/features/sales/data/models/create_order_model.dart';
-import 'package:amar_pos/features/sales/presentation/controller/sales_controller.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+import '../../../../core/data/model/client_list_response_model.dart';
+import '../../data/models/create_purchase_order_model.dart';
 
 class PurchaseSummary extends StatefulWidget {
   const PurchaseSummary({super.key});
@@ -30,7 +33,7 @@ class _PurchaseSummaryState extends State<PurchaseSummary> {
   late final TextEditingController customerPayableAmountEditingController;
   late final TextEditingController customerChangeAmountEditingController;
 
-  ExchangeController controller = Get.find();
+  PurchaseController controller = Get.find();
 
   @override
   void initState() {
@@ -43,26 +46,29 @@ class _PurchaseSummaryState extends State<PurchaseSummary> {
     customerPayableAmountEditingController = TextEditingController();
     customerChangeAmountEditingController = TextEditingController();
 
-    if(!controller.isEditing){
-      controller.paymentMethodTracker.clear();
-      controller.totalDiscount = 0;
-      controller.additionalExpense = 0;
-      controller.paidAmount = 0;
-      controller.isRetailSale = true;
-      controller.redefinePrice();
-      controller.serviceStuffInfo = null;
-      controller.selectedClient = null;
-      controller.getAllServiceStuff();
-      controller.getAllClientList();
-      controller.getPaymentMethods();
-    }else{
-      customerNameEditingController.text = controller.createOrderModel.name;
-      customerPhoneNumberEditingController.text = controller.createOrderModel.phone;
-      customerAddressEditingController.text = controller.createOrderModel.address;
-      customerTotalDiscountEditingController.text = controller.saleHistoryDetailsResponseModel!.data.discount.toString();
-      customerAdditionalExpensesEditingController.text = controller.saleHistoryDetailsResponseModel!.data.expense.toString();
-      customerChangeAmountEditingController.text = controller.totalDeu.toString();
+    if(controller.supplierList.isEmpty){
+      controller.getAllSupplierList();
     }
+    // if(controller.serviceStuffList.isEmpty){
+    //   controller.getAllServiceStuff();
+    // }
+    if(controller.purchasePaymentMethods == null){
+      controller.getPaymentMethods();
+    }
+
+    customerNameEditingController.text = controller.selectedSupplier?.name ?? '';
+    customerPhoneNumberEditingController.text = controller.selectedSupplier?.phone ?? '';
+    customerAddressEditingController.text = controller.selectedSupplier?.address ?? '';
+    customerAdditionalExpensesEditingController.text = controller.additionalExpense.toString();
+    customerTotalDiscountEditingController.text = controller.totalDiscount.toString();
+    // else{
+    //   customerNameEditingController.text = controller.createPurchaseOrderModel.name;
+    //   customerPhoneNumberEditingController.text = controller.createPurchaseOrderModel.phone;
+    //   customerAddressEditingController.text = controller.createPurchaseOrderModel.address;
+    //   customerTotalDiscountEditingController.text = controller.saleHistoryDetailsResponseModel!.data.discount.toString();
+    //   customerAdditionalExpensesEditingController.text = controller.saleHistoryDetailsResponseModel!.data.expense.toString();
+    //   customerChangeAmountEditingController.text = controller.totalDeu.toString();
+    // }
 
 
 
@@ -99,7 +105,7 @@ class _PurchaseSummaryState extends State<PurchaseSummary> {
             key: formKey,
             child: Column(
               children: [
-                GetBuilder<ExchangeController>(
+                GetBuilder<PurchaseController>(
                   id: "billing_summary_form",
                   builder: (controller) => Container(
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
@@ -109,36 +115,26 @@ class _PurchaseSummaryState extends State<PurchaseSummary> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        FieldTitle(
-                            "${controller.isRetailSale ? "Customer" : "Client"} Name"),
+                        FieldTitle("Supplier Name"),
                         addH(4),
-                        controller.isRetailSale
-                            ? CustomTextField(
-                                enabledFlag: controller.isRetailSale,
-                                textCon: customerNameEditingController,
-                                hintText: "Type customer name",
-                                validator: (value) =>
-                                    FieldValidator.nonNullableFieldValidator(
-                                        value, "Customer name"),
-                              )
-                            : GetBuilder<ExchangeController>(
+                        GetBuilder<PurchaseController>(
                                 id: 'client_list',
                                 builder: (controller) =>
                                     DropdownButtonHideUnderline(
-                                  child: DropdownButton2<ClientData>(
+                                  child: DropdownButton2<SupplierInfo>(
                                     isExpanded: true,
                                     hint: Text(
-                                      controller.clientList.isNotEmpty
-                                          ? "Select Client"
+                                      controller.supplierList.isNotEmpty
+                                          ? "Select Supplier"
                                           : "Loading...",
                                       style: TextStyle(
                                         fontSize: 12,
                                         color: Theme.of(context).hintColor,
                                       ),
                                     ),
-                                    items: controller.clientList
-                                        .map((ClientData item) {
-                                      return DropdownMenuItem<ClientData>(
+                                    items: controller.supplierList
+                                        .map((SupplierInfo item) {
+                                      return DropdownMenuItem<SupplierInfo>(
                                         value: item,
                                         child: Text(
                                           item.name,
@@ -150,10 +146,10 @@ class _PurchaseSummaryState extends State<PurchaseSummary> {
                                         ),
                                       );
                                     }).toList(),
-                                    value: controller.selectedClient,
+                                    value: controller.selectedSupplier,
                                     onChanged: (value) {
                                       if (value != null) {
-                                        controller.selectedClient = value;
+                                        controller.selectedSupplier = value;
                                         customerPhoneNumberEditingController
                                             .text = value.phone;
                                         customerAddressEditingController.text =
@@ -190,7 +186,7 @@ class _PurchaseSummaryState extends State<PurchaseSummary> {
                         const FieldTitle("Phone Number"),
                         addH(4),
                         CustomTextField(
-                          enabledFlag: controller.isRetailSale,
+                          enabledFlag: false,
                           textCon: customerPhoneNumberEditingController,
                           hintText: "Type phone number",
                           validator: (value) =>
@@ -201,7 +197,7 @@ class _PurchaseSummaryState extends State<PurchaseSummary> {
                         const FieldTitle("Address"),
                         addH(4),
                         CustomTextField(
-                          enabledFlag: controller.isRetailSale,
+                          enabledFlag: false,
                           textCon: customerAddressEditingController,
                           hintText: "Type customer address",
                           validator: (value) =>
@@ -382,58 +378,57 @@ class _PurchaseSummaryState extends State<PurchaseSummary> {
                             controller.addPaymentMethod();
                           },
                         ),
-                        addH(8),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: GetBuilder<ExchangeController>(
-                                  id: "change-due-amount",
-                                  builder: (controller) => Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          addH(16.h),
-                                          FieldTitle(
-                                              "${controller.totalDeu < 0 ? "Change" : "Deo"} Amount"),
-                                          addH(4),
-                                          CustomTextField(
-                                            enabledFlag: false,
-                                            textCon: TextEditingController(
-                                                text: (controller.totalDeu)
-                                                    .toString()),
-                                            hintText: "Type here",
-                                            inputType: TextInputType.number,
-                                            onChanged: (value) {},
-                                          ),
-                                        ],
-                                      )),
-                            ),
-                            addW(8),
-                            Expanded(
-                              child: GetBuilder<ExchangeController>(
-                                id: 'service_stuff_list',
-                                builder: (controller) =>
-                                    CustomDropdown<ServiceStuffInfo>(
-                                  validator: (value) => value == null
-                                      ? "Please select a service stuff"
-                                      : null,
-                                  value: controller.serviceStuffInfo,
-                                  items: controller.serviceStuffList,
-                                  isMandatory: true,
-                                  title: "Service Stuff",
-                                  itemLabel: (ServiceStuffInfo stuffInfo) =>
-                                      stuffInfo.name,
-                                  onChanged: (value) {
-                                    controller.serviceStuffInfo = value;
-                                  },
-                                  hintText:controller.serviceStuffListLoading? 'Loading...': controller.serviceStuffList.isNotEmpty
-                                          ? "Select Service Stuff"
-                                          : "No Stuff found!",
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                        // addH(8),
+                        // Row(
+                        //   children: [
+                        //     Expanded(
+                        //       child: GetBuilder<PurchaseController>(
+                        //           id: "change-due-amount",
+                        //           builder: (controller) => Column(
+                        //                 crossAxisAlignment:
+                        //                     CrossAxisAlignment.start,
+                        //                 children: [
+                        //                   addH(16.h),
+                        //                   const FieldTitle("Change Amount"),
+                        //                   addH(4),
+                        //                   CustomTextField(
+                        //                     enabledFlag: false,
+                        //                     textCon: TextEditingController(
+                        //                         text: (controller.totalDeu)
+                        //                             .toString()),
+                        //                     hintText: "Type here",
+                        //                     inputType: TextInputType.number,
+                        //                     onChanged: (value) {},
+                        //                   ),
+                        //                 ],
+                        //               )),
+                        //     ),
+                        //     addW(8),
+                        //     Expanded(
+                        //       child: GetBuilder<PurchaseController>(
+                        //         id: 'service_stuff_list',
+                        //         builder: (controller) =>
+                        //             CustomDropdown<ServiceStuffInfo>(
+                        //           validator: (value) => value == null
+                        //               ? "Please select a service stuff"
+                        //               : null,
+                        //           value: controller.serviceStuffInfo,
+                        //           items: controller.serviceStuffList,
+                        //           isMandatory: true,
+                        //           title: "Service Stuff",
+                        //           itemLabel: (ServiceStuffInfo stuffInfo) =>
+                        //               stuffInfo.name,
+                        //           onChanged: (value) {
+                        //             controller.serviceStuffInfo = value;
+                        //           },
+                        //           hintText:controller.serviceStuffListLoading? 'Loading...': controller.serviceStuffList.isNotEmpty
+                        //                   ? "Select Service Stuff"
+                        //                   : "No Stuff found!",
+                        //         ),
+                        //       ),
+                        //     ),
+                        //   ],
+                        // ),
                       ],
                     ),
                   ),
@@ -447,41 +442,26 @@ class _PurchaseSummaryState extends State<PurchaseSummary> {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: CustomButton(
           onTap: () {
+            if(controller.selectedSupplier == null){
+              Methods.showSnackbar(msg: "Please select a supplier first");
+              return;
+            }
+            if(controller.totalPaid != controller.paidAmount){
+              Methods.showSnackbar(msg: "Paid amount must be equal to payable amount", duration: 5);
+              return;
+            }
             if (formKey.currentState!.validate()) {
-              controller.createOrderModel.saleType =
-                  controller.isRetailSale ? 1 : 2;
-              if (!controller.isRetailSale &&
-                  controller.selectedClient != null) {
-                controller.createOrderModel.customerId =
-                    controller.selectedClient!.id;
-              }
-              controller.createOrderModel.amount =
+              controller.createPurchaseOrderModel.purchaseType = 1;
+              controller.createPurchaseOrderModel.supplierId = controller.selectedSupplier!.id;
+              controller.createPurchaseOrderModel.amount =
                   controller.totalAmount.toDouble();
-              controller.createOrderModel.expense =
+              controller.createPurchaseOrderModel.expense =
                   controller.additionalExpense.toDouble();
-              controller.createOrderModel.discount =
+              controller.createPurchaseOrderModel.discount =
                   controller.totalDiscount.toDouble();
-              controller.createOrderModel.vat =
-                  controller.totalVat.toDouble();
-              controller.createOrderModel.payable =
+              controller.createPurchaseOrderModel.payable =
                   controller.paidAmount.toDouble();
-              controller.createOrderModel.name = controller.isRetailSale
-                  ? customerNameEditingController.text
-                  : controller.selectedClient!.name;
-              controller.createOrderModel.phone = controller.isRetailSale
-                  ? customerPhoneNumberEditingController.text
-                  : controller.selectedClient!.phone;
-              controller.createOrderModel.address = controller.isRetailSale
-                  ? customerAddressEditingController.text
-                  : controller.selectedClient!.address;
-              if (controller.serviceStuffInfo == null) {
-                Methods.showSnackbar(msg: "Please select a service stuff");
-                return;
-              }
-              controller.createOrderModel.serviceBy =
-                  controller.serviceStuffInfo!.id;
-
-              controller.createOrderModel.payments.clear();
+              controller.createPurchaseOrderModel.payments.clear();
               for (var e in controller.paymentMethodTracker) {
                 if (e.paymentMethod == null) {
                   Methods.showSnackbar(
@@ -495,21 +475,22 @@ class _PurchaseSummaryState extends State<PurchaseSummary> {
                       msg: "Please select associate payment options");
                   return;
                 } else {
-                  controller.createOrderModel.payments.add(Payment(
+                  controller.createPurchaseOrderModel.payments.add(Payment(
                       methodId: e.paymentMethod!.id,
                       paid: e.paidAmount!.toDouble(),
                       bankId: e.paymentOption?.id));
                 }
               }
-              if(controller.isEditing){
-                controller.updateSaleOrder(context);
-              }else{
-                controller.createSaleOrder(context);
-              }
+              logger.d(controller.createPurchaseOrderModel.toJson());
+              // if(controller.isEditing){
+              //   controller.updateSaleOrder(context);
+              // }else{
+              //   controller.createSaleOrder(context);
+              // }
 
             }
           },
-          text: controller.isEditing ? "Update Order" : "Place Order",
+          text: controller.isEditing ? "Update Order" : "Purchase Now",
         ),
       ),
     );

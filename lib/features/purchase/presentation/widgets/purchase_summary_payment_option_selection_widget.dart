@@ -1,5 +1,6 @@
 import 'package:amar_pos/core/core.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
+import 'package:amar_pos/features/purchase/presentation/purchase_controller.dart';
 import 'package:amar_pos/features/sales/data/models/payment_method_tracker.dart';
 import 'package:amar_pos/features/sales/presentation/controller/sales_controller.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
@@ -30,7 +31,7 @@ class _PurchaseSummaryPaymentOptionSelectionWidgetState
 
   late TextEditingController paidAmount;
 
-  final SalesController controller = Get.find();
+  final PurchaseController controller = Get.find();
 
   @override
   void initState() {
@@ -50,7 +51,7 @@ class _PurchaseSummaryPaymentOptionSelectionWidgetState
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<SalesController>(
+    return GetBuilder<PurchaseController>(
       key: Key(controller.paymentMethodTracker.indexOf(widget.paymentMethodTracker).toString()),
       id: "billing_payment_methods",
       builder: (controller) => Column(
@@ -76,7 +77,7 @@ class _PurchaseSummaryPaymentOptionSelectionWidgetState
                             color: Theme.of(context).hintColor,
                           ),
                         ),
-                        items: controller.billingPaymentMethods?.data
+                        items: controller.purchasePaymentMethods?.data
                             .map((PaymentMethod item) {
                               return DropdownMenuItem<PaymentMethod>(
                                   value: item,
