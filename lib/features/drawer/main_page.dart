@@ -90,7 +90,9 @@ class MainPage extends StatelessWidget {
           } else {
             bool isParentWithChildren = (value?.parent == DrawerItems.inventory) &&
                 value?.child == null || (value?.parent == DrawerItems.returnAndExchange) &&
-                value?.child == null;
+                value?.child == null || (value?.parent == DrawerItems.purchase) &&
+                value?.child == null
+            ;
             if (!isParentWithChildren) {
               menuController.selectedMenuItem.value = value;
             }

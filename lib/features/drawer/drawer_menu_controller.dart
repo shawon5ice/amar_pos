@@ -4,6 +4,7 @@ import 'package:amar_pos/features/auth/data/model/hive/login_data_helper.dart';
 import 'package:amar_pos/features/exchange/exchange_screen.dart';
 import 'package:amar_pos/features/inventory/presentation/products/products_screen.dart';
 import 'package:amar_pos/features/inventory/presentation/stock_report/stock_report.dart';
+import 'package:amar_pos/features/purchase/presentation/purchase_screen.dart';
 import 'package:amar_pos/features/return/presentation/return_screen.dart';
 import 'package:get/get.dart';
 import 'package:amar_pos/features/home/presentation/home_screen.dart';
@@ -96,6 +97,15 @@ class DrawerMenuController extends GetxController {
         if(selectedMenuItem.value?.child == "Return"){
           return const ReturnScreen();
         }else if(selectedMenuItem.value?.child == "Exchange"){
+          return const ExchangeScreen();
+        }else{
+          return Container();
+        }
+
+      case DrawerItems.purchase:
+        if(selectedMenuItem.value?.child == "Purchase"){
+          return const PurchaseScreen();
+        }else if(selectedMenuItem.value?.child == "Purchase Return"){
           return const ExchangeScreen();
         }else{
           return Container();
