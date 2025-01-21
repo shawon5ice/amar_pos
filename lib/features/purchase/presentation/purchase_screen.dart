@@ -1,8 +1,10 @@
+import 'package:amar_pos/features/purchase/presentation/pages/purchase_view.dart';
 import 'package:amar_pos/features/purchase/presentation/purchase_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import '../../../core/constants/app_assets.dart';
+import '../../../core/constants/app_colors.dart';
 import '../../../core/responsive/pixel_perfect.dart';
 import '../../drawer/drawer_menu_controller.dart';
 
@@ -88,8 +90,61 @@ class _PurchaseScreenState extends State<PurchaseScreen>
           addW(12),
         ],
       ),
-      body: Column(
-        children: [],
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 10),
+        child: Column(
+          children: [
+            Container(
+              height: 40.h,
+              padding: const EdgeInsets.all(4),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.all(Radius.circular(20)),
+              ),
+              child: TabBar(
+                dividerHeight: 0,
+                controller: _tabController,
+                indicatorSize: TabBarIndicatorSize.tab,
+                labelStyle:
+                TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp),
+                indicator: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                unselectedLabelStyle:
+                const TextStyle(fontWeight: FontWeight.normal),
+                labelColor: Colors.white,
+                splashBorderRadius: BorderRadius.circular(20),
+                unselectedLabelColor: Colors.black,
+                tabs: const [
+                  Tab(
+                    text: 'Purchase',
+                  ),
+                  Tab(text: 'History'),
+                  Tab(text: 'Purchase Products'),
+                ],
+              ),
+            ),
+            addH(12),
+            Expanded(
+              child: TabBarView(
+                physics: const NeverScrollableScrollPhysics(),
+                controller: _tabController,
+                children: [
+                  PurchaseView(),
+                  Placeholder(),
+                  Placeholder(),
+                  // SoldHistory(
+                  //   onChange: (value){
+                  //     _tabController.index = value;
+                  //   },
+                  // ),
+                  // SoldProduct(),
+                ],
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
