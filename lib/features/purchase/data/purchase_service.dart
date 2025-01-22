@@ -1,4 +1,5 @@
 import 'package:amar_pos/features/purchase/data/models/create_purchase_order_model.dart';
+import 'package:amar_pos/features/purchase/data/models/purchase_history_response_model.dart';
 import 'package:amar_pos/features/sales/data/models/sale_history/sold_history_response_model.dart';
 import 'package:flutter/material.dart';
 
@@ -133,19 +134,17 @@ class PurchaseService {
     return response;
   }
 
-  static downloadSaleHistory(
-      {required String usrToken,
-        required BuildContext context,
-        required SaleHistory saleHistory}) async {
+  static downloadPurchaseHistory(
+      {required String usrToken, required PurchaseOrderInfo purchaseOrderInfo}) async {
     // logger.d("PDF: $isPdf");
 
     String downloadUrl =
-        "${NetWorkStrings.baseUrl}/order/download-order-invoice/${saleHistory.id}";
+        "${NetWorkStrings.baseUrl}/purchase/download-purchase-invoice/${purchaseOrderInfo.id}";
 
     FileDownloader().downloadFile(
       url: downloadUrl,
       token: usrToken,
-      fileName: "${saleHistory.orderNo}.pdf",);
+      fileName: "${purchaseOrderInfo.orderNo}.pdf",);
   }
 
   static Future<dynamic> getSoldHistoryDetails({
@@ -159,12 +158,12 @@ class PurchaseService {
     return response;
   }
 
-  static Future<dynamic> deleteSaleHistory({
+  static Future<dynamic> deletePurchaseHistory({
     required String usrToken,
-    required SaleHistory saleHistory}) async {
+    required PurchaseOrderInfo purchaseOrderInfo}) async {
     var response = await BaseClient.deleteData(
       token: usrToken,
-      api: 'order/delete-order/${saleHistory.id}',);
+      api: 'purchase/delete-order/${purchaseOrderInfo.id}',);
     return response;
   }
 
@@ -174,7 +173,6 @@ class PurchaseService {
     required DateTime? startDate,
     required DateTime? endDate,
     required String? search,
-    required int? saleType,
 
   }) async {
     // logger.d("PDF: $isPdf");
@@ -183,22 +181,21 @@ class PurchaseService {
       "start_date": startDate,
       "end_date": endDate,
       "search": search,
-      "sale_type": saleType,
     };
 
     String downloadUrl = "";
 
     if(saleHistory){
       if(isPdf){
-        downloadUrl = "${NetWorkStrings.baseUrl}/order/download-pdf-order-list/";
+        downloadUrl = "${NetWorkStrings.baseUrl}/purchase/download-pdf-purchase-list/";
       }else{
-        downloadUrl = "${NetWorkStrings.baseUrl}/order/download-excel-order-list/";
+        downloadUrl = "${NetWorkStrings.baseUrl}/purchase/download-excel-purchase-list";
       }
     }else{
       if(isPdf){
-        downloadUrl = "${NetWorkStrings.baseUrl}/order/download-pdf-sold-product/";
+        downloadUrl = "${NetWorkStrings.baseUrl}/purchase/download-pdf-purchase-product/";
       }else{
-        downloadUrl = "${NetWorkStrings.baseUrl}/order/download-excel-sold-product/";
+        downloadUrl = "${NetWorkStrings.baseUrl}/purchase/download-excel-purchase-product/";
       }
     }
 

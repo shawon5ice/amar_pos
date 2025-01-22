@@ -3,6 +3,7 @@ import 'package:amar_pos/core/data/model/reusable/supplier_list_response_model.d
 import 'package:amar_pos/features/purchase/data/models/create_purchase_order_model.dart';
 import 'package:amar_pos/features/purchase/data/models/purchase_history_response_model.dart';
 import 'package:amar_pos/features/purchase/data/models/purchase_order_details_response_model.dart';
+import 'package:amar_pos/features/purchase/data/models/purchase_product_response_model.dart';
 import 'package:amar_pos/features/purchase/data/purchase_service.dart';
 import 'package:amar_pos/features/sales/data/models/payment_method_tracker.dart';
 import 'package:flutter/material.dart';
@@ -84,6 +85,16 @@ class PurchaseController extends GetxController{
   bool isPurchaseHistoryListLoading = false;
   bool isPurchaseHistoryLoadingMore = false;
 
+
+  //Purchase Products
+  PurchaseProductResponseModel? purchaseProductResponseModel;
+  List<PurchaseProduct> purchaseProducts = [];
+  bool isPurchaseProductListLoading = false;
+  bool isPurchaseProductsLoadingMore = false;
+
+  void setSelectedDateRange(DateTimeRange? range) {
+    selectedDateTimeRange.value = range;
+  }
 
   Future<void> getAllProducts(
       {required String search, required int page}) async {
@@ -372,37 +383,43 @@ class PurchaseController extends GetxController{
   }
 
 
-  // void updateReturnOrder(BuildContext context) async {
-  //   createPurchaseOrderLoading = true;
-  //   update(["purchase_order_items"]);
-  //   RandomLottieLoader.show();
-  //   try {
-  //     var response = await PurchaseService.updatePurchaseOrder(
-  //       usrToken: loginData!.token,
-  //       purchaseOrderModel: createPurchaseOrderModel,
-  //       orderId: saleHistoryDetailsResponseModel!.data.id,
-  //     );
-  //     logger.e(response);
-  //     if (response != null) {
-  //       if (response['success']) {
-  //         returnOrderProducts.clear();
-  //         RandomLottieLoader.hide();
-  //         Get.back();
-  //         Get.back();
-  //       } else {
-  //         RandomLottieLoader.hide();
-  //       }
-  //       Methods.showSnackbar(msg: response['message'],
-  //           isSuccess: response['success'] ? true : null);
-  //     }
-  //   } catch (e) {
-  //     logger.e(e);
-  //   } finally {
-  //     createPurchaseOrderLoading = false;
-  //     isEditing = false;
-  //     update(["purchase_order_items"]);
-  //   }
-  // }
+  void updatePurchaseOrder() async {
+    createPurchaseOrderLoading = true;
+    update(["purchase_order_items"]);
+    RandomLottieLoader.show();
+    try {
+      var response = await PurchaseService.updatePurchaseOrder(
+        usrToken: loginData!.token,
+        purchaseOrderModel: createPurchaseOrderModel,
+        orderId: purchaseOrderDetailsResponseModel!.data.id,
+      );
+      logger.e(response);
+      if (response != null) {
+        if (response['success']) {
+          purchaseOrderProducts.clear();
+          selectedSupplier = null;
+          paymentMethodTracker.clear();
+          additionalExpense = 0;
+          totalPaid = 0;
+          paidAmount = 0;
+          totalDiscount = 0;
+          RandomLottieLoader.hide();
+          Get.back();
+          Get.back();
+        } else {
+          RandomLottieLoader.hide();
+        }
+        Methods.showSnackbar(msg: response['message'],
+            isSuccess: response['success'] ? true : null);
+      }
+    } catch (e) {
+      logger.e(e);
+    } finally {
+      createPurchaseOrderLoading = false;
+      isEditing = false;
+      update(["purchase_order_items"]);
+    }
+  }
 
   Future<void> getPurchaseHistory({int page = 1}) async {
     isPurchaseHistoryListLoading = page == 1;
@@ -449,6 +466,53 @@ class PurchaseController extends GetxController{
       update(['purchase_history_list','total_widget']);
     }
   }
+
+  Future<void> getPurchaseProducts({int page = 1}) async {
+    isPurchaseProductListLoading = page == 1;
+    isPurchaseProductsLoadingMore = page > 1;
+
+    if(page == 1){
+      purchaseProductResponseModel = null;
+      purchaseProducts.clear();
+    }
+
+    hasError.value = false;
+
+    update(['purchase_product','total_status_widget']);
+
+    try {
+      var response = await PurchaseService.getPurchaseProducts(
+          usrToken: loginData!.token,
+          page: page,
+          search: searchProductController.text,
+          startDate: selectedDateTimeRange.value?.start,
+          endDate: selectedDateTimeRange.value?.end,
+      );
+
+      logger.i(response);
+      if (response != null) {
+        purchaseProductResponseModel =
+            PurchaseProductResponseModel.fromJson(response);
+
+        if (purchaseProductResponseModel != null) {
+          purchaseProducts.addAll(purchaseProductResponseModel!.data.returnProducts);
+        }
+      } else {
+        if(page != 1){
+          hasError.value = true;
+        }
+      }
+    } catch (e) {
+      hasError.value = true;
+      purchaseProducts.clear();
+      logger.e(e);
+    } finally {
+      isPurchaseProductsLoadingMore = false;
+      isPurchaseProductListLoading = false;
+      update(['purchase_product','total_status_widget']);
+    }
+  }
+
 
   PurchaseOrderDetailsResponseModel? purchaseOrderDetailsResponseModel;
   bool editPurchaseHistoryItemLoading = false;
@@ -528,6 +592,7 @@ class PurchaseController extends GetxController{
         totalPaid = purchaseOrderDetailsResponseModel!.data.payable;
         totalDiscount = purchaseOrderDetailsResponseModel!.data.discount;
         additionalExpense = purchaseOrderDetailsResponseModel!.data.expense;
+        logger.d(createPurchaseOrderModel.products.length);
       }
     } catch (e) {
       hasError.value = true;
@@ -537,6 +602,83 @@ class PurchaseController extends GetxController{
       update(['edit_purchase_history_item']);
       // Methods.hideLoading();
       RandomLottieLoader.hide();
+    }
+  }
+
+  Future<void> deletePurchaseOrder({
+    required PurchaseOrderInfo purchaseOrderInfo,
+  }) async {
+
+    hasError.value = false;
+    update(['purchase_history_list']);
+
+    try {
+      // Call the API
+      var response = await PurchaseService.deletePurchaseHistory(
+        usrToken: loginData!.token,
+        purchaseOrderInfo: purchaseOrderInfo,
+      );
+
+      // Parse the response
+      if (response != null && response['success']) {
+        // Remove the item from the list
+        purchaseHistoryList.remove(purchaseOrderInfo);
+        Methods.showSnackbar(msg: response['message'], isSuccess: true);
+      } else {
+        Methods.showSnackbar(msg: 'Error: Unable to delete the item');
+      }
+    } catch (e) {
+      hasError.value = true;
+      logger.e(e);
+      Methods.showSnackbar(msg: 'Error: something went wrong while deleting the item');
+    } finally {
+      update(['purchase_history_list']);
+    }
+  }
+
+
+
+  Future<void> downloadPurchaseHistory(
+      {required bool isPdf, required PurchaseOrderInfo purchaseOrderInfo,}) async {
+    hasError.value = false;
+
+    String fileName = "${purchaseOrderInfo.orderNo}-${DateTime
+        .now()
+        .microsecondsSinceEpoch
+        .toString()}${isPdf ? ".pdf" : ".xlsx"}";
+    try {
+      var response = await PurchaseService.downloadPurchaseHistory(
+        purchaseOrderInfo: purchaseOrderInfo,
+        usrToken: loginData!.token,
+      );
+    } catch (e) {
+      logger.e(e);
+    } finally {
+
+    }
+  }
+
+  Future<void> downloadList({required bool isPdf,required bool purchaseHistory}) async {
+    hasError.value = false;
+
+    String fileName = "${purchaseHistory? "Return Order history": "Return Product History"}-${
+        selectedDateTimeRange.value != null ? "${selectedDateTimeRange.value!.start.toIso8601String().split("T")[0]}-${selectedDateTimeRange.value!.end.toIso8601String().split("T")[0]}": DateTime.now().toIso8601String().split("T")[0]
+            .toString()
+    }${isPdf ? ".pdf" : ".xlsx"}";
+    try {
+      var response = await PurchaseService.downloadList(
+        saleHistory: purchaseHistory,
+        usrToken: loginData!.token,
+        isPdf: isPdf,
+        search: searchProductController.text,
+        startDate: selectedDateTimeRange.value?.start,
+        endDate: selectedDateTimeRange.value?.end,
+        fileName: fileName,
+      );
+    } catch (e) {
+      logger.e(e);
+    } finally {
+
     }
   }
 

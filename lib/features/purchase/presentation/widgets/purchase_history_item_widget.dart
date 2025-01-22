@@ -89,8 +89,8 @@ class PurchaseHistoryItemWidget extends StatelessWidget {
                 borderColor: const Color(0xff03346E),
                 bgColor: const Color(0xffE1F2FF),
                 onTap: () {
-                  // controller.downloadReturnHistory(
-                  //     isPdf: true, purchaseHistory: purchaseHistory);
+                  controller.downloadPurchaseHistory(
+                      isPdf: true, purchaseOrderInfo: purchaseHistory);
                 },
                 assetPath: AppAssets.downloadIcon,
               ),
@@ -117,8 +117,8 @@ class PurchaseHistoryItemWidget extends StatelessWidget {
                           desc:
                           "You are going to delete order no: ${purchaseHistory.orderNo}",
                           btnOkOnPress: () {
-                            // controller.deleteReturnOrder(
-                            //     purchaseHistory: purchaseHistory);
+                            controller.deletePurchaseOrder(
+                                purchaseOrderInfo: purchaseHistory);
                           },
                           btnCancelOnPress: () {})
                           .show();
@@ -148,6 +148,10 @@ class PurchaseHistoryItemWidget extends StatelessWidget {
                 SaleHistoryItemTitleValueWidget(
                   title: "Phone Number",
                   value: purchaseHistory.phone,
+                ),
+                SaleHistoryItemTitleValueWidget(
+                  title: "Discount",
+                  value: Methods.getFormatedPrice(purchaseHistory.discount.toDouble()),
                 ),
                 SaleHistoryItemTitleValueWidget(
                   title: "Amount",

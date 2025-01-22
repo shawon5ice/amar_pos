@@ -35,12 +35,18 @@ class _PurchaseViewState extends State<PurchaseView> {
   @override
   void initState() {
     suggestionEditingController = TextEditingController();
-    controller.createPurchaseOrderModel = CreatePurchaseOrderModel.defaultConstructor();
-    controller.purchaseOrderProducts.clear();
-    controller.getAllProducts(
-      search: "",
-      page: 1,
-    );
+    if(!controller.isEditing){
+      controller.createPurchaseOrderModel = CreatePurchaseOrderModel.defaultConstructor();
+      controller.purchaseOrderProducts.clear();
+      controller.getAllProducts(
+        search: "",
+        page: 1,
+      );
+    }else{
+      for (var e in controller.createPurchaseOrderModel.products) {
+        purchaseControllers.add(TextEditingController(text: e.unitPrice.toString()));
+      }
+    }
     super.initState();
   }
 

@@ -482,12 +482,11 @@ class _PurchaseSummaryState extends State<PurchaseSummary> {
                 }
               }
               logger.d(controller.createPurchaseOrderModel.toJson());
-              controller.createPurchaseOrder();
-              // if(controller.isEditing){
-              //   controller.updateSaleOrder(context);
-              // }else{
-              //   controller.createSaleOrder(context);
-              // }
+              if(controller.isEditing){
+                controller.updatePurchaseOrder();
+              }else{
+                controller.createPurchaseOrder();
+              }
 
             }
           },

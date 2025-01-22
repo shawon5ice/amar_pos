@@ -1,6 +1,8 @@
 import 'package:amar_pos/features/purchase/presentation/pages/purchase_history_screen.dart';
+import 'package:amar_pos/features/purchase/presentation/pages/purchase_products.dart';
 import 'package:amar_pos/features/purchase/presentation/pages/purchase_view.dart';
 import 'package:amar_pos/features/purchase/presentation/purchase_controller.dart';
+import 'package:amar_pos/features/purchase/presentation/widgets/purchase_filter_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -87,9 +89,9 @@ class _PurchaseScreenState extends State<PurchaseScreen>
               child: SvgPicture.asset(AppAssets.pauseBillingIcon),
             ): GestureDetector(
               onTap: (){
-                // showModalBottomSheet(context: context, builder:(context) => SoldHistoryFilterBottomSheet(
-                //   saleHistory: _tabController.index == 1,
-                // ));
+                showModalBottomSheet(context: context, builder:(context) => PurchaseFilterBottomSheet(
+                  purchaseHistory: _tabController.index == 1,
+                ));
               },
               child: SvgPicture.asset(AppAssets.funnelFilter),
             ),
@@ -142,13 +144,7 @@ class _PurchaseScreenState extends State<PurchaseScreen>
                   PurchaseHistoryScreen(onChange: (value){
                     _tabController.animateTo(value);
                   }),
-                  Placeholder(),
-                  // SoldHistory(
-                  //   onChange: (value){
-                  //     _tabController.index = value;
-                  //   },
-                  // ),
-                  // SoldProduct(),
+                  PurchaseProducts(),
                 ],
               ),
             )

@@ -26,7 +26,7 @@ Map<String, dynamic> _$PurchaseHistoryResponseModelToJson(
 
 PurchaseHistoryData _$PurchaseHistoryDataFromJson(Map<String, dynamic> json) =>
     PurchaseHistoryData(
-          purchaseHistoryList: (json['data'] as List<dynamic>)
+      purchaseHistoryList: (json['data'] as List<dynamic>)
           .map((e) => PurchaseOrderInfo.fromJson(e as Map<String, dynamic>))
           .toList(),
       links: Links.fromJson(json['links'] as Map<String, dynamic>),

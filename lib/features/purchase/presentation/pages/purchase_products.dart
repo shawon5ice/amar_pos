@@ -1,35 +1,31 @@
-import 'package:amar_pos/core/constants/logger/logger.dart';
 import 'package:amar_pos/core/core.dart';
-import 'package:amar_pos/features/purchase/data/models/purchase_history_response_model.dart';
+import 'package:amar_pos/features/purchase/data/models/purchase_product_response_model.dart';
 import 'package:amar_pos/features/purchase/presentation/purchase_controller.dart';
+import 'package:amar_pos/features/purchase/presentation/widgets/purchase_product_item_widget.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:amar_pos/core/widgets/custom_text_field.dart';
-import 'package:amar_pos/features/return/presentation/controller/return_controller.dart';
-import 'package:amar_pos/features/return/presentation/widgets/return_history_item_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-
 import '../../../../core/constants/app_assets.dart';
 import '../../../../core/responsive/pixel_perfect.dart';
+import '../../../../core/widgets/custom_text_field.dart';
 import '../../../../core/widgets/pager_list_view.dart';
 import '../../../inventory/presentation/stock_report/widget/custom_svg_icon_widget.dart';
-import '../widgets/purchase_history_item_widget.dart';
 
-class PurchaseHistoryScreen extends StatefulWidget {
-  PurchaseHistoryScreen({super.key, required this.onChange});
-  Function(int value) onChange;
+
+class PurchaseProducts extends StatefulWidget {
+  const PurchaseProducts({super.key});
 
   @override
-  State<PurchaseHistoryScreen> createState() => _PurchaseHistoryScreenState();
+  State<PurchaseProducts> createState() => _SoldHistoryState();
 }
 
-class _PurchaseHistoryScreenState extends State<PurchaseHistoryScreen> {
+class _SoldHistoryState extends State<PurchaseProducts> {
   final PurchaseController controller = Get.find();
 
   @override
   void initState() {
-    controller.getPurchaseHistory();
+    controller.getPurchaseProducts();
     super.initState();
   }
 
@@ -58,7 +54,7 @@ class _PurchaseHistoryScreenState extends State<PurchaseHistoryScreen> {
                     brdrRadius: 40,
                     prefixWidget: Icon(Icons.search),
                     onChanged: (value){
-                      controller.getPurchaseHistory();
+                      controller.getPurchaseProducts();
                     },
                   ),
                 ),
@@ -66,9 +62,7 @@ class _PurchaseHistoryScreenState extends State<PurchaseHistoryScreen> {
                 CustomSvgIconButton(
                   bgColor: const Color(0xffEBFFDF),
                   onTap: () {
-                    controller.downloadList(isPdf: false, purchaseHistory: true);
-                    // controller.downloadStockLedgerReport(
-                    //     isPdf: false, context: context);
+                    controller.downloadList(isPdf: false, purchaseHistory: false);
                   },
                   assetPath: AppAssets.excelIcon,
                 ),
@@ -76,7 +70,7 @@ class _PurchaseHistoryScreenState extends State<PurchaseHistoryScreen> {
                 CustomSvgIconButton(
                   bgColor: const Color(0xffE1F2FF),
                   onTap: () {
-                    controller.downloadList(isPdf: true, purchaseHistory: true);
+                    controller.downloadList(isPdf: true, purchaseHistory: false);
                   },
                   assetPath: AppAssets.downloadIcon,
                 ),
@@ -90,30 +84,22 @@ class _PurchaseHistoryScreenState extends State<PurchaseHistoryScreen> {
             ),
             addH(8.px),
             GetBuilder<PurchaseController>(
-              id: 'total_widget',
+              id: 'total_status_widget',
               builder: (controller) => Row(
                 children: [
                   TotalStatusWidget(
                     flex: 3,
-                    isLoading: controller.isPurchaseHistoryListLoading,
-                    title: 'Invoice',
-                    value: controller.purchaseHistoryResponseModel != null
-                        ? Methods.getFormattedNumber(controller
-                        .purchaseHistoryResponseModel!.countTotal
-                        .toDouble())
-                        : null,
-                    asset: AppAssets.invoice,
+                    isLoading: controller.isPurchaseProductListLoading,
+                    title: 'Total QTY',
+                    value: Methods.getFormattedNumber(controller.purchaseProductResponseModel?.countTotal.toDouble() ?? 0),
+                    asset: AppAssets.productBox,
                   ),
                   addW(12),
                   TotalStatusWidget(
                     flex: 4,
-                    isLoading: controller.isPurchaseHistoryListLoading,
-                    title: 'Total Amount',
-                    value: controller.purchaseHistoryResponseModel != null
-                        ? Methods.getFormatedPrice(controller
-                        .purchaseHistoryResponseModel!.amountTotal
-                        .toDouble())
-                        : null,
+                    isLoading: controller.isPurchaseProductListLoading,
+                    title: 'Purchase Amount',
+                    value: Methods.getFormatedPrice(controller.purchaseProductResponseModel?.amountTotal.toDouble() ?? 0),
                     asset: AppAssets.amount,
                   ),
                 ],
@@ -122,43 +108,41 @@ class _PurchaseHistoryScreenState extends State<PurchaseHistoryScreen> {
             addH(8),
             Expanded(
               child: GetBuilder<PurchaseController>(
-                id: 'purchase_history_list',
+                id: 'purchase_product',
                 builder: (controller) {
-                  if (controller.isPurchaseHistoryListLoading) {
+                  if (controller.isPurchaseProductListLoading) {
                     return const Center(
                       child: CircularProgressIndicator(),
                     );
-                  }else if(controller.purchaseHistoryResponseModel == null){
+                  }else if(controller.purchaseProductResponseModel == null){
                     return Center(
                       child: Text("Something went wrong", style: context.textTheme.titleLarge,),
                     );
-                  }else if(controller.purchaseHistoryResponseModel!.data.purchaseHistoryList.isEmpty){
+                  }else if(controller.purchaseProductResponseModel!.data.returnProducts.isEmpty){
                     return Center(
                       child: Text("No data found", style: context.textTheme.titleLarge,),
                     );
                   }
                   return RefreshIndicator(
                     onRefresh: () async {
-                      controller.getPurchaseHistory();
+                      controller.getPurchaseProducts();
                     },
-                    child: PagerListView<PurchaseOrderInfo>(
+                    child: PagerListView<PurchaseProduct>(
                       // scrollController: _scrollController,
-                      items: controller.purchaseHistoryList,
+                      items: controller.purchaseProducts,
                       itemBuilder: (_, item) {
-                        return PurchaseHistoryItemWidget(purchaseHistory: item,onChange: (value) {
-                          widget.onChange(value);
-                        },);
+                        return PurchaseProductListItem(productInfo: item);
                       },
-                      isLoading: controller.isPurchaseHistoryLoadingMore,
+                      isLoading: controller.isPurchaseProductsLoadingMore,
                       hasError: controller.hasError.value,
                       onNewLoad: (int nextPage) async {
-                        await controller.getPurchaseHistory(page: nextPage);
+                        await controller.getPurchaseProducts(page: nextPage);
                       },
                       totalPage: controller
-                          .purchaseHistoryResponseModel?.data.meta.lastPage ??
+                          .purchaseProductResponseModel?.data.meta.lastPage ??
                           0,
                       totalSize:
-                      controller.purchaseHistoryResponseModel?.data.meta.total ??
+                      controller.purchaseProductResponseModel?.data.meta.total ??
                           0,
                       itemPerPage: 10,
                     ),
@@ -218,7 +202,7 @@ class TotalStatusWidget extends StatelessWidget {
               addH(12),
               isLoading
                   ? Container(
-                  height: 30.sp, width: 30.sp, child: SpinKitFadingGrid(color: Colors.black,size: 20,))
+                  height: 30.sp, width: 30.sp, child: SpinKitFadingGrid(color: Colors.black,size: 20,) )
                   : Text(
                 value != null ? value! : '--',
                 style: TextStyle(
