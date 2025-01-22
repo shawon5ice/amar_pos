@@ -270,6 +270,7 @@ class PurchaseController extends GetxController{
     if(totalPaid==paidAmount){
       Methods.showSnackbar(msg: "Full amount already distributed", duration: 5);
       return;
+
     }else if(totalPaid> paidAmount){
       Methods.showSnackbar(msg: "Please reduce paid amount", duration: 5);
       return;
