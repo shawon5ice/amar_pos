@@ -1,3 +1,4 @@
+import 'package:amar_pos/features/purchase/presentation/pages/purchase_history_screen.dart';
 import 'package:amar_pos/features/purchase/presentation/pages/purchase_view.dart';
 import 'package:amar_pos/features/purchase/presentation/purchase_controller.dart';
 import 'package:flutter/material.dart';
@@ -49,6 +50,12 @@ class _PurchaseScreenState extends State<PurchaseScreen>
       }
     });
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    Get.delete<PurchaseController>();
+    super.dispose();
   }
 
 
@@ -132,7 +139,9 @@ class _PurchaseScreenState extends State<PurchaseScreen>
                 controller: _tabController,
                 children: [
                   PurchaseView(),
-                  Placeholder(),
+                  PurchaseHistoryScreen(onChange: (value){
+                    _tabController.animateTo(value);
+                  }),
                   Placeholder(),
                   // SoldHistory(
                   //   onChange: (value){

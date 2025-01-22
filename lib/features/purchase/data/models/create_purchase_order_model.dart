@@ -1,7 +1,7 @@
 class CreatePurchaseOrderModel {
   int purchaseType;
   int supplierId;
-  List<SaleProductModel> products;
+  List<PurchaseProductModel> products;
   double amount;
   double expense;
   double discount;
@@ -34,7 +34,7 @@ class CreatePurchaseOrderModel {
       purchaseType: json['purchase_type'],
       supplierId: json['supplier_id'],
       products: (json['product'] as List)
-          .map((productJson) => SaleProductModel.fromJson(productJson))
+          .map((productJson) => PurchaseProductModel.fromJson(productJson))
           .toList(),
       amount: json['amount'].toDouble(),
       expense: json['expense'].toDouble(),
@@ -60,7 +60,7 @@ class CreatePurchaseOrderModel {
   }
 }
 
-class SaleProductModel {
+class PurchaseProductModel {
   int id;
   double unitPrice;
   int quantity;
@@ -68,7 +68,7 @@ class SaleProductModel {
   num? discount;
   List<String> serialNo;
 
-  SaleProductModel({
+  PurchaseProductModel({
     required this.id,
     required this.unitPrice,
     required this.quantity,
@@ -77,8 +77,8 @@ class SaleProductModel {
     this.discount,
   });
 
-  factory SaleProductModel.fromJson(Map<String, dynamic> json) {
-    return SaleProductModel(
+  factory PurchaseProductModel.fromJson(Map<String, dynamic> json) {
+    return PurchaseProductModel(
       id: json['id'],
       unitPrice: json['unit_price'].toDouble(),
       quantity: json['quantity'],

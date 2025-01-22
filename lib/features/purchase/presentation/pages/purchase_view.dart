@@ -2,7 +2,6 @@ import 'package:amar_pos/features/inventory/presentation/products/add_product_sc
 import 'package:amar_pos/features/purchase/data/models/create_purchase_order_model.dart';
 import 'package:amar_pos/features/purchase/presentation/pages/purchase_summary.dart';
 import 'package:amar_pos/features/purchase/presentation/purchase_controller.dart';
-import 'package:amar_pos/features/sales/presentation/page/billing_summary.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_svg/svg.dart';
@@ -16,10 +15,11 @@ import '../../../../core/widgets/methods/helper_methods.dart';
 import '../../../../core/widgets/qr_code_scanner.dart';
 import 'package:get/get.dart';
 import '../../../inventory/data/products/product_list_response_model.dart';
+import '../widgets/purchase_order_product_sn_selection_dialog.dart';
 
 
 class PurchaseView extends StatefulWidget {
-  PurchaseView({super.key});
+  const PurchaseView({super.key});
 
   @override
   State<PurchaseView> createState() => _PurchaseViewState();
@@ -75,7 +75,7 @@ class _PurchaseViewState extends State<PurchaseView> {
                 Expanded(
                   flex: 8,
                   child: GetBuilder<PurchaseController>(
-                    id: "sales_product_list",
+                    id: "purchase_product_list",
                     builder: (controller) {
                       return TypeAheadField<ProductInfo>(
                         hideOnUnfocus: true,
@@ -205,7 +205,7 @@ class _PurchaseViewState extends State<PurchaseView> {
             addH(12),
             Expanded(
               child: GetBuilder<PurchaseController>(
-                id: "place_order_items",
+                id: "purchase_order_items",
                 builder: (controller) {
                   if (controller.purchaseOrderProducts.isEmpty) {
                     return Align(
@@ -477,15 +477,14 @@ class _PurchaseViewState extends State<PurchaseView> {
                                                       top: Radius.circular(20)),
                                             ),
                                             builder: (context) {
-                                              return SizedBox.shrink();
-                                              // return PlaceOrderProductSnSelectionDialog(
-                                              //   product: controller
-                                              //       .createOrderModel
-                                              //       .products[index],
-                                              //   productInfo: controller
-                                              //       .placeOrderProducts[index],
-                                              //   controller: controller,
-                                              // );
+                                              return PurchaseOrderProductSnSelectionDialog(
+                                                product: controller
+                                                    .createPurchaseOrderModel
+                                                    .products[index],
+                                                productInfo: controller
+                                                    .purchaseOrderProducts[index],
+                                                controller: controller,
+                                              );
                                             },
                                           );
                                         },

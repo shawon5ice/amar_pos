@@ -58,20 +58,20 @@ class PurchaseService {
     return response;
   }
 
-  static Future<dynamic> createSaleOrder({
+  static Future<dynamic> createPurchaseOrder({
     required String usrToken,
     required CreatePurchaseOrderModel purchaseOrderModel,
   }) async {
     logger.i(purchaseOrderModel.toJson());
     var response = await BaseClient.postData(
       token: usrToken,
-      api: NetWorkStrings.createSaleOrder,
+      api: "purchase/place-order",
       body: purchaseOrderModel.toJson(),
     );
     return response;
   }
 
-  static Future<dynamic> updateSaleOrder({
+  static Future<dynamic> updatePurchaseOrder({
     required String usrToken,
     required CreatePurchaseOrderModel purchaseOrderModel,
     required int orderId,
@@ -79,7 +79,7 @@ class PurchaseService {
     logger.i(purchaseOrderModel.toJson());
     var response = await BaseClient.postData(
       token: usrToken,
-      api: 'order/update-order/$orderId',
+      api: 'purchase/update-order/$orderId',
       body: purchaseOrderModel.toJson(),
     );
     return response;
@@ -208,5 +208,62 @@ class PurchaseService {
       token: usrToken,
       query: query,
       fileName: fileName,);
+  }
+
+  static Future<dynamic> getPurchaseHistory({
+    required String usrToken,
+    required int page,
+    String? search,
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
+    logger.d("Page: $page");
+    var response = await BaseClient.getData(
+        token: usrToken,
+        api: "purchase/get-all-purchase-list",
+        parameter: {
+          "status": 1,
+          "page": page,
+          "search": search,
+          "start_date": startDate,
+          "end_date": endDate,
+          "limit": 10,
+        });
+    return response;
+  }
+
+  static Future<dynamic> getPurchaseProducts({
+    required String usrToken,
+    required int page,
+    String? search,
+    int? saleType,
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
+    logger.d("Page: $page");
+    var response = await BaseClient.getData(
+        token: usrToken,
+        api: "purchase/get-purchase-product-list",
+        parameter: {
+          "status": 1,
+          "page": page,
+          "search": search,
+          "start_date": startDate,
+          "end_date": endDate,
+          "sale_type": saleType,
+          "limit": 10,
+        });
+    return response;
+  }
+
+  static Future<dynamic> getPurchaseOrderDetails({
+    required String usrToken,
+    required int id,
+  }) async {
+    var response = await BaseClient.getData(
+      token: usrToken,
+      api: "purchase/get-purchase-details/$id",
+    );
+    return response;
   }
 }

@@ -1,18 +1,19 @@
 import 'dart:async';
-
 import 'package:amar_pos/core/data/model/reusable/supplier_list_response_model.dart';
 import 'package:amar_pos/features/purchase/data/models/create_purchase_order_model.dart';
+import 'package:amar_pos/features/purchase/data/models/purchase_history_response_model.dart';
+import 'package:amar_pos/features/purchase/data/models/purchase_order_details_response_model.dart';
 import 'package:amar_pos/features/purchase/data/purchase_service.dart';
 import 'package:amar_pos/features/sales/data/models/payment_method_tracker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import '../../../core/constants/logger/logger.dart';
 import '../../../core/core.dart';
-import '../../../core/data/model/client_list_response_model.dart';
+import '../../../core/widgets/loading/random_lottie_loader.dart';
 import '../../auth/data/model/hive/login_data.dart';
 import '../../auth/data/model/hive/login_data_helper.dart';
 import '../../inventory/data/products/product_list_response_model.dart';
+import '../../return/data/models/return_history/return_history_response_model.dart';
 
 class PurchaseController extends GetxController{
 
@@ -44,6 +45,9 @@ class PurchaseController extends GetxController{
 
   List<ProductInfo> purchaseOrderProducts = [];
 
+
+  Rx<DateTimeRange?> selectedDateTimeRange = Rx<DateTimeRange?>(null);
+
   final isLoading = false.obs; // Tracks ongoing API calls
   var lastFoundList = <ProductInfo>[].obs; // Previously found products
   var currentSearchList = <ProductInfo>[]
@@ -73,13 +77,21 @@ class PurchaseController extends GetxController{
   bool isEditing = false;
   bool detailsLoading =false;
 
+
+  //Purchase History
+  PurchaseHistoryResponseModel? purchaseHistoryResponseModel;
+  List<PurchaseOrderInfo> purchaseHistoryList = [];
+  bool isPurchaseHistoryListLoading = false;
+  bool isPurchaseHistoryLoadingMore = false;
+
+
   Future<void> getAllProducts(
       {required String search, required int page}) async {
     isProductListLoading = page == 1; // Mark initial loading state
     isLoadingMore = page > 1;
 
     hasError.value = false;
-    update(['sales_product_list']);
+    update(['purchase_product_list']);
 
     try {
       var response = await PurchaseService.getAllProductList(
@@ -111,7 +123,7 @@ class PurchaseController extends GetxController{
     } finally {
       isProductListLoading = false;
       isLoadingMore = false;
-      update(['sales_product_list']);
+      update(['purchase_product_list']);
     }
   }
 
@@ -145,7 +157,7 @@ class PurchaseController extends GetxController{
           .quantity++;
     } else {
       purchaseOrderProducts.add(product);
-      createPurchaseOrderModel.products.add(SaleProductModel(
+      createPurchaseOrderModel.products.add(PurchaseProductModel(
           id: product.id,
           unitPrice: product.wholesalePrice.toDouble(),
           quantity:quantity?? 1,
@@ -153,7 +165,7 @@ class PurchaseController extends GetxController{
               .wholesalePrice.toDouble()),
           serialNo: snNo ?? []));
     }
-    update(['place_order_items', 'billing_summary_button']);
+    update(['purchase_order_items', 'billing_summary_button']);
   }
 
   void removePlaceOrderProduct(ProductInfo product) {
@@ -170,7 +182,7 @@ class PurchaseController extends GetxController{
         return false;
       }
     });
-    update(['place_order_items', 'billing_summary_button']);
+    update(['purchase_order_items', 'billing_summary_button']);
   }
 
   void changeQuantityOfProduct(int index, bool increase) {
@@ -181,7 +193,7 @@ class PurchaseController extends GetxController{
         createPurchaseOrderModel.products[index].quantity--;
       }
     }
-    update(['place_order_items', 'billing_summary_button']);
+    update(['purchase_order_items', 'billing_summary_button']);
   }
 
 
@@ -319,6 +331,213 @@ class PurchaseController extends GetxController{
     }
 
     update(['selling_party_selection','change-due-amount', 'billing_summary_form']);
+  }
+
+  bool createPurchaseOrderLoading = false;
+
+  void createPurchaseOrder() async {
+
+    createPurchaseOrderLoading = true;
+    update(["purchase_order_items"]);
+    RandomLottieLoader.show();
+    try{
+      var response = await PurchaseService.createPurchaseOrder(
+        usrToken: loginData!.token,
+        purchaseOrderModel: createPurchaseOrderModel,
+      );
+      logger.e(response);
+      if (response != null) {
+        if(response['success']){
+          selectedSupplier = null;
+          supplierList.clear();
+          paymentMethodTracker.clear();
+          purchaseOrderProducts.clear();
+          createPurchaseOrderModel = CreatePurchaseOrderModel.defaultConstructor();
+          additionalExpense = 0;
+          totalDiscount = 0;
+          RandomLottieLoader.hide();
+          Get.back();
+          Get.back();
+        }else{
+          RandomLottieLoader.hide();
+        }
+        Methods.showSnackbar(msg: response['message'], isSuccess: response['success']? true: null);
+      }
+    }catch(e){
+      logger.e(e);
+    }finally{
+      createPurchaseOrderLoading = false;
+      update(["purchase_order_items"]);
+    }
+  }
+
+
+  // void updateReturnOrder(BuildContext context) async {
+  //   createPurchaseOrderLoading = true;
+  //   update(["purchase_order_items"]);
+  //   RandomLottieLoader.show();
+  //   try {
+  //     var response = await PurchaseService.updatePurchaseOrder(
+  //       usrToken: loginData!.token,
+  //       purchaseOrderModel: createPurchaseOrderModel,
+  //       orderId: saleHistoryDetailsResponseModel!.data.id,
+  //     );
+  //     logger.e(response);
+  //     if (response != null) {
+  //       if (response['success']) {
+  //         returnOrderProducts.clear();
+  //         RandomLottieLoader.hide();
+  //         Get.back();
+  //         Get.back();
+  //       } else {
+  //         RandomLottieLoader.hide();
+  //       }
+  //       Methods.showSnackbar(msg: response['message'],
+  //           isSuccess: response['success'] ? true : null);
+  //     }
+  //   } catch (e) {
+  //     logger.e(e);
+  //   } finally {
+  //     createPurchaseOrderLoading = false;
+  //     isEditing = false;
+  //     update(["purchase_order_items"]);
+  //   }
+  // }
+
+  Future<void> getPurchaseHistory({int page = 1}) async {
+    isPurchaseHistoryListLoading = page == 1;
+    isPurchaseHistoryLoadingMore = page > 1;
+
+    if(page == 1){
+      purchaseHistoryResponseModel = null;
+      purchaseHistoryList.clear();
+    }
+
+    hasError.value = false;
+
+    update(['purchase_history_list','total_widget']);
+
+    try {
+      var response = await PurchaseService.getPurchaseHistory(
+          usrToken: loginData!.token,
+          page: page,
+          search: searchProductController.text,
+          startDate: selectedDateTimeRange.value?.start,
+          endDate: selectedDateTimeRange.value?.end,
+      );
+
+      logger.i(response);
+      if (response != null) {
+        purchaseHistoryResponseModel =
+            PurchaseHistoryResponseModel.fromJson(response);
+
+        if (purchaseHistoryResponseModel != null) {
+          purchaseHistoryList.addAll(purchaseHistoryResponseModel!.data.purchaseHistoryList);
+        }
+      } else {
+        if(page != 1){
+          hasError.value = true;
+        }
+      }
+    } catch (e) {
+      hasError.value = true;
+      purchaseHistoryList.clear();
+      logger.e(e);
+    } finally {
+      isPurchaseHistoryListLoading = false;
+      isPurchaseHistoryLoadingMore = false;
+      update(['purchase_history_list','total_widget']);
+    }
+  }
+
+  PurchaseOrderDetailsResponseModel? purchaseOrderDetailsResponseModel;
+  bool editPurchaseHistoryItemLoading = false;
+
+  Future<void> processEdit({required PurchaseOrderInfo purchaseOrderInfo,required BuildContext context}) async{
+    editPurchaseHistoryItemLoading = true;
+    isEditing = true;
+    RandomLottieLoader.show();
+    serviceStuffInfo = null;
+    paymentMethodTracker.clear();
+    createPurchaseOrderModel = CreatePurchaseOrderModel.defaultConstructor();
+
+    // Methods.showLoading();
+    update(['edit_purchase_history_item']);
+    try {
+      var response = await PurchaseService.getPurchaseOrderDetails(
+        usrToken: loginData!.token,
+        id: purchaseOrderInfo.id,
+      );
+
+      logger.i(response);
+      if (response != null) {
+        purchaseOrderProducts.clear();
+        getAllProducts(search: '', page: 1);
+
+        purchaseOrderDetailsResponseModel =
+            PurchaseOrderDetailsResponseModel.fromJson(response);
+
+        if(purchasePaymentMethods == null){
+          await getPaymentMethods();
+        }
+
+        if(supplierList.isEmpty){
+         await getAllSupplierList();
+        }
+
+
+        if(serviceStuffList.isEmpty){
+          await getAllServiceStuff();
+        }
+
+        //selecting products
+        for (var e in purchaseOrderDetailsResponseModel!.data.details) {
+          ProductInfo productInfo = productsListResponseModel!.data.productList.singleWhere((f) => f.id == e.id);
+          addPlaceOrderProduct(productInfo, quantity:  e.quantity,);
+        }
+        
+
+        //Payment Methods
+        for (var e in purchaseOrderDetailsResponseModel!.data.paymentDetails) {
+          PaymentMethod paymentMethod = purchasePaymentMethods!.data.singleWhere((f) => f.id == e.id);
+          PaymentOption? paymentOption;
+
+          if(paymentMethod.name.toLowerCase().contains("cash")){
+            cashSelected = true;
+          }
+          if(paymentMethod.name.toLowerCase().contains("credit")){
+            creditSelected = true;
+          }
+
+          if(e.bank != null){
+            paymentOption = paymentMethod.paymentOptions.singleWhere((f) => f.id == e.bank!.id);
+          }
+
+          paymentMethodTracker.add(PaymentMethodTracker(
+            id: e.id,
+            paymentMethod: paymentMethod,
+            paidAmount: e.amount.toDouble(),
+            paymentOption: paymentOption,
+          ));
+          logger.i(paymentMethodTracker);
+        }
+        
+        selectedSupplier = supplierList.singleWhere((e) => e.id == purchaseOrderDetailsResponseModel!.data.supplier.id);
+
+        //service stuff
+        totalPaid = purchaseOrderDetailsResponseModel!.data.payable;
+        totalDiscount = purchaseOrderDetailsResponseModel!.data.discount;
+        additionalExpense = purchaseOrderDetailsResponseModel!.data.expense;
+      }
+    } catch (e) {
+      hasError.value = true;
+    } finally {
+
+      editPurchaseHistoryItemLoading = false;
+      update(['edit_purchase_history_item']);
+      // Methods.hideLoading();
+      RandomLottieLoader.hide();
+    }
   }
 
 }

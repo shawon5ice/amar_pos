@@ -115,10 +115,10 @@ class _PurchaseSummaryState extends State<PurchaseSummary> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        FieldTitle("Supplier Name"),
+                        const FieldTitle("Supplier Name"),
                         addH(4),
                         GetBuilder<PurchaseController>(
-                                id: 'client_list',
+                                id: 'supplier_list',
                                 builder: (controller) =>
                                     DropdownButtonHideUnderline(
                                   child: DropdownButton2<SupplierInfo>(
@@ -482,6 +482,7 @@ class _PurchaseSummaryState extends State<PurchaseSummary> {
                 }
               }
               logger.d(controller.createPurchaseOrderModel.toJson());
+              controller.createPurchaseOrder();
               // if(controller.isEditing){
               //   controller.updateSaleOrder(context);
               // }else{
