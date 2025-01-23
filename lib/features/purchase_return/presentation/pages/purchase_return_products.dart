@@ -1,7 +1,5 @@
 import 'package:amar_pos/core/core.dart';
-import 'package:amar_pos/features/purchase/data/models/purchase_product_response_model.dart';
-import 'package:amar_pos/features/purchase/presentation/purchase_controller.dart';
-import 'package:amar_pos/features/purchase/presentation/widgets/purchase_product_item_widget.dart';
+import 'package:amar_pos/features/purchase_return/presentation/purchase_return_controller.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -11,21 +9,23 @@ import '../../../../core/responsive/pixel_perfect.dart';
 import '../../../../core/widgets/custom_text_field.dart';
 import '../../../../core/widgets/pager_list_view.dart';
 import '../../../inventory/presentation/stock_report/widget/custom_svg_icon_widget.dart';
+import '../../data/models/purchase_return_products_response_model.dart';
+import '../widgets/purchase_return_product_item_widget.dart';
 
 
-class PurchaseProducts extends StatefulWidget {
-  const PurchaseProducts({super.key});
+class PurchaseReturnProducts extends StatefulWidget {
+  const PurchaseReturnProducts({super.key});
 
   @override
-  State<PurchaseProducts> createState() => _SoldHistoryState();
+  State<PurchaseReturnProducts> createState() => _SoldHistoryState();
 }
 
-class _SoldHistoryState extends State<PurchaseProducts> {
-  final PurchaseController controller = Get.find();
+class _SoldHistoryState extends State<PurchaseReturnProducts> {
+  final PurchaseReturnController controller = Get.find();
 
   @override
   void initState() {
-    controller.getPurchaseProducts();
+    controller.getPurchaseReturnProducts();
     super.initState();
   }
 
@@ -54,7 +54,7 @@ class _SoldHistoryState extends State<PurchaseProducts> {
                     brdrRadius: 40,
                     prefixWidget: Icon(Icons.search),
                     onChanged: (value){
-                      controller.getPurchaseProducts();
+                      controller.getPurchaseReturnProducts();
                     },
                   ),
                 ),
@@ -83,23 +83,23 @@ class _SoldHistoryState extends State<PurchaseProducts> {
               ],
             ),
             addH(8.px),
-            GetBuilder<PurchaseController>(
+            GetBuilder<PurchaseReturnController>(
               id: 'total_status_widget',
               builder: (controller) => Row(
                 children: [
                   TotalStatusWidget(
                     flex: 3,
-                    isLoading: controller.isPurchaseProductListLoading,
+                    isLoading: controller.isPurchaseReturnProductListLoading,
                     title: 'Total QTY',
-                    value: Methods.getFormattedNumber(controller.purchaseProductResponseModel?.countTotal.toDouble() ?? 0),
+                    value: Methods.getFormattedNumber(controller.purchaseReturnProductResponseModel?.countTotal.toDouble() ?? 0),
                     asset: AppAssets.productBox,
                   ),
                   addW(12),
                   TotalStatusWidget(
                     flex: 4,
-                    isLoading: controller.isPurchaseProductListLoading,
+                    isLoading: controller.isPurchaseReturnProductListLoading,
                     title: 'Purchase Amount',
-                    value: Methods.getFormatedPrice(controller.purchaseProductResponseModel?.amountTotal.toDouble() ?? 0),
+                    value: Methods.getFormatedPrice(controller.purchaseReturnProductResponseModel?.amountTotal.toDouble() ?? 0),
                     asset: AppAssets.amount,
                   ),
                 ],
@@ -107,42 +107,42 @@ class _SoldHistoryState extends State<PurchaseProducts> {
             ),
             addH(8),
             Expanded(
-              child: GetBuilder<PurchaseController>(
+              child: GetBuilder<PurchaseReturnController>(
                 id: 'purchase_product',
                 builder: (controller) {
-                  if (controller.isPurchaseProductListLoading) {
+                  if (controller.isPurchaseReturnProductListLoading) {
                     return const Center(
                       child: CircularProgressIndicator(),
                     );
-                  }else if(controller.purchaseProductResponseModel == null){
+                  }else if(controller.purchaseReturnProductResponseModel == null){
                     return Center(
                       child: Text("Something went wrong", style: context.textTheme.titleLarge,),
                     );
-                  }else if(controller.purchaseProductResponseModel!.data.returnProducts.isEmpty){
+                  }else if(controller.purchaseReturnProductResponseModel!.data.returnProducts.isEmpty){
                     return Center(
                       child: Text("No data found", style: context.textTheme.titleLarge,),
                     );
                   }
                   return RefreshIndicator(
                     onRefresh: () async {
-                      controller.getPurchaseProducts();
+                      controller.getPurchaseReturnProducts();
                     },
-                    child: PagerListView<PurchaseProduct>(
+                    child: PagerListView<PurchaseReturnProduct>(
                       // scrollController: _scrollController,
-                      items: controller.purchaseProducts,
+                      items: controller.purchaseReturnProducts,
                       itemBuilder: (_, item) {
-                        return PurchaseProductListItem(productInfo: item);
+                        return PurchaseReturnProductListItem(productInfo: item);
                       },
-                      isLoading: controller.isPurchaseProductsLoadingMore,
+                      isLoading: controller.isPurchaseReturnProductsLoadingMore,
                       hasError: controller.hasError.value,
                       onNewLoad: (int nextPage) async {
-                        await controller.getPurchaseProducts(page: nextPage);
+                        await controller.getPurchaseReturnProducts(page: nextPage);
                       },
                       totalPage: controller
-                          .purchaseProductResponseModel?.data.meta.lastPage ??
+                          .purchaseReturnProductResponseModel?.data.meta.lastPage ??
                           0,
                       totalSize:
-                      controller.purchaseProductResponseModel?.data.meta.total ??
+                      controller.purchaseReturnProductResponseModel?.data.meta.total ??
                           0,
                       itemPerPage: 10,
                     ),

@@ -231,7 +231,7 @@ class PurchaseReturnService {
     return response;
   }
 
-  static Future<dynamic> getPurchaseProducts({
+  static Future<dynamic> getPurchaseReturnProducts({
     required String usrToken,
     required int page,
     String? search,
@@ -242,7 +242,7 @@ class PurchaseReturnService {
     logger.d("Page: $page");
     var response = await BaseClient.getData(
         token: usrToken,
-        api: "purchase/get-purchase-product-list",
+        api: "purchase_return/get-purchase-return-product-list",
         parameter: {
           "status": 1,
           "page": page,

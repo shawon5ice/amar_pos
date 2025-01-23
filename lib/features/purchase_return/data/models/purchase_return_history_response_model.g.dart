@@ -28,7 +28,7 @@ Map<String, dynamic> _$PurchaseReturnHistoryResponseModelToJson(
 PurchaseReturnHistoryData _$PurchaseReturnHistoryDataFromJson(
         Map<String, dynamic> json) =>
     PurchaseReturnHistoryData(
-          purchaseReturnHistoryList: (json['data'] as List<dynamic>)
+      purchaseReturnHistoryList: (json['data'] as List<dynamic>)
           .map((e) =>
               PurchaseReturnOrderInfo.fromJson(e as Map<String, dynamic>))
           .toList(),

@@ -1,22 +1,22 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'purchase_product_response_model.dart';
+part of 'purchase_return_products_response_model.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-PurchaseProductResponseModel _$PurchaseProductResponseModelFromJson(
+PurchaseReturnProductResponseModel _$PurchaseReturnProductResponseModelFromJson(
         Map<String, dynamic> json) =>
-    PurchaseProductResponseModel(
+    PurchaseReturnProductResponseModel(
       success: json['success'] as bool,
       data: Data.fromJson(json['data'] as Map<String, dynamic>),
       countTotal: (json['count_total'] as num).toInt(),
       amountTotal: json['amount_total'] as num,
     );
 
-Map<String, dynamic> _$PurchaseProductResponseModelToJson(
-        PurchaseProductResponseModel instance) =>
+Map<String, dynamic> _$PurchaseReturnProductResponseModelToJson(
+        PurchaseReturnProductResponseModel instance) =>
     <String, dynamic>{
       'success': instance.success,
       'data': instance.data,
@@ -26,7 +26,7 @@ Map<String, dynamic> _$PurchaseProductResponseModelToJson(
 
 Data _$DataFromJson(Map<String, dynamic> json) => Data(
       returnProducts: (json['data'] as List<dynamic>)
-          .map((e) => PurchaseProduct.fromJson(e as Map<String, dynamic>))
+          .map((e) => PurchaseReturnProduct.fromJson(e as Map<String, dynamic>))
           .toList(),
       meta: Meta.fromJson(json['meta'] as Map<String, dynamic>),
     );
@@ -36,8 +36,9 @@ Map<String, dynamic> _$DataToJson(Data instance) => <String, dynamic>{
       'meta': instance.meta,
     };
 
-PurchaseProduct _$PurchaseProductFromJson(Map<String, dynamic> json) =>
-    PurchaseProduct(
+PurchaseReturnProduct _$PurchaseReturnProductFromJson(
+        Map<String, dynamic> json) =>
+    PurchaseReturnProduct(
       id: (json['id'] as num).toInt(),
       category: json['category'] as String,
       brand: json['brand'] as String,
@@ -46,7 +47,8 @@ PurchaseProduct _$PurchaseProductFromJson(Map<String, dynamic> json) =>
       totalPrice: json['total_price'] as num,
     );
 
-Map<String, dynamic> _$PurchaseProductToJson(PurchaseProduct instance) =>
+Map<String, dynamic> _$PurchaseReturnProductToJson(
+        PurchaseReturnProduct instance) =>
     <String, dynamic>{
       'id': instance.id,
       'category': instance.category,

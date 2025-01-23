@@ -2,10 +2,10 @@ import 'dart:convert';
 
 import 'package:json_annotation/json_annotation.dart';
 
-part 'purchase_product_response_model.g.dart'; // This is the generated file.
+part 'purchase_return_products_response_model.g.dart'; // This is the generated file.
 
 @JsonSerializable()
-class PurchaseProductResponseModel {
+class PurchaseReturnProductResponseModel {
   final bool success;
   final Data data;
   @JsonKey(name: 'count_total')
@@ -13,23 +13,23 @@ class PurchaseProductResponseModel {
   @JsonKey(name: 'amount_total')
   final num amountTotal;
 
-  PurchaseProductResponseModel({
+  PurchaseReturnProductResponseModel({
     required this.success,
     required this.data,
     required this.countTotal,
     required this.amountTotal,
   });
 
-  factory PurchaseProductResponseModel.fromJson(Map<String, dynamic> json) =>
-      _$PurchaseProductResponseModelFromJson(json);
+  factory PurchaseReturnProductResponseModel.fromJson(Map<String, dynamic> json) =>
+      _$PurchaseReturnProductResponseModelFromJson(json);
 
-  Map<String, dynamic> toJson() => _$PurchaseProductResponseModelToJson(this);
+  Map<String, dynamic> toJson() => _$PurchaseReturnProductResponseModelToJson(this);
 }
 
 @JsonSerializable()
 class Data {
   @JsonKey(name: 'data')
-  final List<PurchaseProduct> returnProducts; // Fixed type to match the intended model.
+  final List<PurchaseReturnProduct> returnProducts; // Fixed type to match the intended model.
   final Meta meta;
 
   Data({
@@ -43,7 +43,7 @@ class Data {
 }
 
 @JsonSerializable()
-class PurchaseProduct {
+class PurchaseReturnProduct {
   final int id;
   final String category;
   final String brand;
@@ -52,7 +52,7 @@ class PurchaseProduct {
   @JsonKey(name: 'total_price')
   final num totalPrice;
 
-  PurchaseProduct({
+  PurchaseReturnProduct({
     required this.id,
     required this.category,
     required this.brand,
@@ -61,10 +61,10 @@ class PurchaseProduct {
     required this.totalPrice,
   });
 
-  factory PurchaseProduct.fromJson(Map<String, dynamic> json) =>
-      _$PurchaseProductFromJson(json);
+  factory PurchaseReturnProduct.fromJson(Map<String, dynamic> json) =>
+      _$PurchaseReturnProductFromJson(json);
 
-  Map<String, dynamic> toJson() => _$PurchaseProductToJson(this);
+  Map<String, dynamic> toJson() => _$PurchaseReturnProductToJson(this);
 }
 
 @JsonSerializable()

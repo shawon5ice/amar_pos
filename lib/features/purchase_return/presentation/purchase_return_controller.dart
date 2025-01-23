@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'package:amar_pos/core/data/model/reusable/supplier_list_response_model.dart';
-import 'package:amar_pos/features/purchase/data/models/purchase_history_response_model.dart';
 import 'package:amar_pos/features/purchase/data/models/purchase_order_details_response_model.dart';
-import 'package:amar_pos/features/purchase/data/models/purchase_product_response_model.dart';
 import 'package:amar_pos/features/sales/data/models/payment_method_tracker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -14,6 +12,7 @@ import '../../auth/data/model/hive/login_data_helper.dart';
 import '../../inventory/data/products/product_list_response_model.dart';
 import '../data/models/create_purchase_return_order_model.dart';
 import '../data/models/purchase_return_history_response_model.dart';
+import '../data/models/purchase_return_products_response_model.dart';
 import '../data/purchase_return_service.dart';
 
 
@@ -88,10 +87,10 @@ class PurchaseReturnController extends GetxController{
 
 
   //Purchase Products
-  PurchaseProductResponseModel? purchaseProductResponseModel;
-  List<PurchaseProduct> purchaseProducts = [];
-  bool isPurchaseProductListLoading = false;
-  bool isPurchaseProductsLoadingMore = false;
+  PurchaseReturnProductResponseModel? purchaseReturnProductResponseModel;
+  List<PurchaseReturnProduct> purchaseReturnProducts = [];
+  bool isPurchaseReturnProductListLoading = false;
+  bool isPurchaseReturnProductsLoadingMore = false;
 
   void setSelectedDateRange(DateTimeRange? range) {
     selectedDateTimeRange.value = range;
@@ -468,13 +467,13 @@ class PurchaseReturnController extends GetxController{
     }
   }
 
-  Future<void> getPurchaseProducts({int page = 1}) async {
-    isPurchaseProductListLoading = page == 1;
-    isPurchaseProductsLoadingMore = page > 1;
+  Future<void> getPurchaseReturnProducts({int page = 1}) async {
+    isPurchaseReturnProductListLoading = page == 1;
+    isPurchaseReturnProductsLoadingMore = page > 1;
 
     if(page == 1){
-      purchaseProductResponseModel = null;
-      purchaseProducts.clear();
+      purchaseReturnProductResponseModel = null;
+      purchaseReturnProducts.clear();
     }
 
     hasError.value = false;
@@ -482,7 +481,7 @@ class PurchaseReturnController extends GetxController{
     update(['purchase_product','total_status_widget']);
 
     try {
-      var response = await PurchaseReturnService.getPurchaseProducts(
+      var response = await PurchaseReturnService.getPurchaseReturnProducts(
           usrToken: loginData!.token,
           page: page,
           search: searchProductController.text,
@@ -492,11 +491,11 @@ class PurchaseReturnController extends GetxController{
 
       logger.i(response);
       if (response != null) {
-        purchaseProductResponseModel =
-            PurchaseProductResponseModel.fromJson(response);
+        purchaseReturnProductResponseModel =
+            PurchaseReturnProductResponseModel.fromJson(response);
 
-        if (purchaseProductResponseModel != null) {
-          purchaseProducts.addAll(purchaseProductResponseModel!.data.returnProducts);
+        if (purchaseReturnProductResponseModel != null) {
+          purchaseReturnProducts.addAll(purchaseReturnProductResponseModel!.data.returnProducts);
         }
       } else {
         if(page != 1){
@@ -505,11 +504,11 @@ class PurchaseReturnController extends GetxController{
       }
     } catch (e) {
       hasError.value = true;
-      purchaseProducts.clear();
+      purchaseReturnProducts.clear();
       logger.e(e);
     } finally {
-      isPurchaseProductsLoadingMore = false;
-      isPurchaseProductListLoading = false;
+      isPurchaseReturnProductsLoadingMore = false;
+      isPurchaseReturnProductListLoading = false;
       update(['purchase_product','total_status_widget']);
     }
   }

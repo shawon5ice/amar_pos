@@ -131,7 +131,7 @@ class _PurchaseViewState extends State<PurchaseView> {
                               hintText: "Scan / Type ID or name",
                               contentPadding:
                               const EdgeInsets.symmetric(horizontal: 20),
-                              hintStyle: const TextStyle(color: Colors.grey),
+                              hintStyle: TextStyle(color: Colors.grey, fontSize: 18),
                             ),
                           );
                         },

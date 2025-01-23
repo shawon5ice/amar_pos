@@ -361,13 +361,15 @@ class _ExpandableDrawerWidgetState extends State<ExpandableDrawerWidget> {
                                       color: AppColors.accent,
                                       margin: const EdgeInsets.only(right: 4),
                                     ),
-                                    Text(
-                                      child,
-                                      style: TextStyle(
-                                        color: widget.selectedChild == child
-                                            ? AppColors.accent
-                                            : AppColors.textDarkPrimary,
-                                        fontSize: 12,
+                                    Expanded(
+                                      child: Text(
+                                        child,
+                                        style: TextStyle(
+                                          color: widget.selectedChild == child
+                                              ? AppColors.accent
+                                              : AppColors.textDarkPrimary,
+                                          fontSize: 12,
+                                        ),
                                       ),
                                     ),
                                   ],

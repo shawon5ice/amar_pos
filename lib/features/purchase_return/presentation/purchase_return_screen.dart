@@ -12,6 +12,7 @@ import '../../../core/constants/app_assets.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/responsive/pixel_perfect.dart';
 import '../../drawer/drawer_menu_controller.dart';
+import 'pages/purchase_return_products.dart';
 import 'purchase_return_controller.dart';
 
 class PurchaseReturnScreen extends StatefulWidget {
@@ -147,7 +148,7 @@ class _PurchaseReturnScreenState extends State<PurchaseReturnScreen>
                   PurchaseReturnHistoryScreen(onChange: (value){
                     _tabController.animateTo(value);
                   }),
-                  PurchaseProducts(),
+                  PurchaseReturnProducts(),
                 ],
               ),
             )

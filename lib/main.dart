@@ -32,7 +32,6 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-
   const MyApp({Key? key}) : super(key: key);
 
   @override
@@ -51,7 +50,13 @@ class MyApp extends StatelessWidget {
             FocusManager.instance.primaryFocus?.unfocus();
           },
           behavior: HitTestBehavior.opaque,
-          child: child,
+          child: MediaQuery(
+            data: MediaQuery.of(context).copyWith(
+              textScaler: TextScaler.noScaling,
+              devicePixelRatio: (MediaQuery.of(context).devicePixelRatio).clamp(1.0, 2.0),
+            ),
+            child: child!,
+          ),
         );
       }),
       // home: DrawerSetup(),
