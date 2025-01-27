@@ -457,7 +457,9 @@ class PurchaseReturnController extends GetxController{
         }
       }
     } catch (e) {
-      hasError.value = true;
+      if(page != 1){
+        hasError.value = true;
+      }
       purchaseReturnHistoryList.clear();
       logger.e(e);
     } finally {
@@ -495,7 +497,7 @@ class PurchaseReturnController extends GetxController{
             PurchaseReturnProductResponseModel.fromJson(response);
 
         if (purchaseReturnProductResponseModel != null) {
-          purchaseReturnProducts.addAll(purchaseReturnProductResponseModel!.data.returnProducts);
+          purchaseReturnProducts.addAll(purchaseReturnProductResponseModel!.data!.returnProducts!);
         }
       } else {
         if(page != 1){
@@ -503,7 +505,9 @@ class PurchaseReturnController extends GetxController{
         }
       }
     } catch (e) {
-      hasError.value = true;
+      if(page != 1){
+        hasError.value = true;
+      }
       purchaseReturnProducts.clear();
       logger.e(e);
     } finally {

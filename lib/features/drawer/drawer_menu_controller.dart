@@ -1,4 +1,5 @@
 import 'package:amar_pos/core/constants/logger/logger.dart';
+import 'package:amar_pos/features/accounting/presentation/accounting_screen.dart';
 import 'package:amar_pos/features/auth/data/model/hive/login_data.dart';
 import 'package:amar_pos/features/auth/data/model/hive/login_data_helper.dart';
 import 'package:amar_pos/features/exchange/exchange_screen.dart';
@@ -111,6 +112,9 @@ class DrawerMenuController extends GetxController {
         }else{
           return Container();
         }
+      case DrawerItems.accounting:
+        // currentScreen.value = ConfigurationScreen.routeName;
+        return AccountingScreen();
       case DrawerItems.config:
         currentScreen.value = ConfigurationScreen.routeName;
         return ConfigurationScreen(); // Configuration screen widget

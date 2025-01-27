@@ -125,13 +125,13 @@ class _PurchaseReturnHistoryScreenState extends State<PurchaseReturnHistoryScree
                     return const Center(
                       child: CircularProgressIndicator(),
                     );
+                  }else if(controller.purchaseReturnHistoryList.isEmpty && controller.hasError.value == false){
+                    return Center(
+                      child: Text("No data found", style: context.textTheme.titleLarge,),
+                    );
                   }else if(controller.purchaseReturnHistoryResponseModel == null){
                     return Center(
                       child: Text("Something went wrong", style: context.textTheme.titleLarge,),
-                    );
-                  }else if(controller.purchaseReturnHistoryResponseModel!.data.purchaseReturnHistoryList.isEmpty){
-                    return Center(
-                      child: Text("No data found", style: context.textTheme.titleLarge,),
                     );
                   }
                   return RefreshIndicator(

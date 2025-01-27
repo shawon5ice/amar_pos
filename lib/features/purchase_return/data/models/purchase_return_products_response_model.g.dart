@@ -10,30 +10,35 @@ PurchaseReturnProductResponseModel _$PurchaseReturnProductResponseModelFromJson(
         Map<String, dynamic> json) =>
     PurchaseReturnProductResponseModel(
       success: json['success'] as bool,
-      data: Data.fromJson(json['data'] as Map<String, dynamic>),
+      data: json['data'] == null
+          ? null
+          : Data.fromJson(json['data'] as Map<String, dynamic>),
       countTotal: (json['count_total'] as num).toInt(),
-      amountTotal: json['amount_total'] as num,
+      amountTotal: (json['amount_total'] as num).toInt(),
     );
 
 Map<String, dynamic> _$PurchaseReturnProductResponseModelToJson(
         PurchaseReturnProductResponseModel instance) =>
     <String, dynamic>{
       'success': instance.success,
-      'data': instance.data,
+      'data': instance.data?.toJson(),
       'count_total': instance.countTotal,
       'amount_total': instance.amountTotal,
     };
 
 Data _$DataFromJson(Map<String, dynamic> json) => Data(
-      returnProducts: (json['data'] as List<dynamic>)
-          .map((e) => PurchaseReturnProduct.fromJson(e as Map<String, dynamic>))
+      returnProducts: (json['data'] as List<dynamic>?)
+          ?.map(
+              (e) => PurchaseReturnProduct.fromJson(e as Map<String, dynamic>))
           .toList(),
-      meta: Meta.fromJson(json['meta'] as Map<String, dynamic>),
+      meta: json['meta'] == null
+          ? null
+          : Meta.fromJson(json['meta'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$DataToJson(Data instance) => <String, dynamic>{
-      'data': instance.returnProducts,
-      'meta': instance.meta,
+      'data': instance.returnProducts?.map((e) => e.toJson()).toList(),
+      'meta': instance.meta?.toJson(),
     };
 
 PurchaseReturnProduct _$PurchaseReturnProductFromJson(
@@ -44,7 +49,7 @@ PurchaseReturnProduct _$PurchaseReturnProductFromJson(
       brand: json['brand'] as String,
       product: json['product'] as String,
       quantity: (json['quantity'] as num).toInt(),
-      totalPrice: json['total_price'] as num,
+      totalPrice: (json['total_price'] as num).toInt(),
     );
 
 Map<String, dynamic> _$PurchaseReturnProductToJson(

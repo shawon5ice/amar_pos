@@ -114,13 +114,13 @@ class _SoldHistoryState extends State<PurchaseReturnProducts> {
                     return const Center(
                       child: CircularProgressIndicator(),
                     );
-                  }else if(controller.purchaseReturnProductResponseModel == null){
-                    return Center(
-                      child: Text("Something went wrong", style: context.textTheme.titleLarge,),
-                    );
-                  }else if(controller.purchaseReturnProductResponseModel!.data.returnProducts.isEmpty){
+                  }else if(controller.purchaseReturnProducts.isEmpty){
                     return Center(
                       child: Text("No data found", style: context.textTheme.titleLarge,),
+                    );
+                  }else if(controller.hasError.value){
+                    return Center(
+                      child: Text("Something went wrong", style: context.textTheme.titleLarge,),
                     );
                   }
                   return RefreshIndicator(
@@ -139,10 +139,10 @@ class _SoldHistoryState extends State<PurchaseReturnProducts> {
                         await controller.getPurchaseReturnProducts(page: nextPage);
                       },
                       totalPage: controller
-                          .purchaseReturnProductResponseModel?.data.meta.lastPage ??
+                          .purchaseReturnProductResponseModel?.data?.meta?.lastPage ??
                           0,
                       totalSize:
-                      controller.purchaseReturnProductResponseModel?.data.meta.total ??
+                      controller.purchaseReturnProductResponseModel?.data?.meta?.total ??
                           0,
                       itemPerPage: 10,
                     ),
