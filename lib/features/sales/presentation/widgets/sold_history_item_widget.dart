@@ -32,17 +32,17 @@ class SoldHistoryItemWidget extends StatelessWidget {
         Get.to(()=> InvoiceWidget(saleHistory: saleHistory));
       },
       child: Container(
-        margin: EdgeInsets.symmetric(vertical: 5.h),
+        margin: EdgeInsets.symmetric(vertical: 5),
         padding: const EdgeInsets.all(10),
         foregroundDecoration: !saleHistory.isActionable
             ? BoxDecoration(
                 color: const Color(0xff7c7c7c).withOpacity(.3),
-                borderRadius: BorderRadius.all(Radius.circular(20.r)),
+                borderRadius: BorderRadius.all(Radius.circular(20)),
               )
             : null,
         decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.all(Radius.circular(20.r))),
+            borderRadius: BorderRadius.all(Radius.circular(20))),
         child: Column(
           children: [
             Row(
@@ -70,7 +70,7 @@ class SoldHistoryItemWidget extends StatelessWidget {
                           ),
                         ),
                       ),
-                      addW(8.w),
+                      addW(8),
                       Container(
                         padding:
                             const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -94,7 +94,7 @@ class SoldHistoryItemWidget extends StatelessWidget {
                     ],
                   ),
                 ),
-                addW(8.w),
+                addW(8),
                 CustomSvgSmallIconButton(
                   borderColor: const Color(0xff03346E),
                   bgColor: const Color(0xffE1F2FF),
@@ -188,7 +188,7 @@ class SaleHistoryItemTitleValueWidget extends StatelessWidget {
             flex: 2,
             child: Text(
               title,
-              style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w400),
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
             )),
         const Text(" : "),
         Expanded(
@@ -196,7 +196,7 @@ class SaleHistoryItemTitleValueWidget extends StatelessWidget {
             child: Text(
               value,
               textAlign: TextAlign.end,
-              style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w400),
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
             )),
       ],
     );
@@ -234,7 +234,7 @@ class TitleValueWidget extends StatelessWidget {
           : EdgeInsets.zero,
       decoration: BoxDecoration(
         color: bgColor ?? const Color(0xffFFFBED),
-        borderRadius: BorderRadius.all(Radius.circular(20.r)),
+        borderRadius: BorderRadius.all(Radius.circular(20)),
         border: Border.all(
             color: borderColor ?? const Color(0xffff9000), width: .5),
       ),

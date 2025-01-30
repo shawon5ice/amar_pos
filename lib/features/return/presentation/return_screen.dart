@@ -148,7 +148,7 @@ class _SalesScreenState extends State<ReturnScreen>
             child: Column(
               children: [
                 Container(
-                  height: 40.h,
+                  height: 40,
                   padding: const EdgeInsets.all(4),
                   decoration: const BoxDecoration(
                     color: Colors.white,
@@ -158,8 +158,7 @@ class _SalesScreenState extends State<ReturnScreen>
                     dividerHeight: 0,
                     controller: _tabController,
                     indicatorSize: TabBarIndicatorSize.tab,
-                    labelStyle:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp),
+                    labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                     indicator: BoxDecoration(
                       color: AppColors.primary,
                       borderRadius: BorderRadius.circular(20),

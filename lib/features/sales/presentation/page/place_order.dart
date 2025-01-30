@@ -252,8 +252,8 @@ class _PlaceOrderState extends State<PlaceOrder> {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Container(
-                                      width: 70.w,
-                                      height: 70.w,
+                                      width: 70,
+                                      height: 70,
                                       padding: EdgeInsets.all(1.px),
                                       decoration: ShapeDecoration(
                                         color: const Color(0x33BEBEBE)
@@ -271,50 +271,46 @@ class _PlaceOrderState extends State<PlaceOrder> {
                                             controller.placeOrderProducts[index]
                                                 .thumbnailImage
                                                 .toString(),
-                                            height: 70.w,
-                                            width: 70.w,
+                                            height: 70,
+                                            width: 70,
                                             fit: BoxFit.cover,
                                           )),
                                     ),
-                                    addW(12.w),
+                                    addW(12),
                                     Expanded(
                                       flex: 8,
-                                      child: Container(
-                                        margin: const EdgeInsets.only(top: 10),
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              controller
-                                                  .placeOrderProducts[index]
-                                                  .name,
-                                              style: context
-                                                  .textTheme.titleSmall
-                                                  ?.copyWith(
-                                                fontSize: 13.sp,
-                                              ),
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            controller
+                                                .placeOrderProducts[index]
+                                                .name,
+                                            style: context
+                                                .textTheme.titleSmall
+                                                ?.copyWith(
+                                              fontSize: 13,
                                             ),
-                                            addH(8.h),
-                                            Text(
-                                              "ID : ${controller.placeOrderProducts[index].sku}",
-                                              style: TextStyle(
-                                                  color:
-                                                      const Color(0xff40ACE3),
-                                                  fontWeight: FontWeight.w400,
-                                                  fontSize: 14.sp),
-                                            ),
-                                          ],
-                                        ),
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          addH(8),
+                                          Text(
+                                            "ID : ${controller.placeOrderProducts[index].sku}",
+                                            style: const TextStyle(
+                                                color: Color(0xff40ACE3),
+                                                fontWeight: FontWeight.w400,
+                                                fontSize: 14),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ],
                                 ),
-                                addH(12.h),
+                                addH(12),
                                 Row(
                                   children: [
                                     Expanded(
@@ -337,18 +333,18 @@ class _PlaceOrderState extends State<PlaceOrder> {
                                     )),
                                   ],
                                 ),
-                                addH(12.h),
+                                addH(12),
                                 Row(
                                   children: [
                                     Expanded(
                                       child: Container(
                                         // margin: EdgeInsets.only(right: 20),
-                                        height: 30.h,
+                                        height: 30,
                                         decoration: BoxDecoration(
                                             color: const Color(0xffFFFBED)
                                                 .withOpacity(.3),
                                             borderRadius: BorderRadius.all(
-                                                Radius.circular(20.r)),
+                                                Radius.circular(20)),
                                             border: Border.all(
                                                 color: const Color(0xffff9000)
                                                     .withOpacity(.3),
@@ -363,7 +359,7 @@ class _PlaceOrderState extends State<PlaceOrder> {
                                                   .textTheme.titleSmall
                                                   ?.copyWith(
                                                 color: const Color(0xffFF9000),
-                                                fontSize: 14.sp,
+                                                fontSize: 14,
                                                 fontWeight: FontWeight.w600,
                                               ),
                                             ),
@@ -428,13 +424,13 @@ class _PlaceOrderState extends State<PlaceOrder> {
                                           );
                                         },
                                         child: Container(
-                                          height: 30.h,
+                                          height: 30,
                                           padding: const EdgeInsets.symmetric(
                                               horizontal: 12),
                                           decoration: BoxDecoration(
                                               color: const Color(0xffF6FFF6),
                                               borderRadius: BorderRadius.all(
-                                                  Radius.circular(20.r)),
+                                                  Radius.circular(20)),
                                               border: Border.all(
                                                   color: const Color(0xff94DB8C)
                                                       .withOpacity(.3))),
@@ -447,7 +443,7 @@ class _PlaceOrderState extends State<PlaceOrder> {
                                                     ?.copyWith(
                                                   color:
                                                       const Color(0xff009D5D),
-                                                  fontSize: 14.sp,
+                                                  fontSize: 14,
                                                   fontWeight: FontWeight.w600,
                                                 ),
                                               ),

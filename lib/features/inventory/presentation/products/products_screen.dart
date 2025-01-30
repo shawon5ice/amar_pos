@@ -92,7 +92,7 @@ class _ProductsScreenState extends State<ProductsScreen>
             child: Column(
               children: [
                 Container(
-                  height: 40.h,
+                  height: 40,
                   padding: const EdgeInsets.all(4),
                   decoration: const BoxDecoration(
                     color: Colors.white,
@@ -103,7 +103,7 @@ class _ProductsScreenState extends State<ProductsScreen>
                     controller: _tabController,
                     indicatorSize: TabBarIndicatorSize.tab,
                     labelStyle:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp),
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                     indicator: BoxDecoration(
                       color: AppColors.primary,
                       borderRadius: BorderRadius.circular(20),
@@ -144,7 +144,7 @@ class _ProductsScreenState extends State<ProductsScreen>
                 //     controller.getAllProducts(activeStatus: _tabController.index == 0, page: 1, search: value);
                 //   },
                 // ),
-                addH(16.px),
+                addH(16),
                 Expanded(
                   child: GetBuilder<ProductController>(
                     id: 'product_list',

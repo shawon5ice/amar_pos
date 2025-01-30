@@ -9,7 +9,7 @@ class CustomButton extends StatelessWidget {
     super.key,
     this.marginHorizontal = 0,
     this.marginVertical = 0,
-    this.height = 54,
+    this.height = 56,
     this.radius = 40,
     this.width = double.infinity,
     this.text = "Add Now",
@@ -43,7 +43,7 @@ class CustomButton extends StatelessWidget {
           child: Text(
             text,
             style: context.textTheme.titleMedium
-                ?.copyWith(color: textColor, fontSize: 16.px),
+                ?.copyWith(color: textColor, fontSize: 16),
           ),
         ),
       ),

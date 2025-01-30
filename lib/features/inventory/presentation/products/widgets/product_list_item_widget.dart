@@ -24,17 +24,17 @@ class ProductListItemWidget extends StatelessWidget {
         Get.to(()=> const ProductQuickViewScreen(), arguments: productInfo);
       },
       child: Container(
-        margin: EdgeInsets.symmetric(vertical: 5.h),
+        margin: EdgeInsets.symmetric(vertical: 5),
         padding: const EdgeInsets.only(left: 20, top: 10, bottom: 20, right: 0),
         foregroundDecoration: productInfo.status == 0
             ? BoxDecoration(
                 color: const Color(0xff7c7c7c).withOpacity(.3),
-                borderRadius: BorderRadius.all(Radius.circular(20.r)),
+                borderRadius: BorderRadius.all(Radius.circular(20)),
               )
             : null,
         decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.all(Radius.circular(20.r))),
+            borderRadius: BorderRadius.all(Radius.circular(20))),
         child: Column(
           children: [
             Row(
@@ -42,27 +42,27 @@ class ProductListItemWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Container(
-                  width: 70.w,
-                  height: 70.w,
+                  width: 70,
+                  height: 70,
                   margin: const EdgeInsets.only(top: 10),
-                  padding: EdgeInsets.all(1.px),
+                  padding: EdgeInsets.all(1),
                   decoration: ShapeDecoration(
                     color: const Color(0x33BEBEBE).withOpacity(.3),
                     // image: DecorationImage(image: NetworkImage(controller.supplierList[index].photo!)),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.r),
+                      borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                   child: ClipRRect(
-                      borderRadius: BorderRadius.all(Radius.circular(8.r)),
+                      borderRadius: BorderRadius.all(Radius.circular(8)),
                       child: Image.network(
                         productInfo.thumbnailImage.toString(),
-                        height: 70.w,
-                        width: 70.w,
+                        height: 70,
+                        width: 70,
                         fit: BoxFit.cover,
                       )),
                 ),
-                addW(12.w),
+                addW(12),
                 Expanded(
                   flex: 8,
                   child: Container(
@@ -74,12 +74,12 @@ class ProductListItemWidget extends StatelessWidget {
                         Text(
                           productInfo.name,
                           style: context.textTheme.titleSmall?.copyWith(
-                            fontSize: 13.sp,
+                            fontSize: 13,
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        addH(8.h),
+                        addH(8),
                         Row(
                           children: [
                             const Expanded(
@@ -94,7 +94,7 @@ class ProductListItemWidget extends StatelessWidget {
                             ),
                           ],
                         ),
-                        addH(4.h),
+                        addH(4),
                         Row(
                           children: [
                             const Expanded(
@@ -179,13 +179,13 @@ class ProductListItemWidget extends StatelessWidget {
                 // )
               ],
             ),
-            addH(12.h),
+            addH(12),
             Row(
               children: [
                 Expanded(
                   child: Container(
                     // margin: EdgeInsets.only(right: 20),
-                    height: 30.h,
+                    height: 30,
                     decoration: BoxDecoration(
                         color: const Color(0xffFFFBED).withOpacity(.3),
                         borderRadius: BorderRadius.all(Radius.circular(20.r)),
@@ -197,7 +197,7 @@ class ProductListItemWidget extends StatelessWidget {
                       "WSP : ${Methods.getFormatedPrice(productInfo.wholesalePrice.toDouble())}",
                       style: context.textTheme.titleSmall?.copyWith(
                           color: Color(0xffFF9000),
-                          fontSize: 14.sp,
+                          fontSize: 14,
                           fontWeight: FontWeight.w600),
                     )),
                   ),
@@ -208,10 +208,10 @@ class ProductListItemWidget extends StatelessWidget {
                 Expanded(
                   child: Container(
                     margin: EdgeInsets.only(right: 20),
-                    height: 30.h,
+                    height: 30,
                     decoration: BoxDecoration(
                         color: Color(0xffF6FFF6),
-                        borderRadius: BorderRadius.all(Radius.circular(20.r)),
+                        borderRadius: BorderRadius.all(Radius.circular(20)),
                         border: Border.all(
                             color: const Color(0xff94DB8C).withOpacity(.3))),
                     child: Center(
@@ -219,7 +219,7 @@ class ProductListItemWidget extends StatelessWidget {
                       "MRP : ${Methods.getFormatedPrice(productInfo.mrpPrice.toDouble())}",
                       style: context.textTheme.titleSmall?.copyWith(
                           color: Color(0xff009D5D),
-                          fontSize: 14.sp,
+                          fontSize: 14,
                           fontWeight: FontWeight.w600),
                     )),
                   ),

@@ -54,9 +54,9 @@ class _CustomDropdownState<T> extends State<CustomDropdown<T>> {
       children: [
         if(widget.noTitle == null)Column(
           children: [
-            addH(16.h),
+            // addH(16),
             widget.isMandatory ? RichFieldTitle(text: widget.title,) : FieldTitle(widget.title,),
-            addH(8.h),
+            addH(4),
           ],
         ),
         DropdownButtonHideUnderline(

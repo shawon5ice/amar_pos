@@ -178,7 +178,7 @@ class _BillingSummaryState extends State<BillingSummary> {
                                       }
                                     },
                                     buttonStyleData: ButtonStyleData(
-                                      height: 56.sp,
+                                      height: 56,
                                       padding: EdgeInsets.zero,
                                       decoration: BoxDecoration(
                                         border: Border.all(
@@ -408,7 +408,7 @@ class _BillingSummaryState extends State<BillingSummary> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          addH(16.h),
+                                          // addH(16.h),
                                           FieldTitle(
                                               "${controller.totalDeu < 0 ? "Change" : "Deo"} Amount"),
                                           addH(4),

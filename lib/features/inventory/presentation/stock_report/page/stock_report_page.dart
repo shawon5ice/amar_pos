@@ -31,7 +31,7 @@ class _StockReportPageState extends State<StockReportPage> {
             // _brandController.searchBrand(search: value);
           },
         ),
-        addH(16.px),
+        addH(16),
         Expanded(
           child: GetBuilder<StockReportController>(
             id: 'stock_report_list',

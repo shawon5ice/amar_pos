@@ -38,7 +38,7 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -49,12 +49,12 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
                   builder: (controller) {
                     if (controller.detailsLoading) {
                       return Center(child: SpinKitFoldingCube(size: 100,color: AppColors.primary,));
-                    } else {
+                    } else if(controller.saleHistoryDetailsResponseModel != null){
                       return Column(
                         children: [
                           Card(
                             child: Padding(
-                              padding: const EdgeInsets.all(12.0),
+                              padding: const EdgeInsets.all(20.0),
                               child: Column(
                                 children: [
                                   Row(
@@ -115,7 +115,7 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
                           ),
                           Card(
                             child: Padding(
-                              padding: const EdgeInsets.all(12.0),
+                              padding: const EdgeInsets.all(20.0),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -152,7 +152,7 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
                                           children: [
                                             Text(
                                                 "Invoice No.: ${widget.saleHistory.orderNo}",
-                                                style: TextStyle(
+                                                style:const  TextStyle(
                                                     fontWeight:
                                                         FontWeight.bold)),
                                             Text(
@@ -173,17 +173,17 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
                           Table(
                             border: TableBorder.all(color: Colors.grey),
                             columnWidths: {
-                              0: FixedColumnWidth(40),
+                              0: FixedColumnWidth(40.w),
                               1: FlexColumnWidth(),
-                              2: FixedColumnWidth(40),
-                              3: FixedColumnWidth(60),
-                              4: FixedColumnWidth(60),
+                              2: FixedColumnWidth(40.w),
+                              3: FixedColumnWidth(40.w),
+                              4: FixedColumnWidth(60.w),
                             },
                             children: [
                               TableRow(
                                 decoration:
                                     BoxDecoration(color: Colors.grey[200]),
-                                children: [
+                                children: const [
                                   Padding(
                                       padding: EdgeInsets.all(8),
                                       child: Text("Sl No.",
@@ -364,7 +364,9 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
                         ],
                       );
                     }
-                    return SizedBox.shrink();
+                    return Center(
+                      child: Text("No data found!"),
+                    );
                   },
                 ),
               ),
