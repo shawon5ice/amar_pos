@@ -70,6 +70,8 @@ dev_dependencies:
   json_serializable:
 
 
+
+
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your
@@ -84,6 +86,9 @@ dev_dependencies:
   infinite_scroll_pagination:
   build_runner:
 
+
+dependency_override:
+  ai_barcode_scanner: 5.2.1
 
 
 # For information on the generic Dart part of this file, see the

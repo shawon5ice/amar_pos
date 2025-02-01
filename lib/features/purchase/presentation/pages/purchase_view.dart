@@ -1,3 +1,4 @@
+import 'package:amar_pos/core/constants/logger/logger.dart';
 import 'package:amar_pos/features/inventory/presentation/products/add_product_screen.dart';
 import 'package:amar_pos/features/purchase/data/models/create_purchase_order_model.dart';
 import 'package:amar_pos/features/purchase/presentation/pages/purchase_summary.dart';
@@ -31,6 +32,7 @@ class _PurchaseViewState extends State<PurchaseView> {
   final TextEditingController _purchasePrice = TextEditingController();
 
   List<TextEditingController> purchaseControllers = [];
+  List<TextEditingController> purchaseQTYControllers = [];
 
   @override
   void initState() {
@@ -44,7 +46,10 @@ class _PurchaseViewState extends State<PurchaseView> {
       );
     }else{
       for (var e in controller.createPurchaseOrderModel.products) {
-        purchaseControllers.add(TextEditingController(text: e.unitPrice.toString()));
+        purchaseControllers.add(TextEditingController(text: e.unitPrice.toString(),));
+      }
+      for (var e in controller.createPurchaseOrderModel.products) {
+        purchaseQTYControllers.add(TextEditingController(text: e.quantity.toString(),));
       }
     }
     super.initState();
@@ -64,6 +69,10 @@ class _PurchaseViewState extends State<PurchaseView> {
 
   @override
   void dispose() {
+    for(int i=0;i<purchaseControllers.length; i++){
+      purchaseControllers[i].dispose();
+      purchaseQTYControllers[i].dispose();
+    }
     super.dispose();
   }
 
@@ -119,7 +128,16 @@ class _PurchaseViewState extends State<PurchaseView> {
                                         suggestionEditingController.clear();
                                         controller
                                             .addPlaceOrderProduct(items.first);
-                                        purchaseControllers.add(TextEditingController(text: items.first.wholesalePrice.toString()));
+                                        int value = controller.createPurchaseOrderModel.products.singleWhere((e) => e.id == items.first.id).quantity++;
+
+                                        if(controller.purchaseProducts.any((e) => e.id == items.first.id)){
+                                          int index = controller.purchaseProducts.indexOf(controller.purchaseProducts.singleWhere((e) => e.id == items.first.id));
+                                          purchaseQTYControllers[index].text = value.toString();
+                                        }else{
+                                          purchaseControllers.add(TextEditingController(text: items.first.wholesalePrice.toString()));
+                                          purchaseQTYControllers.add(TextEditingController(text: value.toString()));
+                                        }
+
                                         FocusScope.of(context).unfocus();
                                       }
                                     }
@@ -168,7 +186,15 @@ class _PurchaseViewState extends State<PurchaseView> {
                         },
                         onSelected: (product) {
                           controller.addPlaceOrderProduct(product);
-                          purchaseControllers.add(TextEditingController(text: product.wholesalePrice.toString()));
+                          int value = controller.createPurchaseOrderModel.products.singleWhere((e) => e.id == product.id).quantity;
+                          if(controller.purchaseOrderProducts.any((e) => e.id == product.id)){
+                            // int index = controller.purchaseProducts.indexOf(controller.purchaseProducts.singleWhere((e) => e.id == product.id));
+                            purchaseQTYControllers[0].text = "100";
+                            logger.i(purchaseQTYControllers[0].value);
+                          }else{
+                            purchaseControllers.add(TextEditingController(text:product.wholesalePrice.toString()));
+                            purchaseQTYControllers.add(TextEditingController(text: "1"));
+                          }
                           suggestionEditingController.clear();
                           FocusScope.of(context).unfocus();
                         },
@@ -231,9 +257,13 @@ class _PurchaseViewState extends State<PurchaseView> {
                               children: [
                                 addW(10),
                                 CustomSlidableAction(
-                                    onPressed: (context) => controller
+                                    onPressed: (context) {
+                                      purchaseControllers.removeAt(index);
+                                      purchaseQTYControllers.removeAt(index);
+                                      controller
                                         .removePlaceOrderProduct(controller
-                                            .purchaseOrderProducts[index]),
+                                            .purchaseOrderProducts[index]);
+                                    },
                                     backgroundColor: const Color(0xffEF4B4B),
                                     borderRadius: const BorderRadius.all(
                                         Radius.circular(20)),
@@ -293,7 +323,6 @@ class _PurchaseViewState extends State<PurchaseView> {
                                     Expanded(
                                       flex: 8,
                                       child: Container(
-                                        margin: const EdgeInsets.only(top: 10),
                                         child: Column(
                                           mainAxisAlignment:
                                               MainAxisAlignment.start,
@@ -342,7 +371,7 @@ class _PurchaseViewState extends State<PurchaseView> {
                                         addW(4),
                                         Expanded(
                                           child: TextFormField(
-                                            key: ValueKey(controller.createPurchaseOrderModel.products[index].id),
+                                            key: Key(controller.createPurchaseOrderModel.products[index].id.toString()),
                                             controller: purchaseControllers[index],
                                             keyboardType: TextInputType.number,
                                             onTap: () {
@@ -376,19 +405,8 @@ class _PurchaseViewState extends State<PurchaseView> {
                                         ),
                                       ],
                                     )),
-                                    addW(12),
-                                    Expanded(
-                                      flex: 2,
-                                        child: GetBuilder<PurchaseController>(
-                                          id: 'vat',
-                                          builder: (controller){
-                                            return Text(
-                                              "Vat : ${Methods.getFormatedPrice((controller.purchaseOrderProducts[index].vat*(controller.createPurchaseOrderModel.products[index].unitPrice/100)).toDouble())}",
-                                              style: const TextStyle(
-                                                  color: AppColors.primary),
-                                            );
-                                          },
-                                        )),
+                                    const Expanded(child: SizedBox.shrink()),
+                                    addW(8),
                                     Expanded(
                                       flex: 2,
                                       child: GetBuilder<PurchaseController>(
@@ -425,7 +443,7 @@ class _PurchaseViewState extends State<PurchaseView> {
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             Text(
-                                              "Quantity : ${controller.createPurchaseOrderModel.products[index].quantity}",
+                                              "Quantity : ",
                                               style: context
                                                   .textTheme.titleSmall
                                                   ?.copyWith(
@@ -435,35 +453,69 @@ class _PurchaseViewState extends State<PurchaseView> {
                                               ),
                                             ),
                                             addW(8),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    controller
-                                                        .changeQuantityOfProduct(
-                                                            index, false);
-                                                  },
-                                                  child: const Icon(
-                                                      Icons.keyboard_arrow_down,
-                                                      size: 24,
-                                                      color: AppColors.error),
-                                                ),
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    controller
-                                                        .changeQuantityOfProduct(
-                                                            index, true);
-                                                  },
-                                                  child: const Icon(
-                                                    Icons.keyboard_arrow_up,
-                                                    size: 24,
-                                                    color: AppColors.lightGreen,
+                                            Expanded(
+                                              child: TextFormField(
+                                                key: Key(controller.createPurchaseOrderModel.products[index].id.toString()),
+                                                controller: purchaseQTYControllers[index],
+                                                keyboardType: TextInputType.number,
+                                                onTap: () {
+                                                  purchaseQTYControllers[index].selection = TextSelection.fromPosition(
+                                                    TextPosition(offset: purchaseQTYControllers[index].text.length),
+                                                  );
+                                                },
+                                                onChanged: (value) {
+                                                  if (value.isNotEmpty) {
+                                                    controller.createPurchaseOrderModel.products[index].quantity = int.parse(value);
+                                                    controller.update(['sub_total', 'vat']);
+                                                  }
+                                                },
+                                                decoration: const InputDecoration(
+                                                  isDense: true,
+                                                  filled: true, // Enable background color
+                                                  fillColor: const Color(0xffFF9000), // Set the grey fill color
+                                                  border: const OutlineInputBorder(
+                                                    borderSide: BorderSide(width: .2, color: Colors.black38),
                                                   ),
-                                                )
-                                              ],
-                                            )
+                                                  contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                                ),
+                                                validator: (value) {
+                                                  if (value == null || value.isEmpty) {
+                                                    return "Valid price only";
+                                                  }
+                                                  return null;
+                                                },
+                                              ),
+
+                                            ),
+                                            // Row(
+                                            //   mainAxisAlignment:
+                                            //       MainAxisAlignment.center,
+                                            //   children: [
+                                            //     GestureDetector(
+                                            //       onTap: () {
+                                            //         controller
+                                            //             .changeQuantityOfProduct(
+                                            //                 index, false);
+                                            //       },
+                                            //       child: const Icon(
+                                            //           Icons.keyboard_arrow_down,
+                                            //           size: 24,
+                                            //           color: AppColors.error),
+                                            //     ),
+                                            //     GestureDetector(
+                                            //       onTap: () {
+                                            //         controller
+                                            //             .changeQuantityOfProduct(
+                                            //                 index, true);
+                                            //       },
+                                            //       child: const Icon(
+                                            //         Icons.keyboard_arrow_up,
+                                            //         size: 24,
+                                            //         color: AppColors.lightGreen,
+                                            //       ),
+                                            //     )
+                                            //   ],
+                                            // )
                                           ],
                                         )),
                                       ),
@@ -499,7 +551,7 @@ class _PurchaseViewState extends State<PurchaseView> {
                                           padding: const EdgeInsets.symmetric(
                                               horizontal: 12),
                                           decoration: BoxDecoration(
-                                              color: const Color(0xffF6FFF6),
+                                              color: controller.createPurchaseOrderModel.products[index].serialNo.length == controller.createPurchaseOrderModel.products[index].quantity? Color(0xff94DB8C) : const Color(0xffF6FFF6),
                                               borderRadius: BorderRadius.all(
                                                   Radius.circular(20.r)),
                                               border: Border.all(
@@ -512,8 +564,7 @@ class _PurchaseViewState extends State<PurchaseView> {
                                                 style: context
                                                     .textTheme.titleSmall
                                                     ?.copyWith(
-                                                  color:
-                                                      const Color(0xff009D5D),
+                                                  color: const Color(0xff009D5D),
                                                   fontSize: 14.sp,
                                                   fontWeight: FontWeight.w600,
                                                 ),
