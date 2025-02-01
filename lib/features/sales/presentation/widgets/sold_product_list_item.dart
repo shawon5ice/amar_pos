@@ -58,12 +58,12 @@ class SoldProductListItem extends StatelessWidget {
                       Text(
                         productInfo.product,
                         style: context.textTheme.titleSmall?.copyWith(
-                          fontSize: 13.sp,
+                          fontSize: 13,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      addH(8.h),
+                      addH(8),
                       Row(
                         children: [
                           const Expanded(
@@ -78,7 +78,7 @@ class SoldProductListItem extends StatelessWidget {
                           ),
                         ],
                       ),
-                      addH(4.h),
+                      addH(4),
                       Row(
                         children: [
                           const Expanded(
@@ -98,13 +98,13 @@ class SoldProductListItem extends StatelessWidget {
               ),
             ],
           ),
-          addH(12.h),
+          addH(12),
           Row(
             children: [
               Expanded(
                 child: Container(
                   // margin: EdgeInsets.only(right: 20),
-                  height: 30.h,
+                  height: 30,
                   decoration: BoxDecoration(
                       color: const Color(0xffFFFBED).withOpacity(.3),
                       borderRadius: BorderRadius.all(Radius.circular(20.r)),
@@ -116,7 +116,7 @@ class SoldProductListItem extends StatelessWidget {
                         "QTY : ${Methods.getFormattedNumber(productInfo.quantity.toDouble())}",
                         style: context.textTheme.titleSmall?.copyWith(
                             color: Color(0xffFF9000),
-                            fontSize: 14.sp,
+                            fontSize: 14,
                             fontWeight: FontWeight.w600),
                       )),
                 ),
@@ -127,7 +127,7 @@ class SoldProductListItem extends StatelessWidget {
               Expanded(
                 child: Container(
                   margin: EdgeInsets.only(right: 20),
-                  height: 30.h,
+                  height: 30,
                   decoration: BoxDecoration(
                       color: Color(0xffF6FFF6),
                       borderRadius: BorderRadius.all(Radius.circular(20.r)),
@@ -138,7 +138,7 @@ class SoldProductListItem extends StatelessWidget {
                         "Sold Price : ${Methods.getFormatedPrice(productInfo.soldPrice.toDouble())}",
                         style: context.textTheme.titleSmall?.copyWith(
                             color: Color(0xff009D5D),
-                            fontSize: 14.sp,
+                            fontSize: 14,
                             fontWeight: FontWeight.w600),
                       )),
                 ),

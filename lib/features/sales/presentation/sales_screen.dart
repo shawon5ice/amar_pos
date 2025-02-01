@@ -160,7 +160,7 @@ class _SalesScreenState extends State<SalesScreen>
             child: Column(
               children: [
                 Container(
-                  height: 40.h,
+                  height: 40,
                   padding: const EdgeInsets.all(4),
                   decoration: const BoxDecoration(
                     color: Colors.white,
@@ -171,7 +171,7 @@ class _SalesScreenState extends State<SalesScreen>
                     controller: _tabController,
                     indicatorSize: TabBarIndicatorSize.tab,
                     labelStyle:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp),
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                     indicator: BoxDecoration(
                       color: AppColors.primary,
                       borderRadius: BorderRadius.circular(20),

@@ -111,7 +111,7 @@ class _BillingSummaryPaymentOptionSelectionWidgetState
                           }
                         },
                         buttonStyleData: ButtonStyleData(
-                          height: 48.sp,
+                          height: 56,
                           padding: EdgeInsets.zero,
                           decoration: BoxDecoration(
                             border:

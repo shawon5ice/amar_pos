@@ -86,7 +86,7 @@ class _ProductBarCodeGeneratorState extends State<ProductBarCodeGenerator> {
                         title: "Product ID",
                         value: productInfo!.sku,
                       ),
-                      addH(20.h),
+                      addH(20),
                       CustomButton(
                         onTap: () {
                           controller.generateBarcode(
@@ -130,18 +130,18 @@ class _ProductBarCodeGeneratorState extends State<ProductBarCodeGenerator> {
                                     Text(
                                       controller.loginData!.business.name,
                                       style: TextStyle(
-                                          fontSize: 20.sp,
+                                          fontSize: 20,
                                           fontWeight: FontWeight.w500),
                                     ),
-                                    addH(4.h),
+                                    addH(4),
                                     Text(
                                       productInfo!.name,
                                       style: TextStyle(
-                                          fontSize: 10.sp,
+                                          fontSize: 10,
                                           fontWeight: FontWeight.w400),
                                       textAlign: TextAlign.center,
                                     ),
-                                    addH(12.h),
+                                    addH(12),
                                     SvgPicture.memory(
                                       Uint8List.fromList(base64Decode(controller
                                           .generatedBarcode
@@ -149,19 +149,19 @@ class _ProductBarCodeGeneratorState extends State<ProductBarCodeGenerator> {
                                           .last)),
                                       fit: BoxFit.contain,
                                     ),
-                                    addH(4.h),
+                                    addH(4),
                                     Text(
                                       productInfo!.sku,
                                       style: TextStyle(
-                                          fontSize: 10.sp,
+                                          fontSize: 10,
                                           fontWeight: FontWeight.w400),
                                       textAlign: TextAlign.center,
                                     ),
-                                    addH(8.h),
+                                    addH(8),
                                     Text(
                                       "MRP: ${Methods.getFormatedPrice(productInfo!.mrpPrice.toDouble())}",
                                       style: TextStyle(
-                                          fontSize: 14.sp,
+                                          fontSize: 14,
                                           fontWeight: FontWeight.w500),
                                       textAlign: TextAlign.center,
                                     ),
@@ -169,7 +169,7 @@ class _ProductBarCodeGeneratorState extends State<ProductBarCodeGenerator> {
                                 ),
                               ),
                             ),
-                            addH(20.h),
+                            addH(20),
                             DashedLine(),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -229,7 +229,7 @@ class _ProductBarCodeGeneratorState extends State<ProductBarCodeGenerator> {
                                 //   'Stickers per Row: ${printPerRow.toInt()}',
                                 //   style: TextStyle(fontSize: 18),
                                 // ),
-                                // addH(20.h),
+                                // addH(20),
                                 // Slider(
                                 //   value: linePerPage.toDouble(),
                                 //   min: 1,
@@ -249,7 +249,7 @@ class _ProductBarCodeGeneratorState extends State<ProductBarCodeGenerator> {
                                 const RichFieldTitle(
                                   text: "Quantity",
                                 ),
-                                addH(8.h),
+                                addH(8),
                                 Form(
                                   key: formKey,
                                   child: CustomTextField(
@@ -266,7 +266,7 @@ class _ProductBarCodeGeneratorState extends State<ProductBarCodeGenerator> {
                                     ),
                                   ),
                                 ),
-                                addH(20.h),
+                                addH(20),
                               ],
                             ),
                             CustomButton(

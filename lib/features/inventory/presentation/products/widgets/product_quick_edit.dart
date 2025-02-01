@@ -119,13 +119,13 @@ class _ProductQuickViewScreenState extends State<ProductQuickViewScreen> {
                             ),
                           ),
                         ),
-                        addH(20.h),
+                        addH(20),
                         FieldTitle(
                           productInfo!.name,
                           fontWeight: FontWeight.w600,
-                          fontSize: 16.sp,
+                          fontSize: 16,
                         ),
-                        addH(20.h),
+                        addH(20),
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -135,7 +135,7 @@ class _ProductQuickViewScreenState extends State<ProductQuickViewScreen> {
                                   title: "Product ID",
                                   value: productInfo!.sku,
                                 )),
-                            addW(20.w),
+                            addW(20),
                             Expanded(
                                 flex: 2,
                                 child: VerticalFieldTitleWithValue(
@@ -144,12 +144,12 @@ class _ProductQuickViewScreenState extends State<ProductQuickViewScreen> {
                                 )),
                           ],
                         ),
-                        addH(20.h),
+                        addH(20),
                         VerticalFieldTitleWithValue(
                           title: "Category",
                           value: productInfo!.category?.name ?? '--',
                         ),
-                        addH(20.h),
+                        addH(20),
                         VerticalFieldTitleWithValue(
                           title: "Brand",
                           value: productInfo!.brand?.name ?? '--',
@@ -157,7 +157,7 @@ class _ProductQuickViewScreenState extends State<ProductQuickViewScreen> {
                       ],
                     ),
                   ),
-                  addH(20.h),
+                  addH(20),
                   Container(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20, vertical: 16),
@@ -178,7 +178,7 @@ class _ProductQuickViewScreenState extends State<ProductQuickViewScreen> {
                                     style: context.textTheme.bodySmall
                                         ?.copyWith(
                                             color: const Color(0xff7C7C7C),
-                                            fontSize: 12.sp),
+                                            fontSize: 12),
                                   ),
                                   addH(8),
                                   CustomTextField(
@@ -190,7 +190,7 @@ class _ProductQuickViewScreenState extends State<ProductQuickViewScreen> {
                                 ],
                               ),
                             ),
-                            addW(12.w),
+                            addW(12),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -200,7 +200,7 @@ class _ProductQuickViewScreenState extends State<ProductQuickViewScreen> {
                                     style: context.textTheme.bodySmall
                                         ?.copyWith(
                                             color: const Color(0xff7C7C7C),
-                                            fontSize: 12.sp),
+                                            fontSize: 12),
                                   ),
                                   addH(8),
                                   CustomTextField(
@@ -213,7 +213,7 @@ class _ProductQuickViewScreenState extends State<ProductQuickViewScreen> {
                                 ],
                               ),
                             ),
-                            addW(12.w),
+                            addW(12),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -223,7 +223,7 @@ class _ProductQuickViewScreenState extends State<ProductQuickViewScreen> {
                                     style:
                                         context.textTheme.bodySmall?.copyWith(
                                       color: const Color(0xff7C7C7C),
-                                      fontSize: 12.sp,
+                                      fontSize: 12,
                                     ),
                                   ),
                                   addH(8),
@@ -242,7 +242,7 @@ class _ProductQuickViewScreenState extends State<ProductQuickViewScreen> {
                       ],
                     ),
                   ),
-                  addH(20.h),
+                  addH(20),
                   Container(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20, vertical: 16),
@@ -263,7 +263,7 @@ class _ProductQuickViewScreenState extends State<ProductQuickViewScreen> {
                                     style: context.textTheme.bodySmall
                                         ?.copyWith(
                                             color: const Color(0xff7C7C7C),
-                                            fontSize: 12.sp),
+                                            fontSize: 12),
                                   ),
                                   addH(8),
                                   CustomTextField(
@@ -276,7 +276,7 @@ class _ProductQuickViewScreenState extends State<ProductQuickViewScreen> {
                                 ],
                               ),
                             ),
-                            addW(12.w),
+                            addW(12),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -286,7 +286,7 @@ class _ProductQuickViewScreenState extends State<ProductQuickViewScreen> {
                                     style: context.textTheme.bodySmall
                                         ?.copyWith(
                                             color: const Color(0xff93B7A7),
-                                            fontSize: 12.sp),
+                                            fontSize: 12),
                                   ),
                                   addH(8),
                                   CustomTextField(
@@ -299,7 +299,7 @@ class _ProductQuickViewScreenState extends State<ProductQuickViewScreen> {
                                 ],
                               ),
                             ),
-                            addW(12.w),
+                            addW(12),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -309,7 +309,7 @@ class _ProductQuickViewScreenState extends State<ProductQuickViewScreen> {
                                     style: context.textTheme.bodySmall
                                         ?.copyWith(
                                             color: const Color(0xffFF7373),
-                                            fontSize: 12.sp),
+                                            fontSize: 12),
                                   ),
                                   addH(8),
                                   CustomTextField(
@@ -327,7 +327,7 @@ class _ProductQuickViewScreenState extends State<ProductQuickViewScreen> {
                       ],
                     ),
                   ),
-                  addH(20.h),
+                  addH(20),
                   Row(
                     children: [
                       Expanded(
@@ -340,7 +340,7 @@ class _ProductQuickViewScreenState extends State<ProductQuickViewScreen> {
                           child: Container(
                             padding: EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 8),
-                            height: 56.h,
+                            height: 56,
                             decoration: BoxDecoration(
                                 color: AppColors.primary,
                                 borderRadius: const BorderRadius.all(
@@ -352,16 +352,16 @@ class _ProductQuickViewScreenState extends State<ProductQuickViewScreen> {
                                   "Print",
                                   style: context.textTheme.titleMedium
                                       ?.copyWith(
-                                          color: Colors.white, fontSize: 20.sp),
+                                          color: Colors.white, fontSize: 20),
                                 ),
-                                addW(20.w),
+                                addW(20),
                                 SvgPicture.asset(AppAssets.barcodeSampleIcon),
                               ],
                             ),
                           ),
                         ),
                       ),
-                      addW(16.w),
+                      addW(16),
                       Expanded(
                         flex: 3,
                         child: InkWell(
@@ -379,7 +379,7 @@ class _ProductQuickViewScreenState extends State<ProductQuickViewScreen> {
                           child: Container(
                             padding: EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 8),
-                            height: 56.h,
+                            height: 56,
                             decoration: const BoxDecoration(
                                 color: AppColors.accent,
                                 borderRadius:
@@ -388,7 +388,7 @@ class _ProductQuickViewScreenState extends State<ProductQuickViewScreen> {
                               child: Text(
                                 "Update",
                                 style: context.textTheme.titleMedium?.copyWith(
-                                    color: Colors.white, fontSize: 20.sp),
+                                    color: Colors.white, fontSize: 20),
                               ),
                             ),
                           ),

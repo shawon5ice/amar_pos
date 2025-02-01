@@ -596,7 +596,6 @@ class SalesController extends GetxController {
             SaleHistoryDetailsResponseModel.fromJson(response);
       }
     } catch (e) {
-      hasError.value = true;
     } finally {
       detailsLoading = false;
       update(['sold_history_details']);

@@ -21,14 +21,14 @@ class VerticalFieldTitleWithValue extends StatelessWidget {
         Text(
           title,
           style: context.textTheme.bodySmall
-              ?.copyWith(color: const Color(0xff7C7C7C), fontSize: 12.sp),
+              ?.copyWith(color: const Color(0xff7C7C7C), fontSize: 12),
         ),
         AutoSizeText(
           value,
           maxFontSize: 16,
           minFontSize: 12,
           style: context.textTheme.headlineSmall
-              ?.copyWith(fontSize: 16.sp, fontWeight: FontWeight.w600),
+              ?.copyWith(fontSize: 16, fontWeight: FontWeight.w600),
         ),
       ],
     );

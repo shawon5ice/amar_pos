@@ -18,7 +18,7 @@ class StockReportListItemWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.symmetric(vertical: 5.h),
+      margin: EdgeInsets.symmetric(vertical: 5),
       padding: const EdgeInsets.all(10),
       foregroundDecoration: stockReport.status == 0
           ? BoxDecoration(
@@ -36,27 +36,27 @@ class StockReportListItemWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                width: 70.w,
-                height: 70.w,
+                width: 70,
+                height: 70,
                 margin: const EdgeInsets.only(top: 10),
                 padding: EdgeInsets.all(1.px),
                 decoration: ShapeDecoration(
                   color: const Color(0x33BEBEBE).withOpacity(.3),
                   // image: DecorationImage(image: NetworkImage(controller.supplierList[index].photo!)),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.r),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                 ),
                 child: ClipRRect(
-                    borderRadius: BorderRadius.all(Radius.circular(8.r)),
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
                     child: Image.network(
                       stockReport.thumbnailImage.toString(),
-                      height: 70.w,
-                      width: 70.w,
+                      height: 70,
+                      width: 70,
                       fit: BoxFit.cover,
                     )),
               ),
-              addW(12.w),
+              addW(12),
               Expanded(
                 flex: 8,
                 child: Container(
@@ -68,12 +68,12 @@ class StockReportListItemWidget extends StatelessWidget {
                       Text(
                         stockReport.name,
                         style: context.textTheme.titleSmall?.copyWith(
-                          fontSize: 13.sp,
+                          fontSize: 13,
                         ),
                         maxLines: 4,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      addH(4.h),
+                      addH(4),
                       Row(
                         children: [
                           const Expanded(
@@ -87,7 +87,7 @@ class StockReportListItemWidget extends StatelessWidget {
                           ),
                         ],
                       ),
-                      addH(8.h),
+                      addH(8),
                       Row(
                         children: [
                           Expanded(
@@ -116,7 +116,7 @@ class StockReportListItemWidget extends StatelessWidget {
                       //   style: context.textTheme.bodyLarge
                       //       ?.copyWith(
                       //       color: const Color(0xff7C7C7C),
-                      //       fontSize: 12.sp),
+                      //       fontSize: 12),
                       // ),
                       // AutoSizeText(
                       //   controller.supplierList[index].address??'--',
@@ -142,7 +142,7 @@ class StockReportListItemWidget extends StatelessWidget {
               // )
             ],
           ),
-          addH(12.h),
+          addH(12),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -211,7 +211,7 @@ class TitleValueWidget extends StatelessWidget {
           : EdgeInsets.zero,
       decoration: BoxDecoration(
         color: bgColor ?? const Color(0xffFFFBED),
-        borderRadius: BorderRadius.all(Radius.circular(20.r)),
+        borderRadius: BorderRadius.all(Radius.circular(20)),
         border: Border.all(
             color: borderColor ?? const Color(0xffff9000), width: .5),
       ),
