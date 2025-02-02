@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:amar_pos/core/methods/helper_methods.dart';
 import 'package:amar_pos/features/inventory/data/service/stock_report_service.dart';
 import 'package:amar_pos/features/inventory/data/stock_report/stock_ledger_list_response_model.dart';
-import 'package:amar_pos/features/inventory/data/stock_report/stock_report_list_reponse_model.dart';
+import 'package:amar_pos/features/inventory/data/stock_report/stock_report_list_response_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/constants/logger/logger.dart';
@@ -87,8 +87,8 @@ class StockReportController extends GetxController {
             StockReportListResponseModel.fromJson(response);
 
         if (stockReportListResponseModel != null) {
-          stockReportList.addAll(stockReportListResponseModel!
-              .stockReportResponse.stockReportList);
+          stockReportList.addAll(stockReportListResponseModel!.stockReportResponse
+              .stockReportList);
         } else {
           hasError = true; // Error occurred while parsing data
         }
@@ -96,7 +96,7 @@ class StockReportController extends GetxController {
         hasError = true; // Error occurred with the response
       }
     } catch (e) {
-      hasError = true; // Handle any exceptions
+      // hasError = true; // Handle any exceptions
       logger.e(e);
     } finally {
       if (page == 1) {

@@ -1,6 +1,6 @@
 import 'package:amar_pos/core/core.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
-import 'package:amar_pos/features/inventory/data/stock_report/stock_report_list_reponse_model.dart';
+import 'package:amar_pos/features/inventory/data/stock_report/stock_report_list_response_model.dart';
 import 'package:amar_pos/features/inventory/presentation/products/widgets/product_quick_edit.dart';
 import 'package:amar_pos/features/inventory/presentation/stock_report/stock_report_controller.dart';
 import 'package:auto_size_text/auto_size_text.dart';
@@ -20,12 +20,12 @@ class StockReportListItemWidget extends StatelessWidget {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 5),
       padding: const EdgeInsets.all(10),
-      foregroundDecoration: stockReport.status == 0
-          ? BoxDecoration(
-              color: const Color(0xff7c7c7c).withOpacity(.3),
-              borderRadius: BorderRadius.all(Radius.circular(20.r)),
-            )
-          : null,
+      // foregroundDecoration: stockReport.status == 0
+      //     ? BoxDecoration(
+      //         color: const Color(0xff7c7c7c).withOpacity(.3),
+      //         borderRadius: BorderRadius.all(Radius.circular(20.r)),
+      //       )
+      //     : null,
       decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.all(Radius.circular(20.r))),
@@ -50,7 +50,7 @@ class StockReportListItemWidget extends StatelessWidget {
                 child: ClipRRect(
                     borderRadius: BorderRadius.all(Radius.circular(8)),
                     child: Image.network(
-                      stockReport.thumbnailImage.toString(),
+                      stockReport.image.toString(),
                       height: 70,
                       width: 70,
                       fit: BoxFit.cover,

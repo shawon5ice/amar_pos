@@ -1,6 +1,6 @@
 import 'package:amar_pos/core/core.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
-import 'package:amar_pos/features/inventory/data/stock_report/stock_report_list_reponse_model.dart';
+import 'package:amar_pos/features/inventory/data/stock_report/stock_report_list_response_model.dart';
 import 'package:amar_pos/features/inventory/presentation/products/widgets/product_quick_edit.dart';
 import 'package:amar_pos/features/inventory/presentation/stock_report/stock_report_controller.dart';
 import 'package:amar_pos/features/sales/data/models/sale_history/sold_history_response_model.dart';

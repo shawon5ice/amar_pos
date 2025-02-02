@@ -18,7 +18,7 @@ class StockReportService {
         api: NetWorkStrings.getStockReportList,
         parameter: {
           "page": page,
-          "limit": 5,
+          "limit": 10,
         });
     return response;
   }
