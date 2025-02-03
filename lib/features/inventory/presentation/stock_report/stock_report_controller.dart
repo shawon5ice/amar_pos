@@ -74,7 +74,7 @@ class StockReportController extends GetxController {
     }
 
     hasError = false; // Reset error before loading
-    update(['stock_report_list']);
+    update(['stock_report_list', 'total_widget']);
     try {
       var response = await StockReportService.getStockReportList(
         usrToken: loginData!.token,
@@ -104,7 +104,7 @@ class StockReportController extends GetxController {
       } else {
         isLoadingMore = false;
       }
-      update(['stock_report_list']);
+      update(['stock_report_list','total_widget']);
     }
   }
 

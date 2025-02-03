@@ -10,7 +10,7 @@ PurchaseHistoryResponseModel _$PurchaseHistoryResponseModelFromJson(
         Map<String, dynamic> json) =>
     PurchaseHistoryResponseModel(
       success: json['success'] as bool,
-      data: PurchaseHistoryData.fromJson(json['data'] as Map<String, dynamic>),
+      data: const DataConverter().fromJson(json['data']),
       countTotal: json['count_total'] as num,
       amountTotal: json['amount_total'] as num,
     );
@@ -19,7 +19,7 @@ Map<String, dynamic> _$PurchaseHistoryResponseModelToJson(
         PurchaseHistoryResponseModel instance) =>
     <String, dynamic>{
       'success': instance.success,
-      'data': instance.data,
+      'data': const DataConverter().toJson(instance.data),
       'count_total': instance.countTotal,
       'amount_total': instance.amountTotal,
     };
@@ -29,15 +29,15 @@ PurchaseHistoryData _$PurchaseHistoryDataFromJson(Map<String, dynamic> json) =>
       purchaseHistoryList: (json['data'] as List<dynamic>)
           .map((e) => PurchaseOrderInfo.fromJson(e as Map<String, dynamic>))
           .toList(),
-      links: Links.fromJson(json['links'] as Map<String, dynamic>),
-      meta: Meta.fromJson(json['meta'] as Map<String, dynamic>),
+      meta: json['meta'] == null
+          ? null
+          : Meta.fromJson(json['meta'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$PurchaseHistoryDataToJson(
         PurchaseHistoryData instance) =>
     <String, dynamic>{
       'data': instance.purchaseHistoryList,
-      'links': instance.links,
       'meta': instance.meta,
     };
 

@@ -488,9 +488,7 @@ class ReturnController extends GetxController {
           returnHistoryList.addAll(returnHistoryResponseModel!.data.returnHistoryList);
         }
       } else {
-        if(page != 1){
-          hasError.value = true;
-        }
+
       }
     } catch (e) {
       hasError.value = true;

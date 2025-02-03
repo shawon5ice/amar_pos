@@ -155,10 +155,10 @@ class _PurchaseHistoryScreenState extends State<PurchaseHistoryScreen> {
                         await controller.getPurchaseHistory(page: nextPage);
                       },
                       totalPage: controller
-                          .purchaseHistoryResponseModel?.data.meta.lastPage ??
+                          .purchaseHistoryResponseModel?.data.meta?.lastPage ??
                           0,
                       totalSize:
-                      controller.purchaseHistoryResponseModel?.data.meta.total ??
+                      controller.purchaseHistoryResponseModel?.data.meta?.total ??
                           0,
                       itemPerPage: 10,
                     ),

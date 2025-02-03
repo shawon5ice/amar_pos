@@ -21,8 +21,8 @@ Map<String, dynamic> _$StockReportListResponseModelToJson(
     <String, dynamic>{
       'success': instance.success,
       'data': instance.stockReportResponse,
-      'totalStock': instance.totalStock,
-      'totalValue': instance.totalValue,
+      'total_stock': instance.totalStock,
+      'total_value': instance.totalValue,
     };
 
 StockReportResponse _$StockReportResponseFromJson(Map<String, dynamic> json) =>

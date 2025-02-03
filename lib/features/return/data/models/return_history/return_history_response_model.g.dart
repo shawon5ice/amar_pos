@@ -78,7 +78,7 @@ ReturnHistoryResponseModel _$ReturnHistoryResponseModelFromJson(
         Map<String, dynamic> json) =>
     ReturnHistoryResponseModel(
       success: json['success'] as bool,
-      data: Data.fromJson(json['data'] as Map<String, dynamic>),
+      data: const DataConverter().fromJson(json['data']),
       countTotal: (json['count_total'] as num).toInt(),
       amountTotal: (json['amount_total'] as num).toDouble(),
     );
@@ -87,7 +87,7 @@ Map<String, dynamic> _$ReturnHistoryResponseModelToJson(
         ReturnHistoryResponseModel instance) =>
     <String, dynamic>{
       'success': instance.success,
-      'data': instance.data,
+      'data': const DataConverter().toJson(instance.data),
       'count_total': instance.countTotal,
       'amount_total': instance.amountTotal,
     };

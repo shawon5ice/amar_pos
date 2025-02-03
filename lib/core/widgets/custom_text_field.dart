@@ -7,6 +7,7 @@ import '../constants/app_colors.dart';
 
 class CustomTextField extends StatefulWidget {
   final TextEditingController textCon;
+  final TextInputAction? textInputAction;
   final String? prefixIcon;
   final Widget? suffixWidget;
   final String hintText;
@@ -37,6 +38,7 @@ class CustomTextField extends StatefulWidget {
   const CustomTextField({
     super.key,
     required this.textCon,
+    this.textInputAction,
     required this.hintText,
     this.prefixIcon,
     this.prefixWidget,
@@ -101,6 +103,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      textInputAction: widget.textInputAction,
       controller: widget.textCon,
       readOnly: widget.readOnly,
       enabled: widget.enabledFlag,

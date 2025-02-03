@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:amar_pos/core/constants/logger/logger.dart';
 import 'package:amar_pos/core/core.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -7,6 +9,7 @@ import 'package:amar_pos/features/return/presentation/widgets/return_history_ite
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
+import 'package:lottie/lottie.dart';
 
 import '../../../../core/constants/app_assets.dart';
 import '../../../../core/responsive/pixel_perfect.dart';
@@ -123,14 +126,18 @@ class _ReturnHistoryScreenState extends State<ReturnHistoryScreen> {
                 id: 'return_history_list',
                 builder: (controller) {
                   if (controller.isReturnHistoryListLoading) {
-                    return const Center(
-                      child: CircularProgressIndicator(),
+                    return Center(
+                      child: Lottie.asset(
+                        AppAssets.lottieFiles[Random().nextInt(AppAssets.lottieFiles.length)],
+                        width: 150,
+                        height: 150,
+                      ),
                     );
                   }else if(controller.returnHistoryResponseModel == null){
                     return Center(
                       child: Text("Something went wrong", style: context.textTheme.titleLarge,),
                     );
-                  }else if(controller.returnHistoryResponseModel!.data.returnHistoryList.isEmpty){
+                  }else if(controller.returnHistoryList.isEmpty){
                     return Center(
                       child: Text("No data found", style: context.textTheme.titleLarge,),
                     );
@@ -153,10 +160,10 @@ class _ReturnHistoryScreenState extends State<ReturnHistoryScreen> {
                         await controller.getReturnHistory(page: nextPage);
                       },
                       totalPage: controller
-                          .returnHistoryResponseModel?.data.meta.lastPage ??
+                          .returnHistoryResponseModel?.data.meta?.lastPage ??
                           0,
                       totalSize:
-                      controller.returnHistoryResponseModel?.data.meta.total ??
+                      controller.returnHistoryResponseModel?.data.meta?.total ??
                           0,
                       itemPerPage: 10,
                     ),

@@ -6,6 +6,9 @@ part 'purchase_history_response_model.g.dart';
 @JsonSerializable()
 class PurchaseHistoryResponseModel {
   final bool success;
+
+  @DataConverter()
+  @JsonKey(name: 'data')
   final PurchaseHistoryData data;
   @JsonKey(name: 'count_total')
   final num countTotal;
@@ -29,12 +32,10 @@ class PurchaseHistoryResponseModel {
 class PurchaseHistoryData {
   @JsonKey(name: 'data')
   final List<PurchaseOrderInfo> purchaseHistoryList;
-  final Links links;
-  final Meta meta;
+  final Meta? meta;
 
   PurchaseHistoryData({
     required this.purchaseHistoryList,
-    required this.links,
     required this.meta,
   });
 
@@ -165,54 +166,20 @@ class PageLink {
 }
 
 
-// {
-// "success": true,
-// "data": {
-// "data": [
-// {
-// "id": 103,
-// "date_time": "22 Jan 2025, 08:21 AM",
-// "order_no": "GP-PO-90053",
-// "supplier": "Priyo Supplier",
-// "phone": "01332505465",
-// "discount": 50,
-// "amount": 600,
-// "is_actionable": true
-// }
-// ],
-// "links": {
-// "first": "https://amarpos.motionview.com.bd/api/purchase/get-all-purchase-list?page=1",
-// "last": "https://amarpos.motionview.com.bd/api/purchase/get-all-purchase-list?page=1",
-// "prev": null,
-// "next": null
-// },
-// "meta": {
-// "current_page": 1,
-// "from": 1,
-// "last_page": 1,
-// "links": [
-// {
-// "url": null,
-// "label": "&laquo; Previous",
-// "active": false
-// },
-// {
-// "url": "https://amarpos.motionview.com.bd/api/purchase/get-all-purchase-list?page=1",
-// "label": "1",
-// "active": true
-// },
-// {
-// "url": null,
-// "label": "Next &raquo;",
-// "active": false
-// }
-// ],
-// "path": "https://amarpos.motionview.com.bd/api/purchase/get-all-purchase-list",
-// "per_page": 20,
-// "to": 4,
-// "total": 4
-// }
-// },
-// "count_total": 4,
-// "amount_total": 2885
-// }
+class DataConverter implements JsonConverter<PurchaseHistoryData, dynamic> {
+  const DataConverter();
+
+  @override
+  PurchaseHistoryData fromJson(dynamic json) {
+    if (json is List) {
+      return PurchaseHistoryData(purchaseHistoryList: [], meta: null);
+    } else if (json is Map<String, dynamic>) {
+      return PurchaseHistoryData.fromJson(json);
+    } else {
+      throw Exception('Unexpected type for data: ${json.runtimeType}');
+    }
+  }
+
+  @override
+  dynamic toJson(PurchaseHistoryData object) => object.toJson();
+}

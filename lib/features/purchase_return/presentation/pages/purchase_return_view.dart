@@ -1,3 +1,4 @@
+import 'package:amar_pos/core/widgets/reusable/serial_no/product_serial_no_dialog.dart';
 import 'package:amar_pos/features/inventory/presentation/products/add_product_screen.dart';
 import 'package:amar_pos/features/purchase/presentation/pages/purchase_summary.dart';
 import 'package:amar_pos/features/purchase_return/data/models/create_purchase_return_order_model.dart';
@@ -484,13 +485,12 @@ class _PurchaseReturnViewState extends State<PurchaseReturnView> {
                                                       top: Radius.circular(20)),
                                             ),
                                             builder: (context) {
-                                              return PurchaseReturnOrderProductSnSelectionDialog(
-                                                product: controller
+                                              return ProductSnSelectionDialog(
+                                                productName: controller
+                                                    .purchaseOrderProducts[index].name,
+                                                quantity: controller
                                                     .createPurchaseReturnOrderModel
-                                                    .products[index],
-                                                productInfo: controller
-                                                    .purchaseOrderProducts[index],
-                                                controller: controller,
+                                                    .products[index].quantity,
                                               );
                                             },
                                           );
@@ -500,7 +500,7 @@ class _PurchaseReturnViewState extends State<PurchaseReturnView> {
                                           padding: const EdgeInsets.symmetric(
                                               horizontal: 12),
                                           decoration: BoxDecoration(
-                                              color: const Color(0xffF6FFF6),
+                                              color: controller.createPurchaseReturnOrderModel.products[index].quantity == controller.createPurchaseReturnOrderModel.products[index].serialNo.length ? AppColors.primary.withOpacity(.2) : const Color(0xffF6FFF6),
                                               borderRadius: BorderRadius.all(
                                                   Radius.circular(20.r)),
                                               border: Border.all(

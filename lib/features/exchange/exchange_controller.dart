@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:amar_pos/core/data/model/model.dart';
+import 'package:amar_pos/core/network/helpers/error_extractor.dart';
 import 'package:amar_pos/features/exchange/data/exchange_service.dart';
 import 'package:amar_pos/features/exchange/data/models/create_exchange_request_model.dart';
 import 'package:amar_pos/features/exchange/data/models/exchange_history_response_model.dart';
@@ -101,7 +102,9 @@ class ExchangeController extends GetxController{
     update(['exchange_view_controller','exchange_view']);
   }
 
+  bool validationDone = false;
   void processData(){
+    validationDone = false;
     if (summaryFormKey.currentState!.validate()) {
       exchangeRequestModel.saleType = 5;
       exchangeRequestModel.returnAmount = totalReturnAmount.toDouble();
@@ -134,52 +137,64 @@ class ExchangeController extends GetxController{
               paid: e.paidAmount!.toDouble(),
               bankId: e.paymentOption?.id));
         }
+
       }
+      validationDone = true;
     }
   }
 
   Future<void> onSubmit() async{
     processData();
-    createReturnOrderLoading = true;
-    update(["exchange_product_list"]);
-    RandomLottieLoader.show();
-    try{
-      var response;
-      if(isEditing){
-        response = await ExchangeService.updateExchangeHistory(
-          usrToken: loginData!.token,
-          exchangeRequest: exchangeRequestModel,
-          orderId: exchangeOrderDetailsResponseModel!.data.id
-        );
-      }else{
-        response = await ExchangeService.createExchange(
-          usrToken: loginData!.token,
-          request: exchangeRequestModel,
-        );
-      }
-
-      logger.e(response);
-      if (response != null) {
-        if(response['success']){
-          returnOrderProducts.clear();
-          exchangeRequestModel = CreateExchangeRequestModel.defaultConstructor();
-          exchangeProducts.clear();
-          RandomLottieLoader.hide();
-          Get.back();
-          currentStep = 0;
-          update(['exchange_view_controller','exchange_view']);
+    if(validationDone){
+      createReturnOrderLoading = true;
+      update(["exchange_product_list"]);
+      RandomLottieLoader.show();
+      try{
+        var response;
+        if(isEditing){
+          response = await ExchangeService.updateExchangeHistory(
+              usrToken: loginData!.token,
+              exchangeRequest: exchangeRequestModel,
+              orderId: exchangeOrderDetailsResponseModel!.data.id
+          );
         }else{
-          RandomLottieLoader.hide();
+          response = await ExchangeService.createExchange(
+            usrToken: loginData!.token,
+            request: exchangeRequestModel,
+          );
         }
-        Methods.showSnackbar(msg: response['message'], isSuccess: response['success']? true: null);
+
+        logger.e(response);
+        if (response != null) {
+          if(response['success']){
+            returnOrderProducts.clear();
+            exchangeRequestModel = CreateExchangeRequestModel.defaultConstructor();
+            exchangeProducts.clear();
+            RandomLottieLoader.hide();
+            Get.back();
+            currentStep = 0;
+            update(['exchange_view_controller','exchange_view']);
+            Methods.showSnackbar(msg: response['message'], isSuccess: true);
+          }else{
+            RandomLottieLoader.hide();
+            RandomLottieLoader.hide();
+            RandomLottieLoader.hide();
+            await Future.delayed(const Duration(milliseconds: 500), (){
+
+            });
+            ErrorExtractor.showErrorDialog(Get.context!, response);
+          }
+        }
+      }catch(e){
+        RandomLottieLoader.hide();
+        logger.e(e);
+      }finally{
+        RandomLottieLoader.hide();
+        createReturnOrderLoading = false;
+        update(['exchange_view_controller','exchange_view']);
       }
-    }catch(e){
-      logger.e(e);
-    }finally{
-      createReturnOrderLoading = false;
-      update(['exchange_view_controller','exchange_view']);
+      logger.e(exchangeRequestModel.toJson());
     }
-    logger.e(exchangeRequestModel.toJson());
   }
 
   //Exchange History

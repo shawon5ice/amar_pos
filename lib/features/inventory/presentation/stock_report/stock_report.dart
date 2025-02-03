@@ -78,6 +78,7 @@ class _StockReportScreenState extends State<StockReportScreen>
               addH(12),
               Expanded(
                 child: TabBarView(
+                  physics: NeverScrollableScrollPhysics(),
                   controller: _tabController,
                   children: const [
                     StockReportPage(),

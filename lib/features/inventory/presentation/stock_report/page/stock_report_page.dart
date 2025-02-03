@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../../../core/constants/app_assets.dart';
+import '../../../../../core/core.dart';
 import '../../../../../core/responsive/pixel_perfect.dart';
 import '../../../../../core/widgets/pager_list_view.dart';
+import '../../../../../core/widgets/reusable/status/total_status_widget.dart';
 import '../../../../../core/widgets/search_widget.dart';
 import '../stock_report_controller.dart';
 import '../widget/stock_report_item_widget.dart';
@@ -32,6 +35,37 @@ class _StockReportPageState extends State<StockReportPage> {
           },
         ),
         addH(16),
+        GetBuilder<StockReportController>(
+          id: 'total_widget',
+          builder: (controller) => Row(
+            children: [
+              TotalStatusWidget(
+                flex: 3,
+                isLoading: controller.isStockReportListLoading,
+                title: 'Stock',
+                value: controller.stockReportListResponseModel != null
+                    ? Methods.getFormattedNumber(controller
+                    .stockReportListResponseModel!.totalStock
+                    .toDouble())
+                    : null,
+                asset: AppAssets.productBox,
+              ),
+              addW(12),
+              TotalStatusWidget(
+                flex: 4,
+                isLoading: controller.isStockReportListLoading,
+                title: 'Total Amount',
+                value: controller.stockReportListResponseModel != null
+                    ? Methods.getFormatedPrice(controller
+                    .stockReportListResponseModel!.totalValue
+                    .toDouble())
+                    : null,
+                asset: AppAssets.amount,
+              ),
+            ],
+          ),
+        ),
+        addH(8),
         Expanded(
           child: GetBuilder<StockReportController>(
             id: 'stock_report_list',

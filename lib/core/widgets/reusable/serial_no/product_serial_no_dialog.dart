@@ -1,8 +1,6 @@
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/core/widgets/custom_button.dart';
-import 'package:amar_pos/features/purchase/presentation/purchase_controller.dart';
-import 'package:amar_pos/features/purchase_return/data/models/create_purchase_return_order_model.dart';
-import 'package:amar_pos/features/purchase_return/presentation/purchase_return_controller.dart';
+import 'package:amar_pos/core/widgets/reusable/serial_no/product_serial_no_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/constants/app_colors.dart';
@@ -10,29 +8,29 @@ import '../../../../core/widgets/custom_text_field.dart';
 import '../../../../core/widgets/dashed_line.dart';
 import '../../../../core/widgets/field_title.dart';
 import '../../../../core/widgets/qr_code_scanner.dart';
-import '../../../inventory/data/products/product_list_response_model.dart';
+import 'package:get/get.dart';
 
-class PurchaseReturnOrderProductSnSelectionDialog extends StatefulWidget {
-  final PurchaseReturnProductModel product;
-  final ProductInfo productInfo;
-  final PurchaseReturnController controller;
+class ProductSnSelectionDialog extends StatefulWidget {
+  final String productName;
+  final int quantity;
 
-  const PurchaseReturnOrderProductSnSelectionDialog({
+  const ProductSnSelectionDialog({
     super.key,
-    required this.product,
-    required this.productInfo,
-    required this.controller,
+    required this.productName,
+    required this.quantity,
   });
 
   @override
-  State<PurchaseReturnOrderProductSnSelectionDialog> createState() =>
-      _PurchaseReturnOrderProductSnSelectionDialogState();
+  State<ProductSnSelectionDialog> createState() =>
+      _ProductSnSelectionDialogState();
 }
 
-class _PurchaseReturnOrderProductSnSelectionDialogState
-    extends State<PurchaseReturnOrderProductSnSelectionDialog> {
-  final PurchaseReturnController controller = Get.find();
+class _ProductSnSelectionDialogState
+    extends State<ProductSnSelectionDialog> {
+  final ProductSerialNoController controller = Get.put(ProductSerialNoController());
   late final TextEditingController textEditingController;
+
+  List<String> serialNo = [];
 
   @override
   void initState() {
@@ -43,6 +41,7 @@ class _PurchaseReturnOrderProductSnSelectionDialogState
   @override
   void dispose() {
     textEditingController.dispose();
+    // Get<ProductSnSelectionDialog>.delete();
     super.dispose();
   }
 
@@ -89,7 +88,7 @@ class _PurchaseReturnOrderProductSnSelectionDialogState
                       fontWeight: FontWeight.bold,
                     ),
                     Text(
-                      widget.productInfo.name,
+                      widget.productName,
                     ),
                     const SizedBox(height: 8),
                     const FieldTitle(
@@ -97,61 +96,31 @@ class _PurchaseReturnOrderProductSnSelectionDialogState
                       fontWeight: FontWeight.bold,
                     ),
                     const SizedBox(height: 8),
-                    GetBuilder<PurchaseReturnController>(
+                    GetBuilder<ProductSerialNoController>(
                       id: 'sn_input_field',
                       builder: (controller) => CustomTextField(
-                        enabledFlag: widget.product.quantity <=
-                            widget.product.serialNo.length
-                            ? false
-                            : true,
-                        onSubmitted: (value) {
-                          widget.product.serialNo.add(value);
-                          textEditingController.clear();
-                          widget.controller
-                              .update(['purchase_order_product_sn_list']);
-                        },
                         textCon: textEditingController,
-                        hintText: "Enter Serial Number",
-                        suffixWidget: InkWell(
-                            onTap: () async {
-                              final String? scannedCode =
-                              await Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                  const QRCodeScannerScreen(),
-                                ),
-                              );
-                              if (scannedCode != null &&
-                                  scannedCode.isNotEmpty) {
-                                textEditingController.text = scannedCode;
-                                widget.product.serialNo.add(scannedCode);
-                                textEditingController.clear();
-                                controller.update([
-                                  'purchase_order_product_sn_list',
-                                  'sn_input_field'
-                                ]);
-                              }
-                            },
-                            child: const Icon(
-                              Icons.qr_code_scanner_sharp,
-                              color: AppColors.accent,
-                            )),
+                        hintText: 'Enter Serial No',
+                        textInputAction: controller.serialNoList.length == widget.quantity - 1
+                            ? TextInputAction.done
+                            : TextInputAction.next,
+                        onSubmitted: (value) => controller.handleSubmission(value,widget.quantity),
                       ),
                     ),
                     const SizedBox(height: 8),
-                    if (widget.product.serialNo.isNotEmpty)
+                    if (controller.serialNoList.isNotEmpty)
                       Column(
                         children: [
                           const DashedLine(),
                           const SizedBox(height: 8),
-                          GetBuilder<PurchaseReturnController>(
-                            id: 'purchase_order_product_sn_list',
+                          GetBuilder<ProductSerialNoController>(
+                            id: 'product_sn_list',
                             builder: (controller) => ConstrainedBox(
                               constraints: BoxConstraints(maxHeight: 150),
                               child: SingleChildScrollView(
                                 child: Wrap(
                                   spacing: 4,
-                                  children: widget.product.serialNo
+                                  children: controller.serialNoList
                                       .map(
                                         (e) => Chip(
                                       elevation: 4,
@@ -162,9 +131,9 @@ class _PurchaseReturnOrderProductSnSelectionDialogState
                                             fontSize: 14.sp),
                                       ),
                                       onDeleted: () {
-                                        widget.product.serialNo.remove(e);
+                                        controller.serialNoList.remove(e);
                                         controller.update([
-                                          'purchase_order_product_sn_list',
+                                          'product_sn_list',
                                           'sn_input_field'
                                         ]);
                                       },
@@ -196,4 +165,33 @@ class _PurchaseReturnOrderProductSnSelectionDialogState
       ),
     );
   }
+}
+
+
+InputDecoration _buildInputDecoration(bool enableField, suffixWidget) {
+  return InputDecoration(
+    filled: true,
+    // fillColor: widget.enabledFlag ? widget.fillClr : widget.disableClr,
+    contentPadding: const EdgeInsets.all(15),
+    border: _getInputBorder(enableField),
+    enabledBorder: _getInputBorder(enableField),
+    focusedBorder: _getInputBorder(enableField),
+    hintText: "Enter SN number",
+    hintStyle: TextStyle(
+      fontSize: 12,
+      color: const Color(0xff909090),
+      fontWeight: FontWeight.w500,
+    ),
+    suffixIcon: suffixWidget,
+  );
+}
+
+InputBorder _getInputBorder(bool enabledFlag,) {
+  return OutlineInputBorder(
+    borderRadius: BorderRadius.circular(6),
+    borderSide: BorderSide(
+      color: enabledFlag ? AppColors.primary : Colors.transparent,
+      width: enabledFlag ? 1 : 0,
+    ),
+  );
 }
