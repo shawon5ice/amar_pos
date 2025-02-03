@@ -1,8 +1,10 @@
+import 'package:amar_pos/core/constants/logger/logger.dart';
 import 'package:amar_pos/features/inventory/presentation/products/add_product_screen.dart';
 import 'package:amar_pos/features/purchase/data/models/create_purchase_order_model.dart';
 import 'package:amar_pos/features/purchase/presentation/pages/purchase_summary.dart';
 import 'package:amar_pos/features/purchase/presentation/purchase_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
@@ -30,7 +32,10 @@ class _PurchaseViewState extends State<PurchaseView> {
 
   final TextEditingController _purchasePrice = TextEditingController();
 
+  final formKey = GlobalKey<FormState>();
+
   List<TextEditingController> purchaseControllers = [];
+  List<TextEditingController> purchaseQTYControllers = [];
 
   @override
   void initState() {
@@ -44,7 +49,10 @@ class _PurchaseViewState extends State<PurchaseView> {
       );
     }else{
       for (var e in controller.createPurchaseOrderModel.products) {
-        purchaseControllers.add(TextEditingController(text: e.unitPrice.toString()));
+        purchaseControllers.add(TextEditingController(text: e.unitPrice.toString(),));
+      }
+      for (var e in controller.createPurchaseOrderModel.products) {
+        purchaseQTYControllers.add(TextEditingController(text: e.quantity.toString(),));
       }
     }
     super.initState();
@@ -64,6 +72,10 @@ class _PurchaseViewState extends State<PurchaseView> {
 
   @override
   void dispose() {
+    for(int i=0;i<purchaseControllers.length; i++){
+      purchaseControllers[i].dispose();
+      purchaseQTYControllers[i].dispose();
+    }
     super.dispose();
   }
 
@@ -119,7 +131,16 @@ class _PurchaseViewState extends State<PurchaseView> {
                                         suggestionEditingController.clear();
                                         controller
                                             .addPlaceOrderProduct(items.first);
-                                        purchaseControllers.add(TextEditingController(text: items.first.wholesalePrice.toString()));
+                                        int value = controller.createPurchaseOrderModel.products.singleWhere((e) => e.id == items.first.id).quantity++;
+
+                                        if(controller.purchaseProducts.any((e) => e.id == items.first.id)){
+                                          int index = controller.purchaseProducts.indexOf(controller.purchaseProducts.singleWhere((e) => e.id == items.first.id));
+                                          purchaseQTYControllers[index].text = value.toString();
+                                        }else{
+                                          purchaseControllers.add(TextEditingController(text: items.first.wholesalePrice.toString()));
+                                          purchaseQTYControllers.add(TextEditingController(text: value.toString()));
+                                        }
+
                                         FocusScope.of(context).unfocus();
                                       }
                                     }
@@ -167,8 +188,23 @@ class _PurchaseViewState extends State<PurchaseView> {
                           );
                         },
                         onSelected: (product) {
+                          int i = 0;
+                          int value = 0;
+                          for(;i<controller.createPurchaseOrderModel.products.length; i++){
+                            if(product.id == controller.createPurchaseOrderModel.products[i].id){
+                              value = controller.createPurchaseOrderModel.products[i].quantity;
+                              break;
+                            }
+                          }
+
+                          if(controller.purchaseOrderProducts.any((e) => e.id == product.id)){
+                            purchaseQTYControllers[i].text = (++value).toString();
+                            logger.i(purchaseQTYControllers[i].text);
+                          }else{
+                            purchaseControllers.add(TextEditingController(text:product.wholesalePrice.toString()));
+                            purchaseQTYControllers.add(TextEditingController(text: "1"));
+                          }
                           controller.addPlaceOrderProduct(product);
-                          purchaseControllers.add(TextEditingController(text: product.wholesalePrice.toString()));
                           suggestionEditingController.clear();
                           FocusScope.of(context).unfocus();
                         },
@@ -222,319 +258,353 @@ class _PurchaseViewState extends State<PurchaseView> {
                       ),
                     );
                   } else {
-                    return ListView.builder(
-                      itemCount: controller.purchaseOrderProducts.length,
-                      itemBuilder: (_, index) {
-                        return Slidable(
-                          endActionPane: ActionPane(
-                              motion: const ScrollMotion(),
-                              children: [
-                                addW(10),
-                                CustomSlidableAction(
-                                    onPressed: (context) => controller
-                                        .removePlaceOrderProduct(controller
-                                            .purchaseOrderProducts[index]),
-                                    backgroundColor: const Color(0xffEF4B4B),
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(20)),
-                                    child: Center(
-                                      child: SvgPicture.asset(
-                                        AppAssets.deleteIc,
-                                        // Path to your SVG file
-                                        height: 24,
-                                        width: 24,
-                                      ),
-                                    )),
-                              ]),
-                          key: Key(controller.purchaseOrderProducts[index].id
-                              .toString()),
-                          child: Container(
-                            margin: const EdgeInsets.only(top: 4, bottom: 4),
-                            padding: const EdgeInsets.all(20),
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(20),
+                    return Form(
+                      key: formKey,
+                      child: ListView.builder(
+                        itemCount: controller.purchaseOrderProducts.length,
+                        itemBuilder: (_, index) {
+                          return Slidable(
+                            endActionPane: ActionPane(
+                                motion: const ScrollMotion(),
+                                children: [
+                                  addW(10),
+                                  CustomSlidableAction(
+                                      onPressed: (context) {
+                                        purchaseControllers.removeAt(index);
+                                        purchaseQTYControllers.removeAt(index);
+                                        controller
+                                          .removePlaceOrderProduct(controller
+                                              .purchaseOrderProducts[index]);
+                                      },
+                                      backgroundColor: const Color(0xffEF4B4B),
+                                      borderRadius: const BorderRadius.all(
+                                          Radius.circular(20)),
+                                      child: Center(
+                                        child: SvgPicture.asset(
+                                          AppAssets.deleteIc,
+                                          // Path to your SVG file
+                                          height: 24,
+                                          width: 24,
+                                        ),
+                                      )),
+                                ]),
+                            key: Key(controller.purchaseOrderProducts[index].id
+                                .toString()),
+                            child: Container(
+                              margin: const EdgeInsets.only(top: 4, bottom: 4),
+                              padding: const EdgeInsets.all(20),
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(20),
+                                ),
                               ),
-                            ),
-                            child: Column(
-                              children: [
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Container(
-                                      width: 70.w,
-                                      height: 70.w,
-                                      padding: EdgeInsets.all(1.px),
-                                      decoration: ShapeDecoration(
-                                        color: const Color(0x33BEBEBE)
-                                            .withOpacity(.3),
-                                        // image: DecorationImage(image: NetworkImage(controller.supplierList[index].photo!)),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10.r),
-                                        ),
-                                      ),
-                                      child: ClipRRect(
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(8.r)),
-                                          child: Image.network(
-                                            controller.purchaseOrderProducts[index]
-                                                .thumbnailImage
-                                                .toString(),
-                                            height: 70.w,
-                                            width: 70.w,
-                                            fit: BoxFit.cover,
-                                          )),
-                                    ),
-                                    addW(12.w),
-                                    Expanded(
-                                      flex: 8,
-                                      child: Container(
-                                        margin: const EdgeInsets.only(top: 10),
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              controller
-                                                  .purchaseOrderProducts[index]
-                                                  .name,
-                                              style: context
-                                                  .textTheme.titleSmall
-                                                  ?.copyWith(
-                                                fontSize: 13.sp,
-                                              ),
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                            addH(8.h),
-                                            Text(
-                                              "ID : ${controller.purchaseOrderProducts[index].sku}",
-                                              style: TextStyle(
-                                                  color:
-                                                      const Color(0xff40ACE3),
-                                                  fontWeight: FontWeight.w400,
-                                                  fontSize: 14.sp),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                addH(12.h),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      flex: 3,
-                                        child: Row(
-                                      children: [
-                                        const Text(
-                                          "Price : ৳",
-                                          style: TextStyle(
-                                              color: AppColors.primary),
-                                        ),
-                                        addW(4),
-                                        Expanded(
-                                          child: TextFormField(
-                                            key: ValueKey(controller.createPurchaseOrderModel.products[index].id),
-                                            controller: purchaseControllers[index],
-                                            keyboardType: TextInputType.number,
-                                            onTap: () {
-                                              purchaseControllers[index].selection = TextSelection.fromPosition(
-                                                TextPosition(offset: purchaseControllers[index].text.length),
-                                              );
-                                            },
-                                            onChanged: (value) {
-                                              if (value.isNotEmpty) {
-                                                controller.createPurchaseOrderModel.products[index].unitPrice = double.parse(value);
-                                                controller.update(['sub_total', 'vat']);
-                                              }
-                                            },
-                                            decoration: InputDecoration(
-                                              isDense: true,
-                                              filled: true, // Enable background color
-                                              fillColor: Colors.grey.shade200, // Set the grey fill color
-                                              border: const OutlineInputBorder(
-                                                borderSide: BorderSide(width: .2, color: Colors.black38),
-                                              ),
-                                              contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                            ),
-                                            validator: (value) {
-                                              if (value == null || value.isEmpty) {
-                                                return "Valid price only";
-                                              }
-                                              return null;
-                                            },
+                              child: Column(
+                                children: [
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Container(
+                                        width: 70.w,
+                                        height: 70.w,
+                                        padding: EdgeInsets.all(1.px),
+                                        decoration: ShapeDecoration(
+                                          color: const Color(0x33BEBEBE)
+                                              .withOpacity(.3),
+                                          // image: DecorationImage(image: NetworkImage(controller.supplierList[index].photo!)),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10.r),
                                           ),
-
                                         ),
-                                      ],
-                                    )),
-                                    addW(12),
-                                    Expanded(
-                                      flex: 2,
-                                        child: GetBuilder<PurchaseController>(
-                                          id: 'vat',
-                                          builder: (controller){
-                                            return Text(
-                                              "Vat : ${Methods.getFormatedPrice((controller.purchaseOrderProducts[index].vat*(controller.createPurchaseOrderModel.products[index].unitPrice/100)).toDouble())}",
-                                              style: const TextStyle(
-                                                  color: AppColors.primary),
-                                            );
-                                          },
-                                        )),
-                                    Expanded(
-                                      flex: 2,
-                                      child: GetBuilder<PurchaseController>(
-                                        id: 'sub_total',
-                                        builder: (controller){
-                                          return Text(
-                                            "Sub Total : ${Methods.getFormatedPrice(controller.createPurchaseOrderModel.products[index].unitPrice.toDouble() * controller.createPurchaseOrderModel.products[index].quantity.toDouble())}",
-                                            style: const TextStyle(
-                                                color: AppColors.primary),
-                                          );
-                                        },
-                                      )
-                                    ),
-                                  ],
-                                ),
-                                addH(12.h),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Container(
-                                        // margin: EdgeInsets.only(right: 20),
-                                        height: 30.h,
-                                        decoration: BoxDecoration(
-                                            color: const Color(0xffFFFBED)
-                                                .withOpacity(.3),
+                                        child: ClipRRect(
                                             borderRadius: BorderRadius.all(
-                                                Radius.circular(20.r)),
-                                            border: Border.all(
-                                                color: const Color(0xffff9000)
-                                                    .withOpacity(.3),
-                                                width: .5)),
-                                        child: Center(
-                                            child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Text(
-                                              "Quantity : ${controller.createPurchaseOrderModel.products[index].quantity}",
-                                              style: context
-                                                  .textTheme.titleSmall
-                                                  ?.copyWith(
-                                                color: const Color(0xffFF9000),
-                                                fontSize: 14.sp,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                            addW(8),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    controller
-                                                        .changeQuantityOfProduct(
-                                                            index, false);
-                                                  },
-                                                  child: const Icon(
-                                                      Icons.keyboard_arrow_down,
-                                                      size: 24,
-                                                      color: AppColors.error),
-                                                ),
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    controller
-                                                        .changeQuantityOfProduct(
-                                                            index, true);
-                                                  },
-                                                  child: const Icon(
-                                                    Icons.keyboard_arrow_up,
-                                                    size: 24,
-                                                    color: AppColors.lightGreen,
-                                                  ),
-                                                )
-                                              ],
-                                            )
-                                          ],
-                                        )),
+                                                Radius.circular(8.r)),
+                                            child: Image.network(
+                                              controller.purchaseOrderProducts[index]
+                                                  .thumbnailImage
+                                                  .toString(),
+                                              height: 70.w,
+                                              width: 70.w,
+                                              fit: BoxFit.cover,
+                                            )),
                                       ),
-                                    ),
-                                    const SizedBox(
-                                      width: 8,
-                                    ),
-                                    Expanded(
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          showModalBottomSheet(
-                                            context: context,
-                                            isScrollControlled: true,
-                                            shape: const RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.vertical(
-                                                      top: Radius.circular(20)),
-                                            ),
-                                            builder: (context) {
-                                              return PurchaseOrderProductSnSelectionDialog(
-                                                product: controller
-                                                    .createPurchaseOrderModel
-                                                    .products[index],
-                                                productInfo: controller
-                                                    .purchaseOrderProducts[index],
-                                                controller: controller,
-                                              );
-                                            },
-                                          );
-                                        },
+                                      addW(12.w),
+                                      Expanded(
+                                        flex: 8,
                                         child: Container(
-                                          height: 30.h,
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 12),
-                                          decoration: BoxDecoration(
-                                              color: const Color(0xffF6FFF6),
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(20.r)),
-                                              border: Border.all(
-                                                  color: const Color(0xff94DB8C)
-                                                      .withOpacity(.3))),
-                                          child: Row(
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                "Serial No.",
+                                                controller
+                                                    .purchaseOrderProducts[index]
+                                                    .name,
                                                 style: context
                                                     .textTheme.titleSmall
                                                     ?.copyWith(
-                                                  color:
-                                                      const Color(0xff009D5D),
-                                                  fontSize: 14.sp,
-                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 13.sp,
                                                 ),
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
                                               ),
-                                              const Spacer(),
-                                              SvgPicture.asset(
-                                                AppAssets.snAdd,
-                                                height: 14,
-                                              )
+                                              addH(8.h),
+                                              Text(
+                                                "ID : ${controller.purchaseOrderProducts[index].sku}",
+                                                style: TextStyle(
+                                                    color:
+                                                        const Color(0xff40ACE3),
+                                                    fontWeight: FontWeight.w400,
+                                                    fontSize: 14.sp),
+                                              ),
                                             ],
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                )
-                              ],
+                                    ],
+                                  ),
+                                  addH(12.h),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        flex: 3,
+                                          child: Row(
+                                        children: [
+                                          const Text(
+                                            "Price : ৳",
+                                            style: TextStyle(
+                                                color: AppColors.primary),
+                                          ),
+                                          addW(4),
+                                          Expanded(
+                                            child: TextFormField(
+                                              key: Key(controller.createPurchaseOrderModel.products[index].id.toString()),
+                                              controller: purchaseControllers[index],
+                                              keyboardType: TextInputType.number,
+                                              onTap: () {
+                                                purchaseControllers[index].selection = TextSelection.fromPosition(
+                                                  TextPosition(offset: purchaseControllers[index].text.length),
+                                                );
+                                              },
+                                              onChanged: (value) {
+                                                if (value.isNotEmpty) {
+                                                  controller.createPurchaseOrderModel.products[index].unitPrice = double.parse(value);
+                                                  controller.update(['sub_total', 'vat']);
+                                                }
+                                              },
+                                              decoration: InputDecoration(
+                                                isDense: true,
+                                                filled: true, // Enable background color
+                                                fillColor: Colors.grey.shade200, // Set the grey fill color
+                                                border: const OutlineInputBorder(
+                                                  borderSide: BorderSide(width: .2, color: Colors.black38),
+                                                ),
+                                                contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                              ),
+                                              validator: (value) {
+                                                if (value == null || value.isEmpty) {
+                                                  return "Valid price only";
+                                                }
+                                                return null;
+                                              },
+                                            ),
+
+                                          ),
+                                        ],
+                                      )),
+                                      const Expanded(child: SizedBox.shrink()),
+                                      addW(8),
+                                      Expanded(
+                                        flex: 2,
+                                        child: GetBuilder<PurchaseController>(
+                                          id: 'sub_total',
+                                          builder: (controller){
+                                            return Text(
+                                              "Sub Total : ${Methods.getFormatedPrice(controller.createPurchaseOrderModel.products[index].unitPrice.toDouble() * controller.createPurchaseOrderModel.products[index].quantity.toDouble())}",
+                                              style: const TextStyle(
+                                                  color: AppColors.primary),
+                                            );
+                                          },
+                                        )
+                                      ),
+                                    ],
+                                  ),
+                                  addH(12.h),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Container(
+                                          // margin: EdgeInsets.only(right: 20),
+                                          // height: 30.h,
+                                          decoration: BoxDecoration(
+                                              color: const Color(0xffFFFBED)
+                                                  .withOpacity(.3),
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(20.r)),
+                                              border: Border.all(
+                                                  color: const Color(0xffff9000)
+                                                      .withOpacity(.3),
+                                                  width: .5)),
+                                          child: Center(
+                                              child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text(
+                                                "QTY : ",
+                                                style: context
+                                                    .textTheme.titleSmall
+                                                    ?.copyWith(
+                                                  color: const Color(0xffFF9000),
+                                                  fontSize: 14.sp,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                              addW(8),
+                                              Expanded(
+                                                child: TextFormField(
+                                                  key: Key(controller.createPurchaseOrderModel.products[index].id.toString()),
+                                                  controller: purchaseQTYControllers[index],
+                                                  keyboardType: TextInputType.number,
+                                                  onTap: () {
+                                                    purchaseQTYControllers[index].selection = TextSelection.fromPosition(
+                                                      TextPosition(offset: purchaseQTYControllers[index].text.length),
+                                                    );
+                                                  },
+                                                  inputFormatters: [
+                                                    FilteringTextInputFormatter.digitsOnly,
+                                                  ],
+                                                  onChanged: (value) {
+                                                    if (value.isNotEmpty) {
+                                                      controller.createPurchaseOrderModel.products[index].quantity = int.parse(value);
+                                                      controller.update(['sub_total', 'vat']);
+                                                    }else{
+                                                      controller.createPurchaseOrderModel.products[index].quantity = 0;
+                                                    }
+                                                  },
+                                                  decoration: InputDecoration(
+                                                    isDense: true,
+                                                    filled: true, // Enable background color
+                                                    fillColor: Color(0xffFF9000).withOpacity(.2), // Set the grey fill color
+                                                    border: OutlineInputBorder(
+                                                      borderRadius: BorderRadius.circular(5),
+                                                      borderSide: BorderSide(width: .2, color: Color(0xffFF9000)),
+                                                    ),
+                                                    contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                                  ),
+                                                  validator: (value) {
+                                                    if (value == null || value.isEmpty) {
+                                                      return "Valid quantity only";
+                                                    }
+                                                    return null;
+                                                  },
+                                                ),
+
+                                              ),
+                                              // Row(
+                                              //   mainAxisAlignment:
+                                              //       MainAxisAlignment.center,
+                                              //   children: [
+                                              //     GestureDetector(
+                                              //       onTap: () {
+                                              //         controller
+                                              //             .changeQuantityOfProduct(
+                                              //                 index, false);
+                                              //       },
+                                              //       child: const Icon(
+                                              //           Icons.keyboard_arrow_down,
+                                              //           size: 24,
+                                              //           color: AppColors.error),
+                                              //     ),
+                                              //     GestureDetector(
+                                              //       onTap: () {
+                                              //         controller
+                                              //             .changeQuantityOfProduct(
+                                              //                 index, true);
+                                              //       },
+                                              //       child: const Icon(
+                                              //         Icons.keyboard_arrow_up,
+                                              //         size: 24,
+                                              //         color: AppColors.lightGreen,
+                                              //       ),
+                                              //     )
+                                              //   ],
+                                              // )
+                                            ],
+                                          )),
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        width: 8,
+                                      ),
+                                      Expanded(
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            showModalBottomSheet(
+                                              context: context,
+                                              isScrollControlled: true,
+                                              shape: const RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.vertical(
+                                                        top: Radius.circular(20)),
+                                              ),
+                                              builder: (context) {
+                                                return PurchaseOrderProductSnSelectionDialog(
+                                                  product: controller
+                                                      .createPurchaseOrderModel
+                                                      .products[index],
+                                                  productInfo: controller
+                                                      .purchaseOrderProducts[index],
+                                                  controller: controller,
+                                                );
+                                              },
+                                            );
+                                          },
+                                          child: Container(
+                                            height: 30.h,
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 12),
+                                            decoration: BoxDecoration(
+                                                color: controller.createPurchaseOrderModel.products[index].serialNo.length == controller.createPurchaseOrderModel.products[index].quantity? Color(0xff94DB8C) : const Color(0xffF6FFF6),
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(20.r)),
+                                                border: Border.all(
+                                                    color: const Color(0xff94DB8C)
+                                                        .withOpacity(.3))),
+                                            child: Row(
+                                              children: [
+                                                Text(
+                                                  "Serial No.",
+                                                  style: context
+                                                      .textTheme.titleSmall
+                                                      ?.copyWith(
+                                                    color: const Color(0xff009D5D),
+                                                    fontSize: 14.sp,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                                const Spacer(),
+                                                SvgPicture.asset(
+                                                  AppAssets.snAdd,
+                                                  height: 14,
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ),
                             ),
-                          ),
-                        );
-                      },
+                          );
+                        },
+                      ),
                     );
                   }
                 },
@@ -562,9 +632,11 @@ class _PurchaseViewState extends State<PurchaseView> {
                       child: CustomButton(
                         onTap: () async {
                           FocusScope.of(context).unfocus();
-                         await Get.to(() => PurchaseSummary())?.then((value) {
-                            FocusScope.of(context).unfocus();
-                          });
+                          if(formKey.currentState!.validate()){
+                            await Get.to(() => PurchaseSummary())?.then((value) {
+                              FocusScope.of(context).unfocus();
+                            });
+                          }
                         },
                         text: "Billing Summary",
                       ),
