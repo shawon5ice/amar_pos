@@ -18,7 +18,7 @@ class CustomTextField extends StatefulWidget {
   final double width, height;
   final FontWeight txtFontWeight;
   final Color fillClr, brdrClr, txtClr, disableClr;
-  final double brdrRadius, txtSize;
+  final double brdrRadius, txtSize, contentPadding;
   final bool enabledFlag;
   final String? errorText;
   final int maxLine;
@@ -39,6 +39,7 @@ class CustomTextField extends StatefulWidget {
     super.key,
     required this.textCon,
     this.textInputAction,
+    this.contentPadding = 15,
     required this.hintText,
     this.prefixIcon,
     this.prefixWidget,
@@ -47,7 +48,7 @@ class CustomTextField extends StatefulWidget {
     this.readOnly = false,
     this.inputType = TextInputType.text,
     this.width = double.infinity,
-    this.height = 50,
+    this.height = 56,
     this.txtFontWeight = FontWeight.normal,
     this.fillClr = Colors.white,
     this.brdrClr = AppColors.inputBorderColor,
@@ -142,7 +143,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
     return InputDecoration(
       filled: true,
       fillColor: widget.enabledFlag ? widget.fillClr : widget.disableClr,
-      contentPadding: const EdgeInsets.all(15),
+      contentPadding: EdgeInsets.all(widget.contentPadding),
       border: _getInputBorder(),
       enabledBorder: _getInputBorder(),
       focusedBorder: _getInputBorder(),

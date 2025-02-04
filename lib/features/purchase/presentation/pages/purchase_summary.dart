@@ -154,7 +154,7 @@ class _PurchaseSummaryState extends State<PurchaseSummary> {
                                             .text = value.phone;
                                         customerAddressEditingController.text =
                                             value.address;
-                                        controller.update(['client_list']);
+                                        controller.update(['supplier_list']);
                                       }
                                     },
                                     buttonStyleData: ButtonStyleData(

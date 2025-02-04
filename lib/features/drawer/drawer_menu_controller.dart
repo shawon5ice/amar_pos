@@ -45,7 +45,7 @@ class DrawerMenuController extends GetxController {
 
   void openDrawer() {
     isDrawerOpened.value = true;
-    xOffset.value = Get.width * 0.75;
+    xOffset.value = Get.width * 0.65;
     yOffset.value = Get.height * 0.1;
     scaleFactor.value = 0.8;
     update();

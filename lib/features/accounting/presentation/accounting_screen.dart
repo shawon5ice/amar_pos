@@ -1,4 +1,8 @@
+import 'package:amar_pos/features/accounting/data/models/accounting_menu_item.dart';
+import 'package:amar_pos/features/accounting/presentation/views/daily_statement/daily_statement.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import '../../drawer/drawer_menu_controller.dart';
 
 class AccountingScreen extends StatefulWidget {
   const AccountingScreen({super.key});
@@ -8,26 +12,36 @@ class AccountingScreen extends StatefulWidget {
 }
 
 class _AccountingScreenState extends State<AccountingScreen> {
-  List<String> accounting = [
-    "Daily Statement",
-    "Expense Voucher",
-    "Due Collection",
-    "Due Payment",
-    "Money Transfer",
-    "Money Adjustment",
-    "Ledger",
-    "Trial Balance",
-    "Profit or Loss",
-    "Balance Sheet",
+  List<AccountingMenuItem> accounting = [
+    AccountingMenuItem(title: "Daily Statement", onPress: (){
+      Get.to(()=> const DailyStatement());
+    }),
+    AccountingMenuItem(title: "Expense Voucher", onPress: (){}),
+    AccountingMenuItem(title: "Due Collection", onPress: (){}),
+    AccountingMenuItem(title: "Due Payment", onPress: (){}),
+    AccountingMenuItem(title: "Money Transfer", onPress: (){}),
+    AccountingMenuItem(title: "Money Adjustment", onPress: (){}),
+    AccountingMenuItem(title: "Ledger", onPress: (){}),
+    AccountingMenuItem(title: "Trial Balance", onPress: (){}),
+    AccountingMenuItem(title: "Profit or Loss", onPress: (){}),
+    AccountingMenuItem(title: "Balance Sheet", onPress: (){}),
   ];
+
+
 
   @override
   Widget build(BuildContext context) {
+    final DrawerMenuController drawerMenuController = Get.find();
     return Scaffold(
       appBar: AppBar(
         title: AppBar(
-          title: Text('Accounting'),
+          title: const Text('Accounting'),
           centerTitle: true,
+          leading: DrawerButton(
+            onPressed: () async {
+              drawerMenuController.openDrawer();
+            },
+          ),
         ),
       ),
       body: GridView.count(
@@ -40,10 +54,13 @@ class _AccountingScreenState extends State<AccountingScreen> {
         children: <Widget>[
           ...accounting.map((e) => Container(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-                border: Border.all(color: Color(0xffFF9000), width: .5)
+                borderRadius: const BorderRadius.all(Radius.circular(10)),
+                border: Border.all(color: const Color(0xffFF9000), width: .5)
               ),
-              child: Center(child: Text(e))),)
+              child: GestureDetector(
+                onTap: e.onPress,
+                child: Center(child: Text(e.title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),)),
+              )),)
         ],
       )
     );

@@ -112,7 +112,7 @@ class _PurchaseSummaryPaymentOptionSelectionWidgetState
                           }
                         },
                         buttonStyleData: ButtonStyleData(
-                          height: 48.sp,
+                          height: 56.h,
                           padding: EdgeInsets.zero,
                           decoration: BoxDecoration(
                             border:

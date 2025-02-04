@@ -14,7 +14,10 @@ class MainPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+        statusBarBrightness: Brightness.dark,
+      statusBarIconBrightness: Brightness.light
+    ));
     return PopScope(
       canPop: false,
       onPopInvoked: (value) {

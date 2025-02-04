@@ -76,10 +76,11 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   @override
   Widget build(BuildContext _) {
     return SingleChildScrollView(
+      physics: const NeverScrollableScrollPhysics(),
       child: Padding(
         padding: const EdgeInsets.only(left: 16, top: 100),
         child: SizedBox(
-          width: context.width * .65,
+          width: 232,
           child: Column(
             children: [
               Row(
@@ -123,112 +124,121 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                 indent: 20,
                 // endIndent: 20,
               ),
-              buildDrawerItems(context, DrawerItems.overview),
-              ExpandableDrawerWidget(
-                item: DrawerItems.inventory,
-                children: const ["Product List", "Stock Report",],
-                expanded: (bool isExpanded) {
-                  setState(() {
-                    if (isExpanded) selectedParentItem = DrawerItems.inventory;
-                  });
-                },
-                isExpanded: isExpanded && selectedParentItem == DrawerItems.inventory,
-                selectedChild: selectedChildItem,
-                onParentTap: () => onParentTap(DrawerItems.inventory),
-                onChildTap: (child) => onChildTap(DrawerItems.inventory, child),
-              ),
-              buildDrawerItems(context, DrawerItems.sales),
-              // ExpandableDrawerWidget(
-              //   item: DrawerItems.sales,
-              //   children: const ["Retail Sale", "Whole Sale",],
-              //   expanded: (bool isExpanded) {
-              //     setState(() {
-              //       if (isExpanded) selectedParentItem = DrawerItems.sales;
-              //     });
-              //   },
-              //   isExpanded:
-              //       isExpanded && selectedParentItem == DrawerItems.sales,
-              //   selectedChild: selectedChildItem,
-              //   onParentTap: () => onParentTap(DrawerItems.sales),
-              //   onChildTap: (child) => onChildTap(DrawerItems.sales, child),
-              // ),
-              ExpandableDrawerWidget(
-                item: DrawerItems.returnAndExchange,
-                children: const ["Return", "Exchange",],
-                expanded: (bool isExpanded) {
-                  setState(() {
-                    if (isExpanded) selectedParentItem = DrawerItems.returnAndExchange;
-                  });
-                },
-                isExpanded: isExpanded && selectedParentItem == DrawerItems.returnAndExchange,
-                selectedChild: selectedChildItem,
-                onParentTap: () => onParentTap(DrawerItems.returnAndExchange),
-                onChildTap: (child) => onChildTap(DrawerItems.returnAndExchange, child),
-              ),
-              ExpandableDrawerWidget(
-                item: DrawerItems.purchase,
-                children: const ["Purchase", "Purchase Return",],
-                expanded: (bool isExpanded) {
-                  setState(() {
-                    if (isExpanded) selectedParentItem = DrawerItems.purchase;
-                  });
-                },
-                isExpanded: isExpanded && selectedParentItem == DrawerItems.purchase,
-                selectedChild: selectedChildItem,
-                onParentTap: () => onParentTap(DrawerItems.purchase),
-                onChildTap: (child) => onChildTap(DrawerItems.purchase, child),
-              ),
-              buildDrawerItems(context, DrawerItems.accounting),
-              buildDrawerItems(context, DrawerItems.reports),
-              buildDrawerItems(context, DrawerItems.config),
-              const SizedBox(
-                height: 16,
-              ),
-              const Divider(
-                color: AppColors.lightGreen,
-                indent: 20,
-                // endIndent: 20,
-              ),
-              const SizedBox(
-                height: 16,
-              ),
-              buildDrawerItems(context, DrawerItems.feedback),
-              buildDrawerItems(context, DrawerItems.trainingSession),
-              buildDrawerItems(context, DrawerItems.joinCommunity),
-              buildDrawerItems(context, DrawerItems.subscription),
-              buildDrawerItems(context, DrawerItems.helpAndSupport),
-              const SizedBox(
-                height: 32,
-              ),
-              ListTile(
-                selectedTileColor: AppColors.lightGreen.withOpacity(.3),
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(12)),
-                ),
-                dense: true,
-                onTap: (){
-                  AwesomeDialog(
-                    context: context,
-                    dialogType: DialogType.question,
-                    headerAnimationLoop: false,
-                    title: "Are you sure?",
-                    desc: "You are going to log out from AMAR POS.",
-                    btnCancelColor: Colors.green,
-                    btnOkColor: Colors.red,
-                    btnOkOnPress: () {
-                      LoginDataBoxManager().loginData = null;
-                      Preference.setLoggedInFlag(false);
-                      Get.offAndToNamed(LoginScreen.routeName);
-                    },
-                    btnCancelOnPress: (){
-                    }
-                  ).show();
-                },
-                leading: SvgPicture.asset(AppAssets.logoutMenuIcon),
-                title: Text(
-                  'Log Out',
-                  style: context.textTheme.titleSmall?.copyWith(
-                      color: AppColors.error, fontWeight: FontWeight.bold),
+              SizedBox(
+                height: context.height * .75,
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      buildDrawerItems(context, DrawerItems.overview),
+                      ExpandableDrawerWidget(
+                        item: DrawerItems.inventory,
+                        children: const ["Product List", "Stock Report",],
+                        expanded: (bool isExpanded) {
+                          setState(() {
+                            if (isExpanded) selectedParentItem = DrawerItems.inventory;
+                          });
+                        },
+                        isExpanded: isExpanded && selectedParentItem == DrawerItems.inventory,
+                        selectedChild: selectedChildItem,
+                        onParentTap: () => onParentTap(DrawerItems.inventory),
+                        onChildTap: (child) => onChildTap(DrawerItems.inventory, child),
+                      ),
+                      buildDrawerItems(context, DrawerItems.sales),
+                      // ExpandableDrawerWidget(
+                      //   item: DrawerItems.sales,
+                      //   children: const ["Retail Sale", "Whole Sale",],
+                      //   expanded: (bool isExpanded) {
+                      //     setState(() {
+                      //       if (isExpanded) selectedParentItem = DrawerItems.sales;
+                      //     });
+                      //   },
+                      //   isExpanded:
+                      //       isExpanded && selectedParentItem == DrawerItems.sales,
+                      //   selectedChild: selectedChildItem,
+                      //   onParentTap: () => onParentTap(DrawerItems.sales),
+                      //   onChildTap: (child) => onChildTap(DrawerItems.sales, child),
+                      // ),
+                      ExpandableDrawerWidget(
+                        item: DrawerItems.returnAndExchange,
+                        children: const ["Return", "Exchange",],
+                        expanded: (bool isExpanded) {
+                          setState(() {
+                            if (isExpanded) selectedParentItem = DrawerItems.returnAndExchange;
+                          });
+                        },
+                        isExpanded: isExpanded && selectedParentItem == DrawerItems.returnAndExchange,
+                        selectedChild: selectedChildItem,
+                        onParentTap: () => onParentTap(DrawerItems.returnAndExchange),
+                        onChildTap: (child) => onChildTap(DrawerItems.returnAndExchange, child),
+                      ),
+                      ExpandableDrawerWidget(
+                        item: DrawerItems.purchase,
+                        children: const ["Purchase", "Purchase Return",],
+                        expanded: (bool isExpanded) {
+                          setState(() {
+                            if (isExpanded) selectedParentItem = DrawerItems.purchase;
+                          });
+                        },
+                        isExpanded: isExpanded && selectedParentItem == DrawerItems.purchase,
+                        selectedChild: selectedChildItem,
+                        onParentTap: () => onParentTap(DrawerItems.purchase),
+                        onChildTap: (child) => onChildTap(DrawerItems.purchase, child),
+                      ),
+                      buildDrawerItems(context, DrawerItems.accounting),
+                      buildDrawerItems(context, DrawerItems.reports),
+                      buildDrawerItems(context, DrawerItems.config),
+                      const SizedBox(
+                        height: 16,
+                      ),
+                      const Divider(
+                        color: AppColors.lightGreen,
+                        indent: 20,
+                        // endIndent: 20,
+                      ),
+                      const SizedBox(
+                        height: 16,
+                      ),
+                      buildDrawerItems(context, DrawerItems.feedback),
+                      buildDrawerItems(context, DrawerItems.trainingSession),
+                      buildDrawerItems(context, DrawerItems.joinCommunity),
+                      buildDrawerItems(context, DrawerItems.subscription),
+                      buildDrawerItems(context, DrawerItems.helpAndSupport),
+                      const SizedBox(
+                        height: 16,
+                      ),
+                      ListTile(
+                        selectedTileColor: AppColors.lightGreen.withOpacity(.3),
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(12)),
+                        ),
+                        dense: true,
+                        onTap: (){
+                          AwesomeDialog(
+                              context: context,
+                              dialogType: DialogType.question,
+                              headerAnimationLoop: false,
+                              title: "Are you sure?",
+                              desc: "You are going to log out from AMAR POS.",
+                              btnCancelColor: Colors.green,
+                              btnOkColor: Colors.red,
+                              btnOkOnPress: () {
+                                LoginDataBoxManager().loginData = null;
+                                Preference.setLoggedInFlag(false);
+                                Get.offAndToNamed(LoginScreen.routeName);
+                              },
+                              btnCancelOnPress: (){
+                              }
+                          ).show();
+                        },
+                        leading: SvgPicture.asset(AppAssets.logoutMenuIcon),
+                        title: Text(
+                          'Log Out',
+                          style: context.textTheme.titleSmall?.copyWith(
+                              color: AppColors.error, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(

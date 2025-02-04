@@ -98,17 +98,46 @@ class _ProductSnSelectionDialogState
                     const SizedBox(height: 8),
                     GetBuilder<ProductSerialNoController>(
                       id: 'sn_input_field',
-                      builder: (controller) => CustomTextField(
+                      builder: (controller) =>  CustomTextField(
+                        enabledFlag: widget.quantity <=
+                            serialNo.length
+                            ? false
+                            : true,
+                        onSubmitted: (value) {
+                          serialNo.add(value);
+                          textEditingController.clear();
+                          controller.update(['purchase_order_product_sn_list']);
+                        },
                         textCon: textEditingController,
-                        hintText: 'Enter Serial No',
-                        textInputAction: controller.serialNoList.length == widget.quantity - 1
-                            ? TextInputAction.done
-                            : TextInputAction.next,
-                        onSubmitted: (value) => controller.handleSubmission(value,widget.quantity),
+                        hintText: "Enter Serial Number",
+                        suffixWidget: InkWell(
+                            onTap: () async {
+                              final String? scannedCode =
+                              await Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                  const QRCodeScannerScreen(),
+                                ),
+                              );
+                              if (scannedCode != null &&
+                                  scannedCode.isNotEmpty) {
+                                textEditingController.text = scannedCode;
+                                serialNo.add(scannedCode);
+                                textEditingController.clear();
+                                controller.update([
+                                  'purchase_order_product_sn_list',
+                                  'sn_input_field'
+                                ]);
+                              }
+                            },
+                            child: const Icon(
+                              Icons.qr_code_scanner_sharp,
+                              color: AppColors.accent,
+                            )),
                       ),
                     ),
                     const SizedBox(height: 8),
-                    if (controller.serialNoList.isNotEmpty)
+                    if (serialNo.isNotEmpty)
                       Column(
                         children: [
                           const DashedLine(),
@@ -120,7 +149,7 @@ class _ProductSnSelectionDialogState
                               child: SingleChildScrollView(
                                 child: Wrap(
                                   spacing: 4,
-                                  children: controller.serialNoList
+                                  children: serialNo
                                       .map(
                                         (e) => Chip(
                                       elevation: 4,
@@ -131,7 +160,7 @@ class _ProductSnSelectionDialogState
                                             fontSize: 14.sp),
                                       ),
                                       onDeleted: () {
-                                        controller.serialNoList.remove(e);
+                                        serialNo.remove(e);
                                         controller.update([
                                           'product_sn_list',
                                           'sn_input_field'
