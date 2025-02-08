@@ -1,6 +1,7 @@
 import 'package:amar_pos/core/constants/app_colors.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../../../../../core/widgets/field_title.dart';
 
 class CustomDropdownWithSearchWidget<T> extends StatefulWidget {
@@ -68,7 +69,7 @@ class _CustomDropdownWithSearchWidgetState<T>
             hint: Text(
               widget.hintText,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 12,
                 color: Theme.of(context).hintColor,
               ),
             ),
@@ -112,15 +113,17 @@ class _CustomDropdownWithSearchWidgetState<T>
             items: widget.items
                 .map(
                   (item) => DropdownMenuItem<T>(
+                    alignment: Alignment.centerLeft,
                 value: item,
                 child: Text(
                   widget.itemLabel(item),
-                  style: const TextStyle(fontSize: 14),
-                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 12),
+                  overflow: TextOverflow.visible,
                 ),
               ),
             )
                 .toList(),
+
             value: widget.value,
             onChanged: (value) {
               widget.onChanged(value);
@@ -133,8 +136,10 @@ class _CustomDropdownWithSearchWidgetState<T>
                 borderRadius: const BorderRadius.all(Radius.circular(8)),
               ),
             ),
-            dropdownStyleData: const DropdownStyleData(
+            dropdownStyleData: DropdownStyleData(
               maxHeight: 300,
+              // width: context.width - 100,
+              // offset: Offset(0, 48),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.all(Radius.circular(8)),
@@ -145,7 +150,7 @@ class _CustomDropdownWithSearchWidgetState<T>
             ),
             dropdownSearchData: DropdownSearchData(
               searchController: _textEditingController,
-              searchInnerWidgetHeight: 58,
+              searchInnerWidgetHeight: 48,
               searchInnerWidget: Padding(
                 padding:
                 const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),

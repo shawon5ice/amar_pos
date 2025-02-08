@@ -1,6 +1,6 @@
+import 'package:amar_pos/core/constants/app_colors.dart';
 import 'package:amar_pos/core/core.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
-import 'package:amar_pos/core/widgets/custom_text_field.dart';
 import 'package:amar_pos/core/widgets/field_title.dart';
 import 'package:amar_pos/features/accounting/data/models/daily_statement/daily_statement_report_response_model.dart';
 import 'package:amar_pos/features/accounting/presentation/views/daily_statement/daily_statement_controller.dart';
@@ -9,12 +9,16 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 
 import '../../../../../core/constants/app_assets.dart';
+import '../../../../../core/data/model/outlet_model.dart';
+import '../../../../../core/methods/helper_methods.dart';
 import '../../../../../core/widgets/pager_list_view.dart';
+import '../../../../../core/widgets/reusable/outlet_dd/outlet_dropdown_widget.dart';
 import '../../../../inventory/presentation/stock_report/widget/custom_svg_icon_widget.dart';
 import '../widgets/daily_statement_item.dart';
 import 'status_widget.dart';
 
 class DailyStatement extends StatefulWidget {
+  static const routeName = '/accounting/daily-statement';
   const DailyStatement({super.key});
 
   @override
@@ -24,16 +28,35 @@ class DailyStatement extends StatefulWidget {
 class _DailyStatementState extends State<DailyStatement> {
 
   DailyStatementController controller = Get.put(DailyStatementController());
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Daily Statement"),centerTitle: true,),
+      appBar: AppBar(title: Text("Daily Statement"),centerTitle: true,
+        actions: [
+          IconButton(
+            onPressed: () async {
+              DateTimeRange? selectedDate = await showDateRangePicker(
+                context: context,
+                firstDate: DateTime.now().subtract(const Duration(days: 1000)),
+                lastDate: DateTime.now().add(const Duration(days: 1000)),
+                initialDateRange: controller.selectedDateTimeRange.value,
+              );
+              if (selectedDate != null) {
+                controller.setSelectedDateRange(selectedDate);
+                controller.getDailyStatement();
+              }
+            },
+            icon: SvgPicture.asset(AppAssets.calenderIcon),
+          ),
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Column(
           children: [
             Container(
-              padding: EdgeInsets.all(20),
+              padding: EdgeInsets.only(left: 20,top: 20,right: 20),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.all(Radius.circular(20))
@@ -44,14 +67,17 @@ class _DailyStatementState extends State<DailyStatement> {
                   FieldTitle("Select Account"),
                   addH(4),
                   Row(children: [
-                    Expanded(child: CustomTextField(textCon: TextEditingController(), hintText: "Select Account")),
-                    addW(8),
+                    Expanded(
+                          child: OutletDropDownWidget(
+                        onOutletSelection: (OutletModel? outlet) {
+                          controller.getDailyStatement(caId: outlet?.id);
+                        },
+                      )),
+                      addW(8),
                     CustomSvgIconButton(
                       bgColor: const Color(0xffEBFFDF),
                       onTap: () {
-                        // controller.downloadList(isPdf: false, returnHistory: true);
-                        // controller.downloadStockLedgerReport(
-                        //     isPdf: false, context: context);
+                        controller.downloadDailyStatement(isPdf: false,);
                       },
                       assetPath: AppAssets.excelIcon,
                     ),
@@ -59,7 +85,7 @@ class _DailyStatementState extends State<DailyStatement> {
                     CustomSvgIconButton(
                       bgColor: const Color(0xffE1F2FF),
                       onTap: () {
-                        // controller.downloadList(isPdf: true, returnHistory: true);
+                        controller.downloadDailyStatement(isPdf: true,);
                       },
                       assetPath: AppAssets.downloadIcon,
                     ),
@@ -70,6 +96,20 @@ class _DailyStatementState extends State<DailyStatement> {
                       assetPath: AppAssets.printIcon,
                     )
                   ],),
+                  // addH(8),
+                  Obx(() {
+                    return controller.selectedDateTimeRange.value == null ? addH(20): Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("${formatDate(controller.selectedDateTimeRange.value!.start)} - ${formatDate(controller.selectedDateTimeRange.value!.end)}", style:const TextStyle(fontSize: 14, color: AppColors.error),),
+                        addW(16),
+                        IconButton(onPressed: (){
+                          controller.selectedDateTimeRange.value = null;
+                          controller.getDailyStatement();
+                        }, icon: Icon(Icons.cancel_outlined, size: 18, color: AppColors.error,))
+                      ],
+                    );
+                  })
                 ],
               ),
             ),
@@ -138,7 +178,7 @@ class _DailyStatementState extends State<DailyStatement> {
                   }
                   return RefreshIndicator(
                     onRefresh: () async {
-                      controller.getDailyStatement(search: '', page: 1);
+                      controller.getDailyStatement(page: 1);
                     },
                     child: PagerListView<TransactionData>(
                       // scrollController: _scrollController,
@@ -158,7 +198,7 @@ class _DailyStatementState extends State<DailyStatement> {
                       controller
                           .dailyStatementReportResponseModel?.data.first.data.total ??
                           0,
-                      itemPerPage: 10,
+                      itemPerPage: 20,
                     ),
                   );
                 },

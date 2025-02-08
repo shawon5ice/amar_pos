@@ -1,3 +1,6 @@
+import 'package:amar_pos/core/widgets/reusable/outlet_dd/outlet_dd_controller.dart';
+import 'package:amar_pos/features/accounting/presentation/views/daily_statement/daily_statement_controller.dart';
+import 'package:amar_pos/features/accounting/presentation/views/expense_voucher/expense_voucher_controller.dart';
 import 'package:amar_pos/features/auth/presentation/controller/auth_controller.dart';
 import 'package:amar_pos/features/drawer/drawer_menu_controller.dart';
 import 'package:amar_pos/features/inventory/presentation/products/product_controller.dart';
@@ -30,5 +33,20 @@ class AddProductBinding extends Bindings{
   @override
   void dependencies() {
     Get.lazyPut(()=> ProductController());
+  }
+}
+
+class DailyStatementBinding extends Bindings{
+  @override
+  void dependencies() {
+    Get.lazyPut(()=> DailyStatementController());
+    Get.lazyPut(()=> OutletDDController());
+  }
+}
+
+class ExpenseVoucherBindings extends Bindings{
+  @override
+  void dependencies() {
+    Get.lazyPut(()=> ExpenseVoucherController());
   }
 }

@@ -1,5 +1,6 @@
 import 'package:amar_pos/features/accounting/data/models/accounting_menu_item.dart';
 import 'package:amar_pos/features/accounting/presentation/views/daily_statement/daily_statement.dart';
+import 'package:amar_pos/features/accounting/presentation/views/expense_voucher/expense_voucher.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../drawer/drawer_menu_controller.dart';
@@ -14,9 +15,11 @@ class AccountingScreen extends StatefulWidget {
 class _AccountingScreenState extends State<AccountingScreen> {
   List<AccountingMenuItem> accounting = [
     AccountingMenuItem(title: "Daily Statement", onPress: (){
-      Get.to(()=> const DailyStatement());
+      Get.toNamed(DailyStatement.routeName);
     }),
-    AccountingMenuItem(title: "Expense Voucher", onPress: (){}),
+    AccountingMenuItem(title: "Expense Voucher", onPress: (){
+      Get.toNamed(ExpenseVoucher.routeName);
+    }),
     AccountingMenuItem(title: "Due Collection", onPress: (){}),
     AccountingMenuItem(title: "Due Payment", onPress: (){}),
     AccountingMenuItem(title: "Money Transfer", onPress: (){}),

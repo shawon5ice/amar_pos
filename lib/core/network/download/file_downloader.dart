@@ -1,11 +1,8 @@
 import 'dart:io';
-import 'package:amar_pos/core/core.dart';
 import 'package:amar_pos/core/network/helpers/error_extractor.dart';
 import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
@@ -139,7 +136,7 @@ class FileDownloader {
   Future<void> _handleNotificationTap(String? payload) async {
     if (payload != null) {
       // Open the downloaded file
-      const platform = MethodChannel('com.motionview.hrm/openfile');
+      const platform = MethodChannel('com.motionview.amarPos/openfile');
       try {
         await platform.invokeMethod('openFile', {'filePath': payload});
       } on PlatformException catch (e) {
@@ -148,7 +145,7 @@ class FileDownloader {
             "x": ["Failed to open downloaded file.\nPlease download associated software to view this."],
           },
         });
-        print("Failed to open downloaded file.\nPlease download associated software to view this'.");
+        logger.e("Failed to open downloaded file.\nPlease download associated software to view this'.");
       }
     }
   }

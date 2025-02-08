@@ -13,27 +13,32 @@ class DailyStatementService {
     required String usrToken,
     required int page,
     required String? search,
+    required String? startDate,
+    required String? endDate,
+    int? caId,
   }) async {
     logger.d("Page: $page");
     var response = await BaseClient.getData(
         token: usrToken,
         api: "accounting/report/get-daily-statement-report",
         parameter: {
-          "status": 1,
           "page": page,
           "search": search,
-          "start_date": "2024-12-01"
+          "start_date": startDate,
+          "end_date": endDate,
+          "ca_id": caId,
+          "limit": 20
         });
     return response;
   }
 
 
-  static Future<void> downloadList({required bool isPdf,required bool saleHistory, required String fileName,
+  static Future<void> downloadList({required bool isPdf,required String fileName,
     required String usrToken,
-    required DateTime? startDate,
-    required DateTime? endDate,
-    required String? search,
-
+    DateTime? startDate,
+    DateTime? endDate,
+    String? search,
+    int? caId,
   }) async {
     // logger.d("PDF: $isPdf");
 
@@ -41,29 +46,22 @@ class DailyStatementService {
       "start_date": startDate,
       "end_date": endDate,
       "search": search,
+      "ca_id": caId,
     };
 
     String downloadUrl = "";
 
-    if(saleHistory){
-      if(isPdf){
-        downloadUrl = "${NetWorkStrings.baseUrl}/purchase/download-pdf-purchase-list/";
-      }else{
-        downloadUrl = "${NetWorkStrings.baseUrl}/purchase/download-excel-purchase-list";
-      }
+    if(isPdf){
+      downloadUrl = "${NetWorkStrings.baseUrl}/accounting/report/download-pdf-daily-statement-report";
     }else{
-      if(isPdf){
-        downloadUrl = "${NetWorkStrings.baseUrl}/purchase/download-pdf-purchase-product/";
-      }else{
-        downloadUrl = "${NetWorkStrings.baseUrl}/purchase/download-excel-purchase-product/";
-      }
+      downloadUrl = "${NetWorkStrings.baseUrl}/accounting/report/download-excel-daily-statement-report";
     }
 
 
     FileDownloader().downloadFile(
       url: downloadUrl,
       token: usrToken,
-      query: query,
-      fileName: fileName,);
+      fileName: fileName,
+      query: query,);
   }
 }

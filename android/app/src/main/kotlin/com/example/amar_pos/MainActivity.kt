@@ -13,7 +13,7 @@ import io.flutter.plugin.common.MethodChannel
 import java.io.File
 
 class MainActivity : FlutterActivity() {
-    private val CHANNEL = "com.motionview.hrm/openfile"
+    private val CHANNEL = "com.motionview.amarPos/openfile"
     override
     fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
