@@ -1,6 +1,7 @@
 import 'package:amar_pos/core/widgets/custom_button.dart';
 import 'package:amar_pos/features/accounting/data/models/expense_voucher/expense_categories_response_model.dart';
 import 'package:amar_pos/features/accounting/presentation/views/expense_voucher/expense_voucher_controller.dart';
+import 'package:amar_pos/features/accounting/presentation/views/widgets/create_expense_category_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -134,10 +135,22 @@ class _ExpenseCategoryPageState extends State<ExpenseCategoryPage> {
           ),
         ),
         bottomNavigationBar: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.only(left: 20,right: 20,bottom: 20),
           child: CustomButton(
             text: "Add New Category",
-            onTap: () {},
+            onTap: () {
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(20)),
+                ),
+                builder: (context) {
+                  return CreateExpenseCategoryBottomSheet();
+                },
+              );
+            },
           ),
         ),
       ),

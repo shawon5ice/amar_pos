@@ -6,6 +6,7 @@ import '../../../../../core/constants/app_assets.dart';
 import '../../../../../core/constants/app_colors.dart';
 import '../../../../../core/methods/helper_methods.dart';
 import '../../../../../core/responsive/pixel_perfect.dart';
+import '../../../../../core/widgets/custom_button.dart';
 import 'expense_voucher_controller.dart';
 import 'pages/expense_category_page.dart';
 
@@ -37,7 +38,7 @@ class _ExpenseVoucherState extends State<ExpenseVoucher> with SingleTickerProvid
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Expense Voucher"),centerTitle: true,
+      appBar: AppBar(title: const Text("Expense Voucher"),centerTitle: true,
         actions: [
           GetBuilder<ExpenseVoucherController>(
             id: 'action_button',

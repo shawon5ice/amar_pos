@@ -89,4 +89,22 @@ class ExpenseVoucherService {
       query: query,
       fileName: fileName,);
   }
+
+
+  static Future<dynamic> storeCategory({
+    required String categoryName,
+    required String token,
+  }) async {
+
+    var response = await BaseClient.postData(
+      token: token,
+      api: NetWorkStrings.addCategory,
+      body: {
+        "name": categoryName,
+      },
+    );
+    return response;
+  }
+
+
 }

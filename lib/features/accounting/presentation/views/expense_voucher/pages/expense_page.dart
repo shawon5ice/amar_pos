@@ -78,10 +78,6 @@ class _ExpensePageState extends State<ExpensePage> {
               ),
             ],
           ),
-          bottomNavigationBar: CustomButton(
-            text: "Create Voucher",
-            onTap: () {},
-          ),
         ),
       ),
     );

@@ -1,9 +1,11 @@
+import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:amar_pos/features/accounting/data/services/expense_voucher_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/get_rx.dart';
 
 import '../../../../../core/constants/logger/logger.dart';
+import '../../../../../core/core.dart';
 import '../../../../auth/data/model/hive/login_data.dart';
 import '../../../../auth/data/model/hive/login_data_helper.dart';
 import '../../../data/models/expense_voucher/expense_categories_response_model.dart';
@@ -139,4 +141,94 @@ class ExpenseVoucherController extends GetxController{
       update(['expense_vouchers_categories_list']);
     }
   }
+
+
+  bool isAddCategoryLoading = false;
+  
+  void addNewCategory({
+    required String categoryName,
+  }) async {
+    isAddCategoryLoading = true;
+    update(["expense_vouchers_categories_list"]);
+    RandomLottieLoader.show();
+    try{
+      var response = await ExpenseVoucherService.storeCategory(
+        token: loginData!.token,
+        categoryName: categoryName,
+      );
+      if (response != null) {
+
+        if(response['success']){
+          getExpenseCategories();
+        }
+        Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true: null );
+      }
+    }catch(e){
+      logger.e(e);
+    }finally{
+      isAddCategoryLoading = false;
+      update(['expense_vouchers_categories_list']);
+    }
+    update(["expense_vouchers_categories_list"]);
+    RandomLottieLoader.hide();
+  }
+
+  // void editCategory({
+  //   required Category category,
+  //   required String categoryName,
+  // }) async {
+  //   isAddCategoryLoading = true;
+  //   update(["expense_vouchers_categories_list"]);
+  //   EasyLoading.show();
+  //   try{
+  //     var response = await ExpenseVoucherService.update(
+  //       token: loginData!.token,
+  //       categoryName: categoryName,
+  //       brandId: category.id,
+  //     );
+  //     if (response != null) {
+  //
+  //       if(response['success']){
+  //         getAllCategory();
+  //       }
+  //       Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true: null );
+  //     }
+  //   }catch(e){
+  //     logger.e(e);
+  //   }finally{
+  //     categoryListLoading = false;
+  //     update(['expense_vouchers_categories_list']);
+  //   }
+  //   update(["expense_vouchers_categories_list"]);
+  //   EasyLoading.dismiss();
+  // }
+  //
+  // void deleteCategory({
+  //   required Category category,
+  // }) async {
+  //   isAddCategoryLoading = true;
+  //   update(["expense_vouchers_categories_list"]);
+  //   EasyLoading.show();
+  //   try{
+  //     var response = await CategoryService.delete(
+  //       token: loginData!.token,
+  //       categoryId: category.id,
+  //     );
+  //     if (response != null) {
+  //
+  //       if(response['success']){
+  //         categoryList.remove(category);
+  //         allCategoryCopy.remove(category);
+  //       }
+  //       Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true: null );
+  //     }
+  //   }catch(e){
+  //     logger.e(e);
+  //   }finally{
+  //     categoryListLoading = false;
+  //     update(['expense_vouchers_categories_list']);
+  //   }
+  //   update(["expense_vouchers_categories_list"]);
+  //   EasyLoading.dismiss();
+  // }
 }
