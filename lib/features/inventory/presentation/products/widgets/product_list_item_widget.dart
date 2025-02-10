@@ -145,7 +145,7 @@ class ProductListItemWidget extends StatelessWidget {
                           dialogType: DialogType.question,
                           title: "Are you sure?",
                           desc:
-                              "You are going to ${productInfo.status == 1 ? 'Deactivate' : 'Activate'} your supplier ${productInfo.name}",
+                              "You are going to ${productInfo.status == 1 ? 'Deactivate' : 'Activate'} your product ${productInfo.name}",
                           btnOkOnPress: () {
                             controller.changeStatusOfProduct(
                               productInfo: productInfo,
@@ -159,7 +159,7 @@ class ProductListItemWidget extends StatelessWidget {
                                 dialogType: DialogType.error,
                                 title: "Are you sure?",
                                 desc:
-                                    "You are going to delete your supplier ${productInfo.name}",
+                                    "You are going to delete your product ${productInfo.name}",
                                 btnOkOnPress: () {
                                   controller.deleteProduct(
                                       productInfo: productInfo);

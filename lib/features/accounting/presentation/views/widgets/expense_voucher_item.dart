@@ -1,16 +1,24 @@
 import 'package:amar_pos/core/core.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
+import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
+import 'package:amar_pos/features/accounting/presentation/views/expense_voucher/expense_voucher_controller.dart';
+import 'package:amar_pos/features/accounting/presentation/views/widgets/expense_voucher_action_menu.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../../config/presentation/supplier/supplier_action_menu_widget.dart';
 import '../../../data/models/expense_voucher/expense_voucher_response_model.dart';
+import 'create_expense_voucher_bottom_sheet.dart';
 
 class ExpenseVoucherItem extends StatelessWidget {
-  const ExpenseVoucherItem({super.key, required this.transactionData,});
+  ExpenseVoucherItem({super.key, required this.transactionData,});
 
 
   final TransactionData transactionData;
+
+  final ExpenseVoucherController _controller = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +59,44 @@ class ExpenseVoucherItem extends StatelessWidget {
                     Spacer(),
                   ],
                 ),
+              ),
+              Spacer(),
+              ExpenseVoucherActionMenu(
+                status: 1,
+                onSelected: (value) {
+                  switch (value) {
+                    case "edit":
+                      // RandomLottieLoader.show();
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(20)),
+                        ),
+                        builder: (context) {
+                          return CreateExpenseVoucherBottomSheet(
+                            transactionData: transactionData,
+                          );
+                        },
+                      );
+                      // Get.toNamed(AddProductScreen.routeName, arguments: productInfo);
+                      break;
+                    case "delete":
+                      AwesomeDialog(
+                          context: context,
+                          dialogType: DialogType.error,
+                          title: "Are you sure?",
+                          desc:
+                          "You are going to delete your expense voucher with voucher no. ${transactionData.slNo}",
+                          btnOkOnPress: () {
+                            _controller.deleteExpenseVoucher(transaction: transactionData);
+                          },
+                          btnCancelOnPress: () {})
+                          .show();
+                      break;
+                  }
+                },
               ),
             ],
           ),
@@ -103,7 +149,7 @@ class StatementItemTitleValueWidget extends StatelessWidget {
             flex: 2,
             child: Text(
               title,
-              style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w400),
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
             )),
         const Text(" : "),
         Expanded(
@@ -111,7 +157,7 @@ class StatementItemTitleValueWidget extends StatelessWidget {
             child: Text(
               value,
               textAlign: TextAlign.end,
-              style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w400),
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
             )),
       ],
     );

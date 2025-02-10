@@ -2,6 +2,7 @@ import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/core/widgets/custom_button.dart';
 import 'package:amar_pos/core/widgets/custom_text_field.dart';
 import 'package:amar_pos/core/widgets/field_title.dart';
+import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:amar_pos/features/accounting/data/models/expense_voucher/expense_categories_response_model.dart';
 import 'package:amar_pos/features/accounting/data/models/expense_voucher/expense_payment_methods_response_model.dart';
 import 'package:amar_pos/features/accounting/presentation/views/expense_voucher/expense_voucher_controller.dart';
@@ -11,11 +12,12 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import '../../../../../core/widgets/methods/field_validator.dart';
+import '../../../data/models/expense_voucher/expense_voucher_response_model.dart';
 
 class CreateExpenseVoucherBottomSheet extends StatefulWidget {
-  const CreateExpenseVoucherBottomSheet({super.key, this.category});
+  const CreateExpenseVoucherBottomSheet({super.key, this.transactionData});
 
-  final ExpenseCategory? category;
+  final TransactionData? transactionData;
 
   @override
   State<CreateExpenseVoucherBottomSheet> createState() =>
@@ -32,11 +34,27 @@ class _CreateExpenseVoucherBottomSheetState
 
   @override
   void initState() {
-    _categoryController.getExpenseCategories(limit: 1000);
-    _categoryController.getPaymentMethods();
+    _categoryController.getExpenseCategories(limit: 1000).then((value){
+      if(widget.transactionData != null){
+        selectedExpenseCategory = _categoryController.expenseCategoriesList.singleWhere((e) => e.id == widget.transactionData!.category.id);
+        _categoryController.update(['expense_category_dd']);
+      }
+    });
+    _categoryController.getPaymentMethods().then((value){
+      if(widget.transactionData != null){
+        selectedExpensePaymentMethod = _categoryController.expensePaymentMethods.singleWhere((e) => e.id == widget.transactionData!.paymentMethod.id);
+        _categoryController.update(['expense_payment_methods_dd']);
+      }
+    });
+
+
 
     _textEditingController = TextEditingController();
     _remarksEditingController = TextEditingController();
+
+
+    _remarksEditingController.text = widget.transactionData?.remarks?? '';
+    _textEditingController.text = widget.transactionData?.amount.toString()?? '';
 
     super.initState();
   }
@@ -94,6 +112,7 @@ class _CreateExpenseVoucherBottomSheetState
                           items: controller.expenseCategoriesList,
                           isMandatory: true,
                           title: "Category",
+                          value: selectedExpenseCategory,
                           itemLabel: (expenseCategory) {
                             return expenseCategory.name;
                           },
@@ -103,7 +122,7 @@ class _CreateExpenseVoucherBottomSheetState
                               _remarksEditingController.text = selectedExpenseCategory!.remarks ?? '';
                             }
                           },
-                          hintText: "Select Expense Category",
+                          hintText: controller.isExpenseCategoriesListLoading? "Loading..." : "Select Expense Category",
                           searchHintText: "Search Expense Category",
                         ),
                       ),
@@ -118,13 +137,14 @@ class _CreateExpenseVoucherBottomSheetState
                                     items: controller.expensePaymentMethods,
                                     isMandatory: true,
                                     title: "Payment Method",
+                                    value: selectedExpensePaymentMethod,
                                     itemLabel: (paymentMethod) {
                                       return paymentMethod.name;
                                     },
                                     onChanged: (paymentMethod) {
                                       selectedExpensePaymentMethod = paymentMethod;
                                     },
-                                    hintText: "Select Payment Method",
+                                    hintText: controller.isExpensePaymentMethodsListLoading? "Loading...": "Select Payment Method",
                                     searchHintText: "Search Payment Method",
                                   ),
                             ),
@@ -166,12 +186,18 @@ class _CreateExpenseVoucherBottomSheetState
                 ),
                 const SizedBox(height: 20),
                 CustomButton(
-                  text: widget.category != null ? "Update" : "Add Now",
-                  onTap: widget.category != null
+                  text: widget.transactionData != null ? "Update" : "Add Now",
+                  onTap: widget.transactionData != null
                       ? () {
                           if (formKey.currentState!.validate()) {
                             Get.back();
-                            // _categoryController.editCategory(category: widget.category! ,categoryName: _textEditingController.text,);
+                            _categoryController.updateExpenseVoucher(
+                              id: widget.transactionData!.id,
+                                categoryID: selectedExpenseCategory!.id,
+                                caID: selectedExpensePaymentMethod!.id,
+                                amount: num.parse(_textEditingController.text),
+                                remarks: _remarksEditingController.text
+                            );
                           }
                         }
                       : () {

@@ -112,6 +112,41 @@ class ExpenseVoucherService {
     return response;
   }
 
+  static Future<dynamic> updateExpenseVoucher({
+    required int id,
+    required int categoryID,
+    required int caID,
+    required num amount,
+    String? remarks,
+    required String token,
+  }) async {
+
+    var response = await BaseClient.postData(
+      token: token,
+      api: "expense_voucher/update/$id",
+      body: {
+        "category_id": categoryID,
+        "ca_id":caID,
+        "amount": amount,
+        "remarks": remarks,
+      },
+    );
+    return response;
+  }
+
+
+  static Future<dynamic> deleteExpenseVoucher({
+    required int id,
+    required String token,
+  }) async {
+
+    var response = await BaseClient.deleteData(
+      token: token,
+      api: "expense_voucher/delete/$id",
+    );
+    return response;
+  }
+
 
   static Future<dynamic> storeCategory({
     required String categoryName,

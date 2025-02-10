@@ -1,4 +1,5 @@
 import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
+import 'package:amar_pos/features/accounting/data/models/expense_voucher/expense_voucher_response_model.dart';
 import 'package:amar_pos/features/accounting/data/models/expense_voucher/expense_payment_methods_response_model.dart';
 import 'package:amar_pos/features/accounting/data/services/expense_voucher_service.dart';
 import 'package:flutter/material.dart';
@@ -294,6 +295,70 @@ class ExpenseVoucherController extends GetxController{
 
         if(response['success']){
           getExpenseVouchers();
+        }
+        Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true: null );
+      }
+    }catch(e){
+      logger.e(e);
+    }finally{
+      isAddCategoryLoading = false;
+      update(['expense_vouchers_list']);
+    }
+    update(["expense_vouchers_list"]);
+    RandomLottieLoader.hide();
+  }
+
+  void updateExpenseVoucher({
+    required int id,
+    required int categoryID,
+    required int caID,
+    required num amount,
+    String? remarks,
+  }) async {
+    isAddCategoryLoading = true;
+    update(["expense_vouchers_list"]);
+    RandomLottieLoader.show();
+    try{
+      var response = await ExpenseVoucherService.updateExpenseVoucher(
+        id: id,
+        token: loginData!.token,
+        caID: caID,
+        categoryID: categoryID,
+        amount: amount,
+        remarks: remarks,
+      );
+      if (response != null) {
+
+        if(response['success']){
+          getExpenseVouchers();
+        }
+        Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true: null );
+      }
+    }catch(e){
+      logger.e(e);
+    }finally{
+      isAddCategoryLoading = false;
+      update(['expense_vouchers_list']);
+    }
+    update(["expense_vouchers_list"]);
+    RandomLottieLoader.hide();
+  }
+
+  void deleteExpenseVoucher({
+    required TransactionData transaction,
+  }) async {
+    isAddCategoryLoading = true;
+    update(["expense_vouchers_list"]);
+    RandomLottieLoader.show();
+    try{
+      var response = await ExpenseVoucherService.deleteExpenseVoucher(
+        id: transaction.id,
+        token: loginData!.token,
+      );
+      if (response != null) {
+
+        if(response['success']){
+          expenseVouchersList.remove(transaction);
         }
         Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true: null );
       }
