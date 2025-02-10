@@ -1,4 +1,5 @@
 import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
+import 'package:amar_pos/features/accounting/data/models/expense_voucher/expense_payment_methods_response_model.dart';
 import 'package:amar_pos/features/accounting/data/services/expense_voucher_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -21,12 +22,15 @@ class ExpenseVoucherController extends GetxController{
   int? selectedOutletId;
   Rx<DateTimeRange?> selectedDateTimeRange = Rx<DateTimeRange?>(null);
 
-  List<TransactionData> dailyStatementList = [];
+  List<TransactionData> expenseVouchersList = [];
   List<TransactionData> currentSearchList = [];
   ExpenseVoucherResponseModel? expenseVoucherResponseModel;
 
   ExpenseCategoriesResponseModel? expenseCategoriesResponseModel;
   List<ExpenseCategory> expenseCategoriesList = [];
+
+  ExpensePaymentMethodsResponseModel? expensePaymentMethodsResponseModel;
+  List<ExpensePaymentMethod> expensePaymentMethods = [];
 
 
   LoginData? loginData = LoginDataBoxManager().loginData;
@@ -34,7 +38,6 @@ class ExpenseVoucherController extends GetxController{
   @override
   onInit(){
     super.onInit();
-    getExpenseVouchers(page: 1);
   }
 
 
@@ -47,7 +50,7 @@ class ExpenseVoucherController extends GetxController{
       { String? search, int page = 1}) async {
     isExpenseVouchersListLoading = page == 1; // Mark initial loading state
     if(page == 1){
-      dailyStatementList.clear();
+      expenseVouchersList.clear();
     }
     isLoadingMore = page > 1;
 
@@ -71,8 +74,8 @@ class ExpenseVoucherController extends GetxController{
             ExpenseVoucherResponseModel.fromJson(response);
 
         if (expenseVoucherResponseModel != null && expenseVoucherResponseModel!.data != null) {
-          dailyStatementList.addAll(expenseVoucherResponseModel!.data!.data!);
-          logger.i(dailyStatementList.length);
+          expenseVouchersList.addAll(expenseVoucherResponseModel!.data!.data!);
+          logger.i(expenseVouchersList.length);
           // if (currentSearchList.isNotEmpty) {
           //   lastFoundList.value = currentSearchList; // Update last found list
           // }
@@ -94,7 +97,7 @@ class ExpenseVoucherController extends GetxController{
     }
   }
 
-  Future<void> getExpenseCategories({int page = 1}) async {
+  Future<void> getExpenseCategories({int page = 1, int limit = 20}) async {
     if(page == 1){
       isExpenseCategoriesListLoading = true;
       expenseCategoriesList.clear();
@@ -103,12 +106,13 @@ class ExpenseVoucherController extends GetxController{
     }
 
     hasError.value = false;
-    update(['expense_vouchers_categories_list']);
+    update(['expense_vouchers_categories_list','expense_category_dd']);
 
     try {
       var response = await ExpenseVoucherService.getExpenseCategories(
         usrToken: loginData!.token,
         page: page,
+        limit: limit,
       );
 
       logger.d(response);
@@ -138,7 +142,7 @@ class ExpenseVoucherController extends GetxController{
     } finally {
       isExpenseCategoriesListLoading = false;
       isLoadingMore = false;
-      update(['expense_vouchers_categories_list']);
+      update(['expense_vouchers_categories_list','expense_category_dd']);
     }
   }
 
@@ -231,4 +235,75 @@ class ExpenseVoucherController extends GetxController{
   //   update(["expense_vouchers_categories_list"]);
   //   EasyLoading.dismiss();
   // }
+
+
+  bool isExpensePaymentMethodsListLoading = false;
+  Future<void> getPaymentMethods() async {
+    expensePaymentMethods.clear();
+    isExpensePaymentMethodsListLoading = true;
+
+    hasError.value = false;
+    update(['expense_payment_methods_dd',]);
+
+    try {
+      var response = await ExpenseVoucherService.getPaymentMethods(
+        usrToken: loginData!.token,
+      );
+
+      logger.d(response);
+
+      if (response != null) {
+        logger.e(response);
+        expensePaymentMethodsResponseModel =
+            ExpensePaymentMethodsResponseModel.fromJson(response);
+
+        if (expensePaymentMethodsResponseModel != null) {
+          expensePaymentMethods.addAll(expensePaymentMethodsResponseModel!.paymentMethods);
+          logger.i(expenseCategoriesList.length);
+          // if (currentSearchList.isNotEmpty) {
+          //   lastFoundList.value = currentSearchList; // Update last found list
+          // }
+        }
+      }
+    } catch (e) {
+      logger.e(e);
+    } finally {
+      isExpensePaymentMethodsListLoading = false;
+      update(['expense_payment_methods_dd']);
+    }
+  }
+
+  void addNewExpenseVoucher({
+    required int categoryID,
+    required int caID,
+    required num amount,
+    String? remarks,
+  }) async {
+    isAddCategoryLoading = true;
+    update(["expense_vouchers_list"]);
+    RandomLottieLoader.show();
+    try{
+      var response = await ExpenseVoucherService.storeExpenseVoucher(
+        token: loginData!.token,
+        caID: caID,
+        categoryID: categoryID,
+        amount: amount,
+        remarks: remarks,
+      );
+      if (response != null) {
+
+        if(response['success']){
+          getExpenseVouchers();
+        }
+        Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true: null );
+      }
+    }catch(e){
+      logger.e(e);
+    }finally{
+      isAddCategoryLoading = false;
+      update(['expense_vouchers_list']);
+    }
+    update(["expense_vouchers_list"]);
+    RandomLottieLoader.hide();
+  }
 }

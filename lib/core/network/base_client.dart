@@ -2,7 +2,9 @@ import 'dart:convert';
 
 import 'package:amar_pos/core/data/preference.dart';
 import 'package:amar_pos/core/network/helpers/error_extractor.dart';
+import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import '../../features/auth/data/model/hive/login_data_helper.dart';
 import '../../features/auth/presentation/ui/login_screen.dart';
@@ -12,7 +14,12 @@ import '../widgets/methods/helper_methods.dart';
 import 'network_strings.dart';
 
 class BaseClient {
-  static  final Dio _dio = Dio();
+  static  final Dio _dio = Dio(
+    BaseOptions(
+      connectTimeout: const Duration(seconds: 10),  // Timeout for connection
+      receiveTimeout: const Duration(seconds: 15),  // Timeout for receiving data
+    )
+  );
 
 
   /// Common exception handler for Dio errors

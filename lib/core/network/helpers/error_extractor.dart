@@ -6,6 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 
+import '../../widgets/loading/random_lottie_loader.dart';
+import '../../widgets/methods/helper_methods.dart';
+
 class ErrorExtractor {
   /// Extracts all error messages from a given JSON response.
   static extractErrorMessages(Map<String, dynamic> response) {
@@ -88,6 +91,8 @@ class ErrorExtractor {
                       GestureDetector(
                         onTap: () {
                           Get.back();
+                          RandomLottieLoader.hide();
+                          Methods.hideLoading();
                         },
                         child: Container(
                           width: MediaQuery.of(context).size.width * 0.6,

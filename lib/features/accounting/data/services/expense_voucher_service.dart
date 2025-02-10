@@ -37,6 +37,7 @@ class ExpenseVoucherService {
  static Future<dynamic> getExpenseCategories({
     required String usrToken,
    required int page,
+   required int limit,
   }) async {
 
     var response = await BaseClient.getData(
@@ -44,7 +45,7 @@ class ExpenseVoucherService {
         api: "chart_of_accounts/get-expense-categories",
         parameter: {
           "page": page,
-          "limit": 20,
+          "limit": limit,
         }
     );
     return response;
@@ -90,6 +91,27 @@ class ExpenseVoucherService {
       fileName: fileName,);
   }
 
+  static Future<dynamic> storeExpenseVoucher({
+    required int categoryID,
+    required int caID,
+    required num amount,
+    String? remarks,
+    required String token,
+  }) async {
+
+    var response = await BaseClient.postData(
+      token: token,
+      api: "expense_voucher/store",
+      body: {
+        "category_id": categoryID,
+        "ca_id":caID,
+        "amount": amount,
+        "remarks": remarks,
+      },
+    );
+    return response;
+  }
+
 
   static Future<dynamic> storeCategory({
     required String categoryName,
@@ -98,10 +120,24 @@ class ExpenseVoucherService {
 
     var response = await BaseClient.postData(
       token: token,
-      api: NetWorkStrings.addCategory,
+      api: "pos/accounting/expense-category",
       body: {
         "name": categoryName,
+        "remarks":'',
+        "type": 2,
       },
+    );
+    return response;
+  }
+
+
+  static Future<dynamic> getPaymentMethods({
+    required String usrToken,
+  }) async {
+
+    var response = await BaseClient.getData(
+        token: usrToken,
+        api: "chart_of_accounts/get-banks",
     );
     return response;
   }

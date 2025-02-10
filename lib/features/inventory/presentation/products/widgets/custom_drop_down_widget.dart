@@ -1,4 +1,5 @@
 import 'package:amar_pos/core/constants/app_colors.dart';
+import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -13,6 +14,7 @@ class CustomDropdownWithSearchWidget<T> extends StatefulWidget {
   final String title;
   final String searchHintText;
   final bool isMandatory;
+  final int buttonHeight;
   final bool noTitle;
   final String? Function(T?)? validator;
 
@@ -25,6 +27,7 @@ class CustomDropdownWithSearchWidget<T> extends StatefulWidget {
     required this.onChanged,
     required this.hintText,
     required this.searchHintText,
+    this.buttonHeight = 56,
     this.validator,
     this.value,
     this.noTitle = false,
@@ -129,7 +132,7 @@ class _CustomDropdownWithSearchWidgetState<T>
               widget.onChanged(value);
             },
             buttonStyleData: ButtonStyleData(
-              height: 48,
+              height: widget.buttonHeight.toDouble(),
               padding: EdgeInsets.zero,
               decoration: BoxDecoration(
                 border: Border.all(color: AppColors.inputBorderColor),

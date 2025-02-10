@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 
 import '../../../../../../core/widgets/pager_list_view.dart';
 import '../../../../data/models/expense_voucher/expense_voucher_response_model.dart';
+import '../../widgets/create_expense_voucher_bottom_sheet.dart';
 import '../../widgets/expense_voucher_item.dart';
 
 class ExpensePage extends StatefulWidget {
@@ -19,7 +20,7 @@ class _ExpensePageState extends State<ExpensePage> {
 
   @override
   void initState() {
-    controller.getExpenseVouchers();
+    controller.getExpenseVouchers(page: 1);
     super.initState();
   }
   @override
@@ -44,7 +45,7 @@ class _ExpensePageState extends State<ExpensePage> {
                       return Center(
                         child: Text("Something went wrong", style: context.textTheme.titleLarge,),
                       );
-                    }else if(controller.dailyStatementList.isEmpty){
+                    }else if(controller.expenseVouchersList.isEmpty){
                       return Center(
                         child: Text("No data found", style: context.textTheme.titleLarge,),
                       );
@@ -55,7 +56,7 @@ class _ExpensePageState extends State<ExpensePage> {
                       },
                       child: PagerListView<TransactionData>(
                         // scrollController: _scrollController,
-                        items: controller.dailyStatementList,
+                        items: controller.expenseVouchersList,
                         itemBuilder: (_, item) {
                           return ExpenseVoucherItem(transactionData: item,);
                         },
@@ -77,6 +78,25 @@ class _ExpensePageState extends State<ExpensePage> {
                 ),
               ),
             ],
+          ),
+          bottomNavigationBar: Padding(
+            padding: const EdgeInsets.only(left: 20,right: 20,bottom: 20),
+            child: CustomButton(
+              text: "Create Voucher",
+              onTap: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(20)),
+                  ),
+                  builder: (context) {
+                    return CreateExpenseVoucherBottomSheet();
+                  },
+                );
+              },
+            ),
           ),
         ),
       ),
