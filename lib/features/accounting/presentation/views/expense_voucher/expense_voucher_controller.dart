@@ -358,7 +358,7 @@ class ExpenseVoucherController extends GetxController{
       if (response != null) {
 
         if(response['success']){
-          expenseVouchersList.remove(transaction);
+          getExpenseVouchers(page: 1);
         }
         Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true: null );
       }

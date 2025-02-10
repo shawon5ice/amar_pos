@@ -1,5 +1,6 @@
 import 'package:amar_pos/core/widgets/reusable/client_dd/client_dd_controller.dart';
 import 'package:amar_pos/core/widgets/reusable/outlet_dd/outlet_dd_controller.dart';
+import 'package:amar_pos/core/widgets/reusable/payment_dd/ca_payment_method_dd_controller.dart';
 import 'package:amar_pos/features/accounting/presentation/views/daily_statement/daily_statement_controller.dart';
 import 'package:amar_pos/features/accounting/presentation/views/due_collection/due_collection_controller.dart';
 import 'package:amar_pos/features/accounting/presentation/views/expense_voucher/expense_voucher_controller.dart';
@@ -58,5 +59,6 @@ class DueCollectionBindings extends Bindings{
   void dependencies() {
     Get.lazyPut(()=> DueCollectionController());
     Get.lazyPut(()=> ClientDDController());
+    Get.lazyPut(()=> CAPaymentMethodDDController());
   }
 }

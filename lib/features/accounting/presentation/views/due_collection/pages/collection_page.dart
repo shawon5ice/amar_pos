@@ -25,6 +25,7 @@ class CollectionPage extends StatefulWidget {
 class _CollectionPageState extends State<CollectionPage> {
   DueCollectionController controller = Get.find();
 
+
   @override
   void initState() {
     controller.getDueCollectionList();
@@ -118,7 +119,7 @@ class _CollectionPageState extends State<CollectionPage> {
             ],
           ),
           bottomNavigationBar: Padding(
-            padding: const EdgeInsets.only(left: 20,right: 20,bottom: 20),
+            padding: const EdgeInsets.only(left: 20,right: 20,top: 10),
             child: CustomButton(
               text: "Collect Due",
               onTap: () {

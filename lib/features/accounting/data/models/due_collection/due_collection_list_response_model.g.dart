@@ -44,7 +44,7 @@ DueCollectionData _$DueCollectionDataFromJson(Map<String, dynamic> json) =>
       id: (json['id'] as num).toInt(),
       date: json['date'] as String,
       slNo: json['sl_no'] as String,
-      paymentMethod: PaymentMethod.fromJson(
+      paymentMethod: ChartOfAccountPaymentMethod.fromJson(
           json['payment_method'] as Map<String, dynamic>),
       amount: (json['amount'] as num).toDouble(),
       creator: json['creator'] == null
@@ -56,7 +56,9 @@ DueCollectionData _$DueCollectionDataFromJson(Map<String, dynamic> json) =>
       business: json['business'] == null
           ? null
           : Business.fromJson(json['business'] as Map<String, dynamic>),
-      client: json['client'],
+      client: json['client'] == null
+          ? null
+          : ClientInfo.fromJson(json['client'] as Map<String, dynamic>),
       remarks: json['remarks'] as String?,
     );
 
@@ -104,20 +106,6 @@ Map<String, dynamic> _$CategoryToJson(Category instance) => <String, dynamic>{
       'updated_by': instance.updatedBy,
       'created_at': instance.createdAt,
       'updated_at': instance.updatedAt,
-    };
-
-PaymentMethod _$PaymentMethodFromJson(Map<String, dynamic> json) =>
-    PaymentMethod(
-      id: (json['id'] as num).toInt(),
-      name: json['name'] as String,
-      root: (json['root'] as num).toInt(),
-    );
-
-Map<String, dynamic> _$PaymentMethodToJson(PaymentMethod instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'name': instance.name,
-      'root': instance.root,
     };
 
 Creator _$CreatorFromJson(Map<String, dynamic> json) => Creator(

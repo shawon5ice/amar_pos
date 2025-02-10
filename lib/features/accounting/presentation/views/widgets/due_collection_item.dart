@@ -4,6 +4,7 @@ import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:amar_pos/features/accounting/data/models/due_collection/due_collection_list_response_model.dart';
 import 'package:amar_pos/features/accounting/presentation/views/due_collection/due_collection_controller.dart';
 import 'package:amar_pos/features/accounting/presentation/views/expense_voucher/expense_voucher_controller.dart';
+import 'package:amar_pos/features/accounting/presentation/views/widgets/create_due_collection_bottom_sheet.dart';
 import 'package:amar_pos/features/accounting/presentation/views/widgets/expense_voucher_action_menu.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
@@ -69,19 +70,19 @@ class DueCollectionItem extends StatelessWidget {
                   switch (value) {
                     case "edit":
                       // RandomLottieLoader.show();
-                      // showModalBottomSheet(
-                      //   context: context,
-                      //   isScrollControlled: true,
-                      //   shape: const RoundedRectangleBorder(
-                      //     borderRadius: BorderRadius.vertical(
-                      //         top: Radius.circular(20)),
-                      //   ),
-                      //   builder: (context) {
-                      //     return CreateExpenseVoucherBottomSheet(
-                      //       dueCollectionData: dueCollectionData,
-                      //     );
-                      //   },
-                      // );
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(20)),
+                        ),
+                        builder: (context) {
+                          return CreateDueCollectionBottomSheet(
+                            dueCollectionData: dueCollectionData,
+                          );
+                        },
+                      );
                       // Get.toNamed(AddProductScreen.routeName, arguments: productInfo);
                       break;
                     case "delete":
@@ -90,9 +91,9 @@ class DueCollectionItem extends StatelessWidget {
                           dialogType: DialogType.error,
                           title: "Are you sure?",
                           desc:
-                          "You are going to delete your expense voucher with voucher no. ${dueCollectionData.slNo}",
+                          "You are going to delete your collection with invoice no. ${dueCollectionData.slNo}",
                           btnOkOnPress: () {
-                            // _controller.deleteExpenseVoucher(transaction: dueCollectionData);
+                            _controller.deleteDueCollection(transaction: dueCollectionData);
                           },
                           btnCancelOnPress: () {})
                           .show();

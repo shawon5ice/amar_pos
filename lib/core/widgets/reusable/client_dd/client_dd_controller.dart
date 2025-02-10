@@ -13,11 +13,6 @@ class ClientDDController extends GetxController {
   List<ClientInfo> clients = [];
   ClientInfo? selectedClient;
 
-  @override
-  void onReady() {
-    getAllClients();
-    super.onReady();
-  }
 
   @override
   void onClose() {
@@ -32,7 +27,7 @@ class ClientDDController extends GetxController {
   }
 
   // Fetch all clients
-  void getAllClients() async {
+  Future<void> getAllClients() async {
     clientListLoading = true;
     logger.e("GETTING CLIENTS");
     update(['client_dd']); // Update the UI for loading state

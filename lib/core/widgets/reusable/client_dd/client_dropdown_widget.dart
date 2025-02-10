@@ -12,11 +12,13 @@ class ClientDropDownWidget extends StatefulWidget {
     super.key,
     required this.onClientSelection,
     this.initialClientInfo,
+    this.initialClientId,
     this.isMandatory,
   });
 
   final Function(ClientInfo? client) onClientSelection;
   final ClientInfo? initialClientInfo;
+  final int? initialClientId;
   final bool? isMandatory;
 
   @override
@@ -36,6 +38,19 @@ class _ClientDropDownWidgetState extends State<ClientDropDownWidget> {
   }
 
   @override
+  void initState() {
+    controller.getAllClients().then((value){
+      if(widget.initialClientInfo != null){
+        controller.resetClientSelection();
+        controller.selectedClient = controller.clients.singleWhere((e) => e.id == widget.initialClientInfo?.id);
+        // controller.selectedClient = widget.initialClientInfo;
+      }
+      controller.update(['client_dd']);
+    });
+    super.initState();
+  }
+
+  @override
   void dispose() {
     Get.delete<ClientDDController>();
     super.dispose();
@@ -48,9 +63,9 @@ class _ClientDropDownWidgetState extends State<ClientDropDownWidget> {
       builder: (controller) {
         return CustomDropdownWithSearchWidget<ClientInfo>(
           items: controller.clients,
-          isMandatory: false,
+          isMandatory: true,
           title: "Client",
-          noTitle: true,
+          // noTitle: true,
           itemLabel: (value) => value.name,
           value: controller.selectedClient,
           onChanged: (value) {

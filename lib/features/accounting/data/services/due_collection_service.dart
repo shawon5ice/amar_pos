@@ -91,8 +91,8 @@ class DueCollectionService {
       fileName: fileName,);
   }
 
-  static Future<dynamic> storeExpenseVoucher({
-    required int categoryID,
+  static Future<dynamic> addNewDueCollection({
+    required int clientID,
     required int caID,
     required num amount,
     String? remarks,
@@ -101,9 +101,9 @@ class DueCollectionService {
 
     var response = await BaseClient.postData(
       token: token,
-      api: "expense_voucher/store",
+      api: "due_collection/store",
       body: {
-        "category_id": categoryID,
+        "client_id": clientID,
         "ca_id":caID,
         "amount": amount,
         "remarks": remarks,
@@ -112,9 +112,9 @@ class DueCollectionService {
     return response;
   }
 
-  static Future<dynamic> updateExpenseVoucher({
+  static Future<dynamic> updateDueCollection({
     required int id,
-    required int categoryID,
+    required int clientId,
     required int caID,
     required num amount,
     String? remarks,
@@ -123,9 +123,9 @@ class DueCollectionService {
 
     var response = await BaseClient.postData(
       token: token,
-      api: "expense_voucher/update/$id",
+      api: "due_collection/update/$id",
       body: {
-        "category_id": categoryID,
+        "client_id": clientId,
         "ca_id":caID,
         "amount": amount,
         "remarks": remarks,
@@ -135,14 +135,14 @@ class DueCollectionService {
   }
 
 
-  static Future<dynamic> deleteExpenseVoucher({
+  static Future<dynamic> deleteDueCollection({
     required int id,
     required String token,
   }) async {
 
     var response = await BaseClient.deleteData(
       token: token,
-      api: "expense_voucher/delete/$id",
+      api: "due_collection/delete/$id",
     );
     return response;
   }

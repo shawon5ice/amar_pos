@@ -1,5 +1,6 @@
-import 'package:amar_pos/core/core.dart';
-import 'package:amar_pos/features/exchange/data/models/create_exchange_request_model.dart';
+import 'package:amar_pos/core/widgets/reusable/client_dd/client_list_dd_response_model.dart';
+import 'package:amar_pos/core/widgets/reusable/payment_dd/expense_payment_methods_response_model.dart';
+import 'package:get/get.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'due_collection_list_response_model.g.dart';
@@ -38,14 +39,17 @@ class DueCollectionData {
   @JsonKey(name: 'sl_no')
   final String slNo;
   @JsonKey(name: 'payment_method')
-  final PaymentMethod paymentMethod;
+  final ChartOfAccountPaymentMethod paymentMethod;
   @JsonKey(name: 'business')
   final Business? business;
   @JsonKey(name: 'store')
   final Store? store;
   @JsonKey(name: 'creator')
   final Creator? creator;
-  final dynamic client;
+
+  // @ClientConverter()
+  // @JsonKey(name: 'client',)
+  final ClientInfo? client;
   final double amount;
   final String? remarks;
 
@@ -108,22 +112,6 @@ class Category {
   Map<String, dynamic> toJson() => _$CategoryToJson(this);
 }
 
-
-@JsonSerializable()
-class PaymentMethod {
-  final int id;
-  final String name;
-  final int root;
-
-  PaymentMethod({
-    required this.id,
-    required this.name,
-    required this.root,
-  });
-
-  factory PaymentMethod.fromJson(Map<String, dynamic> json) => _$PaymentMethodFromJson(json);
-  Map<String, dynamic> toJson() => _$PaymentMethodToJson(this);
-}
 
 @JsonSerializable()
 class Creator {
@@ -215,4 +203,22 @@ class DataConverter implements JsonConverter<DataWrapper?, dynamic> {
 
   @override
   dynamic toJson(DataWrapper? object) => object?.toJson();
+}
+
+class ClientConverter implements JsonConverter<ClientInfo?, dynamic> {
+  const ClientConverter();
+
+  @override
+  ClientInfo? fromJson(dynamic json) {
+    if (json is Map<String, dynamic>) {
+      return ClientInfo.fromJson(json);
+    } else if(json != Map<String, dynamic>){
+      return null;
+    }else {
+      throw Exception('Unexpected type for data: ${json.runtimeType}');
+    }
+  }
+
+  @override
+  dynamic toJson(ClientInfo? object) => object?.toJson();
 }

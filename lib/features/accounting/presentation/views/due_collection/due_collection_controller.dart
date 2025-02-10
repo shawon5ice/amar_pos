@@ -276,8 +276,8 @@ class DueCollectionController extends GetxController{
     }
   }
 
-  void addNewExpenseVoucher({
-    required int categoryID,
+  void addNewDueCollection({
+    required int clientID,
     required int caID,
     required num amount,
     String? remarks,
@@ -286,17 +286,17 @@ class DueCollectionController extends GetxController{
     update(["collection_list"]);
     RandomLottieLoader.show();
     try{
-      var response = await ExpenseVoucherService.storeExpenseVoucher(
+      var response = await DueCollectionService.addNewDueCollection(
         token: loginData!.token,
         caID: caID,
-        categoryID: categoryID,
+        clientID: clientID,
         amount: amount,
         remarks: remarks,
       );
       if (response != null) {
 
         if(response['success']){
-          getDueCollectionList();
+          getDueCollectionList(page: 1);
         }
         Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true: null );
       }
@@ -312,7 +312,7 @@ class DueCollectionController extends GetxController{
 
   void updateExpenseVoucher({
     required int id,
-    required int categoryID,
+    required int clientID,
     required int caID,
     required num amount,
     String? remarks,
@@ -321,18 +321,18 @@ class DueCollectionController extends GetxController{
     update(["collection_list"]);
     RandomLottieLoader.show();
     try{
-      var response = await ExpenseVoucherService.updateExpenseVoucher(
+      var response = await DueCollectionService.updateDueCollection(
         id: id,
         token: loginData!.token,
         caID: caID,
-        categoryID: categoryID,
+        clientId: clientID,
         amount: amount,
         remarks: remarks,
       );
       if (response != null) {
 
         if(response['success']){
-          getDueCollectionList();
+          getDueCollectionList(page: 1);
         }
         Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true: null );
       }
@@ -346,21 +346,21 @@ class DueCollectionController extends GetxController{
     RandomLottieLoader.hide();
   }
 
-  void deleteExpenseVoucher({
-    required TransactionData transaction,
+  void deleteDueCollection({
+    required DueCollectionData transaction,
   }) async {
     isAddCategoryLoading = true;
     update(["collection_list"]);
     RandomLottieLoader.show();
     try{
-      var response = await ExpenseVoucherService.deleteExpenseVoucher(
+      var response = await DueCollectionService.deleteDueCollection(
         id: transaction.id,
         token: loginData!.token,
       );
       if (response != null) {
 
         if(response['success']){
-          dueCollectionList.remove(transaction);
+          getDueCollectionList(page: 1);
         }
         Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true: null );
       }
