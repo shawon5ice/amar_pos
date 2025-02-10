@@ -22,13 +22,15 @@ Map<String, dynamic> _$ExpensePaymentMethodsResponseModelToJson(
       'data': instance.paymentMethods,
     };
 
-ExpensePaymentMethod _$ExpensePaymentMethodFromJson(Map<String, dynamic> json) =>
+ExpensePaymentMethod _$ExpensePaymentMethodFromJson(
+        Map<String, dynamic> json) =>
     ExpensePaymentMethod(
       id: (json['id'] as num).toInt(),
       name: json['name'] as String,
     );
 
-Map<String, dynamic> _$ExpensePaymentMethodToJson(ExpensePaymentMethod instance) =>
+Map<String, dynamic> _$ExpensePaymentMethodToJson(
+        ExpensePaymentMethod instance) =>
     <String, dynamic>{
       'id': instance.id,
       'name': instance.name,

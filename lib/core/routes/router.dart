@@ -1,5 +1,6 @@
 import 'package:amar_pos/core/routes/bindings.dart';
 import 'package:amar_pos/features/accounting/presentation/views/daily_statement/daily_statement.dart';
+import 'package:amar_pos/features/accounting/presentation/views/due_collection/due_collection.dart';
 import 'package:amar_pos/features/accounting/presentation/views/expense_voucher/expense_voucher.dart';
 import 'package:amar_pos/features/auth/presentation/ui/login_screen.dart';
 import 'package:amar_pos/features/config/presentation/configuration_screen.dart';
@@ -80,6 +81,12 @@ class AppRoutes {
       name: ExpenseVoucher.routeName,
       page: () => const ExpenseVoucher(),
       binding: ExpenseVoucherBindings(),
+    ),
+
+    GetPage(
+      name: DueCollection.routeName,
+      page: () => const DueCollection(),
+      binding: DueCollectionBindings(),
     ),
   ];
 }

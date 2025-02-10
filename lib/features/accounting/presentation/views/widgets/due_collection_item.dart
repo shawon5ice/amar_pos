@@ -1,6 +1,7 @@
 import 'package:amar_pos/core/core.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
+import 'package:amar_pos/features/accounting/data/models/due_collection/due_collection_list_response_model.dart';
 import 'package:amar_pos/features/accounting/presentation/views/due_collection/due_collection_controller.dart';
 import 'package:amar_pos/features/accounting/presentation/views/expense_voucher/expense_voucher_controller.dart';
 import 'package:amar_pos/features/accounting/presentation/views/widgets/expense_voucher_action_menu.dart';
@@ -13,13 +14,13 @@ import '../../../../config/presentation/supplier/supplier_action_menu_widget.dar
 import '../../../data/models/expense_voucher/expense_voucher_response_model.dart';
 import 'create_expense_voucher_bottom_sheet.dart';
 
-class ExpenseVoucherItem extends StatelessWidget {
-  ExpenseVoucherItem({super.key, required this.transactionData,});
+class DueCollectionItem extends StatelessWidget {
+  DueCollectionItem({super.key, required this.dueCollectionData,});
 
 
-  final TransactionData transactionData;
+  final DueCollectionData dueCollectionData;
 
-  final ExpenseVoucherController _controller = Get.find();
+  final DueCollectionController _controller = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +49,7 @@ class ExpenseVoucherItem extends StatelessWidget {
                           ),
                           borderRadius: BorderRadius.circular(20)),
                       child: AutoSizeText(
-                        transactionData.date,
+                        dueCollectionData.date,
                         maxFontSize: 10,
                         minFontSize: 8,
                         style: const TextStyle(
@@ -68,19 +69,19 @@ class ExpenseVoucherItem extends StatelessWidget {
                   switch (value) {
                     case "edit":
                       // RandomLottieLoader.show();
-                      showModalBottomSheet(
-                        context: context,
-                        isScrollControlled: true,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.vertical(
-                              top: Radius.circular(20)),
-                        ),
-                        builder: (context) {
-                          return CreateExpenseVoucherBottomSheet(
-                            transactionData: transactionData,
-                          );
-                        },
-                      );
+                      // showModalBottomSheet(
+                      //   context: context,
+                      //   isScrollControlled: true,
+                      //   shape: const RoundedRectangleBorder(
+                      //     borderRadius: BorderRadius.vertical(
+                      //         top: Radius.circular(20)),
+                      //   ),
+                      //   builder: (context) {
+                      //     return CreateExpenseVoucherBottomSheet(
+                      //       dueCollectionData: dueCollectionData,
+                      //     );
+                      //   },
+                      // );
                       // Get.toNamed(AddProductScreen.routeName, arguments: productInfo);
                       break;
                     case "delete":
@@ -89,9 +90,9 @@ class ExpenseVoucherItem extends StatelessWidget {
                           dialogType: DialogType.error,
                           title: "Are you sure?",
                           desc:
-                          "You are going to delete your expense voucher with voucher no. ${transactionData.slNo}",
+                          "You are going to delete your expense voucher with voucher no. ${dueCollectionData.slNo}",
                           btnOkOnPress: () {
-                            _controller.deleteExpenseVoucher(transaction: transactionData);
+                            // _controller.deleteExpenseVoucher(transaction: dueCollectionData);
                           },
                           btnCancelOnPress: () {})
                           .show();
@@ -111,20 +112,20 @@ class ExpenseVoucherItem extends StatelessWidget {
             child: Column(
               children: [
                 StatementItemTitleValueWidget(
-                  title: "Voucher No.",
-                  value: transactionData.slNo,
+                  title: "Invoice No.",
+                  value: dueCollectionData.slNo,
                 ),
-                StatementItemTitleValueWidget(
-                  title: "Purpose",
-                  value: transactionData.category.name,
-                ),
+                // StatementItemTitleValueWidget(
+                //   title: "Purpose",
+                //   value: dueCollectionData..name,
+                // ),
                 StatementItemTitleValueWidget(
                   title: "Amount",
-                  value: Methods.getFormatedPrice(transactionData.amount),
+                  value: Methods.getFormatedPrice(dueCollectionData.amount),
                 ),
                 StatementItemTitleValueWidget(
                   title: "Payment Method",
-                  value: transactionData.paymentMethod.name ?? '--',
+                  value: dueCollectionData.paymentMethod.name ?? '--',
                 ),
               ],
             ),

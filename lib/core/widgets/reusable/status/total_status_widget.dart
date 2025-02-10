@@ -25,7 +25,7 @@ class TotalStatusWidget extends StatelessWidget {
     return Expanded(
         flex: flex,
         child: Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(20),
@@ -37,9 +37,9 @@ class TotalStatusWidget extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Color(0xffA2A2A2),
-                      fontSize: 14.sp,
+                      fontSize: 14,
                     ),
                   ),
                   const Spacer(),
@@ -49,14 +49,14 @@ class TotalStatusWidget extends StatelessWidget {
               addH(12),
               isLoading
                   ? Container(
-                  height: 30.sp, width: 30.sp, child: SpinKitFadingGrid(color: Colors.black,size: 20,))
+                  height: 30, width: 30, child: SpinKitFadingGrid(color: Colors.black,size: 20,))
                   : Text(
                 value != null ? value! : '--',
-                style: TextStyle(
+                style:const TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.w600,
-                    fontSize: 20.sp,
-                    height: 1.5.sp
+                    fontSize: 20,
+                    height: 1.5
                 ),
               )
             ],

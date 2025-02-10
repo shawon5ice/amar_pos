@@ -66,7 +66,7 @@ class _PurchaseScreenState extends State<PurchaseScreen>
     final DrawerMenuController drawerMenuController = Get.find();
     return Scaffold(
       appBar: AppBar(
-        title: Text("Purchase"),
+        title:const Text("Purchase"),
         centerTitle: true,
         leading: DrawerButton(
           onPressed: () async {

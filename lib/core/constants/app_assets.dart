@@ -73,6 +73,10 @@ class AppAssets {
   static const String cashOut = "assets/icon/cash_out.svg";
   static const String cash = "assets/icon/cash.svg";
 
+  static const String person = "assets/icon/person.svg";
+  static const String client = "assets/icon/client.svg";
+  static const String clientMoney = "assets/icon/client_money.svg";
+
 
   static const List<String> lottieFiles = [
     'assets/lottie/loading1.json',
