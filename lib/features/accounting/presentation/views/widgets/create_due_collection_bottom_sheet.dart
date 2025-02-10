@@ -34,7 +34,6 @@ class _CreateDueCollectionBottomSheetState
     extends State<CreateDueCollectionBottomSheet> {
   
   final DueCollectionController _dueCollectionController = Get.find();
-
   late TextEditingController _textEditingController;
   late TextEditingController _remarksEditingController;
   ExpenseCategory? selectedExpenseCategory;
