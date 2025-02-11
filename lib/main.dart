@@ -3,6 +3,7 @@ import 'package:amar_pos/features/auth/data/model/hive/login_data_helper.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -15,6 +16,7 @@ import 'package:flutter/rendering.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   // debugPaintSizeEnabled = true;
   await Firebase.initializeApp(options: DefaultFirebaseOptions.ios);
   // FirebaseService().initNotification();

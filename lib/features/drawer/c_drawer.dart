@@ -99,9 +99,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ],
           ),
-          body: SafeArea(
-            child: Placeholder()
-          ),
+          body: Placeholder(),
           // bottomNavigationBar: ClipRRect(
           //   // borderRadius: BorderRadius.only(),
           //   clipBehavior: Clip.hardEdge,

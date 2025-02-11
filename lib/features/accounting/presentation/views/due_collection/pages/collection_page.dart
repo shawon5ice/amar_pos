@@ -34,8 +34,6 @@ class _CollectionPageState extends State<CollectionPage> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      bottom: true,
-      top: false,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Scaffold(
