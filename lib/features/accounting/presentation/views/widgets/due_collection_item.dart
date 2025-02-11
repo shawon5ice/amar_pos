@@ -27,7 +27,7 @@ class DueCollectionItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 5.h),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.all(Radius.circular(20.r))),
@@ -139,10 +139,13 @@ class DueCollectionItem extends StatelessWidget {
 
 class StatementItemTitleValueWidget extends StatelessWidget {
   const StatementItemTitleValueWidget(
-      {super.key, required this.title, required this.value});
+      {super.key, required this.title, required this.value, this.valueFontWeight, this.valueColor, this.valueFontSize});
 
   final String title;
   final String value;
+  final FontWeight? valueFontWeight;
+  final Color? valueColor;
+  final double? valueFontSize;
 
   @override
   Widget build(BuildContext context) {
@@ -152,7 +155,7 @@ class StatementItemTitleValueWidget extends StatelessWidget {
             flex: 2,
             child: Text(
               title,
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: Color(0xff7C7C7C)),
             )),
         const Text(" : "),
         Expanded(
@@ -160,60 +163,9 @@ class StatementItemTitleValueWidget extends StatelessWidget {
             child: Text(
               value,
               textAlign: TextAlign.end,
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
+              style: TextStyle(fontSize: valueFontSize?? 14, fontWeight: valueFontWeight?? FontWeight.w400, color: valueColor),
             )),
       ],
-    );
-  }
-}
-
-class TitleValueWidget extends StatelessWidget {
-  const TitleValueWidget(
-      {super.key,
-        required this.title,
-        required this.value,
-        this.textColor,
-        this.bgColor,
-        this.borderColor,
-        this.fontWeight,
-        this.fontSize,
-        this.rightMargin});
-
-  final String title;
-  final String value;
-  final Color? textColor;
-  final Color? bgColor;
-  final Color? borderColor;
-  final double? fontSize;
-  final FontWeight? fontWeight;
-  final bool? rightMargin;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width / 3.7,
-      padding: const EdgeInsets.all(4),
-      margin: rightMargin != null
-          ? const EdgeInsets.only(right: 10)
-          : EdgeInsets.zero,
-      decoration: BoxDecoration(
-        color: bgColor ?? const Color(0xffFFFBED),
-        borderRadius: BorderRadius.all(Radius.circular(20.r)),
-        border: Border.all(
-            color: borderColor ?? const Color(0xffff9000), width: .5),
-      ),
-      child: Center(
-        child: AutoSizeText(
-          "$title : $value",
-          maxLines: 1,
-          minFontSize: 4,
-          maxFontSize: 14,
-          style: context.textTheme.titleSmall?.copyWith(
-            color: textColor ?? Colors.black,
-            fontWeight: fontWeight ?? FontWeight.w600,
-          ),
-        ),
-      ),
     );
   }
 }

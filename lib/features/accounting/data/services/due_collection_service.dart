@@ -178,4 +178,57 @@ class DueCollectionService {
   }
 
 
+
+  //Client Ledger
+  static Future<dynamic> getClientLedgerList({
+    required String usrToken,
+    required int page,
+    required String? search,
+    required String? startDate,
+    required String? endDate,
+  }) async {
+    logger.d("Page: $page");
+
+    Map<String, dynamic> query = {
+      "page": page,
+      "search": search,
+      "start_date": startDate,
+      "end_date": endDate,
+      "limit": 20,
+    };
+    logger.i(query);
+
+    var response = await BaseClient.getData(
+        token: usrToken,
+        api: "due_collection/get-client-ledger-list",
+        parameter: query);
+    return response;
+  }
+
+
+  //Client ledger statement
+  static Future<dynamic> getClientLedgerStatementList({
+    required String usrToken,
+    required int id,
+    required String? search,
+    required String? startDate,
+    required String? endDate,
+  }) async {
+    // logger.d("Page: $page");
+
+    Map<String, dynamic> query = {
+      // "page": page,
+      "search": search,
+      "start_date": startDate,
+      "end_date": endDate,
+      "limit": 20,
+    };
+    logger.i(query);
+
+    var response = await BaseClient.getData(
+        token: usrToken,
+        api: "due_collection/get-client-ledger-statement/$id",
+        parameter: query);
+    return response;
+  }
 }

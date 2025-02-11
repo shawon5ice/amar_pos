@@ -1,8 +1,12 @@
+import 'package:amar_pos/core/constants/logger/logger.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/core/widgets/custom_button.dart';
 import 'package:amar_pos/core/widgets/custom_text_field.dart';
 import 'package:amar_pos/core/widgets/field_title.dart';
 import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
+import 'package:amar_pos/core/widgets/reusable/payment_dd/ca_payment_method_dd_controller.dart';
+import 'package:amar_pos/core/widgets/reusable/payment_dd/ca_payment_method_dropdown_widget.dart';
+import 'package:amar_pos/core/widgets/reusable/payment_dd/expense_payment_methods_response_model.dart';
 import 'package:amar_pos/features/accounting/data/models/expense_voucher/expense_categories_response_model.dart';
 import 'package:amar_pos/features/accounting/data/models/expense_voucher/expense_payment_methods_response_model.dart';
 import 'package:amar_pos/features/accounting/presentation/views/expense_voucher/expense_voucher_controller.dart';
@@ -26,26 +30,28 @@ class CreateExpenseVoucherBottomSheet extends StatefulWidget {
 
 class _CreateExpenseVoucherBottomSheetState
     extends State<CreateExpenseVoucherBottomSheet> {
-  final ExpenseVoucherController _categoryController = Get.find();
+  final ExpenseVoucherController _controller = Get.find();
   late TextEditingController _textEditingController;
   late TextEditingController _remarksEditingController;
   ExpenseCategory? selectedExpenseCategory;
-  ExpensePaymentMethod? selectedExpensePaymentMethod;
+  ChartOfAccountPaymentMethod? selectedPaymentMethod;
 
   @override
   void initState() {
-    _categoryController.getExpenseCategories(limit: 1000).then((value){
+    final CAPaymentMethodDDController paymentDDController = Get.put(CAPaymentMethodDDController());
+    _controller.getExpenseCategories(limit: 1000).then((value){
       if(widget.transactionData != null){
-        selectedExpenseCategory = _categoryController.expenseCategoriesList.singleWhere((e) => e.id == widget.transactionData!.category.id);
-        _categoryController.update(['expense_category_dd']);
+        selectedExpenseCategory = _controller.expenseCategoriesList.singleWhere((e) => e.id == widget.transactionData!.category.id);
+        _controller.update(['expense_category_dd']);
       }
     });
-    _categoryController.getPaymentMethods().then((value){
-      if(widget.transactionData != null){
-        selectedExpensePaymentMethod = _categoryController.expensePaymentMethods.singleWhere((e) => e.id == widget.transactionData!.paymentMethod.id);
-        _categoryController.update(['expense_payment_methods_dd']);
-      }
-    });
+
+
+
+    if(widget.transactionData != null){
+      selectedPaymentMethod = widget.transactionData!.paymentMethod;
+      logger.d(selectedPaymentMethod);
+    }
 
 
 
@@ -60,6 +66,12 @@ class _CreateExpenseVoucherBottomSheetState
   }
 
   final formKey = GlobalKey<FormState>();
+
+  @override
+  void dispose() {
+    Get.delete<CAPaymentMethodDDController>();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -130,24 +142,12 @@ class _CreateExpenseVoucherBottomSheetState
                       Row(
                         children: [
                           Expanded(
-                            child: GetBuilder<ExpenseVoucherController>(
-                              id: 'expense_payment_methods_dd',
-                              builder: (controller) =>
-                                  CustomDropdownWithSearchWidget<ExpensePaymentMethod>(
-                                    items: controller.expensePaymentMethods,
-                                    isMandatory: true,
-                                    title: "Payment Method",
-                                    value: selectedExpensePaymentMethod,
-                                    itemLabel: (paymentMethod) {
-                                      return paymentMethod.name;
-                                    },
-                                    onChanged: (paymentMethod) {
-                                      selectedExpensePaymentMethod = paymentMethod;
-                                    },
-                                    hintText: controller.isExpensePaymentMethodsListLoading? "Loading...": "Select Payment Method",
-                                    searchHintText: "Search Payment Method",
-                                  ),
-                            ),
+                            child: CAPaymentMethodsDropDownWidget(
+                              onCAPaymentMethodSelection: (ChartOfAccountPaymentMethod? method){
+                                selectedPaymentMethod = method;
+                              },
+                              initialCAPaymentMethod: selectedPaymentMethod,
+                            )
                           ),
                           addW(8),
                           Expanded(child: Column(
@@ -191,10 +191,10 @@ class _CreateExpenseVoucherBottomSheetState
                       ? () {
                           if (formKey.currentState!.validate()) {
                             Get.back();
-                            _categoryController.updateExpenseVoucher(
+                            _controller.updateExpenseVoucher(
                               id: widget.transactionData!.id,
                                 categoryID: selectedExpenseCategory!.id,
-                                caID: selectedExpensePaymentMethod!.id,
+                                caID: selectedPaymentMethod!.id,
                                 amount: num.parse(_textEditingController.text),
                                 remarks: _remarksEditingController.text
                             );
@@ -203,9 +203,9 @@ class _CreateExpenseVoucherBottomSheetState
                       : () {
                           if (formKey.currentState!.validate()) {
                             Get.back();
-                            _categoryController.addNewExpenseVoucher(
+                            _controller.addNewExpenseVoucher(
                               categoryID: selectedExpenseCategory!.id,
-                              caID: selectedExpensePaymentMethod!.id,
+                              caID: selectedPaymentMethod!.id,
                               amount: num.parse(_textEditingController.text),
                               remarks: _remarksEditingController.text
                             );

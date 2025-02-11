@@ -1,4 +1,5 @@
 import 'package:amar_pos/features/accounting/presentation/views/due_collection/due_collection_controller.dart';
+import 'package:amar_pos/features/accounting/presentation/views/due_collection/pages/client_ledger_page.dart';
 import 'package:amar_pos/features/accounting/presentation/views/due_collection/pages/collection_page.dart';
 import 'package:amar_pos/features/accounting/presentation/views/expense_voucher/pages/expense_page.dart';
 import 'package:flutter/material.dart';
@@ -113,7 +114,7 @@ class _DueCollectionState extends State<DueCollection> with SingleTickerProvider
               controller: _tabController,
               children: const [
                 CollectionPage(),
-                CollectionPage(),
+                ClientLedgerPage(),
                 // ExpenseCategoryPage(),
               ],
             ),

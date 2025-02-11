@@ -1,4 +1,6 @@
 import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
+import 'package:amar_pos/features/accounting/data/models/client_ledger/client_ledger_list_response_model.dart';
+import 'package:amar_pos/features/accounting/data/models/client_ledger/client_ledger_statement_response_model.dart';
 import 'package:amar_pos/features/accounting/data/models/due_collection/due_collection_list_response_model.dart';
 import 'package:amar_pos/features/accounting/data/models/expense_voucher/expense_voucher_response_model.dart';
 import 'package:amar_pos/features/accounting/data/models/expense_voucher/expense_payment_methods_response_model.dart';
@@ -26,7 +28,6 @@ class DueCollectionController extends GetxController{
   Rx<DateTimeRange?> selectedDateTimeRange = Rx<DateTimeRange?>(null);
 
   List<DueCollectionData> dueCollectionList = [];
-  List<TransactionData> currentSearchList = [];
   DueCollectionListResponseModel? dueCollectionListResponseModel;
 
   ExpenseCategoriesResponseModel? expenseCategoriesResponseModel;
@@ -83,15 +84,15 @@ class DueCollectionController extends GetxController{
           //   lastFoundList.value = currentSearchList; // Update last found list
           // }
         } else {
-          currentSearchList.clear(); // No results
+          dueCollectionList.clear(); // No results
         }
       } else {
         // hasError.value = true; // Error in response
-        currentSearchList.clear();
+        dueCollectionList.clear();
       }
     } catch (e) {
       hasError.value = true; // Handle exceptions
-      currentSearchList.clear();
+      dueCollectionList.clear();
       logger.e(e);
     } finally {
       isDueCollectionListLoading = false;
@@ -372,5 +373,106 @@ class DueCollectionController extends GetxController{
     }
     update(["collection_list"]);
     RandomLottieLoader.hide();
+  }
+
+
+  //Client Ledger
+
+  bool isClientLedgerListLoading = false;
+  bool isClientLedgerListLoadingMore = false;
+
+  ClientLedgerListResponseModel? clientLedgerListResponseModel;
+  List<ClientLedgerData> clientLedgerList = [];
+
+  Future<void> getClientLedger({ String? search, int page = 1}) async {
+    isClientLedgerListLoading = page == 1;
+    if(page == 1){
+      dueCollectionList.clear();
+    }
+    isClientLedgerListLoadingMore = page > 1;
+
+    hasError.value = false;
+    update(['client_ledger_total_widget','client_ledger']);
+
+    try {
+      var response = await DueCollectionService.getClientLedgerList(
+        usrToken: loginData!.token,
+        page: page,
+        search: search,
+        startDate: selectedDateTimeRange.value?.start.toString(),
+        endDate: selectedDateTimeRange.value?.end.toString(),
+      );
+
+      logger.d(response);
+
+      if (response != null) {
+        logger.e(response);
+        clientLedgerListResponseModel =
+            ClientLedgerListResponseModel.fromJson(response);
+
+        if (clientLedgerListResponseModel != null && clientLedgerListResponseModel!.data != null) {
+          clientLedgerList.addAll(clientLedgerListResponseModel!.data!.data!);
+          logger.i(clientLedgerList.length);
+          // if (currentSearchList.isNotEmpty) {
+          //   lastFoundList.value = currentSearchList; // Update last found list
+          // }
+        } else {
+          clientLedgerList.clear(); // No results
+        }
+      } else {
+        // hasError.value = true; // Error in response
+        clientLedgerList.clear();
+      }
+    } catch (e) {
+      hasError.value = true; // Handle exceptions
+      clientLedgerList.clear();
+      logger.e(e);
+    } finally {
+      isClientLedgerListLoading = false;
+      isClientLedgerListLoadingMore = false;
+      update(['client_ledger_total_widget','client_ledger']);
+    }
+  }
+
+
+  //Client ledger statement
+  bool isClientLedgerStatementListLoading = false;
+  bool isClientLedgerStatementListLoadingMore = false;
+
+  ClientLedgerStatementResponseModel? clientLedgerStatementResponseModel;
+
+  Future<void> getClientLedgerStatement({ String? search,required int id}) async {
+    isClientLedgerStatementListLoading = true;
+    // if(page == 1){
+    //   dueCollectionList.clear();
+    // }
+    // isClientLedgerStatementListLoadingMore = page > 1;
+
+    hasError.value = false;
+    update(['client_ledger_statement']);
+
+    try {
+      var response = await DueCollectionService.getClientLedgerStatementList(
+        usrToken: loginData!.token,
+        id: id,
+        search: search,
+        startDate: selectedDateTimeRange.value?.start.toString(),
+        endDate: selectedDateTimeRange.value?.end.toString(),
+      );
+
+      logger.d(response);
+
+      if (response != null) {
+        logger.e(response);
+        clientLedgerStatementResponseModel =
+            ClientLedgerStatementResponseModel.fromJson(response);
+      }
+    } catch (e) {
+      logger.e(e);
+    } finally {
+      isClientLedgerStatementListLoading = false;
+      isClientLedgerStatementListLoadingMore = false;
+      update(['client_ledger_statement']);
+    }
   }
 }

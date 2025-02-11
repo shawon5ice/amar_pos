@@ -58,15 +58,15 @@ class _AccountingScreenState extends State<AccountingScreen> {
         crossAxisCount: 2,
         childAspectRatio: 166/53,
         children: <Widget>[
-          ...accounting.map((e) => Container(
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.all(Radius.circular(10)),
-                border: Border.all(color: const Color(0xffFF9000), width: .5)
-              ),
-              child: GestureDetector(
-                onTap: e.onPress,
-                child: Center(child: Text(e.title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),)),
-              )),)
+          ...accounting.map((e) => GestureDetector(
+            onTap: e.onPress,
+            child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.all(Radius.circular(10)),
+                  border: Border.all(color: const Color(0xffFF9000), width: .5)
+                ),
+                child: Center(child: Text(e.title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),))),
+          ),)
         ],
       )
     );

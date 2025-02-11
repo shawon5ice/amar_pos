@@ -62,3 +62,10 @@ class DueCollectionBindings extends Bindings{
     Get.lazyPut(()=> CAPaymentMethodDDController());
   }
 }
+
+class ClientLedgerStatementBindings extends Bindings{
+  @override
+  void dependencies() {
+    Get.lazyPut(()=> DueCollectionController());
+  }
+}

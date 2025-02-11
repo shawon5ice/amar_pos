@@ -41,7 +41,7 @@ TransactionData _$TransactionDataFromJson(Map<String, dynamic> json) =>
       date: json['date'] as String,
       slNo: json['sl_no'] as String,
       category: Category.fromJson(json['category'] as Map<String, dynamic>),
-      paymentMethod: PaymentMethod.fromJson(
+      paymentMethod: ChartOfAccountPaymentMethod.fromJson(
           json['payment_method'] as Map<String, dynamic>),
       amount: (json['amount'] as num).toDouble(),
       accountType: (json['account_type'] as num).toInt(),

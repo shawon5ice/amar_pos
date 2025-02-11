@@ -119,7 +119,6 @@ class ExpenseVoucherController extends GetxController{
       logger.d(response);
 
       if (response != null) {
-        logger.e(response);
         expenseCategoriesResponseModel =
             ExpenseCategoriesResponseModel.fromJson(response);
 

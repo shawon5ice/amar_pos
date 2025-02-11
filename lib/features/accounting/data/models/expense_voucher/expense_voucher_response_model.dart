@@ -1,3 +1,4 @@
+import 'package:amar_pos/core/widgets/reusable/payment_dd/expense_payment_methods_response_model.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'expense_voucher_response_model.g.dart';
@@ -33,7 +34,7 @@ class TransactionData {
   final String slNo;
   final Category category;
   @JsonKey(name: 'payment_method')
-  final PaymentMethod paymentMethod;
+  final ChartOfAccountPaymentMethod paymentMethod;
   final double amount;
   @JsonKey(name: 'account_type')
   final int accountType;

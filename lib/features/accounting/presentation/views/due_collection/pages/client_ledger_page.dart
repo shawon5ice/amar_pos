@@ -1,5 +1,6 @@
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/core/widgets/custom_button.dart';
+import 'package:amar_pos/features/accounting/data/models/client_ledger/client_ledger_list_response_model.dart';
 import 'package:amar_pos/features/accounting/data/models/due_collection/due_collection_list_response_model.dart';
 import 'package:amar_pos/features/accounting/presentation/views/due_collection/due_collection_controller.dart';
 import 'package:amar_pos/features/accounting/presentation/views/widgets/create_due_collection_bottom_sheet.dart';
@@ -11,24 +12,22 @@ import '../../../../../../core/constants/app_assets.dart';
 import '../../../../../../core/widgets/methods/helper_methods.dart';
 import '../../../../../../core/widgets/pager_list_view.dart';
 import '../../../../../../core/widgets/reusable/status/total_status_widget.dart';
-import '../../../../data/models/expense_voucher/expense_voucher_response_model.dart';
-import '../../widgets/create_expense_voucher_bottom_sheet.dart';
-import '../../widgets/expense_voucher_item.dart';
+import '../../widgets/client_ledger_item.dart';
 
-class CollectionPage extends StatefulWidget {
-  const CollectionPage({super.key});
+class ClientLedgerPage extends StatefulWidget {
+  const ClientLedgerPage({super.key});
 
   @override
-  State<CollectionPage> createState() => _CollectionPageState();
+  State<ClientLedgerPage> createState() => _ClientLedgerPageState();
 }
 
-class _CollectionPageState extends State<CollectionPage> {
+class _ClientLedgerPageState extends State<ClientLedgerPage> {
   DueCollectionController controller = Get.find();
 
 
   @override
   void initState() {
-    controller.getDueCollectionList();
+    controller.getClientLedger(page: 1);
     super.initState();
   }
   @override
@@ -40,31 +39,31 @@ class _CollectionPageState extends State<CollectionPage> {
           body: Column(
             children: [
               GetBuilder<DueCollectionController>(
-                id: 'total_widget',
+                id: 'client_ledger_total_widget',
                 builder: (controller) => Row(
                   children: [
                     TotalStatusWidget(
                       flex: 3,
-                      isLoading: controller.isDueCollectionListLoading,
-                      title: 'Collected From',
-                      value: controller.dueCollectionListResponseModel != null
+                      isLoading: controller.isClientLedgerListLoading,
+                      title: 'Due Client',
+                      value: controller.clientLedgerListResponseModel != null
                           ? Methods.getFormattedNumber(controller
-                          .dueCollectionListResponseModel!.countTotal
+                          .clientLedgerListResponseModel!.countTotal
                           .toDouble())
                           : null,
-                      asset: AppAssets.person,
+                      asset: AppAssets.client,
                     ),
                     addW(12),
                     TotalStatusWidget(
                       flex: 4,
-                      isLoading: controller.isDueCollectionListLoading,
-                      title: 'Collection Amount',
-                      value: controller.dueCollectionListResponseModel != null
+                      isLoading: controller.isClientLedgerListLoading,
+                      title: 'Due Amount',
+                      value: controller.clientLedgerListResponseModel != null
                           ? Methods.getFormatedPrice(controller
-                          .dueCollectionListResponseModel!.amountTotal
+                          .clientLedgerListResponseModel!.amountTotal
                           .toDouble())
                           : null,
-                      asset: AppAssets.amount,
+                      asset: AppAssets.clientMoney,
                     ),
                   ],
                 ),
@@ -72,17 +71,17 @@ class _CollectionPageState extends State<CollectionPage> {
               addH(8),
               Expanded(
                 child: GetBuilder<DueCollectionController>(
-                  id: 'collection_list',
+                  id: 'client_ledger',
                   builder: (controller) {
-                    if (controller.isDueCollectionListLoading) {
+                    if (controller.isClientLedgerListLoading) {
                       return const Center(
                         child: CircularProgressIndicator(),
                       );
-                    }else if(controller.dueCollectionListResponseModel == null){
+                    }else if(controller.clientLedgerListResponseModel == null){
                       return Center(
                         child: Text("Something went wrong", style: context.textTheme.titleLarge,),
                       );
-                    }else if(controller.dueCollectionList.isEmpty){
+                    }else if(controller.clientLedgerList.isEmpty){
                       return Center(
                         child: Text("No data found", style: context.textTheme.titleLarge,),
                       );
@@ -91,22 +90,22 @@ class _CollectionPageState extends State<CollectionPage> {
                       onRefresh: () async {
                         controller.getDueCollectionList(page: 1);
                       },
-                      child: PagerListView<DueCollectionData>(
+                      child: PagerListView<ClientLedgerData>(
                         // scrollController: _scrollController,
-                        items: controller.dueCollectionList,
+                        items: controller.clientLedgerList,
                         itemBuilder: (_, item) {
-                          return DueCollectionItem(dueCollectionData: item,);
+                          return ClientLedgerItem(clientLedgerData: item,);
                         },
-                        isLoading: controller.isLoadingMore,
+                        isLoading: controller.isClientLedgerListLoadingMore,
                         hasError: controller.hasError.value,
                         onNewLoad: (int nextPage) async {
-                          await controller.getDueCollectionList(page: nextPage);
+                          await controller.getClientLedger(page: nextPage);
                         },
                         totalPage: controller
-                            .dueCollectionListResponseModel?.data?.meta?.lastPage ?? 0,
+                            .clientLedgerListResponseModel?.data?.meta?.lastPage ?? 0,
                         totalSize:
                         controller
-                            .dueCollectionListResponseModel?.data?.meta?.total ??
+                            .clientLedgerListResponseModel?.data?.meta?.total ??
                             0,
                         itemPerPage: 20,
                       ),

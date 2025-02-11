@@ -29,8 +29,6 @@ class _ExpenseCategoryPageState extends State<ExpenseCategoryPage> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      bottom: true,
-      top: false,
       child: Scaffold(
         body: Container(
           decoration: BoxDecoration(
@@ -135,7 +133,7 @@ class _ExpenseCategoryPageState extends State<ExpenseCategoryPage> {
           ),
         ),
         bottomNavigationBar: Padding(
-          padding: const EdgeInsets.only(left: 20,right: 20,bottom: 20),
+          padding: const EdgeInsets.only(left: 20,right: 20,bottom: 10, top: 10),
           child: CustomButton(
             text: "Add New Category",
             onTap: () {

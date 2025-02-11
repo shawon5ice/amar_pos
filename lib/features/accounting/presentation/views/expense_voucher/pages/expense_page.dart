@@ -26,8 +26,6 @@ class _ExpensePageState extends State<ExpensePage> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      bottom: true,
-      top: false,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Scaffold(
@@ -80,7 +78,7 @@ class _ExpensePageState extends State<ExpensePage> {
             ],
           ),
           bottomNavigationBar: Padding(
-            padding: const EdgeInsets.only(left: 20,right: 20,bottom: 20),
+            padding: const EdgeInsets.only(left: 20,right: 20,bottom: 10,top: 10),
             child: CustomButton(
               text: "Create Voucher",
               onTap: () {

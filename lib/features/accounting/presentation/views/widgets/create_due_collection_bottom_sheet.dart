@@ -120,7 +120,7 @@ class _CreateDueCollectionBottomSheetState
                       // ),
                       // addH(8),
                       ClientDropDownWidget(
-                        initialClientInfo: widget.dueCollectionData?.client,
+                        initialClientInfo: selectedClient,
                         onClientSelection: (ClientInfo? client) {
                         selectedClient = client;
                         _dueCollectionController.update(['client_status_widget']);
@@ -130,7 +130,7 @@ class _CreateDueCollectionBottomSheetState
                         id: 'client_status_widget',
                         builder: (controller) {
                           return selectedClient != null ? Container(
-                            padding: EdgeInsets.all(10),
+                            padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
                               color: Color(0xffF6FBFF),
                               borderRadius: BorderRadius.circular(8),

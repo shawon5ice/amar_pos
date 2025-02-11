@@ -35,12 +35,15 @@ class CAPaymentMethodDDController extends GetxController {
       api: "chart_of_accounts/get-payment-methods",
     );
 
-    if (response != null && response['success']) {
+    if (response != null) {
       ChartOfAccountPaymentMethodsResponseModel chartOfAccountPaymentMethodsResponseModel =
       ChartOfAccountPaymentMethodsResponseModel.fromJson(response);
       paymentList = chartOfAccountPaymentMethodsResponseModel.paymentMethods;
-    }
 
+    }
+    for (var e in paymentList) {
+      logger.d(e.id);
+    }
     paymentListLoading = false;
     update(['ca_payment_dd']); // Update the UI after loading
   }
