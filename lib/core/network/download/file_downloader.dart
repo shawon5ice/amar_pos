@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
+import 'package:dio/dio.dart' as dio;
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:permission_handler/permission_handler.dart';
@@ -31,7 +32,12 @@ class FileDownloader {
       final directory = await _getDownloadDirectory();
       logger.e(directory);
       logger.e(token);
-      final filePath = path.join(directory.path, fileName);
+      final response = await _dio.get(
+        url,
+      );
+      final netWorkFileName = await getFileNameFromContentDisposition(response);
+
+      final filePath = path.join(directory.path, netWorkFileName?? fileName);
 
       logger.i(url);
       RandomLottieLoader.show();
@@ -50,7 +56,7 @@ class FileDownloader {
 
       // Methods.hideLoading();
 
-      await _showNotification(filePath, fileName);
+      await _showNotification(filePath, netWorkFileName?? fileName);
     } catch (e) {
       RandomLottieLoader.hide();
       // Methods.hideLoading();
@@ -147,6 +153,38 @@ class FileDownloader {
         });
         logger.e("Failed to open downloaded file.\nPlease download associated software to view this'.");
       }
+    }
+  }
+
+  Future<String?> getFileNameFromContentDisposition(dio.Response<dynamic> response) async {
+    try {
+
+      final dynamic contentDispositionHeader = response.headers['content-disposition']?.first;
+
+      if (contentDispositionHeader != null) {
+        // Regular expression to extract the filename
+        final RegExp regex = RegExp(r'filename="([^"]+)"');
+        final match = regex.firstMatch(contentDispositionHeader);
+
+        if (match != null) {
+          return match.group(1); // Return the captured filename
+        } else {
+          // Handle cases where the filename is not in quotes or the format is unexpected
+          // You might want to try a simpler regex or other parsing methods here.
+          // Example:  filename=([^;]+) (less robust)
+          final simpleRegex = RegExp(r'filename=([^;]+)');
+          final simpleMatch = simpleRegex.firstMatch(contentDispositionHeader);
+          if (simpleMatch != null) {
+            return simpleMatch.group(1);
+          }
+          return null; // No filename found
+        }
+      } else {
+        return null; // Content-Disposition header not found
+      }
+    } catch (e) {
+      print('Error getting filename: $e');
+      return null; // Error occurred
     }
   }
 }

@@ -98,9 +98,7 @@ class _ClientLedgerPageState extends State<ClientLedgerPage> {
                   CustomSvgIconButton(
                     bgColor: const Color(0xffEBFFDF),
                     onTap: () {
-                      // controller.downloadList(isPdf: false, purchaseHistory: true);
-                      // controller.downloadStockLedgerReport(
-                      //     isPdf: false, context: context);
+                      controller.downloadList(isPdf: false, clientLedger: true);
                     },
                     assetPath: AppAssets.excelIcon,
                   ),
@@ -108,7 +106,7 @@ class _ClientLedgerPageState extends State<ClientLedgerPage> {
                   CustomSvgIconButton(
                     bgColor: const Color(0xffE1F2FF),
                     onTap: () {
-                      // controller.downloadList(isPdf: true, purchaseHistory: true);
+                      controller.downloadList(isPdf: true, clientLedger: true);
                     },
                     assetPath: AppAssets.downloadIcon,
                   ),

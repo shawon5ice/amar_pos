@@ -15,9 +15,6 @@ import '../../../../../../core/widgets/methods/helper_methods.dart';
 import '../../../../../../core/widgets/pager_list_view.dart';
 import '../../../../../../core/widgets/reusable/custom_svg_icon_widget.dart';
 import '../../../../../../core/widgets/reusable/status/total_status_widget.dart';
-import '../../../../data/models/expense_voucher/expense_voucher_response_model.dart';
-import '../../widgets/create_expense_voucher_bottom_sheet.dart';
-import '../../widgets/expense_voucher_item.dart';
 
 class CollectionPage extends StatefulWidget {
   const CollectionPage({super.key});
@@ -98,9 +95,7 @@ class _CollectionPageState extends State<CollectionPage> {
                   CustomSvgIconButton(
                     bgColor: const Color(0xffEBFFDF),
                     onTap: () {
-                      // controller.downloadList(isPdf: false, purchaseHistory: true);
-                      // controller.downloadStockLedgerReport(
-                      //     isPdf: false, context: context);
+                      controller.downloadList(isPdf: false, clientLedger: false);
                     },
                     assetPath: AppAssets.excelIcon,
                   ),
@@ -108,7 +103,7 @@ class _CollectionPageState extends State<CollectionPage> {
                   CustomSvgIconButton(
                     bgColor: const Color(0xffE1F2FF),
                     onTap: () {
-                      // controller.downloadList(isPdf: true, purchaseHistory: true);
+                      controller.downloadList(isPdf: true, clientLedger: false);
                     },
                     assetPath: AppAssets.downloadIcon,
                   ),

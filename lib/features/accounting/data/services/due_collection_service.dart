@@ -52,7 +52,7 @@ class DueCollectionService {
   }
 
 
-  static Future<void> downloadList({required bool isPdf,required bool saleHistory, required String fileName,
+  static Future<void> downloadList({required bool isPdf,required bool clientLedger, required String fileName,
     required String usrToken,
     required DateTime? startDate,
     required DateTime? endDate,
@@ -69,18 +69,49 @@ class DueCollectionService {
 
     String downloadUrl = "";
 
-    if(saleHistory){
+    if(clientLedger){
       if(isPdf){
-        downloadUrl = "${NetWorkStrings.baseUrl}/purchase/download-pdf-purchase-list/";
+        downloadUrl = "${NetWorkStrings.baseUrl}/due_collection/download-pdf-client-ledger-list";
       }else{
-        downloadUrl = "${NetWorkStrings.baseUrl}/purchase/download-excel-purchase-list";
+        downloadUrl = "${NetWorkStrings.baseUrl}/due_collection/download-excel-client-ledger-list";
       }
     }else{
       if(isPdf){
-        downloadUrl = "${NetWorkStrings.baseUrl}/purchase/download-pdf-purchase-product/";
+        downloadUrl = "${NetWorkStrings.baseUrl}/due_collection/download-pdf-collection-list";
       }else{
-        downloadUrl = "${NetWorkStrings.baseUrl}/purchase/download-excel-purchase-product/";
+        downloadUrl = "${NetWorkStrings.baseUrl}/due_collection/download-excel-collection-list";
       }
+    }
+
+
+    FileDownloader().downloadFile(
+      url: downloadUrl,
+      token: usrToken,
+      query: query,
+      fileName: fileName,);
+  }
+
+  static Future<void> downloadStatement({required bool isPdf, required String fileName,
+    required String usrToken,
+    required DateTime? startDate,
+    required DateTime? endDate,
+    required String? search,
+    required int clientID,
+  }) async {
+    // logger.d("PDF: $isPdf");
+
+    Map<String, dynamic> query = {
+      "start_date": startDate,
+      "end_date": endDate,
+      "search": search,
+    };
+
+    String downloadUrl = "";
+
+    if(isPdf){
+      downloadUrl = "${NetWorkStrings.baseUrl}/due_collection/download-pdf-client-ledger-statement/$clientID";
+    }else{
+      downloadUrl = "${NetWorkStrings.baseUrl}/due_collection/download-excel-client-ledger-statement/$clientID";
     }
 
 

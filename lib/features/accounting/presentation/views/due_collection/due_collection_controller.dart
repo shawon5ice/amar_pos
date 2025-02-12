@@ -482,4 +482,53 @@ class DueCollectionController extends GetxController{
       update(['client_ledger_statement']);
     }
   }
+
+  Future<void> downloadList({required bool isPdf, required bool clientLedger}) async {
+    hasError.value = false;
+
+    String fileName = "${clientLedger ? 'Client Ledger': 'Due Collection'}-${DateTime
+        .now()
+        .microsecondsSinceEpoch
+        .toString()}${isPdf ? ".pdf" : ".xlsx"}";
+    try {
+      var response = await DueCollectionService.downloadList(
+        clientLedger: clientLedger,
+        isPdf: isPdf,
+        usrToken: loginData!.token,
+        search: searchController.text,
+        startDate: selectedDateTimeRange.value?.start,
+        endDate: selectedDateTimeRange.value?.end,
+        fileName: fileName,
+      );
+    } catch (e) {
+      logger.e(e);
+    } finally {
+
+    }
+  }
+
+
+  Future<void> downloadStatement({required bool isPdf, required int clientID}) async {
+    hasError.value = false;
+
+    String fileName = "Due Statement'-${DateTime
+        .now()
+        .microsecondsSinceEpoch
+        .toString()}${isPdf ? ".pdf" : ".xlsx"}";
+    try {
+      var response = await DueCollectionService.downloadStatement(
+        isPdf: isPdf,
+        usrToken: loginData!.token,
+        search: searchController.text,
+        startDate: selectedDateTimeRange.value?.start,
+        endDate: selectedDateTimeRange.value?.end,
+        fileName: fileName,
+        clientID: clientID,
+      );
+    } catch (e) {
+      logger.e(e);
+    } finally {
+
+    }
+  }
 }

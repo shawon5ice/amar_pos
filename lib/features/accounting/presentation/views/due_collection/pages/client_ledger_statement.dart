@@ -1,4 +1,3 @@
-import 'package:amar_pos/core/constants/app_colors.dart';
 import 'package:amar_pos/core/core.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
@@ -7,12 +6,10 @@ import 'package:amar_pos/features/accounting/presentation/views/due_collection/d
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import '../../../../../../core/constants/app_assets.dart';
 import '../../../../../../core/widgets/custom_text_field.dart';
 import '../../../../../../core/widgets/reusable/custom_svg_icon_widget.dart';
 import '../../widgets/client_ledger_item.dart';
-import '../../widgets/statement_data_source.dart';
 
 class ClientLedgerStatementScreen extends StatefulWidget {
   static const String routeName = '/client-ledger-statement';
@@ -77,9 +74,7 @@ class _ClientLedgerStatementScreenState
                   CustomSvgIconButton(
                     bgColor: const Color(0xffEBFFDF),
                     onTap: () {
-                      // controller.downloadList(isPdf: false, purchaseHistory: true);
-                      // controller.downloadStockLedgerReport(
-                      //     isPdf: false, context: context);
+                      controller.downloadStatement(isPdf: false, clientID: clientLedgerData.id);
                     },
                     assetPath: AppAssets.excelIcon,
                   ),
@@ -87,7 +82,7 @@ class _ClientLedgerStatementScreenState
                   CustomSvgIconButton(
                     bgColor: const Color(0xffE1F2FF),
                     onTap: () {
-                      // controller.downloadList(isPdf: true, purchaseHistory: true);
+                      controller.downloadStatement(isPdf: true, clientID: clientLedgerData.id);
                     },
                     assetPath: AppAssets.downloadIcon,
                   ),
