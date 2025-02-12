@@ -46,7 +46,7 @@ class TotalStatusWidget extends StatelessWidget {
                   SvgPicture.asset(asset)
                 ],
               ),
-              addH(12),
+              addH(4),
               isLoading
                   ? Container(
                   height: 30, width: 30, child: SpinKitFadingGrid(color: Colors.black,size: 20,))

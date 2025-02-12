@@ -2,6 +2,7 @@ import 'package:amar_pos/features/accounting/data/models/accounting_menu_item.da
 import 'package:amar_pos/features/accounting/presentation/views/daily_statement/daily_statement.dart';
 import 'package:amar_pos/features/accounting/presentation/views/due_collection/due_collection.dart';
 import 'package:amar_pos/features/accounting/presentation/views/expense_voucher/expense_voucher.dart';
+import 'package:amar_pos/features/accounting/presentation/views/supplier_payment/supplier_payment.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../drawer/drawer_menu_controller.dart';
@@ -24,7 +25,9 @@ class _AccountingScreenState extends State<AccountingScreen> {
     AccountingMenuItem(title: "Due Collection", onPress: (){
       Get.toNamed(DueCollection.routeName);
     }),
-    AccountingMenuItem(title: "Due Payment", onPress: (){}),
+    AccountingMenuItem(title: "Due Payment", onPress: (){
+      Get.toNamed(SupplierPayment.routeName);
+    }),
     AccountingMenuItem(title: "Money Transfer", onPress: (){}),
     AccountingMenuItem(title: "Money Adjustment", onPress: (){}),
     AccountingMenuItem(title: "Ledger", onPress: (){}),
