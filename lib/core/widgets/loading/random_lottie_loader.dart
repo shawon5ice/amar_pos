@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:amar_pos/core/constants/app_assets.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:get/get.dart';
@@ -12,11 +13,7 @@ class RandomLottieLoader {
 
   bool _isDialogVisible = false; // Track dialog visibility
 
-  final List<String> lottieFiles = [
-    'assets/lottie/loading1.json',
-    'assets/lottie/loading2.json',
-    'assets/lottie/loading3.json',
-  ];
+
 
   // Static method to show the loader
   static void show({double? progress}) {
@@ -30,7 +27,7 @@ class RandomLottieLoader {
 
     _isDialogVisible = true;
 
-    final randomIndex = Random().nextInt(lottieFiles.length);
+    final randomIndex = Random().nextInt(AppAssets.lottieFiles.length);
 
     Get.dialog(
       Center(
@@ -47,7 +44,7 @@ class RandomLottieLoader {
               const SizedBox(height: 50),
               Center(
                 child: Lottie.asset(
-                  lottieFiles[randomIndex],
+                  AppAssets.lottieFiles[randomIndex],
                   width: 150,
                   height: 150,
                 ),
@@ -92,5 +89,36 @@ class RandomLottieLoader {
       }
       _isDialogVisible = false;
     });
+  }
+
+  static Widget lottieLoader(){
+    final randomIndex = Random().nextInt(AppAssets.lottieFiles.length);
+
+    return  SizedBox(
+      height: Get.height * .5,
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Center(
+              child: Lottie.asset(
+                AppAssets.lottieFiles[randomIndex],
+                width: 150,
+                height: 150,
+              ),
+            ),
+            const Align(
+              alignment: Alignment.bottomCenter,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text("Loading..."),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

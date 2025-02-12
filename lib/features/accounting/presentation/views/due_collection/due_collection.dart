@@ -7,8 +7,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import '../../../../../core/constants/app_assets.dart';
 import '../../../../../core/constants/app_colors.dart';
-import '../../../../../core/methods/helper_methods.dart';
-import '../../../../../core/responsive/pixel_perfect.dart';
 
 class DueCollection extends StatefulWidget {
   static const routeName = '/accounting/due-collection';
@@ -30,7 +28,8 @@ class _DueCollectionState extends State<DueCollection> with SingleTickerProvider
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener((){
       if(_tabController.indexIsChanging){
-        controller.update(['action_button']);
+        controller.clearFilter();
+        FocusScope.of(context).unfocus();
       }
     });
     super.initState();
@@ -40,23 +39,25 @@ class _DueCollectionState extends State<DueCollection> with SingleTickerProvider
     return Scaffold(
       appBar: AppBar(title: const Text("Due Collection"),centerTitle: true,
         actions: [
-          GetBuilder<DueCollectionController>(
-            id: 'action_button',
-            builder: (controller) => _tabController.index == 0? IconButton(
-              onPressed: () async {
-                DateTimeRange? selectedDate = await showDateRangePicker(
-                  context: context,
-                  firstDate: DateTime.now().subtract(const Duration(days: 1000)),
-                  lastDate: DateTime.now().add(const Duration(days: 1000)),
-                  initialDateRange: controller.selectedDateTimeRange.value,
-                );
-                if (selectedDate != null) {
-                  controller.setSelectedDateRange(selectedDate);
-                  // controller.getDueCollections();
+          IconButton(
+            onPressed: () async {
+              DateTimeRange? selectedDate = await showDateRangePicker(
+                context: context,
+                firstDate: DateTime.now().subtract(const Duration(days: 1000)),
+                lastDate: DateTime.now().add(const Duration(days: 1000)),
+                initialDateRange: controller.selectedDateTimeRange.value,
+              );
+              if (selectedDate != null) {
+                controller.setSelectedDateRange(selectedDate);
+                if(_tabController.index == 0){
+                  controller.getDueCollectionList();
+                }else{
+                  controller.getClientLedger();
                 }
-              },
-              icon: SvgPicture.asset(AppAssets.calenderIcon),
-            ): SizedBox.shrink(),)
+              }
+            },
+            icon: SvgPicture.asset(AppAssets.calenderIcon),
+          )
         ],
       ),
       body: Column(
@@ -94,20 +95,6 @@ class _DueCollectionState extends State<DueCollection> with SingleTickerProvider
               ),
             ),
           ),
-          // addH(12),
-          Obx(() {
-            return controller.selectedDateTimeRange.value == null ? addH(20): Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text("${formatDate(controller.selectedDateTimeRange.value!.start)} - ${formatDate(controller.selectedDateTimeRange.value!.end)}", style:const TextStyle(fontSize: 14, color: AppColors.error),),
-                addW(16),
-                IconButton(onPressed: (){
-                  controller.selectedDateTimeRange.value = null;
-                  // controller.getDueCollections();
-                }, icon: Icon(Icons.cancel_outlined, size: 18, color: AppColors.error,))
-              ],
-            );
-          }),
           Expanded(
             child: TabBarView(
               physics: NeverScrollableScrollPhysics(),

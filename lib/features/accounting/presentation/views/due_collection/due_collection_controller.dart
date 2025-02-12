@@ -6,6 +6,7 @@ import 'package:amar_pos/features/accounting/data/models/expense_voucher/expense
 import 'package:amar_pos/features/accounting/data/models/expense_voucher/expense_payment_methods_response_model.dart';
 import 'package:amar_pos/features/accounting/data/services/due_collection_service.dart';
 import 'package:amar_pos/features/accounting/data/services/expense_voucher_service.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_rx/get_rx.dart';
@@ -23,6 +24,8 @@ class DueCollectionController extends GetxController{
   bool isExpenseCategoriesListLoading = false;
   bool isLoadingMore = false;
   RxBool hasError = false.obs;
+
+  TextEditingController searchController = TextEditingController();
 
   int? selectedOutletId;
   Rx<DateTimeRange?> selectedDateTimeRange = Rx<DateTimeRange?>(null);
@@ -49,9 +52,13 @@ class DueCollectionController extends GetxController{
     selectedDateTimeRange.value = range;
   }
 
+  void clearFilter(){
+    searchController.clear();
+    selectedDateTimeRange.value = null;
+  }
 
   Future<void> getDueCollectionList(
-      { String? search, int page = 1}) async {
+      {int page = 1}) async {
     isDueCollectionListLoading = page == 1; // Mark initial loading state
     if(page == 1){
       dueCollectionList.clear();
@@ -65,7 +72,7 @@ class DueCollectionController extends GetxController{
       var response = await DueCollectionService.getDueCollectionList(
         usrToken: loginData!.token,
         page: page,
-        search: search,
+        search: searchController.text,
         startDate: selectedDateTimeRange.value?.start.toString(),
         endDate: selectedDateTimeRange.value?.end.toString(),
       );
@@ -384,10 +391,10 @@ class DueCollectionController extends GetxController{
   ClientLedgerListResponseModel? clientLedgerListResponseModel;
   List<ClientLedgerData> clientLedgerList = [];
 
-  Future<void> getClientLedger({ String? search, int page = 1}) async {
+  Future<void> getClientLedger({int page = 1}) async {
     isClientLedgerListLoading = page == 1;
     if(page == 1){
-      dueCollectionList.clear();
+      clientLedgerList.clear();
     }
     isClientLedgerListLoadingMore = page > 1;
 
@@ -398,7 +405,7 @@ class DueCollectionController extends GetxController{
       var response = await DueCollectionService.getClientLedgerList(
         usrToken: loginData!.token,
         page: page,
-        search: search,
+        search: searchController.text,
         startDate: selectedDateTimeRange.value?.start.toString(),
         endDate: selectedDateTimeRange.value?.end.toString(),
       );
@@ -441,7 +448,7 @@ class DueCollectionController extends GetxController{
 
   ClientLedgerStatementResponseModel? clientLedgerStatementResponseModel;
 
-  Future<void> getClientLedgerStatement({ String? search,required int id}) async {
+  Future<void> getClientLedgerStatement({required int id}) async {
     isClientLedgerStatementListLoading = true;
     // if(page == 1){
     //   dueCollectionList.clear();
@@ -455,7 +462,7 @@ class DueCollectionController extends GetxController{
       var response = await DueCollectionService.getClientLedgerStatementList(
         usrToken: loginData!.token,
         id: id,
-        search: search,
+        search: searchController.text,
         startDate: selectedDateTimeRange.value?.start.toString(),
         endDate: selectedDateTimeRange.value?.end.toString(),
       );

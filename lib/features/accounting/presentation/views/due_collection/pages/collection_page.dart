@@ -8,8 +8,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../../../../core/constants/app_assets.dart';
+import '../../../../../../core/constants/app_colors.dart';
+import '../../../../../../core/methods/helper_methods.dart';
+import '../../../../../../core/widgets/custom_text_field.dart';
 import '../../../../../../core/widgets/methods/helper_methods.dart';
 import '../../../../../../core/widgets/pager_list_view.dart';
+import '../../../../../../core/widgets/reusable/custom_svg_icon_widget.dart';
 import '../../../../../../core/widgets/reusable/status/total_status_widget.dart';
 import '../../../../data/models/expense_voucher/expense_voucher_response_model.dart';
 import '../../widgets/create_expense_voucher_bottom_sheet.dart';
@@ -39,6 +43,7 @@ class _CollectionPageState extends State<CollectionPage> {
         child: Scaffold(
           body: Column(
             children: [
+              addH(12),
               GetBuilder<DueCollectionController>(
                 id: 'total_widget',
                 builder: (controller) => Row(
@@ -70,6 +75,65 @@ class _CollectionPageState extends State<CollectionPage> {
                 ),
               ),
               addH(8),
+              Row(
+                children: [
+                  Expanded(
+                    child: CustomTextField(
+                      textCon: controller.searchController,
+                      hintText: "Search...",
+                      brdrClr: Colors.transparent,
+                      txtSize: 12,
+                      debounceDuration: const Duration(
+                        milliseconds: 300,
+                      ),
+                      // noInputBorder: true,
+                      brdrRadius: 40,
+                      prefixWidget: Icon(Icons.search),
+                      onChanged: (value){
+                        controller.getDueCollectionList();
+                      },
+                    ),
+                  ),
+                  addW(8),
+                  CustomSvgIconButton(
+                    bgColor: const Color(0xffEBFFDF),
+                    onTap: () {
+                      // controller.downloadList(isPdf: false, purchaseHistory: true);
+                      // controller.downloadStockLedgerReport(
+                      //     isPdf: false, context: context);
+                    },
+                    assetPath: AppAssets.excelIcon,
+                  ),
+                  addW(4),
+                  CustomSvgIconButton(
+                    bgColor: const Color(0xffE1F2FF),
+                    onTap: () {
+                      // controller.downloadList(isPdf: true, purchaseHistory: true);
+                    },
+                    assetPath: AppAssets.downloadIcon,
+                  ),
+                  addW(4),
+                  CustomSvgIconButton(
+                    bgColor: const Color(0xffFFFCF8),
+                    onTap: () {},
+                    assetPath: AppAssets.printIcon,
+                  )
+                ],
+              ),
+              addH(8),
+              Obx(() {
+                return controller.selectedDateTimeRange.value == null ? addH(8) : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("${formatDate(controller.selectedDateTimeRange.value!.start)} - ${formatDate(controller.selectedDateTimeRange.value!.end)}", style:const TextStyle(fontSize: 14, color: AppColors.error),),
+                    addW(16),
+                    IconButton(onPressed: (){
+                      controller.selectedDateTimeRange.value = null;
+                      controller.getDueCollectionList();
+                    }, icon: const Icon(Icons.cancel_outlined, size: 18, color: AppColors.error,))
+                  ],
+                );
+              }),
               Expanded(
                 child: GetBuilder<DueCollectionController>(
                   id: 'collection_list',
