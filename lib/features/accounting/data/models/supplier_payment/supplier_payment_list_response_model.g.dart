@@ -56,9 +56,9 @@ SupplierPaymentData _$SupplierPaymentDataFromJson(Map<String, dynamic> json) =>
       business: json['business'] == null
           ? null
           : Business.fromJson(json['business'] as Map<String, dynamic>),
-      client: json['client'] == null
+      supplier: json['supplier'] == null
           ? null
-          : ClientInfo.fromJson(json['client'] as Map<String, dynamic>),
+          : SupplierData.fromJson(json['supplier'] as Map<String, dynamic>),
       remarks: json['remarks'] as String?,
     );
 
@@ -72,7 +72,7 @@ Map<String, dynamic> _$SupplierPaymentDataToJson(
       'business': instance.business,
       'store': instance.store,
       'creator': instance.creator,
-      'client': instance.client,
+      'supplier': instance.supplier,
       'amount': instance.amount,
       'remarks': instance.remarks,
     };
@@ -163,4 +163,31 @@ Map<String, dynamic> _$StoreToJson(Store instance) => <String, dynamic>{
       'name': instance.name,
       'phone': instance.phone,
       'address': instance.address,
+    };
+
+SupplierData _$SupplierDataFromJson(Map<String, dynamic> json) => SupplierData(
+      id: (json['id'] as num).toInt(),
+      name: json['name'] as String? ?? 'N/A',
+      business: json['business'] as String? ?? 'N/A',
+      code: json['code'] as String? ?? 'N/A',
+      phone: json['phone'] as String? ?? 'N/A',
+      openingBalance: json['opening_balance'] as num? ?? 0,
+      address: json['address'] as String? ?? 'N/A',
+      photo: json['photo'] as String? ?? 'N/A',
+      due: json['due'] as num? ?? 0,
+      status: (json['status'] as num?)?.toInt() ?? -1,
+    );
+
+Map<String, dynamic> _$SupplierDataToJson(SupplierData instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
+      'business': instance.business,
+      'code': instance.code,
+      'phone': instance.phone,
+      'address': instance.address,
+      'opening_balance': instance.openingBalance,
+      'due': instance.due,
+      'photo': instance.photo,
+      'status': instance.status,
     };

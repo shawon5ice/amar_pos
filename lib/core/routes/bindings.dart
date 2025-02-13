@@ -80,3 +80,10 @@ class SupplierPaymentBindings extends Bindings{
     Get.lazyPut(()=> CAPaymentMethodDDController());
   }
 }
+
+class SupplierLedgerStatementBindings extends Bindings{
+  @override
+  void dependencies() {
+    Get.lazyPut(()=> SupplierPaymentController());
+  }
+}

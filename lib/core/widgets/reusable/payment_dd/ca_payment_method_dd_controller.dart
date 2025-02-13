@@ -41,9 +41,6 @@ class CAPaymentMethodDDController extends GetxController {
       paymentList = chartOfAccountPaymentMethodsResponseModel.paymentMethods;
 
     }
-    for (var e in paymentList) {
-      logger.d(e.id);
-    }
     paymentListLoading = false;
     update(['ca_payment_dd']); // Update the UI after loading
   }

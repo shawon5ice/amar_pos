@@ -1,7 +1,8 @@
 import 'package:amar_pos/core/widgets/reusable/client_dd/client_list_dd_response_model.dart';
 import 'package:amar_pos/core/widgets/reusable/payment_dd/expense_payment_methods_response_model.dart';
-import 'package:get/get.dart';
 import 'package:json_annotation/json_annotation.dart';
+
+import '../../../../../core/data/model/reusable/supplier_list_response_model.dart';
 
 part 'supplier_payment_list_response_model.g.dart';
 
@@ -48,8 +49,8 @@ class SupplierPaymentData {
   final Creator? creator;
 
   // @ClientConverter()
-  // @JsonKey(name: 'client',)
-  final ClientInfo? client;
+  @JsonKey(name: 'supplier',)
+  final SupplierData? supplier;
   final double amount;
   final String? remarks;
 
@@ -62,7 +63,7 @@ class SupplierPaymentData {
     required this.creator,
     required this.store,
     required this.business,
-    required this.client,
+    required this.supplier,
     this.remarks,
   });
 
@@ -221,4 +222,45 @@ class ClientConverter implements JsonConverter<ClientInfo?, dynamic> {
 
   @override
   dynamic toJson(ClientInfo? object) => object?.toJson();
+}
+
+
+@JsonSerializable()
+class SupplierData {
+  final int id;
+  @JsonKey(defaultValue: 'N/A')
+  final String name;
+  @JsonKey(defaultValue: 'N/A')
+  final String business;
+  @JsonKey(defaultValue: 'N/A')
+  final String code;
+  @JsonKey(defaultValue: 'N/A')
+  final String phone;
+  @JsonKey(defaultValue: 'N/A')
+  final String address;
+  @JsonKey(name: 'opening_balance', defaultValue: 0)
+  final num openingBalance;
+  @JsonKey(name: 'due', defaultValue: 0)
+  final num due;
+  @JsonKey(defaultValue: 'N/A')
+  final String photo;
+  @JsonKey(defaultValue: -1)
+  final int status;
+
+  SupplierData({
+    required this.id,
+    required this.name,
+    required this.business,
+    required this.code,
+    required this.phone,
+    required this.openingBalance,
+    required this.address,
+    required this.photo,
+    required this.due,
+    required this.status,
+  });
+
+  factory SupplierData.fromJson(Map<String, dynamic> json) => _$SupplierDataFromJson(json);
+  Map<String, dynamic> toJson() => _$SupplierDataToJson(this);
+
 }

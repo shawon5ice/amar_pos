@@ -22,15 +22,23 @@ class SupplierListResponseModel {
 @JsonSerializable()
 class SupplierInfo {
   final int id;
+  @JsonKey(defaultValue: 'N/A')
   final String name;
+  @JsonKey(defaultValue: 'N/A')
   final String business;
+  @JsonKey(defaultValue: 'N/A')
   final String code;
+  @JsonKey(defaultValue: 'N/A')
   final String phone;
+  @JsonKey(defaultValue: 'N/A')
   final String address;
-  @JsonKey(name: 'opening_balance')
-  final num? openingBalance;
-  final num? due;
-  final String? photo;
+  @JsonKey(name: 'opening_balance', defaultValue: 0)
+  final num openingBalance;
+  @JsonKey(name: 'previous_due', defaultValue: 0)
+  final num previousDue;
+  @JsonKey(defaultValue: 'N/A')
+  final String photo;
+  @JsonKey(defaultValue: -1)
   final int status;
 
   SupplierInfo({
@@ -42,7 +50,7 @@ class SupplierInfo {
     required this.openingBalance,
     required this.address,
     required this.photo,
-    required this.due,
+    required this.previousDue,
     required this.status,
   });
 

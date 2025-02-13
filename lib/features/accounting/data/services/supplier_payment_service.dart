@@ -52,7 +52,7 @@ class SupplierPaymentService {
   }
 
 
-  static Future<void> downloadList({required bool isPdf,required bool clientLedger, required String fileName,
+  static Future<void> downloadList({required bool isPdf,required bool supplierLedger, required String fileName,
     required String usrToken,
     required DateTime? startDate,
     required DateTime? endDate,
@@ -69,17 +69,17 @@ class SupplierPaymentService {
 
     String downloadUrl = "";
 
-    if(clientLedger){
+    if(supplierLedger){
       if(isPdf){
-        downloadUrl = "${NetWorkStrings.baseUrl}/due_collection/download-pdf-client-ledger-list";
+        downloadUrl = "${NetWorkStrings.baseUrl}/due_payment/download-pdf-supplier-ledger-list";
       }else{
-        downloadUrl = "${NetWorkStrings.baseUrl}/due_collection/download-excel-client-ledger-list";
+        downloadUrl = "${NetWorkStrings.baseUrl}/due_payment/download-excel-supplier-ledger-list";
       }
     }else{
       if(isPdf){
-        downloadUrl = "${NetWorkStrings.baseUrl}/due_collection/download-pdf-collection-list";
+        downloadUrl = "${NetWorkStrings.baseUrl}/due_payment/download-pdf-payment-list";
       }else{
-        downloadUrl = "${NetWorkStrings.baseUrl}/due_collection/download-excel-collection-list";
+        downloadUrl = "${NetWorkStrings.baseUrl}/due_payment/download-excel-payment-list";
       }
     }
 
@@ -109,9 +109,9 @@ class SupplierPaymentService {
     String downloadUrl = "";
 
     if(isPdf){
-      downloadUrl = "${NetWorkStrings.baseUrl}/due_collection/download-pdf-client-ledger-statement/$clientID";
+      downloadUrl = "${NetWorkStrings.baseUrl}/due_payment/download-pdf-supplier-ledger-statement/$clientID";
     }else{
-      downloadUrl = "${NetWorkStrings.baseUrl}/due_collection/download-excel-client-ledger-statement/$clientID";
+      downloadUrl = "${NetWorkStrings.baseUrl}/due_payment/download-excel-supplier-ledger-statement/$clientID";
     }
 
 
@@ -122,8 +122,8 @@ class SupplierPaymentService {
       fileName: fileName,);
   }
 
-  static Future<dynamic> addNewDueCollection({
-    required int clientID,
+  static Future<dynamic> addNewSupplierPayment({
+    required int supplierID,
     required int caID,
     required num amount,
     String? remarks,
@@ -132,9 +132,9 @@ class SupplierPaymentService {
 
     var response = await BaseClient.postData(
       token: token,
-      api: "due_collection/store",
+      api: "due_payment/store",
       body: {
-        "client_id": clientID,
+        "supplier_id": supplierID,
         "ca_id":caID,
         "amount": amount,
         "remarks": remarks,
@@ -143,9 +143,9 @@ class SupplierPaymentService {
     return response;
   }
 
-  static Future<dynamic> updateDueCollection({
+  static Future<dynamic> updateSupplierPayment({
     required int id,
-    required int clientId,
+    required int supplierID,
     required int caID,
     required num amount,
     String? remarks,
@@ -154,9 +154,9 @@ class SupplierPaymentService {
 
     var response = await BaseClient.postData(
       token: token,
-      api: "due_collection/update/$id",
+      api: "due_payment/update/$id",
       body: {
-        "client_id": clientId,
+        "supplier_id": supplierID,
         "ca_id":caID,
         "amount": amount,
         "remarks": remarks,
@@ -166,14 +166,14 @@ class SupplierPaymentService {
   }
 
 
-  static Future<dynamic> deleteDueCollection({
+  static Future<dynamic> deleteSupplierPayment({
     required int id,
     required String token,
   }) async {
 
     var response = await BaseClient.deleteData(
       token: token,
-      api: "due_collection/delete/$id",
+      api: "due_payment/delete/$id",
     );
     return response;
   }
@@ -258,7 +258,7 @@ class SupplierPaymentService {
 
     var response = await BaseClient.getData(
         token: usrToken,
-        api: "due_collection/get-client-ledger-statement/$id",
+        api: "due_payment/get-supplier-ledger-statement/$id",
         parameter: query);
     return response;
   }

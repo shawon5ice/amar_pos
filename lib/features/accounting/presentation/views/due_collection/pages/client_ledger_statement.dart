@@ -39,6 +39,12 @@ class _ClientLedgerStatementScreenState
   }
 
   @override
+  void dispose() {
+    controller.clientLedgerStatementResponseModel = null;
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(

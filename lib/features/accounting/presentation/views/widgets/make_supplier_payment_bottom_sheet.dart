@@ -3,64 +3,61 @@ import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/core/widgets/custom_button.dart';
 import 'package:amar_pos/core/widgets/custom_text_field.dart';
 import 'package:amar_pos/core/widgets/field_title.dart';
-import 'package:amar_pos/core/widgets/reusable/client_dd/client_dd_controller.dart';
-import 'package:amar_pos/core/widgets/reusable/client_dd/client_list_dd_response_model.dart';
 import 'package:amar_pos/core/widgets/reusable/payment_dd/ca_payment_method_dd_controller.dart';
 import 'package:amar_pos/core/widgets/reusable/payment_dd/ca_payment_method_dropdown_widget.dart';
 import 'package:amar_pos/core/widgets/reusable/payment_dd/expense_payment_methods_response_model.dart';
-import 'package:amar_pos/features/accounting/data/models/due_collection/due_collection_list_response_model.dart';
-import 'package:amar_pos/features/accounting/data/models/expense_voucher/expense_categories_response_model.dart';
-import 'package:amar_pos/features/accounting/data/models/expense_voucher/expense_payment_methods_response_model.dart';
+import 'package:amar_pos/core/widgets/reusable/supplier_dd/supplier_dd_controller.dart';
+import 'package:amar_pos/core/widgets/reusable/supplier_dd/supplier_dropdown_widget.dart';
+import 'package:amar_pos/features/accounting/data/models/supplier_payment/supplier_payment_list_response_model.dart';
 import 'package:amar_pos/features/accounting/presentation/views/due_collection/due_collection_controller.dart';
-import 'package:amar_pos/features/inventory/presentation/products/widgets/custom_drop_down_widget.dart';
+import 'package:amar_pos/features/accounting/presentation/views/supplier_payment/supplier_payment_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import '../../../../../core/data/model/reusable/supplier_list_response_model.dart';
 
-import '../../../../../core/widgets/methods/field_validator.dart';
-import '../../../../../core/widgets/reusable/client_dd/client_dropdown_widget.dart';
+class MakeSupplierPaymentBottomSheet extends StatefulWidget {
+  const MakeSupplierPaymentBottomSheet({super.key, this.supplierPayment});
 
-class CreateDueCollectionBottomSheet extends StatefulWidget {
-  const CreateDueCollectionBottomSheet({super.key, this.dueCollectionData});
-
-  final DueCollectionData? dueCollectionData;
+  final SupplierPaymentData? supplierPayment;
 
   @override
-  State<CreateDueCollectionBottomSheet> createState() =>
-      _CreateDueCollectionBottomSheetState();
+  State<MakeSupplierPaymentBottomSheet> createState() =>
+      __MakeSupplierPaymentBottomSheetState();
 }
 
-class _CreateDueCollectionBottomSheetState
-    extends State<CreateDueCollectionBottomSheet> {
+class __MakeSupplierPaymentBottomSheetState
+    extends State<MakeSupplierPaymentBottomSheet> {
   
-  final DueCollectionController _dueCollectionController = Get.find();
+  final SupplierPaymentController _supplierPaymentController = Get.find();
   late TextEditingController _textEditingController;
   late TextEditingController _remarksEditingController;
   // ExpenseCategory? selectedExpenseCategory;
   ChartOfAccountPaymentMethod? selectedPaymentMethod;
 
-  ClientInfo? selectedClient;
+  SupplierInfo? selectedSupplier;
+  int? selectedSupplierId;
 
   Future<void> processData() async {
-    // await _dueCollectionController.getExpenseCategories(limit: 1000);
-    // await _dueCollectionController.getPaymentMethods();
+    // await _supplierPaymentController.getExpenseCategories(limit: 1000);
+    // await _supplierPaymentController.getPaymentMethods();
   }
 
   @override
   void initState() {
 
-    Get.put<ClientDDController>(ClientDDController());
+    Get.put<SupplierDDController>(SupplierDDController());
     Get.put<CAPaymentMethodDDController>(CAPaymentMethodDDController());
 
     _textEditingController = TextEditingController();
     _remarksEditingController = TextEditingController();
 
 
-    _remarksEditingController.text = widget.dueCollectionData?.remarks?? '';
-    _textEditingController.text = widget.dueCollectionData?.amount.toString()?? '';
-    if(widget.dueCollectionData != null){
-      selectedClient = widget.dueCollectionData?.client;
-      selectedPaymentMethod = widget.dueCollectionData?.paymentMethod;
+    _remarksEditingController.text = widget.supplierPayment?.remarks?? '';
+    _textEditingController.text = widget.supplierPayment?.amount.toString()?? '';
+    if(widget.supplierPayment != null){
+      selectedSupplierId = widget.supplierPayment!.supplier?.id;
+      selectedPaymentMethod = widget.supplierPayment?.paymentMethod;
     }
 
     super.initState();
@@ -68,7 +65,7 @@ class _CreateDueCollectionBottomSheetState
 
   @override
   void dispose() {
-    Get.delete<ClientDDController>();
+    Get.delete<SupplierDDController>();
     Get.delete<CAPaymentMethodDDController>();
     super.dispose();
   }
@@ -100,7 +97,7 @@ class _CreateDueCollectionBottomSheetState
                   ),
                 ),
                 const Text(
-                  "Collect Due",
+                  "Supplier Payment",
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
@@ -119,22 +116,22 @@ class _CreateDueCollectionBottomSheetState
                       //   "Category",
                       // ),
                       // addH(8),
-                      ClientDropDownWidget(
-                        initialClientInfo: selectedClient,
-                        onClientSelection: (ClientInfo? client) {
-                        selectedClient = client;
-                        _dueCollectionController.update(['client_status_widget']);
+                      SupplierDropDownWidget(
+                        initialSupplierId: selectedSupplierId,
+                        onSupplierSelection: (SupplierInfo? supplier) {
+                        selectedSupplier = supplier;
+                        _supplierPaymentController.update(['supplier_status_widget']);
                       },),
                       addH(8),
-                      GetBuilder<DueCollectionController>(
-                        id: 'client_status_widget',
+                      GetBuilder<SupplierPaymentController>(
+                        id: 'supplier_status_widget',
                         builder: (controller) {
-                          return selectedClient != null ? Container(
+                          return selectedSupplier != null ? Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: Color(0xffF6FBFF),
+                              color: const Color(0xffF6FBFF),
                               borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: Color(0xffE0E0E0)),
+                              border: Border.all(color: const Color(0xffE0E0E0)),
                             ),
                             child: Column(
 
@@ -142,24 +139,24 @@ class _CreateDueCollectionBottomSheetState
                               children: [
                                 TitleValueStatusWidget(
                                   title: "Client Name: ",
-                                  value: selectedClient!.name,
+                                  value: selectedSupplier!.name ,
                                 ),
                                 TitleValueStatusWidget(
                                   title: "Phone Number: ",
-                                  value: selectedClient!.phone,
+                                  value: selectedSupplier!.phone,
                                 ),
                                 TitleValueStatusWidget(
                                   title: "Address: ",
-                                  value: selectedClient!.address,
+                                  value: selectedSupplier!.address,
                                 ),
                                 TitleValueStatusWidget(
                                   title: "Previous Due: ",
                                   value: Methods.getFormatedPrice(
-                                      selectedClient!.previousDue.toDouble()),
+                                      selectedSupplier!.previousDue.toDouble()),
                                 ),
                               ],
                             ),
-                          ): SizedBox.shrink();
+                          ): const SizedBox.shrink();
                         },
                       ),
                       addH(8),
@@ -167,7 +164,7 @@ class _CreateDueCollectionBottomSheetState
                         children: [
                           Expanded(
                             child: CAPaymentMethodsDropDownWidget(
-                              initialCAPaymentMethod: widget.dueCollectionData?.paymentMethod,
+                              initialCAPaymentMethod: widget.supplierPayment?.paymentMethod,
                               onCAPaymentMethodSelection: (ChartOfAccountPaymentMethod? method) {
                               selectedPaymentMethod = method;
                             },),
@@ -211,15 +208,15 @@ class _CreateDueCollectionBottomSheetState
                 ),
                 const SizedBox(height: 20),
                 CustomButton(
-                  text: widget.dueCollectionData != null ? "Update" : "Add Now",
-                  onTap: widget.dueCollectionData != null
+                  text: widget.supplierPayment != null ? "Update" : "Pay Now",
+                  onTap: widget.supplierPayment != null
                       ? () {
                           if (formKey.currentState!.validate()) {
                             Get.back();
-                            _dueCollectionController.updateExpenseVoucher(
-                              id: widget.dueCollectionData!.id,
+                            _supplierPaymentController.updateSupplierPayment(
+                              id: widget.supplierPayment!.id,
                                 caID: selectedPaymentMethod!.id,
-                                clientID: selectedClient!.id,
+                                supplierID: selectedSupplier!.id,
                                 amount: num.parse(_textEditingController.text),
                                 remarks: _remarksEditingController.text
                             );
@@ -228,8 +225,8 @@ class _CreateDueCollectionBottomSheetState
                       : () {
                           if (formKey.currentState!.validate()) {
                             Get.back();
-                            _dueCollectionController.addNewDueCollection(
-                              clientID: selectedClient!.id,
+                            _supplierPaymentController.addNewSupplierPayment(
+                              clientID: selectedSupplier!.id,
                               caID: selectedPaymentMethod!.id,
                               amount: num.parse(_textEditingController.text),
                               remarks: _remarksEditingController.text

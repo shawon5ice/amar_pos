@@ -1,8 +1,7 @@
 import 'package:amar_pos/core/core.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
-import 'package:amar_pos/features/accounting/data/models/client_ledger/client_ledger_list_response_model.dart';
-import 'package:amar_pos/features/accounting/presentation/views/due_collection/due_collection_controller.dart';
+import 'package:amar_pos/features/accounting/data/models/supplier_ledger/supplier_ledger_list_response_model.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -10,32 +9,39 @@ import '../../../../../../core/constants/app_assets.dart';
 import '../../../../../../core/widgets/custom_text_field.dart';
 import '../../../../../../core/widgets/reusable/custom_svg_icon_widget.dart';
 import '../../widgets/client_ledger_item.dart';
+import '../supplier_payment_controller.dart';
 
-class ClientLedgerStatementScreen extends StatefulWidget {
-  static const String routeName = '/client-ledger-statement';
+class SupplierLedgerStatementScreen extends StatefulWidget {
+  static const String routeName = '/supplier-ledger-statement';
 
-  const ClientLedgerStatementScreen({
+  const SupplierLedgerStatementScreen({
     super.key,
   });
 
   @override
-  State<ClientLedgerStatementScreen> createState() =>
+  State<SupplierLedgerStatementScreen> createState() =>
       _ClientLedgerStatementScreenState();
 }
 
 class _ClientLedgerStatementScreenState
-    extends State<ClientLedgerStatementScreen> {
-  DueCollectionController controller = Get.find();
+    extends State<SupplierLedgerStatementScreen> {
+  SupplierPaymentController controller = Get.find();
 
-  late ClientLedgerData clientLedgerData;
+  late SupplierLedgerData supplierLedgerData;
   int i = 1;
 
   @override
   void initState() {
     i = 1;
-    clientLedgerData = Get.arguments;
-    controller.getClientLedgerStatement(id: clientLedgerData.id);
+    supplierLedgerData = Get.arguments;
+    controller.getSupplierLedgerStatement(id: supplierLedgerData.id);
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    controller.supplierLedgerStatementResponseModel = null;
+    super.dispose();
   }
 
   @override
@@ -66,7 +72,7 @@ class _ClientLedgerStatementScreenState
                       brdrRadius: 40,
                       prefixWidget: Icon(Icons.search),
                       onChanged: (value){
-                        controller.getClientLedgerStatement(id: clientLedgerData.id,);
+                        controller.getSupplierLedgerStatement(id: supplierLedgerData.id,);
                       },
                     ),
                   ),
@@ -74,7 +80,7 @@ class _ClientLedgerStatementScreenState
                   CustomSvgIconButton(
                     bgColor: const Color(0xffEBFFDF),
                     onTap: () {
-                      controller.downloadStatement(isPdf: false, clientID: clientLedgerData.id);
+                      controller.downloadStatement(isPdf: false, clientID: supplierLedgerData.id);
                     },
                     assetPath: AppAssets.excelIcon,
                   ),
@@ -82,7 +88,7 @@ class _ClientLedgerStatementScreenState
                   CustomSvgIconButton(
                     bgColor: const Color(0xffE1F2FF),
                     onTap: () {
-                      controller.downloadStatement(isPdf: true, clientID: clientLedgerData.id);
+                      controller.downloadStatement(isPdf: true, clientID: supplierLedgerData.id);
                     },
                     assetPath: AppAssets.downloadIcon,
                   ),
@@ -105,34 +111,34 @@ class _ClientLedgerStatementScreenState
                   children: [
                     StatementItemTitleValueWidget(
                       title: "Client Name",
-                      value: clientLedgerData.name,
+                      value: supplierLedgerData.name ?? '--',
                       valueFontSize: 16,
                       valueFontWeight: FontWeight.w600,
                     ),
                     // StatementItemTitleValueWidget(
                     //   title: "Purpose",
-                    //   value: clientLedgerData..name,
+                    //   value: supplierLedgerData..name,
                     // ),
                     StatementItemTitleValueWidget(
                       title: "Due Amount",
-                      value: Methods.getFormatedPrice(clientLedgerData.due.toDouble()),
+                      value: Methods.getFormatedPrice(supplierLedgerData.due.toDouble()),
                       valueColor: Color(0xffFF0000),
                     ),
                     StatementItemTitleValueWidget(
                       title: "Last Payment",
-                      value: clientLedgerData.lastPaymentDate ?? '--',
+                      value: supplierLedgerData.lastPaymentDate ?? '--',
                     ),
                   ],
                 ),
               ),
               addH(12),
               Expanded(
-                child: GetBuilder<DueCollectionController>(
-                  id: 'client_ledger_statement',
+                child: GetBuilder<SupplierPaymentController>(
+                  id: 'supplier_ledger_statement',
                   builder: (controller) {
-                    if (controller.isClientLedgerStatementListLoading) {
+                    if (controller.isSupplierLedgerStatementListLoading) {
                       return RandomLottieLoader.lottieLoader();
-                    } else if (controller.clientLedgerStatementResponseModel ==
+                    } else if (controller.supplierLedgerStatementResponseModel ==
                         null) {
                       return Center(
                         child: Text(
@@ -227,7 +233,7 @@ class _ClientLedgerStatementScreenState
                           ],
                         ),
                         ...controller
-                            .clientLedgerStatementResponseModel!.data!.data!
+                            .supplierLedgerStatementResponseModel!.data!.data!
                             .map((statement) {
                           return TableRow(
                             children: [
@@ -303,7 +309,7 @@ class _ClientLedgerStatementScreenState
                             Padding(
                                 padding: EdgeInsets.all(8),
                                 child: AutoSizeText(
-                                    "${Methods.getFormattedNumber(controller.clientLedgerStatementResponseModel!.data!.debit!.toDouble())}",
+                                    "${Methods.getFormattedNumber(controller.supplierLedgerStatementResponseModel!.data!.debit!.toDouble())}",
                                     minFontSize: 2,
                                     maxFontSize: 10,
                                     overflow: TextOverflow.visible,
@@ -315,7 +321,7 @@ class _ClientLedgerStatementScreenState
                             Padding(
                                 padding: EdgeInsets.all(8),
                                 child: AutoSizeText(
-                                    "${Methods.getFormattedNumber(controller.clientLedgerStatementResponseModel!.data!.credit!.toDouble())}",
+                                    "${Methods.getFormattedNumber(controller.supplierLedgerStatementResponseModel!.data!.credit!.toDouble())}",
                                     maxLines: 1,
                                     minFontSize: 2,
                                     maxFontSize: 10,
@@ -327,7 +333,7 @@ class _ClientLedgerStatementScreenState
                             Padding(
                                 padding: EdgeInsets.all(8),
                                 child: AutoSizeText(
-                                    "${Methods.getFormattedNumber(controller.clientLedgerStatementResponseModel!.data!.balance!.toDouble())}",
+                                    "${Methods.getFormattedNumber(controller.supplierLedgerStatementResponseModel!.data!.balance!.toDouble())}",
                                     maxLines: 1,
                                     minFontSize: 2,
                                     maxFontSize: 10,

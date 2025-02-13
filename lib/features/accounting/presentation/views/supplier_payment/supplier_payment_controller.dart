@@ -4,6 +4,9 @@ import 'package:amar_pos/features/accounting/data/models/client_ledger/client_le
 import 'package:amar_pos/features/accounting/data/models/due_collection/due_collection_list_response_model.dart';
 import 'package:amar_pos/features/accounting/data/models/expense_voucher/expense_voucher_response_model.dart';
 import 'package:amar_pos/features/accounting/data/models/expense_voucher/expense_payment_methods_response_model.dart';
+import 'package:amar_pos/features/accounting/data/models/supplier_ledger/supplier_ledger_list_response_model.dart';
+import 'package:amar_pos/features/accounting/data/models/supplier_ledger/supplier_ledger_statement_response_model.dart';
+import 'package:amar_pos/features/accounting/data/models/supplier_payment/supplier_payment_list_response_model.dart';
 import 'package:amar_pos/features/accounting/data/services/due_collection_service.dart';
 import 'package:amar_pos/features/accounting/data/services/expense_voucher_service.dart';
 import 'package:flutter/cupertino.dart';
@@ -31,8 +34,8 @@ class SupplierPaymentController extends GetxController{
   int? selectedOutletId;
   Rx<DateTimeRange?> selectedDateTimeRange = Rx<DateTimeRange?>(null);
 
-  List<DueCollectionData> dueCollectionList = [];
-  DueCollectionListResponseModel? dueCollectionListResponseModel;
+  List<SupplierPaymentData> supplierPaymentList = [];
+  SupplierPaymentListResponseModel? supplierPaymentListResponseModel;
 
   ExpenseCategoriesResponseModel? expenseCategoriesResponseModel;
   List<ExpenseCategory> expenseCategoriesList = [];
@@ -62,7 +65,7 @@ class SupplierPaymentController extends GetxController{
       {int page = 1}) async {
     isSupplierPaymentListLoading = page == 1; // Mark initial loading state
     if(page == 1){
-      dueCollectionList.clear();
+      supplierPaymentList.clear();
     }
     isLoadingMore = page > 1;
 
@@ -82,25 +85,25 @@ class SupplierPaymentController extends GetxController{
 
       if (response != null) {
         logger.e(response);
-        dueCollectionListResponseModel =
-            DueCollectionListResponseModel.fromJson(response);
+        supplierPaymentListResponseModel =
+            SupplierPaymentListResponseModel.fromJson(response);
 
-        if (dueCollectionListResponseModel != null && dueCollectionListResponseModel!.data != null) {
-          dueCollectionList.addAll(dueCollectionListResponseModel!.data!.data!);
-          logger.i(dueCollectionList.length);
+        if (supplierPaymentListResponseModel != null && supplierPaymentListResponseModel!.data != null) {
+          supplierPaymentList.addAll(supplierPaymentListResponseModel!.data!.data!);
+          logger.i(supplierPaymentList.length);
           // if (currentSearchList.isNotEmpty) {
           //   lastFoundList.value = currentSearchList; // Update last found list
           // }
         } else {
-          dueCollectionList.clear(); // No results
+          supplierPaymentList.clear(); // No results
         }
       } else {
         // hasError.value = true; // Error in response
-        dueCollectionList.clear();
+        supplierPaymentList.clear();
       }
     } catch (e) {
       hasError.value = true; // Handle exceptions
-      dueCollectionList.clear();
+      supplierPaymentList.clear();
       logger.e(e);
     } finally {
       isSupplierPaymentListLoading = false;
@@ -189,103 +192,8 @@ class SupplierPaymentController extends GetxController{
     RandomLottieLoader.hide();
   }
 
-  // void editCategory({
-  //   required Category category,
-  //   required String categoryName,
-  // }) async {
-  //   isAddCategoryLoading = true;
-  //   update(["expense_vouchers_categories_list"]);
-  //   EasyLoading.show();
-  //   try{
-  //     var response = await ExpenseVoucherService.update(
-  //       token: loginData!.token,
-  //       categoryName: categoryName,
-  //       brandId: category.id,
-  //     );
-  //     if (response != null) {
-  //
-  //       if(response['success']){
-  //         getAllCategory();
-  //       }
-  //       Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true: null );
-  //     }
-  //   }catch(e){
-  //     logger.e(e);
-  //   }finally{
-  //     categoryListLoading = false;
-  //     update(['expense_vouchers_categories_list']);
-  //   }
-  //   update(["expense_vouchers_categories_list"]);
-  //   EasyLoading.dismiss();
-  // }
-  //
-  // void deleteCategory({
-  //   required Category category,
-  // }) async {
-  //   isAddCategoryLoading = true;
-  //   update(["expense_vouchers_categories_list"]);
-  //   EasyLoading.show();
-  //   try{
-  //     var response = await CategoryService.delete(
-  //       token: loginData!.token,
-  //       categoryId: category.id,
-  //     );
-  //     if (response != null) {
-  //
-  //       if(response['success']){
-  //         categoryList.remove(category);
-  //         allCategoryCopy.remove(category);
-  //       }
-  //       Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true: null );
-  //     }
-  //   }catch(e){
-  //     logger.e(e);
-  //   }finally{
-  //     categoryListLoading = false;
-  //     update(['expense_vouchers_categories_list']);
-  //   }
-  //   update(["expense_vouchers_categories_list"]);
-  //   EasyLoading.dismiss();
-  // }
 
-
-  bool isExpensePaymentMethodsListLoading = false;
-  Future<void> getPaymentMethods() async {
-    expensePaymentMethods.clear();
-    isExpensePaymentMethodsListLoading = true;
-
-    hasError.value = false;
-    update(['expense_payment_methods_dd',]);
-
-    try {
-      var response = await ExpenseVoucherService.getPaymentMethods(
-        usrToken: loginData!.token,
-      );
-
-      logger.d(response);
-
-      if (response != null) {
-        logger.e(response);
-        expensePaymentMethodsResponseModel =
-            ExpensePaymentMethodsResponseModel.fromJson(response);
-
-        if (expensePaymentMethodsResponseModel != null) {
-          expensePaymentMethods.addAll(expensePaymentMethodsResponseModel!.paymentMethods);
-          logger.i(expenseCategoriesList.length);
-          // if (currentSearchList.isNotEmpty) {
-          //   lastFoundList.value = currentSearchList; // Update last found list
-          // }
-        }
-      }
-    } catch (e) {
-      logger.e(e);
-    } finally {
-      isExpensePaymentMethodsListLoading = false;
-      update(['expense_payment_methods_dd']);
-    }
-  }
-
-  void addNewDueCollection({
+  void addNewSupplierPayment({
     required int clientID,
     required int caID,
     required num amount,
@@ -295,10 +203,10 @@ class SupplierPaymentController extends GetxController{
     update(["supplier_payment_list"]);
     RandomLottieLoader.show();
     try{
-      var response = await SupplierPaymentService.addNewDueCollection(
+      var response = await SupplierPaymentService.addNewSupplierPayment(
         token: loginData!.token,
         caID: caID,
-        clientID: clientID,
+        supplierID: clientID,
         amount: amount,
         remarks: remarks,
       );
@@ -319,9 +227,9 @@ class SupplierPaymentController extends GetxController{
     RandomLottieLoader.hide();
   }
 
-  void updateExpenseVoucher({
+  void updateSupplierPayment({
     required int id,
-    required int clientID,
+    required int supplierID,
     required int caID,
     required num amount,
     String? remarks,
@@ -330,11 +238,11 @@ class SupplierPaymentController extends GetxController{
     update(["supplier_payment_list"]);
     RandomLottieLoader.show();
     try{
-      var response = await SupplierPaymentService.updateDueCollection(
+      var response = await SupplierPaymentService.updateSupplierPayment(
         id: id,
         token: loginData!.token,
         caID: caID,
-        clientId: clientID,
+        supplierID: supplierID,
         amount: amount,
         remarks: remarks,
       );
@@ -355,14 +263,14 @@ class SupplierPaymentController extends GetxController{
     RandomLottieLoader.hide();
   }
 
-  void deleteDueCollection({
-    required DueCollectionData transaction,
+  void deleteSupplierPayment({
+    required SupplierPaymentData transaction,
   }) async {
     isAddCategoryLoading = true;
     update(["supplier_payment_list"]);
     RandomLottieLoader.show();
     try{
-      var response = await SupplierPaymentService.deleteDueCollection(
+      var response = await SupplierPaymentService.deleteSupplierPayment(
         id: transaction.id,
         token: loginData!.token,
       );
@@ -386,21 +294,21 @@ class SupplierPaymentController extends GetxController{
 
   //Client Ledger
 
-  bool isClientLedgerListLoading = false;
-  bool isClientLedgerListLoadingMore = false;
+  bool isSupplierLedgerListLoading = false;
+  bool isSupplierLedgerListLoadingMore = false;
 
-  ClientLedgerListResponseModel? clientLedgerListResponseModel;
-  List<ClientLedgerData> clientLedgerList = [];
+  SupplierLedgerListResponseModel? supplierLedgerListResponseModel;
+  List<SupplierLedgerData> supplierLedgerList = [];
 
   Future<void> getSupplierLedger({int page = 1}) async {
-    isClientLedgerListLoading = page == 1;
+    isSupplierLedgerListLoading = page == 1;
     if(page == 1){
-      clientLedgerList.clear();
+      supplierLedgerList.clear();
     }
-    isClientLedgerListLoadingMore = page > 1;
+    isSupplierLedgerListLoadingMore = page > 1;
 
     hasError.value = false;
-    update(['client_ledger_total_widget','client_ledger']);
+    update(['supplier_ledger_total_widget','supplier_ledger']);
 
     try {
       var response = await SupplierPaymentService.getSupplierLedgerList(
@@ -415,49 +323,49 @@ class SupplierPaymentController extends GetxController{
 
       if (response != null) {
         logger.e(response);
-        clientLedgerListResponseModel =
-            ClientLedgerListResponseModel.fromJson(response);
+        supplierLedgerListResponseModel =
+            SupplierLedgerListResponseModel.fromJson(response);
 
-        if (clientLedgerListResponseModel != null && clientLedgerListResponseModel!.data != null) {
-          clientLedgerList.addAll(clientLedgerListResponseModel!.data!.data!);
-          logger.i(clientLedgerList.length);
+        if (supplierLedgerListResponseModel != null && supplierLedgerListResponseModel!.data != null) {
+          supplierLedgerList.addAll(supplierLedgerListResponseModel!.data!.data!);
+          logger.i(supplierLedgerList.length);
           // if (currentSearchList.isNotEmpty) {
           //   lastFoundList.value = currentSearchList; // Update last found list
           // }
         } else {
-          clientLedgerList.clear(); // No results
+          supplierLedgerList.clear(); // No results
         }
       } else {
         // hasError.value = true; // Error in response
-        clientLedgerList.clear();
+        supplierLedgerList.clear();
       }
     } catch (e) {
       hasError.value = true; // Handle exceptions
-      clientLedgerList.clear();
+      supplierLedgerList.clear();
       logger.e(e);
     } finally {
-      isClientLedgerListLoading = false;
-      isClientLedgerListLoadingMore = false;
-      update(['client_ledger_total_widget','client_ledger']);
+      isSupplierLedgerListLoading = false;
+      isSupplierLedgerListLoadingMore = false;
+      update(['supplier_ledger_total_widget','supplier_ledger']);
     }
   }
 
 
   //Client ledger statement
-  bool isClientLedgerStatementListLoading = false;
-  bool isClientLedgerStatementListLoadingMore = false;
+  bool isSupplierLedgerStatementListLoading = false;
+  bool isSupplierLedgerStatementListLoadingMore = false;
 
-  ClientLedgerStatementResponseModel? clientLedgerStatementResponseModel;
+  SupplierLedgerStatementResponseModel? supplierLedgerStatementResponseModel;
 
   Future<void> getSupplierLedgerStatement({required int id}) async {
-    isClientLedgerStatementListLoading = true;
+    isSupplierLedgerStatementListLoading = true;
     // if(page == 1){
-    //   dueCollectionList.clear();
+    //   supplierPaymentList.clear();
     // }
-    // isClientLedgerStatementListLoadingMore = page > 1;
+    // isSupplierLedgerStatementListLoadingMore = page > 1;
 
     hasError.value = false;
-    update(['client_ledger_statement']);
+    update(['supplier_ledger_statement']);
 
     try {
       var response = await SupplierPaymentService.getSupplierLedgerStatementList(
@@ -472,28 +380,28 @@ class SupplierPaymentController extends GetxController{
 
       if (response != null) {
         logger.e(response);
-        clientLedgerStatementResponseModel =
-            ClientLedgerStatementResponseModel.fromJson(response);
+        supplierLedgerStatementResponseModel =
+            SupplierLedgerStatementResponseModel.fromJson(response);
       }
     } catch (e) {
       logger.e(e);
     } finally {
-      isClientLedgerStatementListLoading = false;
-      isClientLedgerStatementListLoadingMore = false;
-      update(['client_ledger_statement']);
+      isSupplierLedgerStatementListLoading = false;
+      isSupplierLedgerStatementListLoadingMore = false;
+      update(['supplier_ledger_statement']);
     }
   }
 
-  Future<void> downloadList({required bool isPdf, required bool clientLedger}) async {
+  Future<void> downloadList({required bool isPdf, required bool supplierLedger}) async {
     hasError.value = false;
 
-    String fileName = "${clientLedger ? 'Client Ledger': 'Due Collection'}-${DateTime
+    String fileName = "${supplierLedger ? 'Supplier Payment Ledger': 'Supplier Payment'}-${DateTime
         .now()
         .microsecondsSinceEpoch
         .toString()}${isPdf ? ".pdf" : ".xlsx"}";
     try {
       var response = await SupplierPaymentService.downloadList(
-        clientLedger: clientLedger,
+        supplierLedger: supplierLedger,
         isPdf: isPdf,
         usrToken: loginData!.token,
         search: searchController.text,
@@ -512,7 +420,7 @@ class SupplierPaymentController extends GetxController{
   Future<void> downloadStatement({required bool isPdf, required int clientID}) async {
     hasError.value = false;
 
-    String fileName = "Due Statement'-${DateTime
+    String fileName = "Supplier Payment Statement'-${DateTime
         .now()
         .microsecondsSinceEpoch
         .toString()}${isPdf ? ".pdf" : ".xlsx"}";

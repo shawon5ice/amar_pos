@@ -1,10 +1,8 @@
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/core/widgets/custom_button.dart';
-import 'package:amar_pos/features/accounting/data/models/client_ledger/client_ledger_list_response_model.dart';
-import 'package:amar_pos/features/accounting/data/models/due_collection/due_collection_list_response_model.dart';
-import 'package:amar_pos/features/accounting/presentation/views/due_collection/due_collection_controller.dart';
+import 'package:amar_pos/features/accounting/data/models/supplier_ledger/supplier_ledger_list_response_model.dart';
 import 'package:amar_pos/features/accounting/presentation/views/widgets/create_due_collection_bottom_sheet.dart';
-import 'package:amar_pos/features/accounting/presentation/views/widgets/due_collection_item.dart';
+import 'package:amar_pos/features/accounting/presentation/views/widgets/supplier_ledger_item.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -46,16 +44,16 @@ class _SupplierLedgerPageState extends State<SupplierLedgerPage> {
             children: [
               addH(12),
               GetBuilder<SupplierPaymentController>(
-                id: 'client_ledger_total_widget',
+                id: 'supplier_ledger_total_widget',
                 builder: (controller) => Row(
                   children: [
                     TotalStatusWidget(
                       flex: 3,
-                      isLoading: controller.isClientLedgerListLoading,
+                      isLoading: controller.isSupplierLedgerListLoading,
                       title: 'Due Client',
-                      value: controller.clientLedgerListResponseModel != null
+                      value: controller.supplierLedgerListResponseModel != null
                           ? Methods.getFormattedNumber(controller
-                          .clientLedgerListResponseModel!.countTotal
+                          .supplierLedgerListResponseModel!.countTotal
                           .toDouble())
                           : null,
                       asset: AppAssets.client,
@@ -63,11 +61,11 @@ class _SupplierLedgerPageState extends State<SupplierLedgerPage> {
                     addW(12),
                     TotalStatusWidget(
                       flex: 4,
-                      isLoading: controller.isClientLedgerListLoading,
+                      isLoading: controller.isSupplierLedgerListLoading,
                       title: 'Due Amount',
-                      value: controller.clientLedgerListResponseModel != null
+                      value: controller.supplierLedgerListResponseModel != null
                           ? Methods.getFormatedPrice(controller
-                          .clientLedgerListResponseModel!.amountTotal
+                          .supplierLedgerListResponseModel!.amountTotal
                           .toDouble())
                           : null,
                       asset: AppAssets.clientMoney,
@@ -99,7 +97,7 @@ class _SupplierLedgerPageState extends State<SupplierLedgerPage> {
                   CustomSvgIconButton(
                     bgColor: const Color(0xffEBFFDF),
                     onTap: () {
-                      controller.downloadList(isPdf: false, clientLedger: true);
+                      controller.downloadList(isPdf: false, supplierLedger: true);
                     },
                     assetPath: AppAssets.excelIcon,
                   ),
@@ -107,7 +105,7 @@ class _SupplierLedgerPageState extends State<SupplierLedgerPage> {
                   CustomSvgIconButton(
                     bgColor: const Color(0xffE1F2FF),
                     onTap: () {
-                      controller.downloadList(isPdf: true, clientLedger: true);
+                      controller.downloadList(isPdf: true, supplierLedger: true);
                     },
                     assetPath: AppAssets.downloadIcon,
                   ),
@@ -134,17 +132,17 @@ class _SupplierLedgerPageState extends State<SupplierLedgerPage> {
               }),
               Expanded(
                 child: GetBuilder<SupplierPaymentController>(
-                  id: 'client_ledger',
+                  id: 'supplier_ledger',
                   builder: (controller) {
-                    if (controller.isClientLedgerListLoading) {
+                    if (controller.isSupplierLedgerListLoading) {
                       return const Center(
                         child: CircularProgressIndicator(),
                       );
-                    }else if(controller.clientLedgerListResponseModel == null){
+                    }else if(controller.supplierPaymentListResponseModel == null){
                       return Center(
                         child: Text("Something went wrong", style: context.textTheme.titleLarge,),
                       );
-                    }else if(controller.clientLedgerList.isEmpty){
+                    }else if(controller.supplierLedgerList.isEmpty){
                       return Center(
                         child: Text("No data found", style: context.textTheme.titleLarge,),
                       );
@@ -153,22 +151,22 @@ class _SupplierLedgerPageState extends State<SupplierLedgerPage> {
                       onRefresh: () async {
                         controller.getSupplierLedger(page: 1);
                       },
-                      child: PagerListView<ClientLedgerData>(
+                      child: PagerListView<SupplierLedgerData>(
                         // scrollController: _scrollController,
-                        items: controller.clientLedgerList,
+                        items: controller.supplierLedgerList,
                         itemBuilder: (_, item) {
-                          return ClientLedgerItem(clientLedgerData: item,);
+                          return SupplierLedgerItem(supplierLedgerData: item,);
                         },
-                        isLoading: controller.isClientLedgerListLoadingMore,
+                        isLoading: controller.isSupplierLedgerListLoadingMore,
                         hasError: controller.hasError.value,
                         onNewLoad: (int nextPage) async {
                           await controller.getSupplierLedger(page: nextPage);
                         },
                         totalPage: controller
-                            .clientLedgerListResponseModel?.data?.meta?.lastPage ?? 0,
+                            .supplierPaymentListResponseModel?.data?.meta?.lastPage ?? 0,
                         totalSize:
                         controller
-                            .clientLedgerListResponseModel?.data?.meta?.total ??
+                            .supplierPaymentListResponseModel?.data?.meta?.total ??
                             0,
                         itemPerPage: 20,
                       ),

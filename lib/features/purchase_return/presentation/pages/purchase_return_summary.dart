@@ -135,7 +135,7 @@ class _PurchaseReturnSummaryState extends State<PurchaseReturnSummary> {
                                       return DropdownMenuItem<SupplierInfo>(
                                         value: item,
                                         child: Text(
-                                          item.name,
+                                          item.name ?? '--',
                                           style: const TextStyle(
                                             fontSize: 12,
                                             fontWeight: FontWeight.bold,
@@ -149,9 +149,9 @@ class _PurchaseReturnSummaryState extends State<PurchaseReturnSummary> {
                                       if (value != null) {
                                         controller.selectedSupplier = value;
                                         customerPhoneNumberEditingController
-                                            .text = value.phone;
+                                            .text = value.phone ?? '';
                                         customerAddressEditingController.text =
-                                            value.address;
+                                            value.address ?? '';
                                         controller.update(['client_list']);
                                       }
                                     },
