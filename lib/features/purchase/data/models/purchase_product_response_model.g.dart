@@ -10,7 +10,7 @@ PurchaseProductResponseModel _$PurchaseProductResponseModelFromJson(
         Map<String, dynamic> json) =>
     PurchaseProductResponseModel(
       success: json['success'] as bool,
-      data: Data.fromJson(json['data'] as Map<String, dynamic>),
+      data: const DataConverter().fromJson(json['data']),
       countTotal: (json['count_total'] as num).toInt(),
       amountTotal: json['amount_total'] as num,
     );
@@ -19,16 +19,18 @@ Map<String, dynamic> _$PurchaseProductResponseModelToJson(
         PurchaseProductResponseModel instance) =>
     <String, dynamic>{
       'success': instance.success,
-      'data': instance.data,
+      'data': const DataConverter().toJson(instance.data),
       'count_total': instance.countTotal,
       'amount_total': instance.amountTotal,
     };
 
 Data _$DataFromJson(Map<String, dynamic> json) => Data(
-      returnProducts: (json['data'] as List<dynamic>)
-          .map((e) => PurchaseProduct.fromJson(e as Map<String, dynamic>))
+      returnProducts: (json['data'] as List<dynamic>?)
+          ?.map((e) => PurchaseProduct.fromJson(e as Map<String, dynamic>))
           .toList(),
-      meta: Meta.fromJson(json['meta'] as Map<String, dynamic>),
+      meta: json['meta'] == null
+          ? null
+          : Meta.fromJson(json['meta'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$DataToJson(Data instance) => <String, dynamic>{

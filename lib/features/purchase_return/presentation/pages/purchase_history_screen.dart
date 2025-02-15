@@ -152,10 +152,10 @@ class _PurchaseReturnHistoryScreenState extends State<PurchaseReturnHistoryScree
                         await controller.getPurchaseReturnHistory(page: nextPage);
                       },
                       totalPage: controller
-                          .purchaseReturnHistoryResponseModel?.data.meta.lastPage ??
+                          .purchaseReturnHistoryResponseModel?.data.meta?.lastPage ??
                           0,
                       totalSize:
-                      controller.purchaseReturnHistoryResponseModel?.data.meta.total ??
+                      controller.purchaseReturnHistoryResponseModel?.data.meta?.total ??
                           0,
                       itemPerPage: 10,
                     ),

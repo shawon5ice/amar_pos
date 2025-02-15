@@ -1,8 +1,5 @@
 import 'package:amar_pos/features/purchase/data/models/create_purchase_order_model.dart';
 import 'package:amar_pos/features/purchase/data/models/purchase_history_response_model.dart';
-import 'package:amar_pos/features/sales/data/models/sale_history/sold_history_response_model.dart';
-import 'package:flutter/material.dart';
-
 import '../../../../core/constants/logger/logger.dart';
 import '../../../../core/network/base_client.dart';
 import '../../../../core/network/download/file_downloader.dart';
@@ -135,7 +132,7 @@ class PurchaseService {
   }
 
   static downloadPurchaseHistory(
-      {required String usrToken, required PurchaseOrderInfo purchaseOrderInfo}) async {
+      {required String usrToken, required PurchaseOrderInfo purchaseOrderInfo, required String fileName}) async {
     // logger.d("PDF: $isPdf");
 
     String downloadUrl =

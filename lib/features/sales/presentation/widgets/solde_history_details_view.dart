@@ -1,8 +1,10 @@
 import 'package:amar_pos/core/constants/app_colors.dart';
+import 'package:amar_pos/core/core.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:amar_pos/features/sales/data/models/sale_history/sold_history_response_model.dart';
 import 'package:amar_pos/features/sales/presentation/controller/sales_controller.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -101,6 +103,7 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
                                               ))),
                                     ],
                                   ),
+                                  addH(8),
                                   Text(
                                     "Address: ${controller.saleHistoryDetailsResponseModel!.data.business.address}",
                                     maxLines: 2,
@@ -162,6 +165,7 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
                                       ),
                                     ],
                                   ),
+                                  addH(8),
                                   Text(
                                       "Address: ${widget.saleHistory.customer.name}"),
                                 ],
@@ -175,7 +179,7 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
                             columnWidths: {
                               0: FixedColumnWidth(40.w),
                               1: FlexColumnWidth(),
-                              2: FixedColumnWidth(40.w),
+                              2: FixedColumnWidth(60.w),
                               3: FixedColumnWidth(40.w),
                               4: FixedColumnWidth(60.w),
                             },
@@ -185,23 +189,23 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
                                     BoxDecoration(color: Colors.grey[200]),
                                 children: const [
                                   Padding(
-                                      padding: EdgeInsets.all(8),
-                                      child: Text("Sl No.",
+                                      padding: EdgeInsets.symmetric(horizontal: 4,vertical: 8),
+                                      child: AutoSizeText("SL.",
                                           textAlign: TextAlign.center)),
                                   Padding(
-                                      padding: EdgeInsets.all(8),
-                                      child: Text("Product Name")),
+                                      padding: EdgeInsets.symmetric(horizontal: 4,vertical: 8),
+                                      child: AutoSizeText("Product Name")),
                                   Padding(
-                                      padding: EdgeInsets.all(8),
-                                      child: Text("Quantity",
+                                      padding: EdgeInsets.symmetric(horizontal: 4,vertical: 8),
+                                      child: AutoSizeText("Price",
                                           textAlign: TextAlign.center)),
                                   Padding(
-                                      padding: EdgeInsets.all(8),
-                                      child: Text("Unit Price",
+                                      padding: EdgeInsets.symmetric(horizontal: 4,vertical: 8),
+                                      child: AutoSizeText("QTY",
                                           textAlign: TextAlign.center)),
                                   Padding(
-                                      padding: EdgeInsets.all(8),
-                                      child: Text("Total",
+                                      padding: EdgeInsets.symmetric(horizontal: 4,vertical: 8),
+                                      child: AutoSizeText("Total",
                                           textAlign: TextAlign.center)),
                                 ],
                               ),
@@ -211,41 +215,41 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
                                 return TableRow(
                                   children: [
                                     Padding(
-                                        padding: EdgeInsets.all(8),
-                                        child: Text("${i++}",
+                                        padding: EdgeInsets.symmetric(horizontal: 4,vertical: 8),
+                                        child: AutoSizeText("${i++}",
                                             textAlign: TextAlign.center)),
                                     Padding(
-                                        padding: EdgeInsets.all(8),
+                                        padding: EdgeInsets.symmetric(horizontal: 4,vertical: 8),
                                         child: Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
-                                            Text(product.name),
+                                            AutoSizeText(product.name),
                                             addH(4),
                                             Wrap(
                                               spacing: 4,
                                               runSpacing: 4,
                                               children: product.snNo.map((e) => Container(
-                                                padding: EdgeInsets.symmetric(horizontal: 12,vertical: 5),
-                                                decoration: BoxDecoration(
-                                                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                                                padding: const EdgeInsets.symmetric(horizontal:12,vertical: 4),
+                                                decoration: const BoxDecoration(
+                                                  borderRadius: BorderRadius.all(Radius.circular(8)),
                                                   color: Colors.black,
                                                 ),
-                                                child: Text(e.serialNo,style: TextStyle(color: Colors.white),),
+                                                child: AutoSizeText(e.serialNo,style: const TextStyle(color: Colors.white),),
                                               )).toList(),
                                             )
                                           ],
                                         )),
                                     Padding(
-                                        padding: EdgeInsets.all(8),
-                                        child: Text("${product.quantity}",
+                                        padding: EdgeInsets.symmetric(horizontal: 4,vertical: 8),
+                                        child: AutoSizeText(Methods.getFormattedNumber(product.unitPrice.toDouble()),
                                             textAlign: TextAlign.center)),
                                     Padding(
-                                        padding: EdgeInsets.all(8),
-                                        child: Text("${product.unitPrice}",
+                                        padding: EdgeInsets.symmetric(horizontal: 4,vertical: 8),
+                                        child: AutoSizeText(Methods.getFormattedNumber(product.quantity.toDouble()),
                                             textAlign: TextAlign.center)),
                                     Padding(
-                                        padding: EdgeInsets.all(8),
-                                        child: Text("${product.totalPrice}",
+                                        padding: EdgeInsets.symmetric(horizontal: 4,vertical: 8),
+                                        child: AutoSizeText(Methods.getFormattedNumber(product.totalPrice.toDouble()),
                                             textAlign: TextAlign.center)),
                                   ],
                                 );

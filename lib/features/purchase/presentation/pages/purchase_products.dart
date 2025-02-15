@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import '../../../../core/constants/app_assets.dart';
+import '../../../../core/constants/app_colors.dart';
+import '../../../../core/methods/helper_methods.dart';
 import '../../../../core/responsive/pixel_perfect.dart';
 import '../../../../core/widgets/custom_text_field.dart';
 import '../../../../core/widgets/pager_list_view.dart';
@@ -106,6 +108,19 @@ class _SoldHistoryState extends State<PurchaseProducts> {
               ),
             ),
             addH(8),
+            Obx(() {
+              return controller.selectedDateTimeRange.value == null ? addH(8) : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("${formatDate(controller.selectedDateTimeRange.value!.start)} - ${formatDate(controller.selectedDateTimeRange.value!.end)}", style:const TextStyle(fontSize: 14, color: AppColors.error),),
+                  addW(16),
+                  IconButton(onPressed: (){
+                    controller.selectedDateTimeRange.value = null;
+                    controller.getPurchaseProducts();
+                  }, icon: const Icon(Icons.cancel_outlined, size: 18, color: AppColors.error,))
+                ],
+              );
+            }),
             Expanded(
               child: GetBuilder<PurchaseController>(
                 id: 'purchase_product',
@@ -118,7 +133,7 @@ class _SoldHistoryState extends State<PurchaseProducts> {
                     return Center(
                       child: Text("Something went wrong", style: context.textTheme.titleLarge,),
                     );
-                  }else if(controller.purchaseProductResponseModel!.data.returnProducts.isEmpty){
+                  }else if(controller.purchaseProducts.isEmpty){
                     return Center(
                       child: Text("No data found", style: context.textTheme.titleLarge,),
                     );
@@ -139,10 +154,10 @@ class _SoldHistoryState extends State<PurchaseProducts> {
                         await controller.getPurchaseProducts(page: nextPage);
                       },
                       totalPage: controller
-                          .purchaseProductResponseModel?.data.meta.lastPage ??
+                          .purchaseProductResponseModel?.data.meta!.lastPage ??
                           0,
                       totalSize:
-                      controller.purchaseProductResponseModel?.data.meta.total ??
+                      controller.purchaseProductResponseModel?.data.meta!.total ??
                           0,
                       itemPerPage: 10,
                     ),

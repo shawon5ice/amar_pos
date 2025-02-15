@@ -33,8 +33,11 @@ class _PurchaseSummaryPaymentOptionSelectionWidgetState
 
   final PurchaseController controller = Get.find();
 
+  late TextEditingController _textEditingController;
+
   @override
   void initState() {
+    _textEditingController = TextEditingController();
     paidAmount = TextEditingController();
     paidAmount.text = widget.paymentMethodTracker.paidAmount.toString();
     super.initState();
@@ -49,6 +52,12 @@ class _PurchaseSummaryPaymentOptionSelectionWidgetState
     super.didUpdateWidget(oldWidget);
   }
 
+  @override
+  void dispose() {
+    _textEditingController.dispose();
+    paidAmount.dispose();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return GetBuilder<PurchaseController>(
@@ -209,7 +218,7 @@ class _PurchaseSummaryPaymentOptionSelectionWidgetState
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     addH(8),
-                    RichFieldTitle(
+                    const RichFieldTitle(
                       text: "Payment Options",
                     ),
                     addH(4),
@@ -223,6 +232,30 @@ class _PurchaseSummaryPaymentOptionSelectionWidgetState
                             color: Theme.of(context).hintColor,
                           ),
                         ),
+                        dropdownSearchData: DropdownSearchData(
+                          searchController: _textEditingController,
+                          searchInnerWidgetHeight: 48,
+                          searchInnerWidget: Padding(
+                            padding:
+                            const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+                            child: TextFormField(
+                              controller: _textEditingController,
+                              decoration: InputDecoration(
+                                isDense: true,
+                                hintText: "Search Supplier",
+                                hintStyle: const TextStyle(fontSize: 12),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            ),
+                          ),
+                          searchMatchFn: (item, searchValue) {
+                            return item.value!.name
+                                .toLowerCase()
+                                .contains(searchValue.toLowerCase());
+                          },
+                        ),
                         items: widget
                             .paymentMethodTracker.paymentMethod?.paymentOptions
                             .map((PaymentOption item) =>
@@ -230,7 +263,7 @@ class _PurchaseSummaryPaymentOptionSelectionWidgetState
                                   value: item,
                                   child: Text(
                                     item.name,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold,
                                     ),

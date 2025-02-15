@@ -30,6 +30,8 @@ class _PurchaseReturnSummaryPaymentOptionSelectionWidgetState
   PaymentMethod? paymentMethod;
   PaymentOption? paymentOption;
 
+  late TextEditingController _textEditingController;
+
   late TextEditingController paidAmount;
 
   final PurchaseReturnController controller = Get.find();
@@ -37,6 +39,7 @@ class _PurchaseReturnSummaryPaymentOptionSelectionWidgetState
   @override
   void initState() {
     paidAmount = TextEditingController();
+    _textEditingController = TextEditingController();
     paidAmount.text = widget.paymentMethodTracker.paidAmount.toString();
     super.initState();
   }
@@ -48,6 +51,13 @@ class _PurchaseReturnSummaryPaymentOptionSelectionWidgetState
       controller.calculateAmount();
     }
     super.didUpdateWidget(oldWidget);
+  }
+
+  @override
+  void dispose() {
+    _textEditingController.dispose();
+    paidAmount.dispose();
+    super.dispose();
   }
 
   @override
@@ -255,8 +265,32 @@ class _PurchaseReturnSummaryPaymentOptionSelectionWidgetState
                                 const BorderRadius.all(Radius.circular(8)),
                           ),
                         ),
+                        dropdownSearchData: DropdownSearchData(
+                          searchController: _textEditingController,
+                          searchInnerWidgetHeight: 48,
+                          searchInnerWidget: Padding(
+                            padding:
+                            const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+                            child: TextFormField(
+                              controller: _textEditingController,
+                              decoration: InputDecoration(
+                                isDense: true,
+                                hintText: "Search Supplier",
+                                hintStyle: const TextStyle(fontSize: 12),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            ),
+                          ),
+                          searchMatchFn: (item, searchValue) {
+                            return item.value!.name
+                                .toLowerCase()
+                                .contains(searchValue.toLowerCase());
+                          },
+                        ),
                         dropdownStyleData: const DropdownStyleData(
-                          maxHeight: 200,
+                          maxHeight: 300,
                           offset: Offset(0, 4),
                           decoration: BoxDecoration(
                             color: Colors.white,

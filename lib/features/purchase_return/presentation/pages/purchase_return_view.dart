@@ -1,17 +1,23 @@
+import 'package:amar_pos/core/network/helpers/error_extractor.dart';
 import 'package:amar_pos/core/widgets/reusable/serial_no/product_serial_no_dialog.dart';
 import 'package:amar_pos/features/inventory/presentation/products/add_product_screen.dart';
 import 'package:amar_pos/features/purchase/presentation/pages/purchase_summary.dart';
 import 'package:amar_pos/features/purchase_return/data/models/create_purchase_return_order_model.dart';
 import 'package:amar_pos/features/purchase_return/presentation/purchase_return_controller.dart';
 import 'package:amar_pos/features/purchase_return/presentation/widgets/purchase_return_order_product_sn_selection_dialog.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import '../../../../core/constants/app_assets.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/constants/logger/logger.dart';
+import '../../../../core/methods/number_input_formatter.dart';
 import '../../../../core/responsive/pixel_perfect.dart';
 import '../../../../core/widgets/custom_button.dart';
+import '../../../../core/widgets/custom_text_field.dart';
 import '../../../../core/widgets/dashed_line.dart';
 import '../../../../core/widgets/methods/helper_methods.dart';
 import '../../../../core/widgets/qr_code_scanner.dart';
@@ -32,8 +38,11 @@ class _PurchaseReturnViewState extends State<PurchaseReturnView> {
 
   final TextEditingController _purchasePrice = TextEditingController();
 
-  List<TextEditingController> purchaseControllers = [];
+  final formKey = GlobalKey<FormState>();
 
+  List<TextEditingController> purchaseControllers = [];
+  List<TextEditingController> purchaseReturnQTYControllers = [];
+  
   @override
   void initState() {
     suggestionEditingController = TextEditingController();
@@ -47,6 +56,11 @@ class _PurchaseReturnViewState extends State<PurchaseReturnView> {
     }else{
       for (var e in controller.createPurchaseReturnOrderModel.products) {
         purchaseControllers.add(TextEditingController(text: e.unitPrice.toString()));
+      }
+      for (var e in controller.createPurchaseReturnOrderModel.products) {
+        purchaseReturnQTYControllers.add(TextEditingController(
+          text: e.quantity.toString(),
+        ));
       }
     }
     super.initState();
@@ -66,6 +80,10 @@ class _PurchaseReturnViewState extends State<PurchaseReturnView> {
 
   @override
   void dispose() {
+    for (int i = 0; i < purchaseControllers.length; i++) {
+      purchaseControllers[i].dispose();
+      purchaseReturnQTYControllers[i].dispose();
+    }
     super.dispose();
   }
 
@@ -75,504 +93,604 @@ class _PurchaseReturnViewState extends State<PurchaseReturnView> {
       onTap: () {
         FocusScope.of(context).unfocus();
       },
-      child: Scaffold(
-        body: Column(
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  flex: 8,
-                  child: GetBuilder<PurchaseReturnController>(
-                    id: "purchase_product_list",
-                    builder: (controller) {
-                      return TypeAheadField<ProductInfo>(
-                        hideOnUnfocus: true,
-                        hideOnSelect: true,
-                        showOnFocus: true,
-                        builder: (context, textController, focusNode) {
-                          suggestionEditingController = textController;
-                          return TextField(
-                            autofocus: false,
-                            controller: suggestionEditingController,
-                            focusNode: focusNode,
-                            decoration: InputDecoration(
-                              fillColor: Colors.white,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(
-                                    color: AppColors.accent, width: 1),
-                              ),
-                              suffixIcon: InkWell(
-                                  onTap: () async {
-                                    final String? scannedCode =
-                                        await Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            const QRCodeScannerScreen(),
-                                      ),
-                                    );
-                                    if (scannedCode != null &&
-                                        scannedCode.isNotEmpty) {
-                                      suggestionEditingController.text =
-                                          scannedCode;
-                                      var items = await controller
-                                          .suggestionsCallback(scannedCode);
-                                      if (items.length == 1) {
-                                        suggestionEditingController.clear();
-                                        controller
-                                            .addPlaceOrderProduct(items.first);
-                                        purchaseControllers.add(TextEditingController(text: items.first.wholesalePrice.toString()));
-                                        FocusScope.of(context).unfocus();
+      child: SafeArea(
+        child: Scaffold(
+          body: Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    flex: 8,
+                    child: GetBuilder<PurchaseReturnController>(
+                      id: "purchase_product_list",
+                      builder: (controller) {
+                        return TypeAheadField<ProductInfo>(
+                          hideOnUnfocus: true,
+                          hideOnSelect: true,
+                          showOnFocus: true,
+                          builder: (context, textController, focusNode) {
+                            suggestionEditingController = textController;
+                            return TextField(
+                              autofocus: false,
+                              controller: suggestionEditingController,
+                              focusNode: focusNode,
+                              decoration: InputDecoration(
+                                fillColor: Colors.white,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: const BorderSide(
+                                      color: AppColors.accent, width: 1),
+                                ),
+                                suffixIcon: InkWell(
+                                    onTap: () async {
+                                      final String? scannedCode =
+                                          await Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const QRCodeScannerScreen(),
+                                        ),
+                                      );
+                                      if (scannedCode != null &&
+                                          scannedCode.isNotEmpty) {
+                                        suggestionEditingController.text =
+                                            scannedCode;
+                                        var items = await controller
+                                            .suggestionsCallback(scannedCode);
+                                        if (items.length == 1) {
+                                          suggestionEditingController.clear();
+                                          controller
+                                              .addPlaceOrderProduct(items.first);
+                                          int value = controller
+                                              .createPurchaseReturnOrderModel.products
+                                              .singleWhere(
+                                                  (e) => e.id == items.first.id)
+                                              .quantity++;
+        
+                                          if (controller.purchaseOrderProducts.any(
+                                                  (e) => e.id == items.first.id)) {
+                                            int index = controller
+                                                .purchaseOrderProducts
+                                                .indexOf(controller
+                                                .purchaseOrderProducts
+                                                .singleWhere((e) =>
+                                            e.id == items.first.id));
+                                            purchaseReturnQTYControllers[index].text =
+                                                value.toString();
+                                          } else {
+                                            purchaseControllers.add(
+                                                TextEditingController(
+                                                    text: items
+                                                        .first.wholesalePrice
+                                                        .toString()));
+                                            purchaseReturnQTYControllers.add(
+                                                TextEditingController(
+                                                    text: value.toString()));
+                                          }
+                                          // purchaseControllers.add(TextEditingController(text: items.first.wholesalePrice.toString()));
+                                          FocusScope.of(context).unfocus();
+                                        }
                                       }
-                                    }
-                                  },
-                                  child: const Icon(
-                                    Icons.qr_code_scanner_sharp,
-                                    color: AppColors.accent,
-                                  )),
-                              hintText: "Scan / Type ID or name",
-                              contentPadding:
-                              const EdgeInsets.symmetric(horizontal: 20),
-                              hintStyle: const TextStyle(color: Colors.grey),
-                            ),
-                          );
-                        },
-                        suggestionsCallback: controller.suggestionsCallback,
-                        itemBuilder: (context, product) {
-                          return ListTile(
-                            minVerticalPadding: 4,
-                            isThreeLine: true,
-                            dense: true,
-                            visualDensity: VisualDensity.compact,
-                            title: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  product.sku,
-                                  style: const TextStyle(
-                                      color: Colors.deepPurple,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                const DashedLine(),
-                                Text(product.name),
-                              ],
-                            ),
-                            subtitle: Row(
-                              children: [
-                                Text(
-                                    "WSP: ${Methods.getFormatedPrice(product.wholesalePrice.toDouble())}"),
-                                const Spacer(),
-                                Text(
-                                    "MRP: ${Methods.getFormatedPrice(product.mrpPrice.toDouble())}")
-                              ],
-                            ),
-                          );
-                        },
-                        onSelected: (product) {
-                          controller.addPlaceOrderProduct(product);
-                          purchaseControllers.add(TextEditingController(text: product.wholesalePrice.toString()));
-                          suggestionEditingController.clear();
-                          FocusScope.of(context).unfocus();
-                        },
-                        decorationBuilder: (context, child) {
-                          return Material(
-                            type: MaterialType.card,
-                            elevation: 8,
-                            borderRadius: BorderRadius.circular(8),
-                            child: child,
-                          );
-                        },
-                        offset: const Offset(0, 4),
-                        constraints: const BoxConstraints(
-                          maxHeight: 300,
-                        ),
-                        emptyBuilder: (_) => const Center(
-                          child: Text("No Items found!"),
-                        ),
-                        loadingBuilder: (_) => const Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                addW(12),
-                Expanded(
-                  child: CircleAvatar(
-                    backgroundColor: AppColors.accent,
-                    child: IconButton(
-                      onPressed: () {
-                        Get.toNamed(AddProductScreen.routeName);
-                      },
-                      icon: const Icon(Icons.add),
-                    ),
-                  ),
-                )
-              ],
-            ),
-            addH(12),
-            Expanded(
-              child: GetBuilder<PurchaseReturnController>(
-                id: "purchase_order_items",
-                builder: (controller) {
-                  if (controller.purchaseOrderProducts.isEmpty) {
-                    return Align(
-                      alignment: Alignment.center,
-                      child: AspectRatio(
-                        aspectRatio: 3 / 2,
-                        child: Image.asset("assets/images/place_order.png"),
-                      ),
-                    );
-                  } else {
-                    return ListView.builder(
-                      itemCount: controller.purchaseOrderProducts.length,
-                      itemBuilder: (_, index) {
-                        return Slidable(
-                          endActionPane: ActionPane(
-                              motion: const ScrollMotion(),
-                              children: [
-                                addW(10),
-                                CustomSlidableAction(
-                                    onPressed: (context) => controller
-                                        .removePlaceOrderProduct(controller
-                                            .purchaseOrderProducts[index]),
-                                    backgroundColor: const Color(0xffEF4B4B),
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(20)),
-                                    child: Center(
-                                      child: SvgPicture.asset(
-                                        AppAssets.deleteIc,
-                                        // Path to your SVG file
-                                        height: 24,
-                                        width: 24,
-                                      ),
+                                    },
+                                    child: const Icon(
+                                      Icons.qr_code_scanner_sharp,
+                                      color: AppColors.accent,
                                     )),
-                              ]),
-                          key: Key(controller.purchaseOrderProducts[index].id
-                              .toString()),
-                          child: Container(
-                            margin: const EdgeInsets.only(top: 4, bottom: 4),
-                            padding: const EdgeInsets.all(20),
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(20),
+                                hintText: "Scan / Type ID or name",
+                                contentPadding:
+                                const EdgeInsets.symmetric(horizontal: 20),
+                                hintStyle: const TextStyle(color: Colors.grey),
                               ),
-                            ),
-                            child: Column(
-                              children: [
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Container(
-                                      width: 70.w,
-                                      height: 70.w,
-                                      padding: EdgeInsets.all(1.px),
-                                      decoration: ShapeDecoration(
-                                        color: const Color(0x33BEBEBE)
-                                            .withOpacity(.3),
-                                        // image: DecorationImage(image: NetworkImage(controller.supplierList[index].photo!)),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10.r),
-                                        ),
-                                      ),
-                                      child: ClipRRect(
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(8.r)),
-                                          child: Image.network(
-                                            controller.purchaseOrderProducts[index]
-                                                .thumbnailImage
-                                                .toString(),
-                                            height: 70.w,
-                                            width: 70.w,
-                                            fit: BoxFit.cover,
-                                          )),
-                                    ),
-                                    addW(12.w),
-                                    Expanded(
-                                      flex: 8,
-                                      child: Container(
-                                        margin: const EdgeInsets.only(top: 10),
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              controller
-                                                  .purchaseOrderProducts[index]
-                                                  .name,
-                                              style: context
-                                                  .textTheme.titleSmall
-                                                  ?.copyWith(
-                                                fontSize: 13.sp,
-                                              ),
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                            addH(8.h),
-                                            Text(
-                                              "ID : ${controller.purchaseOrderProducts[index].sku}",
-                                              style: TextStyle(
-                                                  color:
-                                                      const Color(0xff40ACE3),
-                                                  fontWeight: FontWeight.w400,
-                                                  fontSize: 14.sp),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                addH(12.h),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      flex: 3,
-                                        child: Row(
-                                      children: [
-                                        const Text(
-                                          "Price : ৳",
-                                          style: TextStyle(
-                                              color: AppColors.primary),
-                                        ),
-                                        addW(4),
-                                        Expanded(
-                                          child: TextFormField(
-                                            key: ValueKey(controller.createPurchaseReturnOrderModel.products[index].id),
-                                            controller: purchaseControllers[index],
-                                            keyboardType: TextInputType.number,
-                                            onTap: () {
-                                              purchaseControllers[index].selection = TextSelection.fromPosition(
-                                                TextPosition(offset: purchaseControllers[index].text.length),
-                                              );
-                                            },
-                                            onChanged: (value) {
-                                              if (value.isNotEmpty) {
-                                                controller.createPurchaseReturnOrderModel.products[index].unitPrice = double.parse(value);
-                                                controller.update(['sub_total', 'vat']);
-                                              }
-                                            },
-                                            decoration: InputDecoration(
-                                              isDense: true,
-                                              filled: true, // Enable background color
-                                              fillColor: Colors.grey.shade200, // Set the grey fill color
-                                              border: const OutlineInputBorder(
-                                                borderSide: BorderSide(width: .2, color: Colors.black38),
-                                              ),
-                                              contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                            ),
-                                            validator: (value) {
-                                              if (value == null || value.isEmpty) {
-                                                return "Valid price only";
-                                              }
-                                              return null;
-                                            },
-                                          ),
-
-                                        ),
-                                      ],
-                                    )),
-                                    addW(12),
-                                    Expanded(
-                                      flex: 2,
-                                        child: GetBuilder<PurchaseReturnController>(
-                                          id: 'vat',
-                                          builder: (controller){
-                                            return Text(
-                                              "Vat : ${Methods.getFormatedPrice((controller.purchaseOrderProducts[index].vat*(controller.createPurchaseReturnOrderModel.products[index].unitPrice/100)).toDouble())}",
-                                              style: const TextStyle(
-                                                  color: AppColors.primary),
-                                            );
-                                          },
-                                        )),
-                                    Expanded(
-                                      flex: 2,
-                                      child: GetBuilder<PurchaseReturnController>(
-                                        id: 'sub_total',
-                                        builder: (controller){
-                                          return Text(
-                                            "Sub Total : ${Methods.getFormatedPrice(controller.createPurchaseReturnOrderModel.products[index].unitPrice.toDouble() * controller.createPurchaseReturnOrderModel.products[index].quantity.toDouble())}",
-                                            style: const TextStyle(
-                                                color: AppColors.primary),
-                                          );
-                                        },
-                                      )
-                                    ),
-                                  ],
-                                ),
-                                addH(12.h),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Container(
-                                        // margin: EdgeInsets.only(right: 20),
-                                        height: 30.h,
-                                        decoration: BoxDecoration(
-                                            color: const Color(0xffFFFBED)
-                                                .withOpacity(.3),
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(20.r)),
-                                            border: Border.all(
-                                                color: const Color(0xffff9000)
-                                                    .withOpacity(.3),
-                                                width: .5)),
-                                        child: Center(
-                                            child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Text(
-                                              "Quantity : ${controller.createPurchaseReturnOrderModel.products[index].quantity}",
-                                              style: context
-                                                  .textTheme.titleSmall
-                                                  ?.copyWith(
-                                                color: const Color(0xffFF9000),
-                                                fontSize: 14.sp,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                            addW(8),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    controller
-                                                        .changeQuantityOfProduct(
-                                                            index, false);
-                                                  },
-                                                  child: const Icon(
-                                                      Icons.keyboard_arrow_down,
-                                                      size: 24,
-                                                      color: AppColors.error),
-                                                ),
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    controller
-                                                        .changeQuantityOfProduct(
-                                                            index, true);
-                                                  },
-                                                  child: const Icon(
-                                                    Icons.keyboard_arrow_up,
-                                                    size: 24,
-                                                    color: AppColors.lightGreen,
-                                                  ),
-                                                )
-                                              ],
-                                            )
-                                          ],
-                                        )),
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      width: 8,
-                                    ),
-                                    Expanded(
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          showModalBottomSheet(
-                                            context: context,
-                                            isScrollControlled: true,
-                                            shape: const RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.vertical(
-                                                      top: Radius.circular(20)),
-                                            ),
-                                            builder: (context) {
-                                              return ProductSnSelectionDialog(
-                                                productName: controller
-                                                    .purchaseOrderProducts[index].name,
-                                                quantity: controller
-                                                    .createPurchaseReturnOrderModel
-                                                    .products[index].quantity,
-                                              );
-                                            },
-                                          );
-                                        },
-                                        child: Container(
-                                          height: 30.h,
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 12),
-                                          decoration: BoxDecoration(
-                                              color: controller.createPurchaseReturnOrderModel.products[index].quantity == controller.createPurchaseReturnOrderModel.products[index].serialNo.length ? AppColors.primary.withOpacity(.2) : const Color(0xffF6FFF6),
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(20.r)),
-                                              border: Border.all(
-                                                  color: const Color(0xff94DB8C)
-                                                      .withOpacity(.3))),
-                                          child: Row(
-                                            children: [
-                                              Text(
-                                                "Serial No.",
-                                                style: context
-                                                    .textTheme.titleSmall
-                                                    ?.copyWith(
-                                                  color:
-                                                      const Color(0xff009D5D),
-                                                  fontSize: 14.sp,
-                                                  fontWeight: FontWeight.w600,
-                                                ),
-                                              ),
-                                              const Spacer(),
-                                              SvgPicture.asset(
-                                                AppAssets.snAdd,
-                                                height: 14,
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                )
-                              ],
-                            ),
+                            );
+                          },
+                          suggestionsCallback: controller.suggestionsCallback,
+                          itemBuilder: (context, product) {
+                            return ListTile(
+                              minVerticalPadding: 4,
+                              isThreeLine: true,
+                              dense: true,
+                              visualDensity: VisualDensity.compact,
+                              title: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    product.sku,
+                                    style: const TextStyle(
+                                        color: Colors.deepPurple,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  const DashedLine(),
+                                  Text(product.name),
+                                ],
+                              ),
+                              subtitle: Row(
+                                children: [
+                                  Text(
+                                      "WSP: ${Methods.getFormatedPrice(product.wholesalePrice.toDouble())}"),
+                                  const Spacer(),
+                                  Text(
+                                      "MRP: ${Methods.getFormatedPrice(product.mrpPrice.toDouble())}")
+                                ],
+                              ),
+                            );
+                          },
+                          onSelected: (product) {
+                            int i = 0;
+                            int value = 0;
+                            for (;
+                            i <
+                                controller
+                                    .createPurchaseReturnOrderModel.products.length;
+                            i++) {
+                              if (product.id ==
+                                  controller
+                                      .createPurchaseReturnOrderModel.products[i].id) {
+                                value = controller.createPurchaseReturnOrderModel
+                                    .products[i].quantity;
+                                break;
+                              }
+                            }
+        
+                            if (controller.purchaseOrderProducts
+                                .any((e) => e.id == product.id)) {
+                              purchaseReturnQTYControllers[i].text =
+                                  (++value).toString();
+                              logger.i(purchaseReturnQTYControllers[i].text);
+                            } else {
+                              purchaseControllers.add(TextEditingController(
+                                  text: product.wholesalePrice.toString()));
+                              purchaseReturnQTYControllers
+                                  .add(TextEditingController(text: "1"));
+                            }
+                            controller.addPlaceOrderProduct(product);
+                            suggestionEditingController.clear();
+                            FocusScope.of(context).unfocus();
+                          },
+                          decorationBuilder: (context, child) {
+                            return Material(
+                              type: MaterialType.card,
+                              elevation: 8,
+                              borderRadius: BorderRadius.circular(8),
+                              child: child,
+                            );
+                          },
+                          offset: const Offset(0, 4),
+                          constraints: const BoxConstraints(
+                            maxHeight: 300,
+                          ),
+                          emptyBuilder: (_) => const Center(
+                            child: Text("No Items found!"),
+                          ),
+                          loadingBuilder: (_) => const Center(
+                            child: CircularProgressIndicator(),
                           ),
                         );
                       },
-                    );
-                  }
-                },
-              ),
-            ),
-          ],
-        ),
-        bottomNavigationBar: GetBuilder<PurchaseReturnController>(
-          id: "billing_summary_button",
-          builder: (controller) => controller.purchaseOrderProducts.isNotEmpty
-              ? Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 30,
+                    ),
+                  ),
+                  addW(12),
+                  Expanded(
+                    child: CircleAvatar(
                       backgroundColor: AppColors.accent,
-                      child: GestureDetector(
-                        child: SvgPicture.asset(
-                          AppAssets.pauseBillingIcon,
-                          color: Colors.white,
-                        ),
+                      child: IconButton(
+                        onPressed: () {
+                          Get.toNamed(AddProductScreen.routeName);
+                        },
+                        icon: const Icon(Icons.add),
                       ),
                     ),
-                    addW(12),
-                    Expanded(
-                      child: CustomButton(
-                        onTap: () async {
+                  )
+                ],
+              ),
+              addH(12),
+              Expanded(
+                child: GetBuilder<PurchaseReturnController>(
+                  id: "purchase_order_items",
+                  builder: (controller) {
+                    if (controller.purchaseOrderProducts.isEmpty) {
+                      return Align(
+                        alignment: Alignment.center,
+                        child: AspectRatio(
+                          aspectRatio: 3 / 2,
+                          child: Image.asset("assets/images/place_order.png"),
+                        ),
+                      );
+                    } else {
+                      return Form(
+                        key: formKey,
+                        child: ListView.builder(
+                          itemCount: controller.purchaseOrderProducts.length,
+                          itemBuilder: (_, index) {
+                            return Slidable(
+                              endActionPane: ActionPane(
+                                  motion: const ScrollMotion(),
+                                  children: [
+                                    addW(10),
+                                    CustomSlidableAction(
+                                        onPressed: (context) => controller
+                                            .removePlaceOrderProduct(controller
+                                                .purchaseOrderProducts[index]),
+                                        backgroundColor: const Color(0xffEF4B4B),
+                                        borderRadius: const BorderRadius.all(
+                                            Radius.circular(20)),
+                                        child: Center(
+                                          child: SvgPicture.asset(
+                                            AppAssets.deleteIc,
+                                            // Path to your SVG file
+                                            height: 24,
+                                            width: 24,
+                                          ),
+                                        )),
+                                  ]),
+                              key: Key(controller.purchaseOrderProducts[index].id
+                                  .toString()),
+                              child: Container(
+                                margin: const EdgeInsets.only(top: 4, bottom: 4),
+                                padding: const EdgeInsets.all(20),
+                                decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(20),
+                                  ),
+                                ),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Container(
+                                          width: 70.w,
+                                          height: 70.w,
+                                          padding: EdgeInsets.all(1.px),
+                                          decoration: ShapeDecoration(
+                                            color: const Color(0x33BEBEBE)
+                                                .withOpacity(.3),
+                                            // image: DecorationImage(image: NetworkImage(controller.supplierList[index].photo!)),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10.r),
+                                            ),
+                                          ),
+                                          child: ClipRRect(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(8.r)),
+                                              child: Image.network(
+                                                controller.purchaseOrderProducts[index]
+                                                    .thumbnailImage
+                                                    .toString(),
+                                                height: 70.w,
+                                                width: 70.w,
+                                                fit: BoxFit.cover,
+                                              )),
+                                        ),
+                                        addW(12.w),
+                                        Expanded(
+                                          flex: 8,
+                                          child: Container(
+                                            margin: const EdgeInsets.only(top: 10),
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  controller
+                                                      .purchaseOrderProducts[index]
+                                                      .name,
+                                                  style: context
+                                                      .textTheme.titleSmall
+                                                      ?.copyWith(
+                                                    fontSize: 13.sp,
+                                                  ),
+                                                  maxLines: 2,
+                                                  overflow: TextOverflow.ellipsis,
+                                                ),
+                                                addH(8.h),
+                                                addH(8.h),
+                                                Row(
+                                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                                  children: [
+                                                    Expanded(
+                                                      flex: 3,
+                                                      child: AutoSizeText(
+                                                        maxLines: 1,
+                                                        "ID : ${controller.purchaseOrderProducts[index].sku}",
+                                                        style: TextStyle(
+                                                            color:
+                                                            const Color(0xff40ACE3),
+                                                            fontWeight: FontWeight.w400,
+                                                            fontSize: 14.sp),
+                                                      ),
+                                                    ),
+                                                    addW(12),
+                                                    Expanded(
+                                                      child: GestureDetector(
+                                                        onTap: () {
+                                                          showModalBottomSheet(
+                                                            context: context,
+                                                            isScrollControlled: true,
+                                                            shape:
+                                                            const RoundedRectangleBorder(
+                                                              borderRadius:
+                                                              BorderRadius.vertical(
+                                                                  top: Radius.circular(
+                                                                      20)),
+                                                            ),
+                                                            builder: (context) {
+                                                              return PurchaseReturnOrderProductSnSelectionDialog(
+                                                                product: controller
+                                                                    .createPurchaseReturnOrderModel
+                                                                    .products[index],
+                                                                productInfo: controller
+                                                                    .purchaseOrderProducts[
+                                                                index],
+                                                                controller: controller,
+                                                              );
+                                                            },
+                                                          );
+                                                        },
+                                                        child: Container(
+                                                          height: 30.h,
+                                                          padding: const EdgeInsets.symmetric(
+                                                              horizontal: 12),
+                                                          decoration: BoxDecoration(
+                                                              color:controller
+                                                                  .createPurchaseReturnOrderModel
+                                                                  .products[index]
+                                                                  .serialNo
+                                                                  .length>controller
+                                                                  .createPurchaseReturnOrderModel
+                                                                  .products[index]
+                                                                  .quantity? AppColors.error : controller
+                                                                  .createPurchaseReturnOrderModel
+                                                                  .products[index]
+                                                                  .serialNo
+                                                                  .length ==
+                                                                  controller
+                                                                      .createPurchaseReturnOrderModel
+                                                                      .products[index]
+                                                                      .quantity
+                                                                  ? Color(0xff94DB8C)
+                                                                  : const Color(0xffF6FFF6),
+                                                              borderRadius: BorderRadius.all(
+                                                                  Radius.circular(20.r)),
+                                                              border: Border.all(
+                                                                  color:
+                                                                  const Color(0xff94DB8C)
+                                                                      .withOpacity(.3))),
+                                                          child: Row(
+                                                            children: [
+                                                              Text(
+                                                                "SN",
+                                                                style: context
+                                                                    .textTheme.titleSmall
+                                                                    ?.copyWith(
+                                                                  color: Colors.black,
+                                                                  fontSize: 14.sp,
+                                                                  fontWeight: FontWeight.w600,
+                                                                ),
+                                                              ),
+                                                              const Spacer(),
+                                                              SvgPicture.asset(
+                                                                AppAssets.snAdd,
+                                                                height: 14,
+                                                              )
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    addH(12.h),
+                                    Row(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Expanded(
+                                            flex: 3,
+                                            child: Column(
+                                              crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                              children: [
+                                                const Text(
+                                                  "Unit Price",
+                                                  style: TextStyle(
+                                                      color: AppColors.primary),
+                                                ),
+                                                addH(4),
+                                                CustomTextField(
+                                                    contentPadding: 12,
+                                                    txtSize: 14,
+                                                    inputFormatters: [
+                                                      FilteringTextInputFormatter
+                                                          .digitsOnly,
+                                                      NumberInputFormatter(),
+                                                    ],
+                                                    onTap: () {
+                                                      purchaseControllers[
+                                                      index]
+                                                          .selection =
+                                                          TextSelection
+                                                              .fromPosition(
+                                                            TextPosition(
+                                                                offset:
+                                                                purchaseControllers[
+                                                                index]
+                                                                    .text
+                                                                    .length),
+                                                          );
+                                                    },
+                                                    key: Key(controller
+                                                        .createPurchaseReturnOrderModel
+                                                        .products[index]
+                                                        .id
+                                                        .toString()),
+                                                    textCon:
+                                                    purchaseControllers[index],
+                                                    onChanged: (value) {
+                                                      if (value.isNotEmpty) {
+                                                        controller
+                                                            .createPurchaseReturnOrderModel
+                                                            .products[index].unitPrice = double.parse(value.replaceAll(',', ''));
+                                                        controller.update(
+                                                            ['sub_total',]);
+                                                      } else {
+                                                        controller
+                                                            .createPurchaseReturnOrderModel
+                                                            .products[index]
+                                                            .unitPrice = 0;
+                                                      }
+                                                    },
+                                                    hintText: 'Unit price'),
+                                              ],
+                                            )),
+                                        addW(12.w),
+                                        Expanded(
+                                            flex: 2,
+                                            child: Column(
+                                              crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                              children: [
+                                                const Text(
+                                                  "Quantity",
+                                                  style: TextStyle(
+                                                      color: AppColors.primary),
+                                                ),
+                                                addH(4),
+                                                CustomTextField(
+                                                    contentPadding: 12,
+                                                    txtSize: 14,
+                                                    inputFormatters: [
+                                                      FilteringTextInputFormatter
+                                                          .digitsOnly,
+                                                      NumberInputFormatter(),
+                                                    ],
+                                                    onTap: () {
+                                                      purchaseReturnQTYControllers[
+                                                      index]
+                                                          .selection =
+                                                          TextSelection
+                                                              .fromPosition(
+                                                            TextPosition(
+                                                                offset:
+                                                                purchaseReturnQTYControllers[
+                                                                index]
+                                                                    .text
+                                                                    .length),
+                                                          );
+                                                    },
+                                                    key: Key(controller
+                                                        .createPurchaseReturnOrderModel
+                                                        .products[index]
+                                                        .id
+                                                        .toString()),
+                                                    textCon:
+                                                    purchaseReturnQTYControllers[index],
+                                                    onChanged: (value) {
+                                                      if (value.isNotEmpty) {
+                                                        controller
+                                                            .createPurchaseReturnOrderModel
+                                                            .products[index]
+                                                            .quantity =
+                                                            int.parse(value.replaceAll(',', ''));
+                                                        controller.update(
+                                                            ['sub_total',]);
+                                                      } else {
+                                                        controller
+                                                            .createPurchaseReturnOrderModel
+                                                            .products[index]
+                                                            .quantity = 0;
+                                                      }
+                                                    },
+                                                    hintText: 'quantity'),
+                                              ],
+                                            )),
+                                        addW(12.w),
+                                        Expanded(
+                                            flex: 3,
+                                            child: Column(
+                                              crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                              children: [
+                                                const Text(
+                                                  "Sub Total",
+                                                  style: TextStyle(
+                                                      color: AppColors.primary),
+                                                ),
+                                                addH(4),
+                                                GetBuilder<PurchaseReturnController>(
+                                                    id: 'sub_total',
+                                                    builder: (controller) {
+                                                      return CustomTextField(
+                                                          contentPadding: 12,
+                                                          txtSize: 14,
+                                                          enabledFlag: false,
+                                                          textCon: TextEditingController(
+                                                              text: Methods.getFormattedNumber(
+                                                                  controller
+                                                                      .createPurchaseReturnOrderModel
+                                                                      .products[index]
+                                                                      .unitPrice
+                                                                      .toDouble() *
+                                                                      controller
+                                                                          .createPurchaseReturnOrderModel
+                                                                          .products[index]
+                                                                          .quantity
+                                                                          .toDouble())),
+                                                          hintText: 'Subtotal');
+                                                    }),
+                                              ],
+                                            )),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
+          bottomNavigationBar: Padding(
+            padding: const EdgeInsets.only(top: 20),
+            child: GetBuilder<PurchaseReturnController>(
+              id: "billing_summary_button",
+              builder: (controller) => controller.purchaseOrderProducts.isNotEmpty
+                  ? CustomButton(
+                    onTap: () async {
+                      FocusScope.of(context).unfocus();
+                      for(int i = 0; i < controller.createPurchaseReturnOrderModel.products.length; i++){
+                        if(controller.createPurchaseReturnOrderModel.products[i].serialNo.isNotEmpty && controller.createPurchaseReturnOrderModel.products[i].serialNo.length != controller.createPurchaseReturnOrderModel.products[i].quantity){
+                          ErrorExtractor.showSingleErrorDialog(context, "Please fix SN quantity issue of ${controller.purchaseOrderProducts[i].name}");
+                          return;
+                        }
+                      }
+                      if(formKey.currentState!.validate()){
+                        await Get.to(() => PurchaseReturnSummary())?.then((value) {
                           FocusScope.of(context).unfocus();
-                         await Get.to(() => PurchaseReturnSummary())?.then((value) {
-                            FocusScope.of(context).unfocus();
-                          });
-                        },
-                        text: "Return Summary",
-                      ),
-                    )
-                  ],
-                )
-              : const SizedBox.shrink(),
+                        });
+                      }
+
+                    },
+                    text: "Return Summary",
+                  )
+                  : const SizedBox.shrink(),
+            ),
+          ),
         ),
       ),
     );

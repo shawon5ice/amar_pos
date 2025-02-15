@@ -209,7 +209,7 @@ class BaseClient {
             : null,
       );
       logger.i('DELETE Response: ${response.statusCode}');
-      if(response.data['success']){
+      if(response.statusCode == 200){
         return response.data;
       }else{
         ErrorExtractor.showErrorDialog(Get.context!, response.data);

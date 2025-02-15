@@ -7,6 +7,7 @@ part 'purchase_product_response_model.g.dart'; // This is the generated file.
 @JsonSerializable()
 class PurchaseProductResponseModel {
   final bool success;
+  @DataConverter()
   final Data data;
   @JsonKey(name: 'count_total')
   final int countTotal;
@@ -29,8 +30,8 @@ class PurchaseProductResponseModel {
 @JsonSerializable()
 class Data {
   @JsonKey(name: 'data')
-  final List<PurchaseProduct> returnProducts; // Fixed type to match the intended model.
-  final Meta meta;
+  final List<PurchaseProduct>? returnProducts; // Fixed type to match the intended model.
+  final Meta? meta;
 
   Data({
     required this.returnProducts,
@@ -81,4 +82,23 @@ class Meta {
   factory Meta.fromJson(Map<String, dynamic> json) => _$MetaFromJson(json);
 
   Map<String, dynamic> toJson() => _$MetaToJson(this);
+}
+
+
+class DataConverter implements JsonConverter<Data, dynamic> {
+  const DataConverter();
+
+  @override
+  Data fromJson(dynamic json) {
+    if (json is List) {
+      return Data(returnProducts: [], meta: null);
+    } else if (json is Map<String, dynamic>) {
+      return Data.fromJson(json);
+    } else {
+      throw Exception('Unexpected type for data: ${json.runtimeType}');
+    }
+  }
+
+  @override
+  dynamic toJson(Data object) => object.toJson();
 }

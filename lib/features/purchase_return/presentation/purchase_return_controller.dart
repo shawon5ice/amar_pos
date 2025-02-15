@@ -31,7 +31,6 @@ class PurchaseReturnController extends GetxController{
   num totalAmount = 0;
   num totalDiscount = 0;
   num additionalExpense = 0;
-  num totalVat = 0;
   int totalQTY = 0;
   num totalPaid = 0;
   num totalDeu = 0;
@@ -155,7 +154,7 @@ class PurchaseReturnController extends GetxController{
         .where((item) => item.sku.toLowerCase().contains(search.toLowerCase()))
         .toList();
     filteredItems.addAll(currentSearchList
-        .where((item) => item.name.toLowerCase().contains(search.toLowerCase()))
+        .where((item) => item.name.toLowerCase().contains(search.toLowerCase())  && !currentSearchList.contains(item))
         .toList());
     return filteredItems;
   }
@@ -185,9 +184,8 @@ class PurchaseReturnController extends GetxController{
       if (e.id == product.id) {
         totalAmount -= product.mrpPrice * e.quantity;
         totalQTY -= e.quantity;
-        totalVat -= e.quantity * product.vat * product.wholesalePrice / 100;
         paidAmount =
-        (totalAmount + totalVat - totalDiscount - additionalExpense);
+        (totalAmount  - totalDiscount - additionalExpense);
         return true;
       } else {
         return false;
@@ -334,9 +332,8 @@ class PurchaseReturnController extends GetxController{
       totalA += e.unitPrice * e.quantity;
     }
     totalAmount = totalA;
-    totalVat = totalV;
     totalQTY = totalQ;
-    paidAmount = totalAmount + totalVat + additionalExpense - totalDiscount;
+    paidAmount = totalAmount + additionalExpense - totalDiscount;
     if(firstTime == null){
       totalDeu =   totalPaid - paidAmount ;
     }
@@ -449,7 +446,7 @@ class PurchaseReturnController extends GetxController{
             PurchaseReturnHistoryResponseModel.fromJson(response);
 
         if (purchaseReturnHistoryResponseModel != null) {
-          purchaseReturnHistoryList.addAll(purchaseReturnHistoryResponseModel!.data.purchaseReturnHistoryList);
+          purchaseReturnHistoryList.addAll(purchaseReturnHistoryResponseModel!.data.purchaseReturnHistoryList!);
         }
       } else {
         if(page != 1){

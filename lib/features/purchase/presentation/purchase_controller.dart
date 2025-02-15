@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:amar_pos/core/data/model/reusable/supplier_list_response_model.dart';
+import 'package:amar_pos/core/network/helpers/error_extractor.dart';
 import 'package:amar_pos/features/purchase/data/models/create_purchase_order_model.dart';
 import 'package:amar_pos/features/purchase/data/models/purchase_history_response_model.dart';
 import 'package:amar_pos/features/purchase/data/models/purchase_order_details_response_model.dart';
@@ -14,7 +15,6 @@ import '../../../core/widgets/loading/random_lottie_loader.dart';
 import '../../auth/data/model/hive/login_data.dart';
 import '../../auth/data/model/hive/login_data_helper.dart';
 import '../../inventory/data/products/product_list_response_model.dart';
-import '../../return/data/models/return_history/return_history_response_model.dart';
 
 class PurchaseController extends GetxController{
 
@@ -31,7 +31,6 @@ class PurchaseController extends GetxController{
   num totalAmount = 0;
   num totalDiscount = 0;
   num additionalExpense = 0;
-  num totalVat = 0;
   int totalQTY = 0;
   num totalPaid = 0;
   num totalDeu = 0;
@@ -96,6 +95,21 @@ class PurchaseController extends GetxController{
     selectedDateTimeRange.value = range;
   }
 
+
+  void clearEditing(){
+    purchaseProducts.clear();
+    isEditing = false;
+    selectedSupplier = null;
+    selectedDateTimeRange.value = null;
+    paidAmount = 0;
+    searchProductController.clear();
+    totalDiscount = 0;
+    totalPaid = 0;
+    totalDeu = 0;
+    totalDiscount = 0;
+    totalQTY = 0;
+    paymentMethodTracker.clear();
+  }
   Future<void> getAllProducts(
       {required String search, required int page}) async {
     isProductListLoading = page == 1; // Mark initial loading state
@@ -155,7 +169,7 @@ class PurchaseController extends GetxController{
         .where((item) => item.sku.toLowerCase().contains(search.toLowerCase()))
         .toList();
     filteredItems.addAll(currentSearchList
-        .where((item) => item.name.toLowerCase().contains(search.toLowerCase()))
+        .where((item) => item.name.toLowerCase().contains(search.toLowerCase()) && !currentSearchList.contains(item))
         .toList());
     return filteredItems;
   }
@@ -185,9 +199,8 @@ class PurchaseController extends GetxController{
       if (e.id == product.id) {
         totalAmount -= product.mrpPrice * e.quantity;
         totalQTY -= e.quantity;
-        totalVat -= e.quantity * product.vat * product.wholesalePrice / 100;
         paidAmount =
-        (totalAmount + totalVat - totalDiscount - additionalExpense);
+        (totalAmount - totalDiscount - additionalExpense);
         return true;
       } else {
         return false;
@@ -308,7 +321,6 @@ class PurchaseController extends GetxController{
 
   void calculateAmount({bool? firstTime}) {
     num totalA = 0;
-    num totalV = 0;
     int totalQ = 0;
     paidAmount = 0;
     bool cash = false;
@@ -330,13 +342,11 @@ class PurchaseController extends GetxController{
     totalPaid = excludeAmount;
     for (var e in createPurchaseOrderModel.products) {
       totalQ += e.quantity;
-      totalV += e.vat * e.quantity;
       totalA += e.unitPrice * e.quantity;
     }
     totalAmount = totalA;
-    totalVat = totalV;
     totalQTY = totalQ;
-    paidAmount = totalAmount + totalVat + additionalExpense - totalDiscount;
+    paidAmount = totalAmount + additionalExpense - totalDiscount;
     if(firstTime == null){
       totalDeu =   totalPaid - paidAmount ;
     }
@@ -495,7 +505,7 @@ class PurchaseController extends GetxController{
             PurchaseProductResponseModel.fromJson(response);
 
         if (purchaseProductResponseModel != null) {
-          purchaseProducts.addAll(purchaseProductResponseModel!.data.returnProducts);
+          purchaseProducts.addAll(purchaseProductResponseModel!.data.returnProducts??[]);
         }
       } else {
         if(page != 1){
@@ -573,10 +583,6 @@ class PurchaseController extends GetxController{
             creditSelected = true;
           }
 
-          if(e.bank != null){
-            paymentOption = paymentMethod.paymentOptions.singleWhere((f) => f.id == e.bank!.id);
-          }
-
           paymentMethodTracker.add(PaymentMethodTracker(
             id: e.id,
             paymentMethod: paymentMethod,
@@ -625,12 +631,12 @@ class PurchaseController extends GetxController{
         purchaseHistoryList.remove(purchaseOrderInfo);
         Methods.showSnackbar(msg: response['message'], isSuccess: true);
       } else {
-        Methods.showSnackbar(msg: 'Error: Unable to delete the item');
+        ErrorExtractor.showSingleErrorDialog(Get.context!, response['message']);
       }
     } catch (e) {
       hasError.value = true;
       logger.e(e);
-      Methods.showSnackbar(msg: 'Error: something went wrong while deleting the item');
+      ErrorExtractor.showSingleErrorDialog(Get.context!, 'Error: something went wrong while deleting the item');
     } finally {
       update(['purchase_history_list']);
     }
@@ -650,6 +656,7 @@ class PurchaseController extends GetxController{
       var response = await PurchaseService.downloadPurchaseHistory(
         purchaseOrderInfo: purchaseOrderInfo,
         usrToken: loginData!.token,
+        fileName: fileName
       );
     } catch (e) {
       logger.e(e);

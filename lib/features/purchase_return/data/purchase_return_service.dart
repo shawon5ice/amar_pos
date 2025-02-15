@@ -261,7 +261,7 @@ class PurchaseReturnService {
   }) async {
     var response = await BaseClient.getData(
       token: usrToken,
-      api: "purchase/get-purchase-details/$id",
+      api: "purchase_return/get-purchase-return-details/$id",
     );
     return response;
   }
