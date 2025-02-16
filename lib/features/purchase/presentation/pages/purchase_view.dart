@@ -436,8 +436,10 @@ class _PurchaseViewState extends State<PurchaseView> {
                                                       },
                                                       child: Container(
                                                         height: 30.h,
+                                                        // width: 64.w,
+                                                        // width: 100.w,
                                                         padding: const EdgeInsets.symmetric(
-                                                            horizontal: 12),
+                                                            horizontal: 8),
                                                         decoration: BoxDecoration(
                                                             color:controller
                                                                 .createPurchaseOrderModel
@@ -465,6 +467,7 @@ class _PurchaseViewState extends State<PurchaseView> {
                                                                 const Color(0xff94DB8C)
                                                                     .withOpacity(.3))),
                                                         child: Row(
+                                                          mainAxisSize: MainAxisSize.min,
                                                           children: [
                                                             Text(
                                                               "SN",
@@ -472,14 +475,14 @@ class _PurchaseViewState extends State<PurchaseView> {
                                                                   .textTheme.titleSmall
                                                                   ?.copyWith(
                                                                 color: Colors.black,
-                                                                fontSize: 14.sp,
+                                                                fontSize: 10.sp,
                                                                 fontWeight: FontWeight.w600,
                                                               ),
                                                             ),
-                                                            const Spacer(),
+                                                            Spacer(),
                                                             SvgPicture.asset(
                                                               AppAssets.snAdd,
-                                                              height: 14,
+                                                              height: 12.sp,
                                                             )
                                                           ],
                                                         ),

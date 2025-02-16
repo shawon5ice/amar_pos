@@ -1,3 +1,4 @@
+import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -21,7 +22,7 @@ class FieldTitle extends StatelessWidget {
       text,
       style: context.textTheme.titleSmall?.copyWith(
         color: color,
-        fontSize: fontSize,
+        fontSize: fontSize ?? 12.sp,
         fontWeight: fontWeight,
       ),
     );
@@ -50,7 +51,7 @@ class RichFieldTitle extends StatelessWidget {
         text: text,
         style: context.textTheme.titleSmall?.copyWith(
           color: Colors.black,
-          fontSize: fontSize,
+          fontSize: fontSize ?? 12.sp,
           fontWeight: fontWeight,
         ),
       ),
@@ -58,7 +59,7 @@ class RichFieldTitle extends StatelessWidget {
         text: "*",
         style: context.textTheme.titleSmall?.copyWith(
           color: Colors.red,
-          fontSize: fontSize,
+          fontSize: fontSize ?? 12.sp,
           fontWeight: fontWeight,
         ),
       )

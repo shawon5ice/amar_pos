@@ -181,7 +181,7 @@ class SaleHistoryItemTitleValueWidget extends StatelessWidget {
             flex: 2,
             child: Text(
               title,
-              style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w400),
+              style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w400),
             )),
         const Text(" : "),
         Expanded(
@@ -189,7 +189,7 @@ class SaleHistoryItemTitleValueWidget extends StatelessWidget {
             child: Text(
               value,
               textAlign: TextAlign.end,
-              style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w400),
+              style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w400),
             )),
       ],
     );

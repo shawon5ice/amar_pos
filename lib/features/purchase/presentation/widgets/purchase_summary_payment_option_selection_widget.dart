@@ -64,6 +64,7 @@ class _PurchaseSummaryPaymentOptionSelectionWidgetState
       key: Key(controller.paymentMethodTracker.indexOf(widget.paymentMethodTracker).toString()),
       id: "billing_payment_methods",
       builder: (controller) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           addH(8),
           Row(
@@ -82,7 +83,7 @@ class _PurchaseSummaryPaymentOptionSelectionWidgetState
                         hint: Text(
                           "Select Payment",
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 12.sp,
                             color: Theme.of(context).hintColor,
                           ),
                         ),

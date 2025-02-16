@@ -20,7 +20,7 @@ extension NumExtension on num{
 
   double get w => this * scaleWidth;
 
-  double get sp => this * scaleWidth;
+  double get sp => this * Get.context!.textScaleFactor;
 
   double get r => this * min(scaleWidth, scaleHeight);
 }

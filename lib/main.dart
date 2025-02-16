@@ -1,5 +1,6 @@
 import 'package:amar_pos/core/network/base_client.dart';
 import 'package:amar_pos/features/auth/data/model/hive/login_data_helper.dart';
+import 'package:device_preview_plus/device_preview_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +30,10 @@ void main() async {
   await LoginDataBoxManager().initBox();
 
   runApp(
-    const MyApp(),
+    DevicePreview(
+      enabled: !kReleaseMode,
+      builder: (context) => MyApp(), // Wrap your app
+    ),
   );
 }
 

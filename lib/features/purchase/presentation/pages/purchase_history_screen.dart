@@ -52,12 +52,12 @@ class _PurchaseHistoryScreenState extends State<PurchaseHistoryScreen> {
                     textCon: controller.searchProductController,
                     hintText: "Search...",
                     brdrClr: Colors.transparent,
-                    txtSize: 12,
+                    txtSize: 12.sp,
                     debounceDuration: const Duration(
                       milliseconds: 300,
                     ),
                     // noInputBorder: true,
-                    brdrRadius: 40,
+                    brdrRadius: 40.r,
                     prefixWidget: Icon(Icons.search),
                     onChanged: (value){
                       controller.getPurchaseHistory();
@@ -209,10 +209,10 @@ class TotalStatusWidget extends StatelessWidget {
     return Expanded(
         flex: flex,
         child: Container(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(20.r),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -223,14 +223,14 @@ class TotalStatusWidget extends StatelessWidget {
                     title,
                     style: TextStyle(
                       color: Color(0xffA2A2A2),
-                      fontSize: 14.sp,
+                      fontSize: 12.sp,
                     ),
                   ),
                   const Spacer(),
                   SvgPicture.asset(asset)
                 ],
               ),
-              addH(12),
+              addH(8.h),
               isLoading
                   ? Container(
                   height: 30.sp, width: 30.sp, child: SpinKitFadingGrid(color: Colors.black,size: 20,))
@@ -239,7 +239,7 @@ class TotalStatusWidget extends StatelessWidget {
                 style: TextStyle(
                     color: Colors.black,
                     fontWeight: FontWeight.w600,
-                    fontSize: 20.sp,
+                    fontSize: 16.sp,
                     height: 1.5.sp
                 ),
               )

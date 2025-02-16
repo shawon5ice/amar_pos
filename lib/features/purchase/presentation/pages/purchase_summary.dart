@@ -11,10 +11,12 @@ import 'package:amar_pos/features/inventory/presentation/products/widgets/custom
 import 'package:amar_pos/features/inventory/presentation/products/widgets/custom_dropdown_widget.dart';
 import 'package:amar_pos/features/purchase/presentation/purchase_controller.dart';
 import 'package:amar_pos/features/purchase/presentation/widgets/purchase_summary_payment_option_selection_widget.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 import '../../../../core/constants/app_assets.dart';
 import '../../../../core/data/model/client_list_response_model.dart';
@@ -96,13 +98,27 @@ class _PurchaseSummaryState extends State<PurchaseSummary> {
 
   final formKey = GlobalKey<FormState>();
 
+  List<double> _getCustomItemsHeights(items) {
+    final List<double> itemsHeights = [];
+    for (int i = 0; i < (items.length * 2) - 1; i++) {
+      if (i.isEven) {
+        itemsHeights.add(40);
+      }
+      //Dividers indexes will be the odd indexes
+      if (i.isOdd) {
+        itemsHeights.add(4);
+      }
+    }
+    return itemsHeights;
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
           centerTitle: true,
-          title: const Text("Billing Summary"),
+          title: Text("Billing Summary",),
         ),
         body: SingleChildScrollView(
           child: Padding(
@@ -129,6 +145,16 @@ class _PurchaseSummaryState extends State<PurchaseSummary> {
                                       DropdownButtonHideUnderline(
                                     child: DropdownButton2<SupplierInfo>(
                                       isExpanded: true,
+                                      customButton: CustomTextField(
+                                        enabledFlag: false,
+                                        txtSize: 12.sp,
+                                        textCon: customerNameEditingController,
+                                        hintText: "Type supplier name",
+                                        suffixWidget: Icon(Icons.arrow_drop_down),
+                                        validator: (value) =>
+                                            FieldValidator.nonNullableFieldValidator(
+                                                value, "Supplier name"),
+                                      ),
                                       hint: Text(
                                         controller.supplierList.isNotEmpty
                                             ? "Select Supplier"
@@ -170,10 +196,13 @@ class _PurchaseSummaryState extends State<PurchaseSummary> {
                                             mainAxisSize: MainAxisSize.min,
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
-                                              Text(
+                                              AutoSizeText(
                                                 item.name,
+                                                maxFontSize: 12,
+                                                minFontSize: 3,
+                                                maxLines: 1,
                                                 style: const TextStyle(
-                                                  fontSize: 12,
+                                                  // fontSize: 12,
                                                   fontWeight: FontWeight.bold,
                                                 ),
                                                 overflow: TextOverflow.visible,
@@ -181,7 +210,7 @@ class _PurchaseSummaryState extends State<PurchaseSummary> {
                                               Text(
                                                 item.phone,
                                                 style: const TextStyle(
-                                                  fontSize: 12,
+                                                  fontSize: 10,
                                                   fontWeight: FontWeight.normal,
 
                                                 ),
@@ -195,6 +224,7 @@ class _PurchaseSummaryState extends State<PurchaseSummary> {
                                       onChanged: (value) {
                                         if (value != null) {
                                           controller.selectedSupplier = value;
+                                          customerNameEditingController.text = value.name ?? '';
                                           customerPhoneNumberEditingController
                                               .text = value.phone ?? '';
                                           customerAddressEditingController.text =
@@ -202,6 +232,7 @@ class _PurchaseSummaryState extends State<PurchaseSummary> {
                                           controller.update(['supplier_list']);
                                         }
                                       },
+
                                       buttonStyleData: ButtonStyleData(
                                         height: 56,
                                         padding: EdgeInsets.zero,
@@ -220,9 +251,6 @@ class _PurchaseSummaryState extends State<PurchaseSummary> {
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(8)),
                                         ),
-                                      ),
-                                      menuItemStyleData: const MenuItemStyleData(
-                                        height: 40,
                                       ),
                                     ),
                                   ),
