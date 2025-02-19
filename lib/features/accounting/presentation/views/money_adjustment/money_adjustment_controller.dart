@@ -1,8 +1,8 @@
 import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
-import 'package:amar_pos/features/accounting/data/models/money_transfer/money_transfer_list_response_model.dart';
+import 'package:amar_pos/features/accounting/data/models/expense_voucher/expense_payment_methods_response_model.dart';
+import 'package:amar_pos/features/accounting/data/models/money_adjustment_list_response_model/money_adjustment_list_response_model.dart';
 import 'package:amar_pos/features/accounting/data/models/money_transfer/outlet_list_for_money_transfer_response_model.dart';
 import 'package:amar_pos/features/accounting/data/services/due_collection_service.dart';
-import 'package:amar_pos/features/accounting/data/services/money_adjustment_service.dart';
 import 'package:amar_pos/features/accounting/data/services/money_transfer_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -14,10 +14,12 @@ import '../../../../../core/network/base_client.dart';
 import '../../../../../core/widgets/reusable/payment_dd/expense_payment_methods_response_model.dart';
 import '../../../../auth/data/model/hive/login_data.dart';
 import '../../../../auth/data/model/hive/login_data_helper.dart';
+import '../../../data/models/expense_voucher/expense_categories_response_model.dart';
+import '../../../data/services/money_adjustment_service.dart';
 
-class MoneyTransferController extends GetxController{
+class MoneyAdjustmentController extends GetxController{
 
-  bool ismoneyTransferListLoading = false;
+  bool isMoneyAdjustmentListLoading = false;
   bool isExpenseCategoriesListLoading = false;
   bool isLoadingMore = false;
   RxBool hasError = false.obs;
@@ -27,12 +29,17 @@ class MoneyTransferController extends GetxController{
   int? selectedOutletId;
   Rx<DateTimeRange?> selectedDateTimeRange = Rx<DateTimeRange?>(null);
 
-  // List<MoneyAdjustmentData> moneyTransferList = [];
+  // List<MoneyAdjustmentData> moneyAdjustmentList = [];
   // MoneyAdjustmentListResponseModel? MoneyAdjustmentListResponseModel;
 
-  List<MoneyTransferData> moneyTransferList = [];
-  MoneyTransferListResponseModel? moneyTransferListResponseModel;
+  List<MoneyAdjustmentData> moneyAdjustmentList = [];
+  MoneyAdjustmentListResponseModel? moneyAdjustmentListResponseModel;
 
+  ExpenseCategoriesResponseModel? expenseCategoriesResponseModel;
+  List<ExpenseCategory> expenseCategoriesList = [];
+
+  ExpensePaymentMethodsResponseModel? expensePaymentMethodsResponseModel;
+  List<ExpensePaymentMethod> expensePaymentMethods = [];
 
 
   LoginData? loginData = LoginDataBoxManager().loginData;
@@ -52,85 +59,84 @@ class MoneyTransferController extends GetxController{
     selectedDateTimeRange.value = null;
   }
 
-  Future<void> getMoneyTransferList(
-      {int page = 1}) async {
-    ismoneyTransferListLoading = page == 1; // Mark initial loading state
+  int adjustmentType = 1;
+
+  Future<void> getMoneyAdjustmentList(
+      {int page = 1, int? type}) async {
+    adjustmentType = type ?? adjustmentType;
+    isMoneyAdjustmentListLoading = page == 1; // Mark initial loading state
     if(page == 1){
-      moneyTransferList.clear();
+      moneyAdjustmentList.clear();
     }
     isLoadingMore = page > 1;
 
     hasError.value = false;
-    update(['total_widget','money_transfer_list']);
+    update(['total_widget','money_adjustment_list$adjustmentType']);
 
     try {
-      var response = await MoneyTransferService.getMoneyTransferList(
+      var response = await MoneyAdjustmentService.getMoneyAdjustmentList(
         usrToken: loginData!.token,
         page: page,
         search: searchController.text,
         startDate: selectedDateTimeRange.value?.start.toString(),
         endDate: selectedDateTimeRange.value?.end.toString(),
+        moneyAdjustmentType: adjustmentType
       );
 
       logger.d(response);
 
       if (response != null) {
         logger.e(response);
-        moneyTransferListResponseModel =
-            MoneyTransferListResponseModel.fromJson(response);
+        moneyAdjustmentListResponseModel =
+            MoneyAdjustmentListResponseModel.fromJson(response);
 
-        if (moneyTransferListResponseModel != null && moneyTransferListResponseModel!.data != null) {
-          moneyTransferList.addAll(moneyTransferListResponseModel!.data!.data!);
-          logger.i(moneyTransferList.length);
+        if (moneyAdjustmentListResponseModel != null && moneyAdjustmentListResponseModel!.data != null) {
+          moneyAdjustmentList.addAll(moneyAdjustmentListResponseModel!.data!.data!);
+          logger.i(moneyAdjustmentList.length);
           // if (currentSearchList.isNotEmpty) {
           //   lastFoundList.value = currentSearchList; // Update last found list
           // }
         } else {
-          moneyTransferList.clear(); // No results
+          moneyAdjustmentList.clear(); // No results
         }
       } else {
         // hasError.value = true; // Error in response
-        moneyTransferList.clear();
+        moneyAdjustmentList.clear();
       }
     } catch (e) {
       hasError.value = true; // Handle exceptions
-      moneyTransferList.clear();
+      moneyAdjustmentList.clear();
       logger.e(e);
     } finally {
-      ismoneyTransferListLoading = false;
+      isMoneyAdjustmentListLoading = false;
       isLoadingMore = false;
-      update(['total_widget','money_transfer_list']);
+      update(['total_widget','money_adjustment_list$adjustmentType']);
     }
   }
 
 
   bool isAddOrUpdateLoading = false;
 
-  void storeNewMoneyTransfer({
-    required int fromStoreID,
-    required int fromAccountID,
-    required int toAccountID,
-    required int toStoreID,
+  void storeNewMoneyAdjustment({
+    required int caID,
     required num amount,
     String? remarks,
   }) async {
     isAddOrUpdateLoading = true;
-    update(["money_transfer_list"]);
+    update(["money_adjustment_list$adjustmentType"]);
     RandomLottieLoader.show();
     try{
-      var response = await MoneyTransferService.storeNewMoneyTransfer(
+      var response = await MoneyAdjustmentService.storeNewMoneyAdjustment(
         token: loginData!.token,
-        fromAccountID: fromAccountID,
-        fromStoreID: fromStoreID,
-        toAccountID: toAccountID,
-        toStoreID: toStoreID,
+        caID: caID,
         amount: amount,
         remarks: remarks,
+        type: adjustmentType
       );
       if (response != null) {
 
         if(response['success']){
-          getMoneyTransferList(page: 1);
+          getMoneyAdjustmentList(page: 1);
         }
         Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true: null );
       }
@@ -138,40 +144,35 @@ class MoneyTransferController extends GetxController{
       logger.e(e);
     }finally{
       isAddOrUpdateLoading = false;
-      update(['money_transfer_list']);
+      update(['money_adjustment_list$adjustmentType']);
     }
-    update(["money_transfer_list"]);
+    update(["money_adjustment_list$adjustmentType"]);
     RandomLottieLoader.hide();
   }
 
-  void updateMoneyTransferItem({
+  void updateMoneyAdjustmentItem({
     required int id,
-    required int fromStoreID,
-    required int fromAccountID,
-    required int toAccountID,
-    required int toStoreID,
+    required int caID,
     required num amount,
     String? remarks,
   }) async {
     isAddOrUpdateLoading = true;
-    update(["money_transfer_list"]);
+    update(["money_adjustment_list$adjustmentType"]);
     RandomLottieLoader.show();
     try{
-      var response = await MoneyTransferService.updateMoneyTransfer(
+      var response = await MoneyAdjustmentService.updateMoneyAdjustmentItem(
         id: id,
         token: loginData!.token,
-        fromAccountID: fromAccountID,
-        fromStoreID: fromStoreID,
-        toAccountID: toAccountID,
-        toStoreID: toStoreID,
         amount: amount,
         remarks: remarks,
+        caID: caID,
+        type: adjustmentType
       );
       if (response != null) {
 
         if(response['success']){
-          moneyTransferList.clear();
-          getMoneyTransferList(page: 1);
+          moneyAdjustmentList.clear();
+          getMoneyAdjustmentList(page: 1);
         }
         Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true: null );
       }
@@ -179,28 +180,28 @@ class MoneyTransferController extends GetxController{
       logger.e(e);
     }finally{
       isAddOrUpdateLoading = false;
-      update(['money_transfer_list']);
+      update(['money_adjustment_list$adjustmentType']);
     }
-    update(["money_transfer_list"]);
+    update(["money_adjustment_list$adjustmentType"]);
     RandomLottieLoader.hide();
   }
 
-  void deleteMoneyTransferItem({
+  void deleteMoneyAdjustmentItem({
     required int id,
   }) async {
     isAddOrUpdateLoading = true;
-    update(["money_transfer_list"]);
+    update(["money_adjustment_list$adjustmentType"]);
     RandomLottieLoader.show();
     try{
-      var response = await MoneyTransferService.deleteMoneyTransferItem(
+      var response = await MoneyAdjustmentService.deleteMoneyAdjustmentItem(
         id: id,
         token: loginData!.token,
       );
       if (response != null) {
 
         if(response['success']){
-          moneyTransferList.clear();
-          getMoneyTransferList(page: 1);
+          moneyAdjustmentList.clear();
+          getMoneyAdjustmentList(page: 1);
         }
         Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true: null );
       }
@@ -208,29 +209,21 @@ class MoneyTransferController extends GetxController{
       logger.e(e);
     }finally{
       isAddOrUpdateLoading = false;
-      update(['money_transfer_list']);
+      update(['money_adjustment_list$adjustmentType']);
     }
-    update(["money_transfer_list"]);
+    update(["money_adjustment_list$adjustmentType"]);
     RandomLottieLoader.hide();
   }
-
-
-  //Client Ledger
-
-  bool isClientLedgerListLoading = false;
-  bool isClientLedgerListLoadingMore = false;
-
-
 
   Future<void> downloadList({required bool isPdf, bool? shouldPrint}) async {
     hasError.value = false;
 
-    String fileName = "Money Adjustment-${loginData?.business.name}-${DateTime
+    String fileName = "Money Transfer-${loginData?.business.name}-${DateTime
         .now()
         .microsecondsSinceEpoch
         .toString()}${isPdf ? ".pdf" : ".xlsx"}";
     try {
-      var response = await MoneyAdjustmentService.downloadList(
+      var response = await MoneyTransferService.downloadList(
         isPdf: isPdf,
         usrToken: loginData!.token,
         search: searchController.text,
@@ -238,6 +231,31 @@ class MoneyTransferController extends GetxController{
         endDate: selectedDateTimeRange.value?.end,
         fileName: fileName,
         shouldPrint: shouldPrint,
+      );
+    } catch (e) {
+      logger.e(e);
+    } finally {
+
+    }
+  }
+
+
+  Future<void> downloadStatement({required bool isPdf, required int clientID}) async {
+    hasError.value = false;
+
+    String fileName = "Due Statement'-${DateTime
+        .now()
+        .microsecondsSinceEpoch
+        .toString()}${isPdf ? ".pdf" : ".xlsx"}";
+    try {
+      var response = await DueCollectionService.downloadStatement(
+        isPdf: isPdf,
+        usrToken: loginData!.token,
+        search: searchController.text,
+        startDate: selectedDateTimeRange.value?.start,
+        endDate: selectedDateTimeRange.value?.end,
+        fileName: fileName,
+        clientID: clientID,
       );
     } catch (e) {
       logger.e(e);
@@ -282,11 +300,11 @@ class MoneyTransferController extends GetxController{
         outletListForMoneyTransferResponseModel =
             OutletListForMoneyTransferResponseModel.fromJson(response);
       } else {
-        moneyTransferList.clear();
+        moneyAdjustmentList.clear();
       }
     } catch (e) {
       hasError.value = true; // Handle exceptions
-      moneyTransferList.clear();
+      moneyAdjustmentList.clear();
       logger.e(e);
     } finally {
       outletListLoading = false;

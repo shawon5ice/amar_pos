@@ -20,8 +20,9 @@ class ChartOfAccountPaymentMethodsResponseModel {
 class ChartOfAccountPaymentMethod {
   final int id;
   final String name;
+  final int? root;
 
-  ChartOfAccountPaymentMethod({required this.id, required this.name});
+  ChartOfAccountPaymentMethod({required this.id, required this.name, this.root});
 
   factory ChartOfAccountPaymentMethod.fromJson(Map<String, dynamic> json) => _$ChartOfAccountPaymentMethodFromJson(json);
   Map<String, dynamic> toJson() => _$ChartOfAccountPaymentMethodToJson(this);

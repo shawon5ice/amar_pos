@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
+import 'package:printing/printing.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../constants/logger/logger.dart';
@@ -24,7 +25,7 @@ class FileDownloader {
   }
 
   Future<void> downloadFile(
-      {required String url, required String fileName, String? token, Map<String, dynamic>? query}) async {
+      {required String url, required String fileName, String? token, Map<String, dynamic>? query, bool? shouldPrint}) async {
     try {
       // Request necessary permissions
       await _requestPermissions();
@@ -56,7 +57,12 @@ class FileDownloader {
 
       // Methods.hideLoading();
 
-      await _showNotification(filePath, netWorkFileName?? fileName);
+      if(shouldPrint != null){
+        _showPrintDialog(filePath);
+      }else{
+        await _showNotification(filePath, netWorkFileName?? fileName);
+      }
+
     } catch (e) {
       RandomLottieLoader.hide();
       // Methods.hideLoading();
@@ -185,6 +191,18 @@ class FileDownloader {
     } catch (e) {
       print('Error getting filename: $e');
       return null; // Error occurred
+    }
+  }
+
+  Future<void> _showPrintDialog(String filePath) async {
+    final file = File(filePath);
+
+    if (file.existsSync()) {
+      await Printing.layoutPdf(
+        onLayout: (format) async => file.readAsBytes(),
+      );
+    } else {
+      print("File not found for printing.");
     }
   }
 }

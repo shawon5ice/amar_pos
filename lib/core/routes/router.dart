@@ -3,6 +3,7 @@ import 'package:amar_pos/features/accounting/presentation/views/daily_statement/
 import 'package:amar_pos/features/accounting/presentation/views/due_collection/due_collection.dart';
 import 'package:amar_pos/features/accounting/presentation/views/due_collection/pages/client_ledger_statement.dart';
 import 'package:amar_pos/features/accounting/presentation/views/expense_voucher/expense_voucher.dart';
+import 'package:amar_pos/features/accounting/presentation/views/money_adjustment/money_adjustment.dart';
 import 'package:amar_pos/features/accounting/presentation/views/supplier_payment/pages/supplier_ledger_statement.dart';
 import 'package:amar_pos/features/accounting/presentation/views/supplier_payment/supplier_payment.dart';
 import 'package:amar_pos/features/auth/presentation/ui/login_screen.dart';
@@ -14,6 +15,7 @@ import 'package:amar_pos/features/inventory/presentation/products/products_scree
 import 'package:amar_pos/features/splash/splash_screen.dart';
 import 'package:get/get.dart';
 
+import '../../features/accounting/presentation/views/money_transfer/money_transfer.dart';
 import '../../features/auth/presentation/ui/forget_password/forgot_password.dart';
 
 class AppRoutes {
@@ -109,6 +111,18 @@ class AppRoutes {
       name: SupplierLedgerStatementScreen.routeName,
       page: () => const SupplierLedgerStatementScreen(),
       binding: SupplierLedgerStatementBindings(),
+    ),
+
+    GetPage(
+      name: MoneyTransfer.routeName,
+      page: () => const MoneyTransfer(),
+      binding: MoneyTransferBindings(),
+    ),
+
+    GetPage(
+      name: MoneyAdjustment.routeName,
+      page: () => const MoneyAdjustment(),
+      binding: MoneyTransferBindings(),
     ),
   ];
 }

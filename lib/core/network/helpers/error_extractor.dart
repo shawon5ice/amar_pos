@@ -37,6 +37,9 @@ class ErrorExtractor {
         .toList();
   }
 
+  static bool isDialogOpen(BuildContext context) {
+    return Navigator.of(context).canPop();
+  }
   /// Shows a dialog with the extracted error messages.
   static Future<void> showErrorDialog(
       BuildContext context, Map<String, dynamic> response, ) async {
@@ -44,6 +47,14 @@ class ErrorExtractor {
     final errorMessages = extractErrorMessages(response);
 
     var widgets = getListOfTextWidget(errorMessages);
+
+    if (isDialogOpen(context)) {
+      Get.back();
+      print('A dialog is currently open!');
+    } else {
+      print('No dialog is open.');
+    }
+
 
     if (errorMessages.isNotEmpty) {
       await showGeneralDialog(

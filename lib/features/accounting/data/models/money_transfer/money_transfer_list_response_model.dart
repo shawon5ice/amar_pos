@@ -1,29 +1,24 @@
-import 'package:amar_pos/core/widgets/reusable/client_dd/client_list_dd_response_model.dart';
 import 'package:amar_pos/core/widgets/reusable/payment_dd/expense_payment_methods_response_model.dart';
 import 'package:get/get.dart';
 import 'package:json_annotation/json_annotation.dart';
 
-part 'due_collection_list_response_model.g.dart';
+part 'money_transfer_list_response_model.g.dart';
 
 @JsonSerializable()
-class DueCollectionListResponseModel {
+class MoneyTransferListResponseModel {
   final bool success;
   @DataConverter()
   final DataWrapper? data;
-  @JsonKey(name: 'count_total', defaultValue: 0)
-  final int countTotal;
-  @JsonKey(name: 'amount_total', defaultValue: 0)
-  final num amountTotal;
 
-  DueCollectionListResponseModel({required this.success, required this.data,required this.countTotal,required this.amountTotal});
+  MoneyTransferListResponseModel({required this.success, required this.data,});
 
-  factory DueCollectionListResponseModel.fromJson(Map<String, dynamic> json) => _$DueCollectionListResponseModelFromJson(json);
-  Map<String, dynamic> toJson() => _$DueCollectionListResponseModelToJson(this);
+  factory MoneyTransferListResponseModel.fromJson(Map<String, dynamic> json) => _$MoneyTransferListResponseModelFromJson(json);
+  Map<String, dynamic> toJson() => _$MoneyTransferListResponseModelToJson(this);
 }
 
 @JsonSerializable()
 class DataWrapper {
-  final List<DueCollectionData>? data;
+  final List<MoneyTransferData>? data;
   final Meta? meta;
 
   DataWrapper({this.data, this.meta});
@@ -33,101 +28,81 @@ class DataWrapper {
 }
 
 @JsonSerializable()
-class DueCollectionData {
+class MoneyTransferData {
   final int id;
   final String date;
   @JsonKey(name: 'sl_no')
   final String slNo;
-  @JsonKey(name: 'payment_method')
-  final ChartOfAccountPaymentMethod paymentMethod;
   @JsonKey(name: 'business')
   final Business? business;
-  @JsonKey(name: 'store')
-  final Store? store;
+  @JsonKey(name: 'from_store')
+  final Store? fromStore;
+  @JsonKey(name: 'to_store')
+  final Store? toStore;
+
+  @JsonKey(name: 'to_account')
+  final Account? toAccount;
+
+  @JsonKey(name: 'from_account')
+  final Account? fromAccount;
   @JsonKey(name: 'creator')
   final Creator? creator;
 
-  // @ClientConverter()
-  // @JsonKey(name: 'client',)
-  final ClientInfo? client;
   final double amount;
   final String? remarks;
+  final String? status;
 
-  DueCollectionData({
+  MoneyTransferData({
     required this.id,
     required this.date,
     required this.slNo,
-    required this.paymentMethod,
     required this.amount,
     required this.creator,
-    required this.store,
+    required this.fromStore,
+    required this.toAccount,
+    required this.toStore,
+    required this.fromAccount,
     required this.business,
-    required this.client,
     this.remarks,
+    this.status,
   });
 
-  factory DueCollectionData.fromJson(Map<String, dynamic> json) => _$DueCollectionDataFromJson(json);
-  Map<String, dynamic> toJson() => _$DueCollectionDataToJson(this);
+  factory MoneyTransferData.fromJson(Map<String, dynamic> json) => _$MoneyTransferDataFromJson(json);
+  Map<String, dynamic> toJson() => _$MoneyTransferDataToJson(this);
 }
-
-@JsonSerializable()
-class Category {
-  final int id;
-  @JsonKey(name: 'business_id')
-  final int? businessId;
-  @JsonKey(name: 'store_id')
-  final int? storeId;
-  final String name;
-  final String? code;
-  final String? remarks;
-  final int root;
-  final int type;
-  final int status;
-  @JsonKey(name: 'created_by')
-  final int? createdBy;
-  @JsonKey(name: 'updated_by')
-  final int? updatedBy;
-  @JsonKey(name: 'created_at')
-  final String? createdAt;
-  @JsonKey(name: 'updated_at')
-  final String? updatedAt;
-
-  Category({
-    required this.id,
-    this.businessId,
-    this.storeId,
-    required this.name,
-    this.code,
-    this.remarks,
-    required this.root,
-    required this.type,
-    required this.status,
-    this.createdBy,
-    this.updatedAt,
-    this.updatedBy,
-    this.createdAt,
-  });
-
-  factory Category.fromJson(Map<String, dynamic> json) => _$CategoryFromJson(json);
-  Map<String, dynamic> toJson() => _$CategoryToJson(this);
-}
-
 
 @JsonSerializable()
 class Creator {
   final int id;
   final String name;
-  final String? photo;
+  @JsonKey(name: 'photo_url')
+  final String? photoUrl;
 
   Creator({
     required this.id,
     required this.name,
-    required this.photo,
+    required this.photoUrl,
   });
 
   factory Creator.fromJson(Map<String, dynamic> json) => _$CreatorFromJson(json);
   Map<String, dynamic> toJson() => _$CreatorToJson(this);
 }
+
+
+@JsonSerializable()
+class Account {
+  final int id;
+  final String name;
+
+  Account({
+    required this.id,
+    required this.name,
+  });
+
+  factory Account.fromJson(Map<String, dynamic> json) => _$AccountFromJson(json);
+  Map<String, dynamic> toJson() => _$AccountToJson(this);
+}
+
 
 @JsonSerializable()
 class Meta {
@@ -152,6 +127,13 @@ class Business {
   final String? address;
   @JsonKey(name: 'photo_url')
   final String? photoUrl;
+  @JsonKey(name: 'currency_id')
+  final int? currencyId;
+  @JsonKey(name: 'owner_id')
+  final int? ownerId;
+  @JsonKey(name: 'time_zone')
+  final String? timeZone;
+
 
   Business({
     required this.id,
@@ -161,6 +143,9 @@ class Business {
     required this.email,
     required this.logo,
     required this.photoUrl,
+    this.timeZone,
+    this.currencyId,
+    this.ownerId,
   });
 
   factory Business.fromJson(Map<String, dynamic> json) => _$BusinessFromJson(json);
@@ -203,22 +188,4 @@ class DataConverter implements JsonConverter<DataWrapper?, dynamic> {
 
   @override
   dynamic toJson(DataWrapper? object) => object?.toJson();
-}
-
-class ClientConverter implements JsonConverter<ClientInfo?, dynamic> {
-  const ClientConverter();
-
-  @override
-  ClientInfo? fromJson(dynamic json) {
-    if (json is Map<String, dynamic>) {
-      return ClientInfo.fromJson(json);
-    } else if(json != Map<String, dynamic>){
-      return null;
-    }else {
-      throw Exception('Unexpected type for data: ${json.runtimeType}');
-    }
-  }
-
-  @override
-  dynamic toJson(ClientInfo? object) => object?.toJson();
 }

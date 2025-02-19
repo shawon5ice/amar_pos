@@ -29,6 +29,7 @@ ChartOfAccountPaymentMethod _$ChartOfAccountPaymentMethodFromJson(
     ChartOfAccountPaymentMethod(
       id: (json['id'] as num).toInt(),
       name: json['name'] as String,
+      root: (json['root'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$ChartOfAccountPaymentMethodToJson(
@@ -36,4 +37,5 @@ Map<String, dynamic> _$ChartOfAccountPaymentMethodToJson(
     <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
+      'root': instance.root,
     };

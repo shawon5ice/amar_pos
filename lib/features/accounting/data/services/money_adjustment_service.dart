@@ -8,13 +8,14 @@ import '../../../../core/network/base_client.dart';
 import '../../../../core/network/download/file_downloader.dart';
 import '../../../../core/network/network_strings.dart';
 
-class MoneyTransferService {
-  static Future<dynamic> getMoneyTransferList({
+class MoneyAdjustmentService {
+  static Future<dynamic> getMoneyAdjustmentList({
     required String usrToken,
     required int page,
     required String? search,
     required String? startDate,
     required String? endDate,
+    required int moneyAdjustmentType,
   }) async {
     logger.d("Page: $page");
 
@@ -24,12 +25,13 @@ class MoneyTransferService {
       "start_date": startDate,
       "end_date": endDate,
       "limit": 20,
+      'type': moneyAdjustmentType,
     };
     logger.i(query);
 
     var response = await BaseClient.getData(
         token: usrToken,
-        api: "money_transfer/get-all-money-transfer",
+        api: "money_adjustment/get-all-money-adjustment",
         parameter: query);
     return response;
   }
@@ -70,9 +72,9 @@ class MoneyTransferService {
     String downloadUrl = "";
 
     if(isPdf){
-      downloadUrl = "${NetWorkStrings.baseUrl}/money_transfer/download-pdf-money-transfer-list";
+      downloadUrl = "${NetWorkStrings.baseUrl}/money_adjustment/download-pdf-money-transfer-list";
     }else{
-      downloadUrl = "${NetWorkStrings.baseUrl}/money_transfer/download-excel-money-transfer-list";
+      downloadUrl = "${NetWorkStrings.baseUrl}/money_adjustment/download-excel-money-transfer-list";
     }
 
 
@@ -85,39 +87,7 @@ class MoneyTransferService {
     );
   }
 
-  static Future<void> downloadStatement({required bool isPdf, required String fileName,
-    required String usrToken,
-    required DateTime? startDate,
-    required DateTime? endDate,
-    required String? search,
-    required int clientID,
-  }) async {
-    // logger.d("PDF: $isPdf");
-
-    Map<String, dynamic> query = {
-      "start_date": startDate,
-      "end_date": endDate,
-      "search": search,
-    };
-
-    String downloadUrl = "";
-
-    if(isPdf){
-      downloadUrl = "${NetWorkStrings.baseUrl}/due_collection/download-pdf-client-ledger-statement/$clientID";
-    }else{
-      downloadUrl = "${NetWorkStrings.baseUrl}/due_collection/download-excel-client-ledger-statement/$clientID";
-    }
-
-
-    FileDownloader().downloadFile(
-      url: downloadUrl,
-      token: usrToken,
-      query: query,
-      fileName: fileName,);
-  }
-
-
-  static Future<void> downloadMoneyTransferInvoice({required bool isPdf, required int invoiceID,
+  static Future<void> downloadMoneyAdjustmentInvoice({required bool isPdf, required int invoiceID,
     required String usrToken,
     required String fileName,
     required bool? shouldPrint
@@ -126,9 +96,9 @@ class MoneyTransferService {
     String downloadUrl = "";
 
     if(isPdf){
-      downloadUrl = "${NetWorkStrings.baseUrl}/money_transfer/download-invoice/$invoiceID";
+      downloadUrl = "${NetWorkStrings.baseUrl}/money_adjustment/download-invoice/$invoiceID";
     }else{
-      downloadUrl = "${NetWorkStrings.baseUrl}/money_transfer/download-invoice/$invoiceID";
+      downloadUrl = "${NetWorkStrings.baseUrl}/money_adjustment/download-invoice/$invoiceID";
     }
 
 
@@ -139,11 +109,9 @@ class MoneyTransferService {
       shouldPrint: shouldPrint,
     );
   }
-  static Future<dynamic> storeNewMoneyTransfer({
-    required int fromStoreID,
-    required int fromAccountID,
-    required int toAccountID,
-    required int toStoreID,
+  static Future<dynamic> storeNewMoneyAdjustment({
+    required int caID,
+    required int type,
     required num amount,
     String? remarks,
     required String token,
@@ -151,25 +119,21 @@ class MoneyTransferService {
 
     var response = await BaseClient.postData(
       token: token,
-      api: "money_transfer/store",
+      api: "money_adjustment/store",
       body: {
-        "from_store_id": fromStoreID,
-        "from_ca_id": fromAccountID,
-        "to_store_id": toStoreID,
-        "to_ca_id": toAccountID,
+        "ca_id": caID,
         "amount": amount,
+        "type": type,
         "remarks": remarks,
       },
     );
     return response;
   }
 
-  static Future<dynamic> updateMoneyTransfer({
+  static Future<dynamic> updateMoneyAdjustmentItem({
     required int id,
-    required int fromStoreID,
-    required int fromAccountID,
-    required int toAccountID,
-    required int toStoreID,
+    required int caID,
+    required int type,
     required num amount,
     String? remarks,
     required String token,
@@ -177,13 +141,11 @@ class MoneyTransferService {
 
     var response = await BaseClient.postData(
       token: token,
-      api: "money_transfer/update/$id",
+      api: "money_adjustment/update/$id",
       body: {
-        "from_store_id": fromStoreID,
-        "from_ca_id": fromAccountID,
-        "to_store_id": toStoreID,
-        "to_ca_id": toAccountID,
+        "ca_id": caID,
         "amount": amount,
+        "type": type,
         "remarks": remarks,
       },
     );
@@ -191,14 +153,14 @@ class MoneyTransferService {
   }
 
 
-  static Future<dynamic> deleteMoneyTransferItem({
+  static Future<dynamic> deleteMoneyAdjustmentItem({
     required int id,
     required String token,
   }) async {
 
     var response = await BaseClient.deleteData(
       token: token,
-      api: "money_transfer/delete/$id",
+      api: "money_adjustment/delete/$id",
     );
     return response;
   }
