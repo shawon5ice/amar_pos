@@ -3,6 +3,7 @@ import 'package:amar_pos/features/accounting/presentation/views/daily_statement/
 import 'package:amar_pos/features/accounting/presentation/views/due_collection/due_collection.dart';
 import 'package:amar_pos/features/accounting/presentation/views/due_collection/pages/client_ledger_statement.dart';
 import 'package:amar_pos/features/accounting/presentation/views/expense_voucher/expense_voucher.dart';
+import 'package:amar_pos/features/accounting/presentation/views/ledger/ledger_screen.dart';
 import 'package:amar_pos/features/accounting/presentation/views/money_adjustment/money_adjustment.dart';
 import 'package:amar_pos/features/accounting/presentation/views/supplier_payment/pages/supplier_ledger_statement.dart';
 import 'package:amar_pos/features/accounting/presentation/views/supplier_payment/supplier_payment.dart';
@@ -123,6 +124,12 @@ class AppRoutes {
       name: MoneyAdjustment.routeName,
       page: () => const MoneyAdjustment(),
       binding: MoneyTransferBindings(),
+    ),
+
+    GetPage(
+      name: LedgerScreen.routeName,
+      page: () => const LedgerScreen(),
+      binding: LedgerScreenBindings(),
     ),
   ];
 }

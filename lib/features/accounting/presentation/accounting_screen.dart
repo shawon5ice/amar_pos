@@ -1,13 +1,14 @@
-import 'package:amar_pos/features/accounting/data/models/accounting_menu_item.dart';
-import 'package:amar_pos/features/accounting/presentation/views/daily_statement/daily_statement.dart';
-import 'package:amar_pos/features/accounting/presentation/views/due_collection/due_collection.dart';
-import 'package:amar_pos/features/accounting/presentation/views/expense_voucher/expense_voucher.dart';
-import 'package:amar_pos/features/accounting/presentation/views/money_adjustment/money_adjustment.dart';
-import 'package:amar_pos/features/accounting/presentation/views/money_transfer/money_transfer.dart';
-import 'package:amar_pos/features/accounting/presentation/views/supplier_payment/supplier_payment.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../drawer/drawer_menu_controller.dart';
+import '../data/models/accounting_menu_item.dart';
+import 'views/daily_statement/daily_statement.dart';
+import 'views/due_collection/due_collection.dart';
+import 'views/expense_voucher/expense_voucher.dart';
+import 'views/ledger/ledger_screen.dart';
+import 'views/money_adjustment/money_adjustment.dart';
+import 'views/money_transfer/money_transfer.dart';
+import 'views/supplier_payment/supplier_payment.dart';
 
 class AccountingScreen extends StatefulWidget {
   const AccountingScreen({super.key});
@@ -36,7 +37,9 @@ class _AccountingScreenState extends State<AccountingScreen> {
     AccountingMenuItem(title: "Money Adjustment", onPress: (){
       Get.toNamed(MoneyAdjustment.routeName);
     }),
-    AccountingMenuItem(title: "Ledger", onPress: (){}),
+    AccountingMenuItem(title: "Ledger", onPress: (){
+      Get.toNamed(LedgerScreen.routeName);
+    }),
     AccountingMenuItem(title: "Trial Balance", onPress: (){}),
     AccountingMenuItem(title: "Profit or Loss", onPress: (){}),
     AccountingMenuItem(title: "Balance Sheet", onPress: (){}),

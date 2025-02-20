@@ -26,13 +26,13 @@ class CAPaymentMethodDDController extends GetxController {
   }
 
   // Fetch all paymentList
-  Future<void> getAllPaymentMethods() async {
+  Future<void> getAllPaymentMethods(bool? lastLevelOfAccounts) async {
     paymentListLoading = true;
     logger.e("GETTING PAYMENTS");
     update(['ca_payment_dd']); // Update the UI for loading state
     var response = await BaseClient.getData(
       token: loginData!.token,
-      api: "chart_of_accounts/get-payment-methods",
+      api: lastLevelOfAccounts != null ? "chart_of_accounts/get-last-level-account-list" : "chart_of_accounts/get-payment-methods",
     );
 
     if (response != null) {

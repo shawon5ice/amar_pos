@@ -58,6 +58,7 @@ class _CustomDropdownWithSearchWidgetState<T>
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
         if (!widget.noTitle)
           Padding(

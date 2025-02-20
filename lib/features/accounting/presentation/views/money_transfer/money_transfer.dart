@@ -24,7 +24,7 @@ class MoneyTransfer extends StatefulWidget {
 
 class _MoneyTransferState extends State<MoneyTransfer> with SingleTickerProviderStateMixin{
 
-  MoneyTransferController controller = Get.put(MoneyTransferController());
+  MoneyTransferController controller = Get.find();
 
 
   @override

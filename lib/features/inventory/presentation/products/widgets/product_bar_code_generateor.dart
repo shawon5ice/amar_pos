@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'package:amar_pos/core/widgets/dashed_line.dart';
-import 'package:amar_pos/features/inventory/presentation/products/widgets/custom_drop_down_widget.dart';
 import 'package:amar_pos/features/inventory/presentation/products/widgets/custom_dropdown_widget.dart';
-import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/rendering.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:amar_pos/core/constants/app_colors.dart';
@@ -104,9 +102,9 @@ class _ProductBarCodeGeneratorState extends State<ProductBarCodeGenerator> {
                   id: "barcode_list",
                   builder: (controller) {
                     if (controller.barcodeGenerationLoading) {
-                      return Center(child: CircularProgressIndicator());
+                      return const Center(child: CircularProgressIndicator());
                     } else if (controller.generatedBarcode == "") {
-                      return Center(child: Text("Barcode generation failed"));
+                      return const Center(child: Text("Barcode generation failed"));
                     } else {
                       return Container(
                         padding: const EdgeInsets.symmetric(
@@ -317,7 +315,7 @@ class _ProductBarCodeGeneratorState extends State<ProductBarCodeGenerator> {
           build: (context) {
             return pw.GridView(
               crossAxisCount: stickersPerRow,
-              padding: pw.EdgeInsets.all(8),
+              padding: const pw.EdgeInsets.all(8),
               children: List.generate(
                 stickersPerPage,
                 (index) {

@@ -15,11 +15,26 @@ class CAPaymentMethodsDropDownWidget extends StatefulWidget {
     required this.onCAPaymentMethodSelection,
     this.initialCAPaymentMethod,
     this.isMandatory,
+    this.noTitle,
+    this.title,
+    this.notFound,
+    this.hint,
+    this.searchHint,
+    this.lastLevelAccount,
+    this.height,
   });
 
   final Function(ChartOfAccountPaymentMethod? caPaymentMethod) onCAPaymentMethodSelection;
   final ChartOfAccountPaymentMethod? initialCAPaymentMethod;
   final bool? isMandatory;
+  final bool? noTitle;
+  final String? title;
+  final String? notFound;
+  final String? hint;
+  final String? searchHint;
+  final bool? lastLevelAccount;
+  final int? height;
+
 
   @override
   State<CAPaymentMethodsDropDownWidget> createState() => _CAPaymentMethodsDropDownWidgetState();
@@ -30,7 +45,7 @@ class _CAPaymentMethodsDropDownWidgetState extends State<CAPaymentMethodsDropDow
 
   @override
   void initState() {
-    controller.getAllPaymentMethods().then((value){
+    controller.getAllPaymentMethods(widget.lastLevelAccount).then((value){
       if(widget.initialCAPaymentMethod != null){
         controller.resetPaymentSelection();
         controller.selectedCAPaymentMethod = controller.paymentList.singleWhere((e) => e.id == widget.initialCAPaymentMethod?.id);
@@ -62,9 +77,11 @@ class _CAPaymentMethodsDropDownWidgetState extends State<CAPaymentMethodsDropDow
       id: 'ca_payment_dd',
       builder: (controller) {
         return CustomDropdownWithSearchWidget<ChartOfAccountPaymentMethod>(
+          buttonHeight: widget.height ?? 56,
           items: controller.paymentList,
           isMandatory: true,
-          title: "Payment Method",
+          noTitle: widget.noTitle != null,
+          title: widget.title ?? "Payment Method",
           // noTitle: true,
           itemLabel: (value) => value.name,
           value: controller.selectedCAPaymentMethod,
@@ -76,12 +93,12 @@ class _CAPaymentMethodsDropDownWidgetState extends State<CAPaymentMethodsDropDow
           hintText: controller.paymentListLoading
               ? "Loading..."
               : controller.paymentList.isEmpty
-              ? "No payment method found..."
-              : "Select Payment Method",
-          searchHintText: "Search a payment method",
+              ? widget.notFound ?? "No payment method found..."
+              : widget.hint ?? "Select Payment Method",
+          searchHintText: widget.searchHint ?? "Search a payment method",
           validator: widget.isMandatory != null ?  (value) =>
               FieldValidator.nonNullableFieldValidator(
-                  value?.name, "Payment Method") : null,
+                  value?.name, widget.title ?? "Payment Method") : null,
         );
       },
     );

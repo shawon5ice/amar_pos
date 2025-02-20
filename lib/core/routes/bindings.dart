@@ -4,6 +4,7 @@ import 'package:amar_pos/core/widgets/reusable/payment_dd/ca_payment_method_dd_c
 import 'package:amar_pos/features/accounting/presentation/views/daily_statement/daily_statement_controller.dart';
 import 'package:amar_pos/features/accounting/presentation/views/due_collection/due_collection_controller.dart';
 import 'package:amar_pos/features/accounting/presentation/views/expense_voucher/expense_voucher_controller.dart';
+import 'package:amar_pos/features/accounting/presentation/views/ledger/ledger_controller.dart';
 import 'package:amar_pos/features/accounting/presentation/views/money_adjustment/money_adjustment_controller.dart';
 import 'package:amar_pos/features/accounting/presentation/views/money_transfer/money_transfer_controller.dart';
 import 'package:amar_pos/features/accounting/presentation/views/supplier_payment/supplier_payment_controller.dart';
@@ -101,6 +102,14 @@ class MoneyAdjustmentBindings extends Bindings{
   @override
   void dependencies() {
     Get.lazyPut(()=> MoneyAdjustmentController());
+    Get.lazyPut(()=> CAPaymentMethodDDController());
+  }
+}
+
+class LedgerScreenBindings extends Bindings{
+  @override
+  void dependencies() {
+    Get.lazyPut(()=> LedgerController());
     Get.lazyPut(()=> CAPaymentMethodDDController());
   }
 }
