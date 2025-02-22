@@ -1,6 +1,8 @@
 import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
+import 'package:amar_pos/features/accounting/data/models/book_ledger/book_ledger_list_response_model.dart';
 import 'package:amar_pos/features/accounting/data/models/money_transfer/money_transfer_list_response_model.dart';
 import 'package:amar_pos/features/accounting/data/models/money_transfer/outlet_list_for_money_transfer_response_model.dart';
+import 'package:amar_pos/features/accounting/data/services/book_ledger_service.dart';
 import 'package:amar_pos/features/accounting/data/services/due_collection_service.dart';
 import 'package:amar_pos/features/accounting/data/services/money_adjustment_service.dart';
 import 'package:amar_pos/features/accounting/data/services/money_transfer_service.dart';
@@ -27,11 +29,12 @@ class LedgerController extends GetxController{
   int? selectedOutletId;
   Rx<DateTimeRange?> selectedDateTimeRange = Rx<DateTimeRange?>(null);
 
-  // List<MoneyAdjustmentData> moneyTransferList = [];
+  // List<MoneyAdjustmentData> ledgerList = [];
   // MoneyAdjustmentListResponseModel? MoneyAdjustmentListResponseModel;
 
-  List<MoneyTransferData> moneyTransferList = [];
-  MoneyTransferListResponseModel? moneyTransferListResponseModel;
+  List<LedgerData> ledgerList = [];
+  BookLedgerListResponseModel? bookLedgerListResponseModel;
+
 
 
 
@@ -54,11 +57,11 @@ class LedgerController extends GetxController{
     update(['selection_status']);
   }
 
-  Future<void> getMoneyTransferList(
-      {int page = 1}) async {
+  Future<void> getBookLedger(
+      {int page = 1, required int caID}) async {
     ismoneyTransferListLoading = page == 1; // Mark initial loading state
     if(page == 1){
-      moneyTransferList.clear();
+      ledgerList.clear();
     }
     isLoadingMore = page > 1;
 
@@ -66,37 +69,37 @@ class LedgerController extends GetxController{
     update(['total_widget','money_transfer_list']);
 
     try {
-      var response = await MoneyTransferService.getMoneyTransferList(
+      var response = await BookLedgerService.getBookLedger(
         usrToken: loginData!.token,
         page: page,
+        caID: caID,
         search: searchController.text,
         startDate: selectedDateTimeRange.value?.start.toString(),
         endDate: selectedDateTimeRange.value?.end.toString(),
       );
 
-      logger.d(response);
-
       if (response != null) {
         logger.e(response);
-        moneyTransferListResponseModel =
-            MoneyTransferListResponseModel.fromJson(response);
+        bookLedgerListResponseModel =
+            BookLedgerListResponseModel.fromJson(response);
+        logger.i(bookLedgerListResponseModel?.data?.first.debit);
 
-        if (moneyTransferListResponseModel != null && moneyTransferListResponseModel!.data != null) {
-          moneyTransferList.addAll(moneyTransferListResponseModel!.data!.data!);
-          logger.i(moneyTransferList.length);
+        if (bookLedgerListResponseModel != null && bookLedgerListResponseModel!.data != null && bookLedgerListResponseModel!.data!.first.data != null) {
+          ledgerList.addAll(bookLedgerListResponseModel!.data!.first.data!.data);
+          logger.i(ledgerList.length);
           // if (currentSearchList.isNotEmpty) {
           //   lastFoundList.value = currentSearchList; // Update last found list
           // }
         } else {
-          moneyTransferList.clear(); // No results
+          ledgerList.clear(); // No results
         }
       } else {
         // hasError.value = true; // Error in response
-        moneyTransferList.clear();
+        ledgerList.clear();
       }
     } catch (e) {
       hasError.value = true; // Handle exceptions
-      moneyTransferList.clear();
+      ledgerList.clear();
       logger.e(e);
     } finally {
       ismoneyTransferListLoading = false;
@@ -107,114 +110,6 @@ class LedgerController extends GetxController{
 
 
   bool isAddOrUpdateLoading = false;
-
-  void storeNewMoneyTransfer({
-    required int fromStoreID,
-    required int fromAccountID,
-    required int toAccountID,
-    required int toStoreID,
-    required num amount,
-    String? remarks,
-  }) async {
-    isAddOrUpdateLoading = true;
-    update(["money_transfer_list"]);
-    RandomLottieLoader.show();
-    try{
-      var response = await MoneyTransferService.storeNewMoneyTransfer(
-        token: loginData!.token,
-        fromAccountID: fromAccountID,
-        fromStoreID: fromStoreID,
-        toAccountID: toAccountID,
-        toStoreID: toStoreID,
-        amount: amount,
-        remarks: remarks,
-      );
-      if (response != null) {
-
-        if(response['success']){
-          getMoneyTransferList(page: 1);
-        }
-        Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true: null );
-      }
-    }catch(e){
-      logger.e(e);
-    }finally{
-      isAddOrUpdateLoading = false;
-      update(['money_transfer_list']);
-    }
-    update(["money_transfer_list"]);
-    RandomLottieLoader.hide();
-  }
-
-  void updateMoneyTransferItem({
-    required int id,
-    required int fromStoreID,
-    required int fromAccountID,
-    required int toAccountID,
-    required int toStoreID,
-    required num amount,
-    String? remarks,
-  }) async {
-    isAddOrUpdateLoading = true;
-    update(["money_transfer_list"]);
-    RandomLottieLoader.show();
-    try{
-      var response = await MoneyTransferService.updateMoneyTransfer(
-        id: id,
-        token: loginData!.token,
-        fromAccountID: fromAccountID,
-        fromStoreID: fromStoreID,
-        toAccountID: toAccountID,
-        toStoreID: toStoreID,
-        amount: amount,
-        remarks: remarks,
-      );
-      if (response != null) {
-
-        if(response['success']){
-          moneyTransferList.clear();
-          getMoneyTransferList(page: 1);
-        }
-        Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true: null );
-      }
-    }catch(e){
-      logger.e(e);
-    }finally{
-      isAddOrUpdateLoading = false;
-      update(['money_transfer_list']);
-    }
-    update(["money_transfer_list"]);
-    RandomLottieLoader.hide();
-  }
-
-  void deleteMoneyTransferItem({
-    required int id,
-  }) async {
-    isAddOrUpdateLoading = true;
-    update(["money_transfer_list"]);
-    RandomLottieLoader.show();
-    try{
-      var response = await MoneyTransferService.deleteMoneyTransferItem(
-        id: id,
-        token: loginData!.token,
-      );
-      if (response != null) {
-
-        if(response['success']){
-          moneyTransferList.clear();
-          getMoneyTransferList(page: 1);
-        }
-        Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true: null );
-      }
-    }catch(e){
-      logger.e(e);
-    }finally{
-      isAddOrUpdateLoading = false;
-      update(['money_transfer_list']);
-    }
-    update(["money_transfer_list"]);
-    RandomLottieLoader.hide();
-  }
 
 
   //Client Ledger
@@ -284,11 +179,11 @@ class LedgerController extends GetxController{
         outletListForMoneyTransferResponseModel =
             OutletListForMoneyTransferResponseModel.fromJson(response);
       } else {
-        moneyTransferList.clear();
+        ledgerList.clear();
       }
     } catch (e) {
       hasError.value = true; // Handle exceptions
-      moneyTransferList.clear();
+      ledgerList.clear();
       logger.e(e);
     } finally {
       outletListLoading = false;
