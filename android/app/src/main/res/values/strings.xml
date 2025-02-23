@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Amar POS</string>
+
+    <!-- Shortcut Labels -->
+    <string name="shortcut_home_short">Open Home</string>
+    <string name="shortcut_home_long">Go to Home Screen</string>
+
+    <string name="shortcut_new_post_short">New Post</string>
+    <string name="shortcut_new_post_long">Create a New Post</string>
+</resources>

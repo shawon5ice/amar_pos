@@ -26,19 +26,21 @@ DataWrapper _$DataWrapperFromJson(Map<String, dynamic> json) => DataWrapper(
       data: json['data'] == null
           ? null
           : BookLedgerList.fromJson(json['data'] as Map<String, dynamic>),
-      debit: DataWrapper._debitFromJson(json['debit']),
-      credit: DataWrapper._debitFromJson(json['credit']),
+      debit: json['debit'] == null ? 0 : dynamicNumberFromJson(json['debit']),
+      credit:
+          json['credit'] == null ? 0 : dynamicNumberFromJson(json['credit']),
       type: json['type'] as String,
-      balance: json['balance'] as num,
+      balance:
+          json['balance'] == null ? 0 : dynamicNumberFromJson(json['balance']),
     );
 
 Map<String, dynamic> _$DataWrapperToJson(DataWrapper instance) =>
     <String, dynamic>{
       'data': instance.data,
-      'debit': DataWrapper._debitToJson(instance.debit),
-      'credit': DataWrapper._debitToJson(instance.credit),
+      'debit': dynamicNumberToJson(instance.debit),
+      'credit': dynamicNumberToJson(instance.credit),
       'type': instance.type,
-      'balance': instance.balance,
+      'balance': dynamicNumberToJson(instance.balance),
     };
 
 BookLedgerList _$BookLedgerListFromJson(Map<String, dynamic> json) =>
@@ -65,8 +67,9 @@ LedgerData _$LedgerDataFromJson(Map<String, dynamic> json) => LedgerData(
       fullNarration: json['full_narration'] as String?,
       balance: json['balance'] as num?,
       type: json['type'] as String?,
-      debit: json['debit'] ?? 0,
-      credit: json['credit'] ?? 0,
+      debit: json['debit'] == null ? 0 : dynamicNumberFromJson(json['debit']),
+      credit:
+          json['credit'] == null ? 0 : dynamicNumberFromJson(json['credit']),
     );
 
 Map<String, dynamic> _$LedgerDataToJson(LedgerData instance) =>
@@ -76,7 +79,7 @@ Map<String, dynamic> _$LedgerDataToJson(LedgerData instance) =>
       'account_name': instance.accountName,
       'full_narration': instance.fullNarration,
       'balance': instance.balance,
-      'debit': instance.debit,
+      'debit': dynamicNumberToJson(instance.debit),
       'type': instance.type,
-      'credit': instance.credit,
+      'credit': dynamicNumberToJson(instance.credit),
     };

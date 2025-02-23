@@ -10,14 +10,14 @@ class TotalStatusWidget extends StatelessWidget {
     required this.title,
     this.value,
     required this.isLoading,
-    required this.asset,
+    this.asset,
     this.flex = 1,
   });
 
   final String title;
   final String? value;
   final bool isLoading;
-  final String asset;
+  final String? asset;
   final int flex;
 
   @override
@@ -43,10 +43,10 @@ class TotalStatusWidget extends StatelessWidget {
                     ),
                   ),
                   const Spacer(),
-                  SvgPicture.asset(asset)
+                  asset != null ? SvgPicture.asset(asset!) : SizedBox.shrink()
                 ],
               ),
-              addH(8.h),
+              asset != null ? addH(8.h) : addH(4.h),
               isLoading
                   ? Container(
                   height: 30.sp, width: 30.sp, child: SpinKitFadingGrid(color: Colors.black,size: 20,) )

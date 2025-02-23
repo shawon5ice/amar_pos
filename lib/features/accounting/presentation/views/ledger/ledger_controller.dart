@@ -1,6 +1,6 @@
+import 'package:amar_pos/core/network/helpers/error_extractor.dart';
 import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:amar_pos/features/accounting/data/models/book_ledger/book_ledger_list_response_model.dart';
-import 'package:amar_pos/features/accounting/data/models/money_transfer/money_transfer_list_response_model.dart';
 import 'package:amar_pos/features/accounting/data/models/money_transfer/outlet_list_for_money_transfer_response_model.dart';
 import 'package:amar_pos/features/accounting/data/services/book_ledger_service.dart';
 import 'package:amar_pos/features/accounting/data/services/due_collection_service.dart';
@@ -19,7 +19,7 @@ import '../../../../auth/data/model/hive/login_data_helper.dart';
 
 class LedgerController extends GetxController{
 
-  bool ismoneyTransferListLoading = false;
+  bool ledgerListLoading = false;
   bool isExpenseCategoriesListLoading = false;
   bool isLoadingMore = false;
   RxBool hasError = false.obs;
@@ -59,14 +59,14 @@ class LedgerController extends GetxController{
 
   Future<void> getBookLedger(
       {int page = 1, required int caID}) async {
-    ismoneyTransferListLoading = page == 1; // Mark initial loading state
+    ledgerListLoading = page == 1; // Mark initial loading state
     if(page == 1){
       ledgerList.clear();
     }
     isLoadingMore = page > 1;
 
     hasError.value = false;
-    update(['total_widget','money_transfer_list']);
+    update(['total_widget','ledger_list']);
 
     try {
       var response = await BookLedgerService.getBookLedger(
@@ -102,9 +102,9 @@ class LedgerController extends GetxController{
       ledgerList.clear();
       logger.e(e);
     } finally {
-      ismoneyTransferListLoading = false;
+      ledgerListLoading = false;
       isLoadingMore = false;
-      update(['total_widget','money_transfer_list']);
+      update(['total_widget','ledger_list']);
     }
   }
 
@@ -118,16 +118,25 @@ class LedgerController extends GetxController{
   bool isClientLedgerListLoadingMore = false;
 
 
+  bool downloadLoading = false;
 
-  Future<void> downloadList({required bool isPdf, bool? shouldPrint}) async {
+  Future<void> downloadList({required ChartOfAccountPaymentMethod? ca,required bool isPdf, bool? shouldPrint}) async {
+    if(downloadLoading){
+      return;
+    }
+    downloadLoading = true;
+    if(ca == null){
+      ErrorExtractor.showSingleErrorDialog(Get.context!, "Please select an account first");
+      return;
+    }
     hasError.value = false;
 
-    String fileName = "Money Adjustment-${loginData?.business.name}-${DateTime
+    String fileName = "Book Ledger of ${ca.name}-${DateTime
         .now()
         .microsecondsSinceEpoch
         .toString()}${isPdf ? ".pdf" : ".xlsx"}";
     try {
-      var response = await MoneyAdjustmentService.downloadList(
+      var response = await BookLedgerService.downloadList(
         isPdf: isPdf,
         usrToken: loginData!.token,
         search: searchController.text,
@@ -135,11 +144,12 @@ class LedgerController extends GetxController{
         endDate: selectedDateTimeRange.value?.end,
         fileName: fileName,
         shouldPrint: shouldPrint,
+        caID: ca.id,
       );
     } catch (e) {
       logger.e(e);
     } finally {
-
+      downloadLoading = false;
     }
   }
 

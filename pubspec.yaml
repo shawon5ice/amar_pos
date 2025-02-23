@@ -63,6 +63,7 @@ dependencies:
   json_annotation: ^4.9.0
   syncfusion_flutter_datagrid: 26.2.8
   device_preview_plus:
+  data_table_2: 2.5.15
 
 
 dev_dependencies:

@@ -25,7 +25,7 @@ class BookLedgerService {
       "search": search,
       "start_date": startDate,
       "end_date": endDate,
-      "limit": 20,
+      "per_page": 10,
     };
     logger.i(query);
 
@@ -56,6 +56,7 @@ class BookLedgerService {
 
   static Future<void> downloadList({required bool isPdf, required String fileName,
     required String usrToken,
+    required int caID,
     required DateTime? startDate,
     required DateTime? endDate,
     required String? search,
@@ -67,14 +68,15 @@ class BookLedgerService {
       "start_date": startDate,
       "end_date": endDate,
       "search": search,
+      "ca_id": caID,
     };
 
     String downloadUrl = "";
 
     if(isPdf){
-      downloadUrl = "${NetWorkStrings.baseUrl}/money_transfer/download-pdf-money-transfer-list";
+      downloadUrl = "${NetWorkStrings.baseUrl}/accounting/report/download-pdf-book-ledger-report";
     }else{
-      downloadUrl = "${NetWorkStrings.baseUrl}/money_transfer/download-excel-money-transfer-list";
+      downloadUrl = "${NetWorkStrings.baseUrl}/accounting/report/download-excel-book-ledger-report";
     }
 
 

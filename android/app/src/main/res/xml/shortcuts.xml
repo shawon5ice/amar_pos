@@ -1,0 +1,27 @@
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="shortcut_home"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="@string/shortcut_home_short"
+        android:shortcutLongLabel="@string/shortcut_home_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.example.amar_pos"
+            android:targetClass="com.example.amar_pos.MainActivity">
+        </intent>
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="shortcut_new_post"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="@string/shortcut_new_post_short"
+        android:shortcutLongLabel="@string/shortcut_new_post_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.example.amar_pos"
+            android:targetClass="com.example.amar_pos.NewPostActivity">
+        </intent>
+    </shortcut>
+</shortcuts>
