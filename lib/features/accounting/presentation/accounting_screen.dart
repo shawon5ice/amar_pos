@@ -1,3 +1,6 @@
+import 'package:amar_pos/features/accounting/presentation/views/balance_sheet/balance_sheet_screen.dart';
+import 'package:amar_pos/features/accounting/presentation/views/profit_or_loss/profit_or_loss_screen.dart';
+import 'package:amar_pos/features/accounting/presentation/views/trial_balance/trial_balance_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../drawer/drawer_menu_controller.dart';
@@ -40,9 +43,15 @@ class _AccountingScreenState extends State<AccountingScreen> {
     AccountingMenuItem(title: "Ledger", onPress: (){
       Get.toNamed(LedgerScreen.routeName);
     }),
-    AccountingMenuItem(title: "Trial Balance", onPress: (){}),
-    AccountingMenuItem(title: "Profit or Loss", onPress: (){}),
-    AccountingMenuItem(title: "Balance Sheet", onPress: (){}),
+    AccountingMenuItem(title: "Trial Balance", onPress: (){
+      Get.toNamed(TrialBalanceScreen.routeName);
+    }),
+    AccountingMenuItem(title: "Profit or Loss", onPress: (){
+      Get.toNamed(ProfitOrLossScreen.routeName);
+    }),
+    AccountingMenuItem(title: "Balance Sheet", onPress: (){
+      Get.toNamed(BalanceSheetScreen.routeName);
+    }),
   ];
 
 

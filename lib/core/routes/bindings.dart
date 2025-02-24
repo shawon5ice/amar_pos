@@ -1,13 +1,16 @@
 import 'package:amar_pos/core/widgets/reusable/client_dd/client_dd_controller.dart';
 import 'package:amar_pos/core/widgets/reusable/outlet_dd/outlet_dd_controller.dart';
 import 'package:amar_pos/core/widgets/reusable/payment_dd/ca_payment_method_dd_controller.dart';
+import 'package:amar_pos/features/accounting/presentation/views/balance_sheet/balance_sheet_controller.dart';
 import 'package:amar_pos/features/accounting/presentation/views/daily_statement/daily_statement_controller.dart';
 import 'package:amar_pos/features/accounting/presentation/views/due_collection/due_collection_controller.dart';
 import 'package:amar_pos/features/accounting/presentation/views/expense_voucher/expense_voucher_controller.dart';
 import 'package:amar_pos/features/accounting/presentation/views/ledger/ledger_controller.dart';
 import 'package:amar_pos/features/accounting/presentation/views/money_adjustment/money_adjustment_controller.dart';
 import 'package:amar_pos/features/accounting/presentation/views/money_transfer/money_transfer_controller.dart';
+import 'package:amar_pos/features/accounting/presentation/views/profit_or_loss/profit_or_loss_controller.dart';
 import 'package:amar_pos/features/accounting/presentation/views/supplier_payment/supplier_payment_controller.dart';
+import 'package:amar_pos/features/accounting/presentation/views/trial_balance/trial_balance_controller.dart';
 import 'package:amar_pos/features/auth/presentation/controller/auth_controller.dart';
 import 'package:amar_pos/features/drawer/drawer_menu_controller.dart';
 import 'package:amar_pos/features/inventory/presentation/products/product_controller.dart';
@@ -111,5 +114,29 @@ class LedgerScreenBindings extends Bindings{
   void dependencies() {
     Get.lazyPut(()=> LedgerController());
     Get.lazyPut(()=> CAPaymentMethodDDController());
+  }
+}
+
+
+class TrialBalanceScreenBindings extends Bindings{
+  @override
+  void dependencies() {
+    Get.lazyPut(()=> TrialBalanceController());
+  }
+}
+
+
+class ProfitOrLossScreenBindings extends Bindings{
+  @override
+  void dependencies() {
+    Get.lazyPut(()=> ProfitOrLossController());
+  }
+}
+
+
+class BalanceSheetScreenBindings extends Bindings{
+  @override
+  void dependencies() {
+    Get.lazyPut(()=> BalanceSheetController());
   }
 }

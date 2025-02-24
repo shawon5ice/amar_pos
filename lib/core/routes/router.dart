@@ -1,12 +1,15 @@
 import 'package:amar_pos/core/routes/bindings.dart';
+import 'package:amar_pos/features/accounting/presentation/views/balance_sheet/balance_sheet_screen.dart';
 import 'package:amar_pos/features/accounting/presentation/views/daily_statement/daily_statement.dart';
 import 'package:amar_pos/features/accounting/presentation/views/due_collection/due_collection.dart';
 import 'package:amar_pos/features/accounting/presentation/views/due_collection/pages/client_ledger_statement.dart';
 import 'package:amar_pos/features/accounting/presentation/views/expense_voucher/expense_voucher.dart';
 import 'package:amar_pos/features/accounting/presentation/views/ledger/ledger_screen.dart';
 import 'package:amar_pos/features/accounting/presentation/views/money_adjustment/money_adjustment.dart';
+import 'package:amar_pos/features/accounting/presentation/views/profit_or_loss/profit_or_loss_screen.dart';
 import 'package:amar_pos/features/accounting/presentation/views/supplier_payment/pages/supplier_ledger_statement.dart';
 import 'package:amar_pos/features/accounting/presentation/views/supplier_payment/supplier_payment.dart';
+import 'package:amar_pos/features/accounting/presentation/views/trial_balance/trial_balance_screen.dart';
 import 'package:amar_pos/features/auth/presentation/ui/login_screen.dart';
 import 'package:amar_pos/features/config/presentation/configuration_screen.dart';
 import 'package:amar_pos/features/drawer/main_page.dart';
@@ -130,6 +133,24 @@ class AppRoutes {
       name: LedgerScreen.routeName,
       page: () => const LedgerScreen(),
       binding: LedgerScreenBindings(),
+    ),
+
+    GetPage(
+      name: TrialBalanceScreen.routeName,
+      page: () => const TrialBalanceScreen(),
+      binding: TrialBalanceScreenBindings(),
+    ),
+
+    GetPage(
+      name: ProfitOrLossScreen.routeName,
+      page: () => const ProfitOrLossScreen(),
+      binding: ProfitOrLossScreenBindings(),
+    ),
+
+    GetPage(
+      name: BalanceSheetScreen.routeName,
+      page: () => const BalanceSheetScreen(),
+      binding: BalanceSheetScreenBindings(),
     ),
   ];
 }
