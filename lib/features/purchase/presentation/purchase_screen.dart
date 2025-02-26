@@ -29,12 +29,12 @@ class _PurchaseScreenState extends State<PurchaseScreen>
   void initState() {
     _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(() async {
-      if (_tabController.index != _tabController.previousIndex) {
+      if (_tabController.index != _tabController.previousIndex && _tabController.previousIndex ==0 ) {
         controller.searchProductController.clear();
         controller.selectedDateTimeRange.value = null;
         FocusScope.of(context).unfocus();
         // Check if the user is editing and is leaving the first tab
-        if (controller.isEditing && _tabController.previousIndex == 0) {
+        if (controller.purchaseOrderProducts.isNotEmpty) {
           // Store the new index
           int newIndex = _tabController.index;
 
@@ -46,8 +46,9 @@ class _PurchaseScreenState extends State<PurchaseScreen>
           logger.d(discard);
 
           if (discard) {
-            controller.clearEditing();
+            controller.purchaseOrderProducts.clear();
             _tabController.animateTo(newIndex);
+            controller.clearEditing();
           }
         }
         controller.update(['action_icon']); // Update the specific UI element

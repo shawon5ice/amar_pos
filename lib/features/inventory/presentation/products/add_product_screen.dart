@@ -47,6 +47,8 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
   String? fileName;
 
+  bool directlyAddProduct = false;
+
   Future<void> selectFile() async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.image,
@@ -62,6 +64,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
   @override
   void initState() {
+    directlyAddProduct = Get.arguments != null;
     productNameController = TextEditingController();
     productIdController = TextEditingController();
     costingPriceController = TextEditingController();
@@ -451,56 +454,59 @@ class _AddProductScreenState extends State<AddProductScreen> {
         ),
       ),
       bottomNavigationBar:
-          controller.productBrandCategoryWarrantyUnitListResponseModel != null
-              ? CustomButton(
-                  text: productInfo != null ? "Update" : "Add Now",
-                  marginHorizontal: 20,
-                  marginVertical: 10,
-                  onTap: () {
-                    if (formKey.currentState!.validate()) {
-                      if(productInfo != null){
-                        controller.updateProduct(
-                          id: productInfo!.id,
-                          sku: productIdController.text.trim(),
-                          name: productNameController.text.trim(),
-                          brandId: selectedBrand?.id,
-                          categoryId: selectedCategory!.id,
-                          unitId: selectedUnits!.id,
-                          warrantyId: selectedWarranties?.id,
-                          wholesalePrice:
-                          num.parse(wholeSalePriceController.text.trim()),
-                          mrpPrice: num.parse(mrpPriceController.text.trim()),
-                          vat: vatController.text.trim().isNotEmpty
-                              ? num.parse(vatController.text.trim())
-                              : 0,
-                          alertQuantity: vatController.text.trim().isNotEmpty
-                              ? num.parse(vatController.text.trim())
-                              : 0,
-                          photo: fileName,
-                        );
-                      }else{
-                        controller.addProduct(
-                          sku: productIdController.text.trim(),
-                          name: productNameController.text.trim(),
-                          brandId: selectedBrand?.id,
-                          categoryId: selectedCategory!.id,
-                          unitId: selectedUnits!.id,
-                          warrantyId: selectedWarranties?.id,
-                          wholesalePrice:
-                          num.parse(wholeSalePriceController.text.trim()),
-                          mrpPrice: num.parse(mrpPriceController.text.trim()),
-                          vat: vatController.text.trim().isNotEmpty
-                              ? num.parse(vatController.text.trim())
-                              : 0,
-                          alertQuantity: vatController.text.trim().isNotEmpty
-                              ? num.parse(vatController.text.trim())
-                              : 0,
-                          photo: fileName,
-                        );
+          controller.productBrandCategoryWarrantyUnitListResponseModel != null || directlyAddProduct
+              ? Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: CustomButton(
+                    text: productInfo != null ? "Update" : "Add Now",
+                    marginHorizontal: 20,
+                    marginVertical: 10,
+                    onTap: () {
+                      if (formKey.currentState!.validate()) {
+                        if(productInfo != null){
+                          controller.updateProduct(
+                            id: productInfo!.id,
+                            sku: productIdController.text.trim(),
+                            name: productNameController.text.trim(),
+                            brandId: selectedBrand?.id,
+                            categoryId: selectedCategory!.id,
+                            unitId: selectedUnits!.id,
+                            warrantyId: selectedWarranties?.id,
+                            wholesalePrice:
+                            num.parse(wholeSalePriceController.text.trim()),
+                            mrpPrice: num.parse(mrpPriceController.text.trim()),
+                            vat: vatController.text.trim().isNotEmpty
+                                ? num.parse(vatController.text.trim())
+                                : 0,
+                            alertQuantity: vatController.text.trim().isNotEmpty
+                                ? num.parse(vatController.text.trim())
+                                : 0,
+                            photo: fileName,
+                          );
+                        }else{
+                          controller.addProduct(
+                            sku: productIdController.text.trim(),
+                            name: productNameController.text.trim(),
+                            brandId: selectedBrand?.id,
+                            categoryId: selectedCategory!.id,
+                            unitId: selectedUnits!.id,
+                            warrantyId: selectedWarranties?.id,
+                            wholesalePrice:
+                            num.parse(wholeSalePriceController.text.trim()),
+                            mrpPrice: num.parse(mrpPriceController.text.trim()),
+                            vat: vatController.text.trim().isNotEmpty
+                                ? num.parse(vatController.text.trim())
+                                : 0,
+                            alertQuantity: vatController.text.trim().isNotEmpty
+                                ? num.parse(vatController.text.trim())
+                                : 0,
+                            photo: fileName,
+                          );
+                        }
                       }
-                    }
-                  },
-                )
+                    },
+                  ),
+              )
               : const SizedBox.shrink(),
     );
   }

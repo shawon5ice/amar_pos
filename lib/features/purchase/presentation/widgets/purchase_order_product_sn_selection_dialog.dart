@@ -1,3 +1,4 @@
+import 'package:amar_pos/core/network/helpers/error_extractor.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/core/widgets/custom_button.dart';
 import 'package:amar_pos/features/purchase/data/models/create_purchase_order_model.dart';
@@ -104,6 +105,12 @@ class _PurchaseOrderProductSnSelectionDialogState
                             ? false
                             : true,
                         onSubmitted: (value) {
+                          for(int i = 0;i<widget.product.serialNo.length; i++){
+                            if(value == widget.product.serialNo[i]){
+                              ErrorExtractor.showSingleErrorDialog(context, "Please don't insert \"$value\" code again");
+                              return;
+                            }
+                          }
                           widget.product.serialNo.add(value);
                           textEditingController.clear();
                           widget.controller
@@ -122,6 +129,13 @@ class _PurchaseOrderProductSnSelectionDialogState
                               );
                               if (scannedCode != null &&
                                   scannedCode.isNotEmpty) {
+                                for(int i = 0;i<widget.product.serialNo.length; i++){
+                                  if(scannedCode == widget.product.serialNo[i]){
+                                    ErrorExtractor.showSingleErrorDialog(context, "Please don't scan \"$scannedCode\" code again");
+                                    return;
+                                  }
+                                }
+
                                 textEditingController.text = scannedCode;
                                 widget.product.serialNo.add(scannedCode);
                                 textEditingController.clear();
@@ -138,46 +152,45 @@ class _PurchaseOrderProductSnSelectionDialogState
                       ),
                     ),
                     const SizedBox(height: 8),
-                    if (widget.product.serialNo.isNotEmpty)
-                      Column(
+                    GetBuilder<PurchaseController>(
+                      id: 'purchase_order_product_sn_list',
+                      builder: (controller) => widget.product.serialNo.isNotEmpty ? Column(
                         children: [
                           const DashedLine(),
                           const SizedBox(height: 8),
-                          GetBuilder<PurchaseController>(
-                            id: 'purchase_order_product_sn_list',
-                            builder: (controller) => ConstrainedBox(
-                              constraints: BoxConstraints(maxHeight: 150),
-                              child: SingleChildScrollView(
-                                child: Wrap(
-                                  spacing: 4,
-                                  children: widget.product.serialNo
-                                      .map(
-                                        (e) => Chip(
-                                      elevation: 4,
-                                      label: Text(
-                                        e,
-                                        style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 14.sp),
-                                      ),
-                                      onDeleted: () {
-                                        widget.product.serialNo.remove(e);
-                                        controller.update([
-                                          'purchase_order_product_sn_list',
-                                          'sn_input_field'
-                                        ]);
-                                      },
+                          ConstrainedBox(
+                            constraints: BoxConstraints(maxHeight: 150),
+                            child: SingleChildScrollView(
+                              child: Wrap(
+                                spacing: 4,
+                                children: widget.product.serialNo
+                                    .map(
+                                      (e) => Chip(
+                                    elevation: 4,
+                                    label: Text(
+                                      e,
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 14.sp),
                                     ),
-                                  )
-                                      .toList(),
-                                ),
+                                    onDeleted: () {
+                                      widget.product.serialNo.remove(e);
+                                      controller.update([
+                                        'purchase_order_product_sn_list',
+                                        'sn_input_field'
+                                      ]);
+                                    },
+                                  ),
+                                )
+                                    .toList(),
                               ),
                             ),
                           ),
                           addH(4),
                           DashedLine(),
                         ],
-                      ),
+                      ) : SizedBox.shrink(),
+                    ),
                   ],
                 ),
               ),

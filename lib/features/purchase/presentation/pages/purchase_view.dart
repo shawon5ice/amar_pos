@@ -142,18 +142,20 @@ class _PurchaseViewState extends State<PurchaseView> {
                                               .createPurchaseOrderModel.products
                                               .singleWhere(
                                                   (e) => e.id == items.first.id)
-                                              .quantity++;
-        
-                                          if (controller.purchaseProducts.any(
-                                              (e) => e.id == items.first.id)) {
+                                              .quantity;
+                                          logger.i(value);
+                                          if (value>1) {
+                                            logger.e("HERE");
                                             int index = controller
-                                                .purchaseProducts
+                                                .createPurchaseOrderModel.products
                                                 .indexOf(controller
-                                                    .purchaseProducts
+                                                    .createPurchaseOrderModel.products
                                                     .singleWhere((e) =>
                                                         e.id == items.first.id));
                                             purchaseQTYControllers[index].text =
-                                                value.toString();
+                                            (value++).toString();
+                                            logger.e(purchaseQTYControllers[index].text);
+                                            controller.update(['purchase_order_items']);
                                           } else {
                                             purchaseControllers.add(
                                                 TextEditingController(
@@ -272,7 +274,7 @@ class _PurchaseViewState extends State<PurchaseView> {
                       backgroundColor: AppColors.accent,
                       child: IconButton(
                         onPressed: () {
-                          Get.toNamed(AddProductScreen.routeName);
+                          Get.toNamed(AddProductScreen.routeName,arguments: true);
                         },
                         icon: const Icon(Icons.add),
                       ),
@@ -434,58 +436,63 @@ class _PurchaseViewState extends State<PurchaseView> {
                                                           },
                                                         );
                                                       },
-                                                      child: Container(
-                                                        height: 30.h,
-                                                        // width: 64.w,
-                                                        // width: 100.w,
-                                                        padding: const EdgeInsets.symmetric(
-                                                            horizontal: 8),
-                                                        decoration: BoxDecoration(
-                                                            color:controller
-                                                                .createPurchaseOrderModel
-                                                                .products[index]
-                                                                .serialNo
-                                                                .length >
-                                                                controller
+                                                      child: GetBuilder<PurchaseController>(
+                                                        id: 'sn_status',
+                                                        builder: (controller){
+                                                          return Container(
+                                                            height: 30.h,
+                                                            // width: 64.w,
+                                                            // width: 100.w,
+                                                            padding: const EdgeInsets.symmetric(
+                                                                horizontal: 8),
+                                                            decoration: BoxDecoration(
+                                                                color:controller
                                                                     .createPurchaseOrderModel
                                                                     .products[index]
-                                                                    .quantity? AppColors.error : controller
-                                                                .createPurchaseOrderModel
-                                                                .products[index]
-                                                                .serialNo
-                                                                .length ==
-                                                                controller
+                                                                    .serialNo
+                                                                    .length >
+                                                                    controller
+                                                                        .createPurchaseOrderModel
+                                                                        .products[index]
+                                                                        .quantity? AppColors.error : controller
                                                                     .createPurchaseOrderModel
                                                                     .products[index]
-                                                                    .quantity
-                                                                ? Color(0xff94DB8C)
-                                                                : const Color(0xffF6FFF6),
-                                                            borderRadius: BorderRadius.all(
-                                                                Radius.circular(20.r)),
-                                                            border: Border.all(
-                                                                color:
-                                                                const Color(0xff94DB8C)
-                                                                    .withOpacity(.3))),
-                                                        child: Row(
-                                                          mainAxisSize: MainAxisSize.min,
-                                                          children: [
-                                                            Text(
-                                                              "SN",
-                                                              style: context
-                                                                  .textTheme.titleSmall
-                                                                  ?.copyWith(
-                                                                color: Colors.black,
-                                                                fontSize: 10.sp,
-                                                                fontWeight: FontWeight.w600,
-                                                              ),
+                                                                    .serialNo
+                                                                    .length ==
+                                                                    controller
+                                                                        .createPurchaseOrderModel
+                                                                        .products[index]
+                                                                        .quantity
+                                                                    ? Color(0xff94DB8C)
+                                                                    : const Color(0xffF6FFF6),
+                                                                borderRadius: BorderRadius.all(
+                                                                    Radius.circular(20.r)),
+                                                                border: Border.all(
+                                                                    color:
+                                                                    const Color(0xff94DB8C)
+                                                                        .withOpacity(.3))),
+                                                            child: Row(
+                                                              mainAxisSize: MainAxisSize.min,
+                                                              children: [
+                                                                Text(
+                                                                  "SN",
+                                                                  style: context
+                                                                      .textTheme.titleSmall
+                                                                      ?.copyWith(
+                                                                    color: Colors.black,
+                                                                    fontSize: 10.sp,
+                                                                    fontWeight: FontWeight.w600,
+                                                                  ),
+                                                                ),
+                                                                Spacer(),
+                                                                SvgPicture.asset(
+                                                                  AppAssets.snAdd,
+                                                                  height: 12.sp,
+                                                                )
+                                                              ],
                                                             ),
-                                                            Spacer(),
-                                                            SvgPicture.asset(
-                                                              AppAssets.snAdd,
-                                                              height: 12.sp,
-                                                            )
-                                                          ],
-                                                        ),
+                                                          );
+                                                        },
                                                       ),
                                                     ),
                                                   ),
@@ -609,7 +616,7 @@ class _PurchaseViewState extends State<PurchaseView> {
                                                         .quantity =
                                                         int.parse(value.replaceAll(',', ''));
                                                     controller.update(
-                                                        ['sub_total', 'vat']);
+                                                        ['sub_total', 'vat','sn_status']);
                                                   } else {
                                                     controller
                                                         .createPurchaseOrderModel

@@ -183,9 +183,11 @@ class _PurchaseSummaryState extends State<PurchaseSummary> {
                                           ),
                                         ),
                                         searchMatchFn: (item, searchValue) {
-                                          return item.value!.name
+                                           return item.value!.name
                                               .toLowerCase()
-                                              .contains(searchValue.toLowerCase());
+                                              .contains(searchValue.toLowerCase()) || item.value!.phone
+                                               .toLowerCase()
+                                               .contains(searchValue.toLowerCase());
                                         },
                                       ),
                                       items: controller.supplierList
