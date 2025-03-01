@@ -174,7 +174,7 @@ class Details {
   late final int quantity;
   late final int unitPrice;
   late final int total;
-  late final List<dynamic> snNo;
+  late final List<String>? snNo;
 
   Details.fromJson(Map<String, dynamic> json){
     id = json['id'];
@@ -183,7 +183,7 @@ class Details {
     quantity = json['quantity'];
     unitPrice = json['unit_price'];
     total = json['total'];
-    snNo = List.castFrom<dynamic, dynamic>(json['sn_no']);
+    snNo = List.from(json['sn_no']);
   }
 
   Map<String, dynamic> toJson() {
@@ -213,7 +213,7 @@ class PaymentDetails {
   late final String name;
   late final int amount;
   late final List<dynamic> details;
-  late final Null bank;
+  late final Bank? bank;
 
   PaymentDetails.fromJson(Map<String, dynamic> json){
     id = json['id'];
@@ -221,7 +221,7 @@ class PaymentDetails {
     name = json['name'];
     amount = json['amount'];
     details = List.castFrom<dynamic, dynamic>(json['details']);
-    bank = null;
+    bank = json['bank'] is Map? Bank.fromJson(json['bank']) : null ;
   }
 
   Map<String, dynamic> toJson() {
@@ -232,6 +232,29 @@ class PaymentDetails {
     _data['amount'] = amount;
     _data['details'] = details;
     _data['bank'] = bank;
+    return _data;
+  }
+}
+
+
+
+class Bank {
+  Bank({
+    required this.id,
+    required this.name,
+  });
+  late final int id;
+  late final String name;
+
+  Bank.fromJson(Map<String, dynamic> json){
+    id = json['id'];
+    name = json['name'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final _data = <String, dynamic>{};
+    _data['id'] = id;
+    _data['name'] = name;
     return _data;
   }
 }

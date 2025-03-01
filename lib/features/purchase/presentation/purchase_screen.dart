@@ -1,3 +1,6 @@
+import 'package:amar_pos/core/widgets/reusable/filter_bottom_sheet/filter_controller.dart';
+import 'package:amar_pos/core/widgets/reusable/filter_bottom_sheet/product_brand_category_warranty_unit_response_model.dart';
+import 'package:amar_pos/core/widgets/reusable/filter_bottom_sheet/simple_filter_bottom_sheet_widget.dart';
 import 'package:amar_pos/features/purchase/presentation/pages/purchase_history_screen.dart';
 import 'package:amar_pos/features/purchase/presentation/pages/purchase_products.dart';
 import 'package:amar_pos/features/purchase/presentation/pages/purchase_view.dart';
@@ -29,6 +32,14 @@ class _PurchaseScreenState extends State<PurchaseScreen>
   void initState() {
     _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(() async {
+      if(_tabController.indexIsChanging){
+        controller.brand = null;
+        controller.category = null;
+        controller.selectedDateTimeRange.value = null;
+        controller.searchProductController.clear();
+        FocusScope.of(context).unfocus();
+        controller.update(['action_icon']);
+      }
       if (_tabController.index != _tabController.previousIndex && _tabController.previousIndex ==0 ) {
         controller.searchProductController.clear();
         controller.selectedDateTimeRange.value = null;
@@ -60,6 +71,7 @@ class _PurchaseScreenState extends State<PurchaseScreen>
   @override
   void dispose() {
     Get.delete<PurchaseController>();
+    Get.delete<FilterController>();
     super.dispose();
   }
 
@@ -133,22 +145,27 @@ class _PurchaseScreenState extends State<PurchaseScreen>
                 child: SvgPicture.asset(AppAssets.pauseBillingIcon),
               ): IconButton(
                 onPressed: () async {
-                  DateTimeRange? selectedDate = await showDateRangePicker(
-                    context: context,
-                    firstDate: DateTime.now().subtract(const Duration(days: 1000)),
-                    lastDate: DateTime.now().add(const Duration(days: 1000)),
-                    initialDateRange: controller.selectedDateTimeRange.value,
-                  );
-                  if (selectedDate != null) {
-                    controller.setSelectedDateRange(selectedDate);
-                    if(_tabController.index == 1){
-                      controller.getPurchaseHistory();
-                    }else{
-                      controller.getPurchaseProducts();
-                    }
-                  }
+                  showModalBottomSheet(context: context, builder: (context) => SimpleFilterBottomSheetWidget(
+                    selectedBrand: controller.brand,
+                    selectedCategory: controller.category,
+                    selectedDateTimeRange: controller.selectedDateTimeRange.value,
+                    onSubmit: (FilterItem? brand,FilterItem? category,DateTimeRange? dateTimeRange){
+                      controller.brand = brand;
+                      controller.category = category;
+                      controller.selectedDateTimeRange.value = dateTimeRange;
+                      logger.i(controller.brand);
+                      logger.i(controller.category?.id);
+                      logger.i(controller.selectedDateTimeRange.value);
+                      Get.back();
+                      if(_tabController.index == 1){
+                        controller.getPurchaseHistory();
+                      }else{
+                        controller.getPurchaseProducts();
+                      }
+                    },
+                  ));
                 },
-                icon: SvgPicture.asset(AppAssets.calenderIcon),
+                icon: Icon(Icons.filter_alt_outlined, color: (controller.brand != null || controller.category != null || controller.selectedDateTimeRange.value != null) ? AppColors.error : null,),
               )
             ),
             addW(12),
@@ -195,7 +212,9 @@ class _PurchaseScreenState extends State<PurchaseScreen>
                   physics: const NeverScrollableScrollPhysics(),
                   controller: _tabController,
                   children: [
-                    const PurchaseView(),
+                    PurchaseView(onSuccess:  (value){
+                      _tabController.animateTo(value);
+                    },),
                     PurchaseHistoryScreen(onChange: (value){
                       _tabController.animateTo(value);
                     }),

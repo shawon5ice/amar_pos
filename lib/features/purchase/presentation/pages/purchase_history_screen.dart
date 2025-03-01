@@ -91,19 +91,19 @@ class _PurchaseHistoryScreenState extends State<PurchaseHistoryScreen> {
               ],
             ),
             addH(8.px),
-            Obx(() {
-              return controller.selectedDateTimeRange.value == null ? addH(8) : Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text("${formatDate(controller.selectedDateTimeRange.value!.start)} - ${formatDate(controller.selectedDateTimeRange.value!.end)}", style:const TextStyle(fontSize: 14, color: AppColors.error),),
-                  addW(16),
-                  IconButton(onPressed: (){
-                    controller.selectedDateTimeRange.value = null;
-                    controller.getPurchaseHistory();
-                  }, icon: const Icon(Icons.cancel_outlined, size: 18, color: AppColors.error,))
-                ],
-              );
-            }),
+            // Obx(() {
+            //   return controller.selectedDateTimeRange.value == null ? addH(8) : Row(
+            //     mainAxisAlignment: MainAxisAlignment.center,
+            //     children: [
+            //       Text("${formatDate(controller.selectedDateTimeRange.value!.start)} - ${formatDate(controller.selectedDateTimeRange.value!.end)}", style:const TextStyle(fontSize: 14, color: AppColors.error),),
+            //       addW(16),
+            //       IconButton(onPressed: (){
+            //         controller.selectedDateTimeRange.value = null;
+            //         controller.getPurchaseHistory();
+            //       }, icon: const Icon(Icons.cancel_outlined, size: 18, color: AppColors.error,))
+            //     ],
+            //   );
+            // }),
             GetBuilder<PurchaseController>(
               id: 'total_widget',
               builder: (controller) => Row(

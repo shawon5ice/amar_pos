@@ -16,6 +16,7 @@ class CustomDropdownWithSearchWidget<T> extends StatefulWidget {
   final bool isMandatory;
   final int buttonHeight;
   final bool noTitle;
+  final bool? filled;
   final String? Function(T?)? validator;
 
   const CustomDropdownWithSearchWidget({
@@ -23,6 +24,7 @@ class CustomDropdownWithSearchWidget<T> extends StatefulWidget {
     required this.items,
     required this.isMandatory,
     required this.title,
+    this.filled,
     required this.itemLabel,
     required this.onChanged,
     required this.hintText,
@@ -77,7 +79,7 @@ class _CustomDropdownWithSearchWidgetState<T>
                 color: Theme.of(context).hintColor,
               ),
             ),
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               isDense: true,
               contentPadding: EdgeInsets.zero,
               border: OutlineInputBorder(
@@ -86,6 +88,8 @@ class _CustomDropdownWithSearchWidgetState<T>
                   color: AppColors.inputBorderColor,
                 ),
               ),
+              filled: widget.filled,
+              fillColor: Colors.white,
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.all(Radius.circular(8)),
                 borderSide: BorderSide(
@@ -134,7 +138,7 @@ class _CustomDropdownWithSearchWidgetState<T>
             },
             buttonStyleData: ButtonStyleData(
               height: widget.buttonHeight.toDouble(),
-              padding: EdgeInsets.zero,
+              padding: EdgeInsets.only(right: 8),
               decoration: BoxDecoration(
                 border: Border.all(color: AppColors.inputBorderColor),
                 borderRadius: const BorderRadius.all(Radius.circular(8)),
@@ -150,7 +154,7 @@ class _CustomDropdownWithSearchWidgetState<T>
               ),
             ),
             menuItemStyleData: const MenuItemStyleData(
-              height: 40,
+              height: 48,
             ),
             dropdownSearchData: DropdownSearchData(
               searchController: _textEditingController,

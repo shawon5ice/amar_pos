@@ -35,9 +35,9 @@ class _ProductListFilterBottomSheetState
   // Function to show secondary bottom sheet
   void _showSelectionSheet({
     required String title,
-    required List<String> items,
-    required List<String> selectedItems,
-    required Function(List<String>) onSelectionDone,
+    required List<dynamic> items,
+    required List<dynamic> selectedItems,
+    required Function(List<dynamic>) onSelectionDone,
   }) {
     GlobalKey key = GlobalKey();
 
@@ -322,7 +322,7 @@ class SelectorWidget extends StatelessWidget {
 
   final String title;
   final void Function()? onTap;
-  final List<String> selectedItems;
+  final List<dynamic> selectedItems;
 
   @override
   Widget build(BuildContext context) {

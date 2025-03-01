@@ -210,6 +210,8 @@ class PurchaseService {
     String? search,
     DateTime? startDate,
     DateTime? endDate,
+    int? categoryId,
+    int? brandId,
   }) async {
     logger.d("Page: $page");
     var response = await BaseClient.getData(
@@ -221,6 +223,8 @@ class PurchaseService {
           "search": search,
           "start_date": startDate,
           "end_date": endDate,
+          "category_id": categoryId,
+          "brand_id": brandId,
           "limit": 10,
         });
     return response;
@@ -233,6 +237,8 @@ class PurchaseService {
     int? saleType,
     DateTime? startDate,
     DateTime? endDate,
+    int? categoryId,
+    int? brandId,
   }) async {
     logger.d("Page: $page");
     var response = await BaseClient.getData(
@@ -245,6 +251,8 @@ class PurchaseService {
           "start_date": startDate,
           "end_date": endDate,
           "sale_type": saleType,
+          "category_id": categoryId,
+          "brand_id": brandId,
           "limit": 10,
         });
     return response;

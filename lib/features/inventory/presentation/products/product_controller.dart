@@ -19,12 +19,12 @@ class ProductController extends GetxController {
 
   LoginData? loginData = LoginDataBoxManager().loginData;
 
-  List<String> selectedFilterItems = [];
-  List<String> selectedBrands = [];
-  List<String> selectedCategories = [];
+  List<dynamic> selectedFilterItems = [];
+  List<dynamic> selectedBrands = [];
+  List<dynamic> selectedCategories = [];
 
-  List<String> brands = [];
-  List<String> categories = [];
+  List<Brands> brands = [];
+  List<Categories> categories = [];
 
 
   ProductsListResponseModel? productsListResponseModel;
@@ -327,8 +327,8 @@ class ProductController extends GetxController {
             ProductBrandCategoryWarrantyUnitListResponseModel.fromJson(response);
 
         if (productBrandCategoryWarrantyUnitListResponseModel != null) {
-          brands = productBrandCategoryWarrantyUnitListResponseModel!.data.brands.map((e) => e.name).toList();
-          categories = productBrandCategoryWarrantyUnitListResponseModel!.data.categories.map((e) => e.name).toList();
+          brands = productBrandCategoryWarrantyUnitListResponseModel!.data.brands;
+          categories = productBrandCategoryWarrantyUnitListResponseModel!.data.categories;
         }
       }
     } catch (e) {
@@ -340,13 +340,13 @@ class ProductController extends GetxController {
   }
 
 
-  void addFilterItem(List<String> item){
+  void addFilterItem(List<dynamic> item){
     selectedFilterItems.addAll(item);
     update(['filter_list']);
     update(['filter_count']);
   }
 
-  void deleteFilterItem(List<String> item){
+  void deleteFilterItem(List<dynamic> item){
     item.forEach(selectedFilterItems.remove);
     item.forEach(selectedCategories.remove);
     item.forEach(selectedBrands.remove);
@@ -360,11 +360,11 @@ class ProductController extends GetxController {
     update(['filter_count']);
   }
 
-  List<String> filterItems({required bool isBrand,required String search}){
+  List<dynamic> filterItems({required bool isBrand,required String search}){
     if(isBrand){
-      return brands.where((e) => e.toLowerCase().contains(search.toLowerCase())).toList();
+      return brands.where((e) => e.name.toLowerCase().contains(search.toLowerCase())).toList();
     }else{
-      return categories.where((e) => e.toLowerCase().contains(search.toLowerCase())).toList();
+      return categories.where((e) => e.name.toLowerCase().contains(search.toLowerCase())).toList();
     }
   }
 

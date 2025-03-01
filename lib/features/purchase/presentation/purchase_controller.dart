@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:amar_pos/core/data/model/reusable/supplier_list_response_model.dart';
 import 'package:amar_pos/core/network/helpers/error_extractor.dart';
+import 'package:amar_pos/core/widgets/reusable/filter_bottom_sheet/product_brand_category_warranty_unit_response_model.dart';
 import 'package:amar_pos/features/purchase/data/models/create_purchase_order_model.dart';
 import 'package:amar_pos/features/purchase/data/models/purchase_history_response_model.dart';
 import 'package:amar_pos/features/purchase/data/models/purchase_order_details_response_model.dart';
@@ -38,6 +39,9 @@ class PurchaseController extends GetxController{
   bool isRetailSale = true;
 
   num paidAmount = 0;
+
+  FilterItem? brand;
+  FilterItem? category;
 
   LoginData? loginData = LoginDataBoxManager().loginData;
 
@@ -164,31 +168,56 @@ class PurchaseController extends GetxController{
     }
   }
 
+  FutureOr<List<SupplierInfo>> supplierSuggestionsCallback(String search) async {
+    // Check if the search term is in the existing items
+    return  getAllSupplier(search);
+  }
+
   getAll(search) {
     var filteredItems = currentSearchList
-        .where((item) => item.sku.toLowerCase().contains(search.toLowerCase()))
+        .where((item) => item.sku.toLowerCase().contains(search.toLowerCase()) || item.name.toLowerCase().contains(search.toLowerCase()))
         .toList();
-    filteredItems.addAll(currentSearchList
-        .where((item) => item.name.toLowerCase().contains(search.toLowerCase()) && !currentSearchList.contains(item))
-        .toList());
+    return filteredItems;
+  }
+
+  getAllSupplier(search) {
+    var filteredItems = supplierList
+        .where((item) => item.phone.toLowerCase().contains(search.toLowerCase()) || (item.name.toLowerCase().contains(search.toLowerCase())))
+        .toList();
     return filteredItems;
   }
 
 
+
+
   void addPlaceOrderProduct(ProductInfo product, {List<String>? snNo, int? quantity}) {
+    logger.i(snNo);
     if (purchaseOrderProducts.any((e) => e.id == product.id)) {
       createPurchaseOrderModel.products
-          .firstWhere((e) => e.id == product.id)
+          .firstWhere((e) => e.id  == product.id)
           .quantity++;
     } else {
-      purchaseOrderProducts.add(product);
-      createPurchaseOrderModel.products.add(PurchaseProductModel(
-          id: product.id,
-          unitPrice: product.wholesalePrice.toDouble(),
-          quantity:quantity?? 1,
-          vat: (product.vat/100 *  product
-              .wholesalePrice.toDouble()),
-          serialNo: snNo ?? []));
+      if(purchaseOrderProducts.isNotEmpty){
+        purchaseOrderProducts.insert(0, product);
+
+        createPurchaseOrderModel.products.insert(0, PurchaseProductModel(
+            id: product.id,
+            unitPrice: product.wholesalePrice.toDouble(),
+            quantity:quantity?? 1,
+            vat: (product.vat/100 *  product
+                .wholesalePrice.toDouble()),
+            serialNo: snNo ?? []));
+      }else{
+        purchaseOrderProducts.add(product);
+
+        createPurchaseOrderModel.products.add(PurchaseProductModel(
+            id: product.id,
+            unitPrice: product.wholesalePrice.toDouble(),
+            quantity:quantity?? 1,
+            vat: (product.vat/100 *  product
+                .wholesalePrice.toDouble()),
+            serialNo: snNo ?? []));
+      }
     }
     update(['purchase_order_items', 'billing_summary_button']);
   }
@@ -356,7 +385,7 @@ class PurchaseController extends GetxController{
 
   bool createPurchaseOrderLoading = false;
 
-  void createPurchaseOrder() async {
+  Future<bool> createPurchaseOrder() async {
 
     createPurchaseOrderLoading = true;
     update(["purchase_order_items"]);
@@ -379,6 +408,7 @@ class PurchaseController extends GetxController{
           RandomLottieLoader.hide();
           Get.back();
           Get.back();
+          return true;
         }else{
           RandomLottieLoader.hide();
         }
@@ -386,14 +416,16 @@ class PurchaseController extends GetxController{
       }
     }catch(e){
       logger.e(e);
+      return false;
     }finally{
       createPurchaseOrderLoading = false;
       update(["purchase_order_items"]);
     }
+    return false;
   }
 
 
-  void updatePurchaseOrder() async {
+  Future<bool> updatePurchaseOrder() async {
     createPurchaseOrderLoading = true;
     update(["purchase_order_items"]);
     RandomLottieLoader.show();
@@ -416,6 +448,7 @@ class PurchaseController extends GetxController{
           RandomLottieLoader.hide();
           Get.back();
           Get.back();
+          return true;
         } else {
           RandomLottieLoader.hide();
         }
@@ -429,6 +462,7 @@ class PurchaseController extends GetxController{
       isEditing = false;
       update(["purchase_order_items"]);
     }
+    return false;
   }
 
   Future<void> getPurchaseHistory({int page = 1}) async {
@@ -451,6 +485,8 @@ class PurchaseController extends GetxController{
           search: searchProductController.text,
           startDate: selectedDateTimeRange.value?.start,
           endDate: selectedDateTimeRange.value?.end,
+          categoryId: category?.id,
+          brandId: brand?.id,
       );
 
       logger.i(response);
@@ -497,6 +533,8 @@ class PurchaseController extends GetxController{
           search: searchProductController.text,
           startDate: selectedDateTimeRange.value?.start,
           endDate: selectedDateTimeRange.value?.end,
+          categoryId: category?.id,
+          brandId: brand?.id,
       );
 
       logger.i(response);
@@ -567,7 +605,7 @@ class PurchaseController extends GetxController{
         //selecting products
         for (var e in purchaseOrderDetailsResponseModel!.data.details) {
           ProductInfo productInfo = productsListResponseModel!.data.productList.singleWhere((f) => f.id == e.id);
-          addPlaceOrderProduct(productInfo, quantity:  e.quantity,);
+          addPlaceOrderProduct(productInfo, quantity:  e.quantity,snNo: e.snNo);
         }
         
 
@@ -576,6 +614,9 @@ class PurchaseController extends GetxController{
           PaymentMethod paymentMethod = purchasePaymentMethods!.data.singleWhere((f) => f.id == e.id);
           PaymentOption? paymentOption;
 
+          if(e.bank != null){
+            paymentOption = paymentMethod.paymentOptions.singleWhere((f) => f.id == e.bank!.id);
+          }
           if(paymentMethod.name.toLowerCase().contains("cash")){
             cashSelected = true;
           }
@@ -666,6 +707,10 @@ class PurchaseController extends GetxController{
   }
 
   Future<void> downloadList({required bool isPdf,required bool purchaseHistory}) async {
+    if(purchaseHistory && purchaseHistoryList.isEmpty || !purchaseHistory && purchaseProducts.isEmpty){
+      ErrorExtractor.showSingleErrorDialog(Get.context!, "There is no associated data to perform your action!");
+      return;
+    }
     hasError.value = false;
 
     String fileName = "${purchaseHistory? "Return Order history": "Return Product History"}-${

@@ -11,6 +11,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:get_storage/get_storage.dart';
 import '../../../../core/constants/app_assets.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/network/helpers/error_extractor.dart';
@@ -24,7 +25,8 @@ import '../../../inventory/data/products/product_list_response_model.dart';
 import '../widgets/purchase_order_product_sn_selection_dialog.dart';
 
 class PurchaseView extends StatefulWidget {
-  const PurchaseView({super.key});
+  PurchaseView({super.key, required this.onSuccess});
+  Function(int value) onSuccess;
 
   @override
   State<PurchaseView> createState() => _PurchaseViewState();
@@ -42,7 +44,6 @@ class _PurchaseViewState extends State<PurchaseView> {
 
   @override
   void initState() {
-    suggestionEditingController = TextEditingController();
     if (!controller.isEditing) {
       controller.createPurchaseOrderModel =
           CreatePurchaseOrderModel.defaultConstructor();
@@ -53,28 +54,36 @@ class _PurchaseViewState extends State<PurchaseView> {
       );
     } else {
       for (var e in controller.createPurchaseOrderModel.products) {
-        purchaseControllers.add(TextEditingController(
-          text: e.unitPrice.toString(),
-        ));
+        if(purchaseControllers.isNotEmpty){
+          purchaseControllers.insert(0,TextEditingController(
+            text: e.unitPrice.toString(),
+          ));
+          purchaseQTYControllers.insert(0,TextEditingController(
+            text: e.quantity.toString(),
+          ));
+        }else{
+          purchaseControllers.add(TextEditingController(
+            text: e.unitPrice.toString(),
+          ));
+          purchaseQTYControllers.add(TextEditingController(
+            text: e.quantity.toString(),
+          ));
+        }
       }
-      for (var e in controller.createPurchaseOrderModel.products) {
-        purchaseQTYControllers.add(TextEditingController(
-          text: e.quantity.toString(),
-        ));
-      }
+      logger.i(purchaseControllers.length);
     }
     super.initState();
   }
 
   late TextEditingController suggestionEditingController;
 
-  @override
-  void didUpdateWidget(covariant PurchaseView oldWidget) {
-    if (widget != oldWidget) {
-      FocusScope.of(context).unfocus();
-    }
-    super.didUpdateWidget(oldWidget);
-  }
+  // @override
+  // void didUpdateWidget(covariant PurchaseView oldWidget) {
+  //   if (widget != oldWidget) {
+  //     FocusScope.of(context).unfocus();
+  //   }
+  //   super.didUpdateWidget(oldWidget);
+  // }
 
   @override
   void dispose() {
@@ -157,14 +166,25 @@ class _PurchaseViewState extends State<PurchaseView> {
                                             logger.e(purchaseQTYControllers[index].text);
                                             controller.update(['purchase_order_items']);
                                           } else {
-                                            purchaseControllers.add(
-                                                TextEditingController(
-                                                    text: items
-                                                        .first.wholesalePrice
-                                                        .toString()));
-                                            purchaseQTYControllers.add(
-                                                TextEditingController(
-                                                    text: value.toString()));
+                                            if(purchaseControllers.isNotEmpty){
+                                              purchaseControllers.insert(0,
+                                                  TextEditingController(
+                                                      text: items
+                                                          .first.wholesalePrice
+                                                          .toString()));
+                                              purchaseQTYControllers.insert(0,
+                                                  TextEditingController(
+                                                      text: value.toString()));
+                                            }else{
+                                              purchaseControllers.add(
+                                                  TextEditingController(
+                                                      text: items
+                                                          .first.wholesalePrice
+                                                          .toString()));
+                                              purchaseQTYControllers.add(
+                                                  TextEditingController(
+                                                      text: value.toString()));
+                                            }
                                           }
         
                                           FocusScope.of(context).unfocus();
@@ -237,10 +257,17 @@ class _PurchaseViewState extends State<PurchaseView> {
                                   (++value).toString();
                               logger.i(purchaseQTYControllers[i].text);
                             } else {
-                              purchaseControllers.add(TextEditingController(
-                                  text: product.wholesalePrice.toString()));
-                              purchaseQTYControllers
-                                  .add(TextEditingController(text: "1"));
+                              if(purchaseControllers.isNotEmpty){
+                                purchaseControllers.insert(0,TextEditingController(
+                                    text: product.wholesalePrice.toString()));
+                                purchaseQTYControllers
+                                    .insert(0,TextEditingController(text: "1"));
+                              }else{
+                                purchaseControllers.add(TextEditingController(
+                                    text: product.wholesalePrice.toString()));
+                                purchaseQTYControllers
+                                    .add(TextEditingController(text: "1"));
+                              }
                             }
                             controller.addPlaceOrderProduct(product);
                             suggestionEditingController.clear();
@@ -691,7 +718,12 @@ class _PurchaseViewState extends State<PurchaseView> {
                       }
                     }
                     if (formKey.currentState!.validate()) {
-                      await Get.to(() => PurchaseSummary())
+                      await Get.to(() => PurchaseSummary(onSuccess: (value){
+                        if(value){
+                          controller.clearEditing();
+                          widget.onSuccess(1);
+                        }
+                      },))
                           ?.then((value) {
                         FocusScope.of(context).unfocus();
                       });

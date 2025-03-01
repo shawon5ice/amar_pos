@@ -1,4 +1,5 @@
 import 'package:amar_pos/core/core.dart';
+import 'package:amar_pos/core/network/helpers/error_extractor.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/features/purchase/data/models/purchase_history_response_model.dart';
 import 'package:amar_pos/features/purchase/presentation/purchase_controller.dart';
@@ -104,6 +105,10 @@ class PurchaseHistoryItemWidget extends StatelessWidget {
               addW(8),
               SoldHistoryItemActionMenu(
                 onSelected: (value) async{
+                  if(purchaseHistory.isActionable == false){
+                    ErrorExtractor.showSingleErrorDialog(context, "You can't perform any action on this invoice due to changed stock Value!");
+                    return;
+                  }
                   switch (value) {
                     case "edit":
                       await controller.processEdit(purchaseOrderInfo: purchaseHistory, context: context);
