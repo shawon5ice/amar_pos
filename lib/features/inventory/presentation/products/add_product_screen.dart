@@ -140,314 +140,312 @@ class _AddProductScreenState extends State<AddProductScreen> {
         centerTitle: true,
       ),
       body: SingleChildScrollView(
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              decoration: BoxDecoration(
-                  color: Colors.white, borderRadius: BorderRadius.circular(20)),
-              child: Form(
-                key: formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const RichFieldTitle(
-                      text: "Product Name",
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            decoration: BoxDecoration(
+                color: Colors.white, borderRadius: BorderRadius.circular(20)),
+            child: Form(
+              key: formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const RichFieldTitle(
+                    text: "Product Name",
+                  ),
+                  addH(8.h),
+                  CustomTextField(
+                    textCon: productNameController,
+                    hintText: "Type product name...",
+                    inputType: TextInputType.text,
+                    validator: (value) =>
+                        FieldValidator.nonNullableFieldValidator(
+                      value,
+                      "Product Name",
                     ),
-                    addH(8.h),
-                    CustomTextField(
-                      textCon: productNameController,
-                      hintText: "Type product name...",
-                      inputType: TextInputType.text,
-                      validator: (value) =>
-                          FieldValidator.nonNullableFieldValidator(
-                        value,
-                        "Product Name",
-                      ),
-                    ),
-                    addH(16.h),
-                    const RichFieldTitle(
-                      text: "Product ID",
-                    ),
-                    addH(8.h),
-                    CustomTextField(
-                      textCon: productIdController,
-                      suffixWidget: InkWell(
-                          onTap: () async {
-                            final String? scannedCode =
-                                await Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const QRCodeScannerScreen(),
-                              ),
-                            );
-                            if (scannedCode != null && scannedCode.isNotEmpty) {
-                              setState(() {
-                                productIdController.text = scannedCode;
-                              });
-                            }
-                          },
-                          child: const Icon(Icons.qr_code_scanner_sharp)),
-                      hintText: "Scan/Type here...",
-                      inputType: TextInputType.text,
-                      validator: (value) =>
-                          FieldValidator.nonNullableFieldValidator(
-                        value,
-                        "Product ID",
-                      ),
-                    ),
-                    GetBuilder<ProductController>(
-                      id: 'category_dd',
-                      builder: (controller) => CustomDropdownWithSearchWidget<Categories>(
-                        isMandatory: true,
-                        items: controller
-                                .productBrandCategoryWarrantyUnitListResponseModel
-                                ?.data
-                                .categories ??
-                            [],
-                        itemLabel: (item) => item.name,
-                        // How to display the item
-                        value: selectedCategory,
-                        title: "Category",
-                        hintText: controller.filterListLoading
-                            ? 'Loading...'
-                            : controller.productBrandCategoryWarrantyUnitListResponseModel ==
-                                    null
-                                ? 'Something went wrong'
-                                : 'Select a category...',
-                        searchHintText: 'Search for an item...',
-                        onChanged: (value) {
-                          setState(() {
-                            selectedCategory = value;
-                          });
-                        },
-                        validator: (value) {
-                          if (value == null) {
-                            return "Please select a category";
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
-                    GetBuilder<ProductController>(
-                      id: 'brand_dd',
-                      builder: (controller) => CustomDropdownWithSearchWidget<Brands>(
-                        isMandatory: false,
-                        items: controller
-                                .productBrandCategoryWarrantyUnitListResponseModel
-                                ?.data
-                                .brands ??
-                            [],
-                        itemLabel: (item) => item.name,
-                        // How to display the item
-                        value: selectedBrand,
-                        title: "Brand",
-                        hintText: controller.filterListLoading
-                            ? 'Loading...'
-                            : controller.productBrandCategoryWarrantyUnitListResponseModel ==
-                                    null
-                                ? 'Something went wrong'
-                                : 'Select a brand...',
-                        searchHintText: 'Search for an item...',
-                        onChanged: (value) {
-                          selectedBrand = value;
-                          controller.update(['brand_dd']);
-                        },
-                      ),
-                    ),
-                    GetBuilder<ProductController>(
-                      id: 'unit_dd',
-                      builder: (controller) => CustomDropdownWithSearchWidget<Units>(
-                        isMandatory: true,
-                        items: controller
-                                .productBrandCategoryWarrantyUnitListResponseModel
-                                ?.data
-                                .units ??
-                            [],
-                        itemLabel: (item) => item.name,
-                        // How to display the item
-                        value: selectedUnits,
-                        title: "Unit",
-                        hintText: controller.filterListLoading
-                            ? 'Loading...'
-                            : controller.productBrandCategoryWarrantyUnitListResponseModel ==
-                                    null
-                                ? 'Something went wrong'
-                                : 'Select a unit...',
-                        searchHintText: 'Search for an item...',
-                        onChanged: (value) {
-                          selectedUnits = value;
-                          controller.update(['unit_dd']);
-                        },
-                        validator: (value) {
-                          if (value == null) {
-                            return "Please select an unit";
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
-                    GetBuilder<ProductController>(
-                      id: 'warranty_dd',
-                      builder: (controller) => CustomDropdownWithSearchWidget<Warranties>(
-                        isMandatory: false,
-                        items: controller
-                                .productBrandCategoryWarrantyUnitListResponseModel
-                                ?.data
-                                .warranties ??
-                            [],
-                        itemLabel: (item) => item.name.toString(),
-                        // How to display the item
-                        value: selectedWarranties,
-                        title: "Warranty",
-                        hintText: controller.filterListLoading
-                            ? 'Loading...'
-                            : controller.productBrandCategoryWarrantyUnitListResponseModel ==
-                                    null
-                                ? 'Something went wrong'
-                                : 'Select a warranty...',
-                        searchHintText: 'Search for an item...',
-                        onChanged: (value) {
-                          selectedWarranties = value;
-                          controller.update(['warranty_dd']);
-                        },
-                      ),
-                    ),
-                    CustomDateSelectionFieldWidget(
-                      onDateSelection: (String? selectedDate) {
-                        manufacturingDate = selectedDate;
-                      },
-                      title: "Manufacturing Date",
-                      initialDate: productInfo?.mfgDate,
-                    ),
-                    CustomDateSelectionFieldWidget(
-                      onDateSelection: (String? selectedDate) {
-                        expireDate = selectedDate;
-                      },
-                      title: "Expiry Date",
-                      initialDate: productInfo?.expiredDate,
-                    ),
-                    addH(16.h),
-                    const FieldTitle(
-                      "Costing Price",
-                    ),
-                    addH(8.h),
-                    CustomTextField(
-                      textCon: costingPriceController,
-                      hintText: "Type here...",
-                      inputType: TextInputType.number,
-                      inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly,
-                      ],
-                    ),
-                    addH(16.h),
-                    const RichFieldTitle(
-                      text: "Wholesale Price",
-                    ),
-                    addH(8.h),
-                    CustomTextField(
-                      textCon: wholeSalePriceController,
-                      hintText: "Type here...",
-                      inputType: TextInputType.number,
-                      inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly,
-                      ],
-                      validator: (value) =>
-                          FieldValidator.nonNullableFieldValidator(
-                        value,
-                        "Wholesale price",
-                      ),
-                    ),
-                    addH(16.h),
-                    const RichFieldTitle(
-                      text: "MRP",
-                    ),
-                    addH(8.h),
-                    CustomTextField(
-                      textCon: mrpPriceController,
-                      hintText: "Type here...",
-                      inputType: TextInputType.number,
-                      inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly,
-                      ],
-                      validator: (value) =>
-                          FieldValidator.nonNullableFieldValidator(
-                        value,
-                        "MRP",
-                      ),
-                    ),
-                    addH(16.h),
-                    const FieldTitle(
-                      "VAT",
-                    ),
-                    addH(8.h),
-                    CustomTextField(
-                      textCon: vatController,
-                      hintText: "Type here...",
-                      inputType: TextInputType.number,
-                      inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly,
-                      ],
-                    ),
-                    addH(16.h),
-                    const FieldTitle(
-                      "No Stock Alert",
-                    ),
-                    addH(8.h),
-                    CustomTextField(
-                      textCon: noStockAlertController,
-                      hintText: "Type here...",
-                      inputType: TextInputType.number,
-                      inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly,
-                      ],
-                    ),
-                    addH(16.h),
-                    const FieldTitle(
-                      "Upload Photo",
-                    ),
-                    addH(8.h),
-                    InkWell(
-                      borderRadius: const BorderRadius.all(Radius.circular(8)),
-                      onTap: selectFile,
-                      child: CustomPaint(
-                        painter: DottedBorderPainter(
-                          color: const Color(0xffD8E0EC),
-                        ),
-                        child: SizedBox(
-                          height: 150,
-                          width: double.infinity,
-                          child: Center(
-                            child: fileName == null
-                                ? const Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(Icons.image_outlined,
-                                          size: 40, color: Colors.grey),
-                                      SizedBox(height: 8),
-                                      Text(
-                                        "Select product picture",
-                                        style: TextStyle(color: Colors.grey),
-                                      ),
-                                    ],
-                                  )
-                                : Padding(
-                              padding: const EdgeInsets.all(8.0),
-                                    child: fileName!.contains('https://') &&
-                                            productInfo != null
-                                        ? Image.network(fileName!)
-                                        : Image.file(
-                                            fit: BoxFit.cover,
-                                            File(fileName!),
-                                          ),
+                  ),
+                  addH(16.h),
+                  const RichFieldTitle(
+                    text: "Product ID",
+                  ),
+                  addH(8.h),
+                  CustomTextField(
+                    textCon: productIdController,
+                    suffixWidget: InkWell(
+                        onTap: () async {
+                          final String? scannedCode =
+                              await Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  const QRCodeScannerScreen(),
                             ),
+                          );
+                          if (scannedCode != null && scannedCode.isNotEmpty) {
+                            setState(() {
+                              productIdController.text = scannedCode;
+                            });
+                          }
+                        },
+                        child: const Icon(Icons.qr_code_scanner_sharp)),
+                    hintText: "Scan/Type here...",
+                    inputType: TextInputType.text,
+                    validator: (value) =>
+                        FieldValidator.nonNullableFieldValidator(
+                      value,
+                      "Product ID",
+                    ),
+                  ),
+                  GetBuilder<ProductController>(
+                    id: 'category_dd',
+                    builder: (controller) => CustomDropdownWithSearchWidget<Categories>(
+                      isMandatory: true,
+                      items: controller
+                              .productBrandCategoryWarrantyUnitListResponseModel
+                              ?.data
+                              .categories ??
+                          [],
+                      itemLabel: (item) => item.name,
+                      // How to display the item
+                      value: selectedCategory,
+                      title: "Category",
+                      hintText: controller.filterListLoading
+                          ? 'Loading...'
+                          : controller.productBrandCategoryWarrantyUnitListResponseModel ==
+                                  null
+                              ? 'Something went wrong'
+                              : 'Select a category...',
+                      searchHintText: 'Search for an item...',
+                      onChanged: (value) {
+                        setState(() {
+                          selectedCategory = value;
+                        });
+                      },
+                      validator: (value) {
+                        if (value == null) {
+                          return "Please select a category";
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  GetBuilder<ProductController>(
+                    id: 'brand_dd',
+                    builder: (controller) => CustomDropdownWithSearchWidget<Brands>(
+                      isMandatory: false,
+                      items: controller
+                              .productBrandCategoryWarrantyUnitListResponseModel
+                              ?.data
+                              .brands ??
+                          [],
+                      itemLabel: (item) => item.name,
+                      // How to display the item
+                      value: selectedBrand,
+                      title: "Brand",
+                      hintText: controller.filterListLoading
+                          ? 'Loading...'
+                          : controller.productBrandCategoryWarrantyUnitListResponseModel ==
+                                  null
+                              ? 'Something went wrong'
+                              : 'Select a brand...',
+                      searchHintText: 'Search for an item...',
+                      onChanged: (value) {
+                        selectedBrand = value;
+                        controller.update(['brand_dd']);
+                      },
+                    ),
+                  ),
+                  GetBuilder<ProductController>(
+                    id: 'unit_dd',
+                    builder: (controller) => CustomDropdownWithSearchWidget<Units>(
+                      isMandatory: true,
+                      items: controller
+                              .productBrandCategoryWarrantyUnitListResponseModel
+                              ?.data
+                              .units ??
+                          [],
+                      itemLabel: (item) => item.name,
+                      // How to display the item
+                      value: selectedUnits,
+                      title: "Unit",
+                      hintText: controller.filterListLoading
+                          ? 'Loading...'
+                          : controller.productBrandCategoryWarrantyUnitListResponseModel ==
+                                  null
+                              ? 'Something went wrong'
+                              : 'Select a unit...',
+                      searchHintText: 'Search for an item...',
+                      onChanged: (value) {
+                        selectedUnits = value;
+                        controller.update(['unit_dd']);
+                      },
+                      validator: (value) {
+                        if (value == null) {
+                          return "Please select an unit";
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  GetBuilder<ProductController>(
+                    id: 'warranty_dd',
+                    builder: (controller) => CustomDropdownWithSearchWidget<Warranties>(
+                      isMandatory: false,
+                      items: controller
+                              .productBrandCategoryWarrantyUnitListResponseModel
+                              ?.data
+                              .warranties ??
+                          [],
+                      itemLabel: (item) => item.name.toString(),
+                      // How to display the item
+                      value: selectedWarranties,
+                      title: "Warranty",
+                      hintText: controller.filterListLoading
+                          ? 'Loading...'
+                          : controller.productBrandCategoryWarrantyUnitListResponseModel ==
+                                  null
+                              ? 'Something went wrong'
+                              : 'Select a warranty...',
+                      searchHintText: 'Search for an item...',
+                      onChanged: (value) {
+                        selectedWarranties = value;
+                        controller.update(['warranty_dd']);
+                      },
+                    ),
+                  ),
+                  CustomDateSelectionFieldWidget(
+                    onDateSelection: (String? selectedDate) {
+                      manufacturingDate = selectedDate;
+                    },
+                    title: "Manufacturing Date",
+                    initialDate: productInfo?.mfgDate,
+                  ),
+                  CustomDateSelectionFieldWidget(
+                    onDateSelection: (String? selectedDate) {
+                      expireDate = selectedDate;
+                    },
+                    title: "Expiry Date",
+                    initialDate: productInfo?.expiredDate,
+                  ),
+                  addH(16.h),
+                  const FieldTitle(
+                    "Costing Price",
+                  ),
+                  addH(8.h),
+                  CustomTextField(
+                    textCon: costingPriceController,
+                    hintText: "Type here...",
+                    inputType: TextInputType.number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                    ],
+                  ),
+                  addH(16.h),
+                  const RichFieldTitle(
+                    text: "Wholesale Price",
+                  ),
+                  addH(8.h),
+                  CustomTextField(
+                    textCon: wholeSalePriceController,
+                    hintText: "Type here...",
+                    inputType: TextInputType.number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                    ],
+                    validator: (value) =>
+                        FieldValidator.nonNullableFieldValidator(
+                      value,
+                      "Wholesale price",
+                    ),
+                  ),
+                  addH(16.h),
+                  const RichFieldTitle(
+                    text: "MRP",
+                  ),
+                  addH(8.h),
+                  CustomTextField(
+                    textCon: mrpPriceController,
+                    hintText: "Type here...",
+                    inputType: TextInputType.number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                    ],
+                    validator: (value) =>
+                        FieldValidator.nonNullableFieldValidator(
+                      value,
+                      "MRP",
+                    ),
+                  ),
+                  addH(16.h),
+                  const FieldTitle(
+                    "VAT",
+                  ),
+                  addH(8.h),
+                  CustomTextField(
+                    textCon: vatController,
+                    hintText: "Type here...",
+                    inputType: TextInputType.number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                    ],
+                  ),
+                  addH(16.h),
+                  const FieldTitle(
+                    "No Stock Alert",
+                  ),
+                  addH(8.h),
+                  CustomTextField(
+                    textCon: noStockAlertController,
+                    hintText: "Type here...",
+                    inputType: TextInputType.number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                    ],
+                  ),
+                  addH(16.h),
+                  const FieldTitle(
+                    "Upload Photo",
+                  ),
+                  addH(8.h),
+                  InkWell(
+                    borderRadius: const BorderRadius.all(Radius.circular(8)),
+                    onTap: selectFile,
+                    child: CustomPaint(
+                      painter: DottedBorderPainter(
+                        color: const Color(0xffD8E0EC),
+                      ),
+                      child: SizedBox(
+                        height: 150,
+                        width: double.infinity,
+                        child: Center(
+                          child: fileName == null
+                              ? const Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.image_outlined,
+                                        size: 40, color: Colors.grey),
+                                    SizedBox(height: 8),
+                                    Text(
+                                      "Select product picture",
+                                      style: TextStyle(color: Colors.grey),
+                                    ),
+                                  ],
+                                )
+                              : Padding(
+                            padding: const EdgeInsets.all(8.0),
+                                  child: fileName!.contains('https://') &&
+                                          productInfo != null
+                                      ? Image.network(fileName!)
+                                      : Image.file(
+                                          fit: BoxFit.cover,
+                                          File(fileName!),
+                                        ),
                           ),
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -456,7 +454,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
       bottomNavigationBar:
           controller.productBrandCategoryWarrantyUnitListResponseModel != null || directlyAddProduct
               ? Padding(
-                padding: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.only(bottom: 20),
                 child: CustomButton(
                     text: productInfo != null ? "Update" : "Add Now",
                     marginHorizontal: 20,

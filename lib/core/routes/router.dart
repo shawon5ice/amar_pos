@@ -16,6 +16,7 @@ import 'package:amar_pos/features/drawer/main_page.dart';
 import 'package:amar_pos/features/home/presentation/home_screen.dart';
 import 'package:amar_pos/features/inventory/presentation/products/add_product_screen.dart';
 import 'package:amar_pos/features/inventory/presentation/products/products_screen.dart';
+import 'package:amar_pos/features/purchase/presentation/pages/purchase_history_details_view.dart';
 import 'package:amar_pos/features/splash/splash_screen.dart';
 import 'package:get/get.dart';
 

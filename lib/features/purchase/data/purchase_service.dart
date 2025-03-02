@@ -144,13 +144,13 @@ class PurchaseService {
       fileName: "${purchaseOrderInfo.orderNo}.pdf",);
   }
 
-  static Future<dynamic> getSoldHistoryDetails({
+  static Future<dynamic> getPurchaseHistoryDetails({
     required String usrToken,
     required int id,
   }) async {
     var response = await BaseClient.getData(
       token: usrToken,
-      api: "order/get-order-details/$id",
+      api: "purchase/get-purchase-details/$id",
     );
     return response;
   }

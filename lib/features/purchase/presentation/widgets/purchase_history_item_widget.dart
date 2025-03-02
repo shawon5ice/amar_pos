@@ -2,6 +2,7 @@ import 'package:amar_pos/core/core.dart';
 import 'package:amar_pos/core/network/helpers/error_extractor.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/features/purchase/data/models/purchase_history_response_model.dart';
+import 'package:amar_pos/features/purchase/presentation/pages/purchase_history_details_view.dart';
 import 'package:amar_pos/features/purchase/presentation/purchase_controller.dart';
 import 'package:amar_pos/features/sales/presentation/widgets/sold_history_item_action_menu.dart';
 import 'package:auto_size_text/auto_size_text.dart';
@@ -22,150 +23,155 @@ class PurchaseHistoryItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 5.h),
-      padding: const EdgeInsets.all(10),
-      foregroundDecoration: !purchaseHistory.isActionable
-          ? BoxDecoration(
-        color: const Color(0xff7c7c7c).withOpacity(.3),
-        borderRadius: BorderRadius.all(Radius.circular(20.r)),
-      )
-          : null,
-      decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.all(Radius.circular(20.r))),
-      child: Column(
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Flexible(
-                child: Row(
-                  children: [
-                    Container(
-                      padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                      decoration: BoxDecoration(
-                          color: const Color(0xffF6FFF6),
-                          border: Border.all(
-                            color: const Color(0xff94DB8C),
-                            width: .5,
+    return GestureDetector(
+      onTap: (){
+        Get.to(PurchaseHistoryDetailsView(purchaseOrderInfo: purchaseHistory,));
+      },
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical: 5.h),
+        padding: const EdgeInsets.all(10),
+        foregroundDecoration: !purchaseHistory.isActionable
+            ? BoxDecoration(
+          color: const Color(0xff7c7c7c).withOpacity(.3),
+          borderRadius: BorderRadius.all(Radius.circular(20.r)),
+        )
+            : null,
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.all(Radius.circular(20.r))),
+        child: Column(
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Flexible(
+                  child: Row(
+                    children: [
+                      Container(
+                        padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                            color: const Color(0xffF6FFF6),
+                            border: Border.all(
+                              color: const Color(0xff94DB8C),
+                              width: .5,
+                            ),
+                            borderRadius: BorderRadius.circular(20)),
+                        child: AutoSizeText(
+                          purchaseHistory.dateTime,
+                          maxFontSize: 10,
+                          minFontSize: 8,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w500,
                           ),
-                          borderRadius: BorderRadius.circular(20)),
-                      child: AutoSizeText(
-                        purchaseHistory.dateTime,
-                        maxFontSize: 10,
-                        minFontSize: 8,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w500,
                         ),
                       ),
-                    ),
-                    // addW(8.w),
-                    // Container(
-                    //   padding:
-                    //   EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    //   decoration: BoxDecoration(
-                    //       color: Color(0xffF2E8FF),
-                    //       border: Border.all(
-                    //         color: Color(0xff500DA0),
-                    //         width: .5,
-                    //       ),
-                    //       borderRadius: BorderRadius.circular(20)),
-                    //   child: AutoSizeText(
-                    //     purchaseHistory.orderNo,
-                    //     minFontSize: 8,
-                    //     maxFontSize: 10,
-                    //     style: TextStyle(
-                    //       color: Color(0xff500DA0),
-                    //       fontWeight: FontWeight.w500,
-                    //     ),
-                    //   ),
-                    // ),
-                  ],
+                      // addW(8.w),
+                      // Container(
+                      //   padding:
+                      //   EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      //   decoration: BoxDecoration(
+                      //       color: Color(0xffF2E8FF),
+                      //       border: Border.all(
+                      //         color: Color(0xff500DA0),
+                      //         width: .5,
+                      //       ),
+                      //       borderRadius: BorderRadius.circular(20)),
+                      //   child: AutoSizeText(
+                      //     purchaseHistory.orderNo,
+                      //     minFontSize: 8,
+                      //     maxFontSize: 10,
+                      //     style: TextStyle(
+                      //       color: Color(0xff500DA0),
+                      //       fontWeight: FontWeight.w500,
+                      //     ),
+                      //   ),
+                      // ),
+                    ],
+                  ),
                 ),
-              ),
-              addW(8.w),
-              CustomSvgSmallIconButton(
-                borderColor: const Color(0xff03346E),
-                bgColor: const Color(0xffE1F2FF),
-                onTap: () {
-                  controller.downloadPurchaseHistory(
-                      isPdf: true, purchaseOrderInfo: purchaseHistory);
-                },
-                assetPath: AppAssets.downloadIcon,
-              ),
-              addW(8),
-              CustomSvgSmallIconButton(
-                borderColor: const Color(0xffFF9000),
-                bgColor: const Color(0xffFFFCF8),
-                onTap: () {},
-                assetPath: AppAssets.printIcon,
-              ),
-              addW(8),
-              SoldHistoryItemActionMenu(
-                onSelected: (value) async{
-                  if(purchaseHistory.isActionable == false){
-                    ErrorExtractor.showSingleErrorDialog(context, "You can't perform any action on this invoice due to changed stock Value!");
-                    return;
-                  }
-                  switch (value) {
-                    case "edit":
-                      await controller.processEdit(purchaseOrderInfo: purchaseHistory, context: context);
-                      onChange(0);
-                      break;
-                    case "delete":
-                      AwesomeDialog(
-                          context: context,
-                          dialogType: DialogType.error,
-                          title: "Are you sure?",
-                          desc:
-                          "You are going to delete order no: ${purchaseHistory.orderNo}",
-                          btnOkOnPress: () {
-                            controller.deletePurchaseOrder(
-                                purchaseOrderInfo: purchaseHistory);
-                          },
-                          btnCancelOnPress: () {})
-                          .show();
-                      break;
-                  }
-                },
-              ),
-            ],
-          ),
-          addH(12),
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: const BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(10)),
-              color: Color(0xffF8F7F2),
-            ),
-            child: Column(
-              children: [
-                SaleHistoryItemTitleValueWidget(
-                  title: "Invoice Number",
-                  value: purchaseHistory.orderNo,
+                addW(8.w),
+                CustomSvgSmallIconButton(
+                  borderColor: const Color(0xff03346E),
+                  bgColor: const Color(0xffE1F2FF),
+                  onTap: () {
+                    controller.downloadPurchaseHistory(
+                        isPdf: true, purchaseOrderInfo: purchaseHistory);
+                  },
+                  assetPath: AppAssets.downloadIcon,
                 ),
-                SaleHistoryItemTitleValueWidget(
-                  title: "Supplier Name",
-                  value: purchaseHistory.supplier,
+                addW(8),
+                CustomSvgSmallIconButton(
+                  borderColor: const Color(0xffFF9000),
+                  bgColor: const Color(0xffFFFCF8),
+                  onTap: () {},
+                  assetPath: AppAssets.printIcon,
                 ),
-                SaleHistoryItemTitleValueWidget(
-                  title: "Phone Number",
-                  value: purchaseHistory.phone,
-                ),
-                SaleHistoryItemTitleValueWidget(
-                  title: "Discount",
-                  value: Methods.getFormatedPrice(purchaseHistory.discount.toDouble()),
-                ),
-                SaleHistoryItemTitleValueWidget(
-                  title: "Amount",
-                  value: Methods.getFormatedPrice(purchaseHistory.amount.toDouble()),
+                addW(8),
+                SoldHistoryItemActionMenu(
+                  onSelected: (value) async{
+                    if(purchaseHistory.isActionable == false){
+                      ErrorExtractor.showSingleErrorDialog(context, "You can't perform any action on this invoice due to changed stock Value!");
+                      return;
+                    }
+                    switch (value) {
+                      case "edit":
+                        await controller.processEdit(purchaseOrderInfo: purchaseHistory, context: context);
+                        onChange(0);
+                        break;
+                      case "delete":
+                        AwesomeDialog(
+                            context: context,
+                            dialogType: DialogType.error,
+                            title: "Are you sure?",
+                            desc:
+                            "You are going to delete order no: ${purchaseHistory.orderNo}",
+                            btnOkOnPress: () {
+                              controller.deletePurchaseOrder(
+                                  purchaseOrderInfo: purchaseHistory);
+                            },
+                            btnCancelOnPress: () {})
+                            .show();
+                        break;
+                    }
+                  },
                 ),
               ],
             ),
-          )
-        ],
+            addH(12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: const BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                color: Color(0xffF8F7F2),
+              ),
+              child: Column(
+                children: [
+                  SaleHistoryItemTitleValueWidget(
+                    title: "Invoice Number",
+                    value: purchaseHistory.orderNo,
+                  ),
+                  SaleHistoryItemTitleValueWidget(
+                    title: "Supplier Name",
+                    value: purchaseHistory.supplier,
+                  ),
+                  SaleHistoryItemTitleValueWidget(
+                    title: "Phone Number",
+                    value: purchaseHistory.phone,
+                  ),
+                  SaleHistoryItemTitleValueWidget(
+                    title: "Discount",
+                    value: Methods.getFormatedPrice(purchaseHistory.discount.toDouble()),
+                  ),
+                  SaleHistoryItemTitleValueWidget(
+                    title: "Amount",
+                    value: Methods.getFormatedPrice(purchaseHistory.amount.toDouble()),
+                  ),
+                ],
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

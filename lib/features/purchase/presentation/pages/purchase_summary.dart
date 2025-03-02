@@ -142,90 +142,88 @@ class _PurchaseSummaryState extends State<PurchaseSummary> {
                           const FieldTitle("Supplier Name"),
                           addH(4),
                           GetBuilder<PurchaseController>(
-                            id: "purchase_product_list",
-                            builder: (controller) {
-                              return TypeAheadField<SupplierInfo>(
-                                hideOnUnfocus: false,
-                                hideOnSelect: true,
-                                showOnFocus: true,
-                                controller: suggestionEditingController,
-                                builder: (context, textController, focusNode) {
-                                  suggestionEditingController = textController;
-                                  return TextFormField(
-                                    autofocus: false,
-                                    validator: (value) =>
-                                        FieldValidator.nonNullableFieldValidator(
-                                            value, "Supplier name"),
-                                    controller: suggestionEditingController,
-                                    focusNode: focusNode,
-                                    decoration: InputDecoration(
-                                      border: _getInputBorder(),
-                                      suffixIcon: Icon(Icons.arrow_drop_down_sharp),
-                                      hintText: "Select Supplier",
-                                      contentPadding:
-                                      const EdgeInsets.symmetric(horizontal: 20),
-                                      hintStyle:
-                                      TextStyle(color: Colors.grey, fontSize: 14),
-                                    ),
-                                  );
-                                },
-                                suggestionsCallback: controller.supplierSuggestionsCallback,
-                                itemBuilder: (context, supplier) {
-                                  return ListTile(
-                                    minVerticalPadding: 4,
-                                    isThreeLine: true,
-                                    dense: true,
-                                    visualDensity: VisualDensity.compact,
-                                    title: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          supplier.name,
-                                          style: const TextStyle(
-                                              color: Colors.deepPurple,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        Text(supplier.phone),
-                                      ],
-                                    ),
-                                    subtitle: Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 4),
-                                      child: DashedLine(),
-                                    ),
-                                  );
-                                },
-                                onSelected: (value) {
-                                  controller.selectedSupplier = value;
-                                  suggestionEditingController.text = value.name;
-                                  customerNameEditingController.text = value.name ?? '';
-                                  customerPhoneNumberEditingController
-                                      .text = value.phone ?? '';
-                                  customerAddressEditingController.text =
-                                      value.address ?? '';
-                                  controller.update(['supplier_list']);
-                                                                  FocusScope.of(context).unfocus();
-                                },
+                            id: 'supplier_list',
+                            builder: (controller) => TypeAheadField<SupplierInfo>(
+                              hideOnUnfocus: false,
+                              hideOnSelect: true,
+                              showOnFocus: true,
+                              controller: suggestionEditingController,
+                              builder: (context, textController, focusNode) {
+                                suggestionEditingController = textController;
+                                return TextFormField(
+                                  autofocus: false,
+                                  validator: (value) =>
+                                      FieldValidator.nonNullableFieldValidator(
+                                          value, "Supplier name"),
+                                  controller: suggestionEditingController,
+                                  focusNode: focusNode,
+                                  decoration: InputDecoration(
+                                    border: _getInputBorder(),
+                                    suffixIcon: Icon(Icons.arrow_drop_down_sharp),
+                                    hintText: "Select Supplier",
+                                    contentPadding:
+                                    const EdgeInsets.symmetric(horizontal: 20),
+                                    hintStyle:
+                                    TextStyle(color: Colors.grey, fontSize: 14),
+                                  ),
+                                );
+                              },
+                              suggestionsCallback: controller.supplierSuggestionsCallback,
+                              itemBuilder: (context, supplier) {
+                                return ListTile(
+                                  minVerticalPadding: 4,
+                                  isThreeLine: true,
+                                  dense: true,
+                                  visualDensity: VisualDensity.compact,
+                                  title: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        supplier.name,
+                                        style: const TextStyle(
+                                            color: Colors.deepPurple,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      Text(supplier.phone),
+                                    ],
+                                  ),
+                                  subtitle: Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 4),
+                                    child: DashedLine(),
+                                  ),
+                                );
+                              },
+                              onSelected: (value) {
+                                controller.selectedSupplier = value;
+                                suggestionEditingController.text = value.name;
+                                customerNameEditingController.text = value.name ?? '';
+                                customerPhoneNumberEditingController
+                                    .text = value.phone ?? '';
+                                customerAddressEditingController.text =
+                                    value.address ?? '';
+                                controller.update(['supplier_list']);
+                                FocusScope.of(context).unfocus();
+                              },
 
-                                decorationBuilder: (context, child) {
-                                  return Material(
-                                    type: MaterialType.card,
-                                    elevation: 8,
-                                    borderRadius: BorderRadius.circular(8),
-                                    child: child,
-                                  );
-                                },
-                                offset: const Offset(0, 4),
-                                constraints: const BoxConstraints(
-                                  maxHeight: 300,
-                                ),
-                                emptyBuilder: (_) => const Center(
-                                  child: Text("No Items found!"),
-                                ),
-                                loadingBuilder: (_) => const Center(
-                                  child: CircularProgressIndicator(),
-                                ),
-                              );
-                            },
+                              decorationBuilder: (context, child) {
+                                return Material(
+                                  type: MaterialType.card,
+                                  elevation: 8,
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: child,
+                                );
+                              },
+                              offset: const Offset(0, 4),
+                              constraints: const BoxConstraints(
+                                maxHeight: 300,
+                              ),
+                              emptyBuilder: (_) => const Center(
+                                child: Text("No Items found!"),
+                              ),
+                              loadingBuilder: (_) => const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                            ),
                           ),
                           addH(8),
                           const FieldTitle("Phone Number"),

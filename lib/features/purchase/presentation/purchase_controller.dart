@@ -3,6 +3,7 @@ import 'package:amar_pos/core/data/model/reusable/supplier_list_response_model.d
 import 'package:amar_pos/core/network/helpers/error_extractor.dart';
 import 'package:amar_pos/core/widgets/reusable/filter_bottom_sheet/product_brand_category_warranty_unit_response_model.dart';
 import 'package:amar_pos/features/purchase/data/models/create_purchase_order_model.dart';
+import 'package:amar_pos/features/purchase/data/models/purchase_history_details/purchase_history_details_response_model.dart';
 import 'package:amar_pos/features/purchase/data/models/purchase_history_response_model.dart';
 import 'package:amar_pos/features/purchase/data/models/purchase_order_details_response_model.dart';
 import 'package:amar_pos/features/purchase/data/models/purchase_product_response_model.dart';
@@ -734,4 +735,27 @@ class PurchaseController extends GetxController{
     }
   }
 
+  PurchaseHistoryDetailsResponseModel? purchaseHistoryDetailsResponseModel;
+
+  Future<void> getSoldHistoryDetails(BuildContext context, PurchaseOrderInfo purchaseOrderInfo) async {
+    detailsLoading = true;
+    purchaseHistoryDetailsResponseModel = null;
+    update(['purchase_history_details']);
+    try {
+      var response = await PurchaseService.getPurchaseHistoryDetails(
+        usrToken: loginData!.token,
+        id: purchaseOrderInfo.id,
+      );
+
+      logger.i(response);
+      if (response != null) {
+        purchaseHistoryDetailsResponseModel =
+            PurchaseHistoryDetailsResponseModel.fromJson(response);
+      }
+    } catch (e) {
+    } finally {
+      detailsLoading = false;
+      update(['purchase_history_details']);
+    }
+  }
 }

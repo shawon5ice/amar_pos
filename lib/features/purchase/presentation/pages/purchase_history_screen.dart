@@ -4,15 +4,11 @@ import 'package:amar_pos/features/purchase/data/models/purchase_history_response
 import 'package:amar_pos/features/purchase/presentation/purchase_controller.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:amar_pos/core/widgets/custom_text_field.dart';
-import 'package:amar_pos/features/return/presentation/controller/return_controller.dart';
-import 'package:amar_pos/features/return/presentation/widgets/return_history_item_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 
 import '../../../../core/constants/app_assets.dart';
-import '../../../../core/constants/app_colors.dart';
-import '../../../../core/methods/helper_methods.dart';
 import '../../../../core/responsive/pixel_perfect.dart';
 import '../../../../core/widgets/pager_list_view.dart';
 import '../../../inventory/presentation/stock_report/widget/custom_svg_icon_widget.dart';

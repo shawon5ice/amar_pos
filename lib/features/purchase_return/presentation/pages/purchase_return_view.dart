@@ -55,27 +55,29 @@ class _PurchaseReturnViewState extends State<PurchaseReturnView> {
       );
     }else{
       for (var e in controller.createPurchaseReturnOrderModel.products) {
-        purchaseControllers.add(TextEditingController(text: e.unitPrice.toString()));
+        if(purchaseControllers.isNotEmpty){
+          purchaseControllers.insert(0,TextEditingController(
+            text: e.unitPrice.toString(),
+          ));
+          purchaseReturnQTYControllers.insert(0,TextEditingController(
+            text: e.quantity.toString(),
+          ));
+        }else{
+          purchaseControllers.add(TextEditingController(
+            text: e.unitPrice.toString(),
+          ));
+          purchaseReturnQTYControllers.add(TextEditingController(
+            text: e.quantity.toString(),
+          ));
+        }
       }
-      for (var e in controller.createPurchaseReturnOrderModel.products) {
-        purchaseReturnQTYControllers.add(TextEditingController(
-          text: e.quantity.toString(),
-        ));
-      }
+      logger.i(purchaseControllers.length);
     }
     super.initState();
   }
 
   late TextEditingController suggestionEditingController;
 
-
-  @override
-  void didUpdateWidget(covariant PurchaseReturnView oldWidget) {
-    if(widget != oldWidget){
-      FocusScope.of(context).unfocus();
-    }
-    super.didUpdateWidget(oldWidget);
-  }
 
 
   @override
@@ -144,28 +146,43 @@ class _PurchaseReturnViewState extends State<PurchaseReturnView> {
                                               .createPurchaseReturnOrderModel.products
                                               .singleWhere(
                                                   (e) => e.id == items.first.id)
-                                              .quantity++;
-        
-                                          if (controller.purchaseOrderProducts.any(
-                                                  (e) => e.id == items.first.id)) {
+                                              .quantity;
+
+                                          if (value>1) {
+                                            logger.e("HERE");
                                             int index = controller
-                                                .purchaseOrderProducts
+                                                .createPurchaseReturnOrderModel.products
                                                 .indexOf(controller
-                                                .purchaseOrderProducts
+                                                .createPurchaseReturnOrderModel.products
                                                 .singleWhere((e) =>
                                             e.id == items.first.id));
                                             purchaseReturnQTYControllers[index].text =
-                                                value.toString();
+                                                (value++).toString();
+                                            logger.e(purchaseReturnQTYControllers[index].text);
+                                            controller.update(['purchase_order_items']);
                                           } else {
-                                            purchaseControllers.add(
-                                                TextEditingController(
-                                                    text: items
-                                                        .first.wholesalePrice
-                                                        .toString()));
-                                            purchaseReturnQTYControllers.add(
-                                                TextEditingController(
-                                                    text: value.toString()));
+                                            if(purchaseControllers.isNotEmpty){
+                                              purchaseControllers.insert(0,
+                                                  TextEditingController(
+                                                      text: items
+                                                          .first.wholesalePrice
+                                                          .toString()));
+                                              purchaseReturnQTYControllers.insert(0,
+                                                  TextEditingController(
+                                                      text: value.toString()));
+                                            }else{
+                                              purchaseControllers.add(
+                                                  TextEditingController(
+                                                      text: items
+                                                          .first.wholesalePrice
+                                                          .toString()));
+                                              purchaseReturnQTYControllers.add(
+                                                  TextEditingController(
+                                                      text: value.toString()));
+                                            }
                                           }
+
+
                                           // purchaseControllers.add(TextEditingController(text: items.first.wholesalePrice.toString()));
                                           FocusScope.of(context).unfocus();
                                         }
@@ -229,17 +246,24 @@ class _PurchaseReturnViewState extends State<PurchaseReturnView> {
                                 break;
                               }
                             }
-        
+
                             if (controller.purchaseOrderProducts
                                 .any((e) => e.id == product.id)) {
                               purchaseReturnQTYControllers[i].text =
                                   (++value).toString();
                               logger.i(purchaseReturnQTYControllers[i].text);
                             } else {
-                              purchaseControllers.add(TextEditingController(
-                                  text: product.wholesalePrice.toString()));
-                              purchaseReturnQTYControllers
-                                  .add(TextEditingController(text: "1"));
+                              if(purchaseControllers.isNotEmpty){
+                                purchaseControllers.insert(0,TextEditingController(
+                                    text: product.wholesalePrice.toString()));
+                                purchaseReturnQTYControllers
+                                    .insert(0,TextEditingController(text: "1"));
+                              }else{
+                                purchaseControllers.add(TextEditingController(
+                                    text: product.wholesalePrice.toString()));
+                                purchaseReturnQTYControllers
+                                    .add(TextEditingController(text: "1"));
+                              }
                             }
                             controller.addPlaceOrderProduct(product);
                             suggestionEditingController.clear();
@@ -273,7 +297,7 @@ class _PurchaseReturnViewState extends State<PurchaseReturnView> {
                       backgroundColor: AppColors.accent,
                       child: IconButton(
                         onPressed: () {
-                          Get.toNamed(AddProductScreen.routeName);
+                          Get.toNamed(AddProductScreen.routeName, arguments: true);
                         },
                         icon: const Icon(Icons.add),
                       ),

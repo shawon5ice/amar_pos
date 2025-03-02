@@ -151,11 +151,8 @@ class PurchaseReturnController extends GetxController{
 
   getAll(search) {
     var filteredItems = currentSearchList
-        .where((item) => item.sku.toLowerCase().contains(search.toLowerCase()))
+        .where((item) => item.sku.toLowerCase().contains(search.toLowerCase()) || item.name.toLowerCase().contains(search.toLowerCase()))
         .toList();
-    filteredItems.addAll(currentSearchList
-        .where((item) => item.name.toLowerCase().contains(search.toLowerCase())  && !currentSearchList.contains(item))
-        .toList());
     return filteredItems;
   }
 
@@ -166,14 +163,27 @@ class PurchaseReturnController extends GetxController{
           .firstWhere((e) => e.id == product.id)
           .quantity++;
     } else {
-      purchaseOrderProducts.add(product);
-      createPurchaseReturnOrderModel.products.add(PurchaseReturnProductModel(
-          id: product.id,
-          unitPrice: product.wholesalePrice.toDouble(),
-          quantity:quantity?? 1,
-          vat: (product.vat/100 *  product
-              .wholesalePrice.toDouble()),
-          serialNo: snNo ?? []));
+      if(purchaseOrderProducts.isNotEmpty){
+        purchaseOrderProducts.insert(0, product);
+
+        createPurchaseReturnOrderModel.products.insert(0, PurchaseReturnProductModel(
+            id: product.id,
+            unitPrice: product.wholesalePrice.toDouble(),
+            quantity:quantity?? 1,
+            vat: (product.vat/100 *  product
+                .wholesalePrice.toDouble()),
+            serialNo: snNo ?? []));
+      }else{
+        purchaseOrderProducts.add(product);
+
+        createPurchaseReturnOrderModel.products.add(PurchaseReturnProductModel(
+            id: product.id,
+            unitPrice: product.wholesalePrice.toDouble(),
+            quantity:quantity?? 1,
+            vat: (product.vat/100 *  product
+                .wholesalePrice.toDouble()),
+            serialNo: snNo ?? []));
+      }
     }
     update(['purchase_order_items', 'billing_summary_button']);
   }
@@ -681,6 +691,17 @@ class PurchaseReturnController extends GetxController{
     } finally {
 
     }
+  }
+  FutureOr<List<SupplierInfo>> supplierSuggestionsCallback(String search) async {
+    // Check if the search term is in the existing items
+    return  getAllSupplier(search);
+  }
+
+  getAllSupplier(search) {
+    var filteredItems = supplierList
+        .where((item) => item.phone.toLowerCase().contains(search.toLowerCase()) || (item.name.toLowerCase().contains(search.toLowerCase())))
+        .toList();
+    return filteredItems;
   }
 
 }

@@ -11,8 +11,9 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import '../../../../core/constants/app_assets.dart';
+import '../../../../core/widgets/dashed_line.dart';
 import '../../data/models/create_purchase_return_order_model.dart';
 import '../widgets/purchase_return_summary_payment_option_selection_widget.dart';
 
@@ -39,6 +40,8 @@ class _PurchaseReturnSummaryState extends State<PurchaseReturnSummary> {
   @override
   void initState() {
 
+    suggestionEditingController = TextEditingController();
+
     _textEditingController = TextEditingController();
     customerNameEditingController = TextEditingController();
     customerPhoneNumberEditingController = TextEditingController();
@@ -58,6 +61,7 @@ class _PurchaseReturnSummaryState extends State<PurchaseReturnSummary> {
       controller.getPaymentMethods();
     }
 
+    suggestionEditingController.text = controller.selectedSupplier?.name ?? '';
     customerNameEditingController.text = controller.selectedSupplier?.name ?? '';
     customerPhoneNumberEditingController.text = controller.selectedSupplier?.phone ?? '';
     customerAddressEditingController.text = controller.selectedSupplier?.address ?? '';
@@ -78,6 +82,8 @@ class _PurchaseReturnSummaryState extends State<PurchaseReturnSummary> {
 
     super.initState();
   }
+
+  late TextEditingController suggestionEditingController;
 
   @override
   void dispose() {
@@ -123,107 +129,85 @@ class _PurchaseReturnSummaryState extends State<PurchaseReturnSummary> {
                           addH(4),
                           GetBuilder<PurchaseReturnController>(
                                   id: 'supplier_list',
-                                  builder: (controller) =>
-                                      DropdownButtonHideUnderline(
-                                    child: DropdownButton2<SupplierInfo>(
-                                      isExpanded: true,
-                                      dropdownSearchData: DropdownSearchData(
-                                        searchController: _textEditingController,
-                                        searchInnerWidgetHeight: 48,
-                                        searchInnerWidget: Padding(
-                                          padding:
-                                          const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
-                                          child: TextFormField(
-                                            controller: _textEditingController,
-                                            decoration: InputDecoration(
-                                              isDense: true,
-                                              hintText: "Search Supplier",
-                                              hintStyle: const TextStyle(fontSize: 12),
-                                              border: OutlineInputBorder(
-                                                borderRadius: BorderRadius.circular(8),
-                                              ),
+                                  builder: (controller) => TypeAheadField<SupplierInfo>(
+                                    hideOnUnfocus: false,
+                                    hideOnSelect: true,
+                                    showOnFocus: true,
+                                    controller: suggestionEditingController,
+                                    builder: (context, textController, focusNode) {
+                                      suggestionEditingController = textController;
+                                      return TextFormField(
+                                        autofocus: false,
+                                        validator: (value) =>
+                                            FieldValidator.nonNullableFieldValidator(
+                                                value, "Supplier name"),
+                                        controller: suggestionEditingController,
+                                        focusNode: focusNode,
+                                        decoration: InputDecoration(
+                                          border: _getInputBorder(),
+                                          suffixIcon: Icon(Icons.arrow_drop_down_sharp),
+                                          hintText: "Select Supplier",
+                                          contentPadding:
+                                          const EdgeInsets.symmetric(horizontal: 20),
+                                          hintStyle:
+                                          TextStyle(color: Colors.grey, fontSize: 14),
+                                        ),
+                                      );
+                                    },
+                                    suggestionsCallback: controller.supplierSuggestionsCallback,
+                                    itemBuilder: (context, supplier) {
+                                      return ListTile(
+                                        minVerticalPadding: 4,
+                                        isThreeLine: true,
+                                        dense: true,
+                                        visualDensity: VisualDensity.compact,
+                                        title: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              supplier.name,
+                                              style: const TextStyle(
+                                                  color: Colors.deepPurple,
+                                                  fontWeight: FontWeight.bold),
                                             ),
-                                          ),
+                                            Text(supplier.phone),
+                                          ],
                                         ),
-                                        searchMatchFn: (item, searchValue) {
-                                          var filteredItem =  item.value!.name
-                                              .toLowerCase()
-                                              .contains(searchValue.toLowerCase());
-      
-                                          return filteredItem;
-                                        },
-                                      ),
-                                      hint: Text(
-                                        controller.supplierList.isNotEmpty
-                                            ? "Select Supplier"
-                                            : "Loading...",
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: Theme.of(context).hintColor,
+                                        subtitle: Padding(
+                                          padding: const EdgeInsets.symmetric(vertical: 4),
+                                          child: DashedLine(),
                                         ),
-                                      ),
-                                      items: controller.supplierList
-                                          .map((SupplierInfo item) {
-                                        return DropdownMenuItem<SupplierInfo>(
-                                          value: item,
-                                          child:  Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                item.name,
-                                                style: const TextStyle(
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                                overflow: TextOverflow.visible,
-                                              ),
-                                              Text(
-                                                item.phone,
-                                                style: const TextStyle(
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.normal,
-      
-                                                ),
-                                                overflow: TextOverflow.visible,
-                                              ),
-                                            ],
-                                          ),
-                                        );
-                                      }).toList(),
-                                      value: controller.selectedSupplier,
-                                      onChanged: (value) {
-                                        if (value != null) {
-                                          controller.selectedSupplier = value;
-                                          customerPhoneNumberEditingController
-                                              .text = value.phone ?? '';
-                                          customerAddressEditingController.text =
-                                              value.address ?? '';
-                                          controller.update(['client_list']);
-                                        }
-                                      },
-                                      buttonStyleData: ButtonStyleData(
-                                        height: 56.sp,
-                                        padding: EdgeInsets.zero,
-                                        decoration: BoxDecoration(
-                                          border: Border.all(
-                                              color: AppColors.inputBorderColor),
-                                          borderRadius: const BorderRadius.all(
-                                              Radius.circular(8)),
-                                        ),
-                                      ),
-                                      dropdownStyleData: const DropdownStyleData(
-                                        maxHeight: 300,
-                                        offset: Offset(0, 4),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(8)),
-                                        ),
-                                      ),
-                                      menuItemStyleData: const MenuItemStyleData(
-                                        height: 40,
-                                      ),
+                                      );
+                                    },
+                                    onSelected: (value) {
+                                      controller.selectedSupplier = value;
+                                      suggestionEditingController.text = value.name;
+                                      customerNameEditingController.text = value.name ?? '';
+                                      customerPhoneNumberEditingController
+                                          .text = value.phone ?? '';
+                                      customerAddressEditingController.text =
+                                          value.address ?? '';
+                                      controller.update(['supplier_list']);
+                                      FocusScope.of(context).unfocus();
+                                    },
+
+                                    decorationBuilder: (context, child) {
+                                      return Material(
+                                        type: MaterialType.card,
+                                        elevation: 8,
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: child,
+                                      );
+                                    },
+                                    offset: const Offset(0, 4),
+                                    constraints: const BoxConstraints(
+                                      maxHeight: 300,
+                                    ),
+                                    emptyBuilder: (_) => const Center(
+                                      child: Text("No Items found!"),
+                                    ),
+                                    loadingBuilder: (_) => const Center(
+                                      child: CircularProgressIndicator(),
                                     ),
                                   ),
                                 ),
@@ -539,6 +523,16 @@ class _PurchaseReturnSummaryState extends State<PurchaseReturnSummary> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  InputBorder _getInputBorder() {
+    return OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+      borderSide: BorderSide(
+        color: AppColors.inputBorderColor,
+        width:  1,
       ),
     );
   }
