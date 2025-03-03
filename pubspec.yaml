@@ -64,6 +64,7 @@ dependencies:
   syncfusion_flutter_datagrid: 26.2.8
   device_preview_plus:
   data_table_2: 2.5.15
+  barcode: ^2.2.9
 
 
 dev_dependencies:

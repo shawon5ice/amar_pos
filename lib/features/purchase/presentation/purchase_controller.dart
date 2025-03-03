@@ -737,7 +737,7 @@ class PurchaseController extends GetxController{
 
   PurchaseHistoryDetailsResponseModel? purchaseHistoryDetailsResponseModel;
 
-  Future<void> getSoldHistoryDetails(BuildContext context, PurchaseOrderInfo purchaseOrderInfo) async {
+  Future<void> getPurchaseHistoryDetails(BuildContext context, PurchaseOrderInfo purchaseOrderInfo) async {
     detailsLoading = true;
     purchaseHistoryDetailsResponseModel = null;
     update(['purchase_history_details']);

@@ -10,14 +10,14 @@ import '../../../core/widgets/loading/random_lottie_loader.dart';
 import '../../auth/data/model/hive/login_data.dart';
 import '../../auth/data/model/hive/login_data_helper.dart';
 import '../../inventory/data/products/product_list_response_model.dart';
+import '../../purchase/data/models/purchase_history_details/purchase_history_details_response_model.dart';
+import '../../purchase/data/models/purchase_return_history_details/purchase_return_history_details_response_model.dart';
 import '../data/models/create_purchase_return_order_model.dart';
 import '../data/models/purchase_return_history_response_model.dart';
 import '../data/models/purchase_return_products_response_model.dart';
 import '../data/purchase_return_service.dart';
 
-
-class PurchaseReturnController extends GetxController{
-
+class PurchaseReturnController extends GetxController {
   bool isProductListLoading = false;
   bool isPaymentMethodListLoading = false;
   bool isLoadingMore = false;
@@ -41,27 +41,25 @@ class PurchaseReturnController extends GetxController{
 
   LoginData? loginData = LoginDataBoxManager().loginData;
 
-  CreatePurchaseReturnOrderModel createPurchaseReturnOrderModel = CreatePurchaseReturnOrderModel.defaultConstructor();
+  CreatePurchaseReturnOrderModel createPurchaseReturnOrderModel =
+      CreatePurchaseReturnOrderModel.defaultConstructor();
 
   List<ProductInfo> purchaseOrderProducts = [];
-
 
   Rx<DateTimeRange?> selectedDateTimeRange = Rx<DateTimeRange?>(null);
 
   final isLoading = false.obs; // Tracks ongoing API calls
   var lastFoundList = <ProductInfo>[].obs; // Previously found products
-  var currentSearchList = <ProductInfo>[]
-      .obs; // Results from the ongoing search
+  var currentSearchList =
+      <ProductInfo>[].obs; // Results from the ongoing search
   var isSearching = false.obs; // Indicates whether a search is ongoing
   var hasError = false.obs; // Tracks if an error occurred
 
   bool cashSelected = false;
   bool creditSelected = false;
 
-
   TextEditingController searchProductController = TextEditingController();
   ProductsListResponseModel? productsListResponseModel;
-
 
   List<ServiceStuffInfo> serviceStuffList = [];
   bool serviceStuffLoading = false;
@@ -75,15 +73,13 @@ class PurchaseReturnController extends GetxController{
   List<PaymentMethodTracker> paymentMethodTracker = [];
 
   bool isEditing = false;
-  bool detailsLoading =false;
-
+  bool detailsLoading = false;
 
   //Purchase History
   PurchaseReturnHistoryResponseModel? purchaseReturnHistoryResponseModel;
   List<PurchaseReturnOrderInfo> purchaseReturnHistoryList = [];
   bool isPurchaseReturnHistoryListLoading = false;
   bool isPurchaseReturnHistoryLoadingMore = false;
-
 
   //Purchase Products
   PurchaseReturnProductResponseModel? purchaseReturnProductResponseModel;
@@ -151,37 +147,39 @@ class PurchaseReturnController extends GetxController{
 
   getAll(search) {
     var filteredItems = currentSearchList
-        .where((item) => item.sku.toLowerCase().contains(search.toLowerCase()) || item.name.toLowerCase().contains(search.toLowerCase()))
+        .where((item) =>
+            item.sku.toLowerCase().contains(search.toLowerCase()) ||
+            item.name.toLowerCase().contains(search.toLowerCase()))
         .toList();
     return filteredItems;
   }
 
-
-  void addPlaceOrderProduct(ProductInfo product, {List<String>? snNo, int? quantity}) {
+  void addPlaceOrderProduct(ProductInfo product,
+      {List<String>? snNo, int? quantity}) {
     if (purchaseOrderProducts.any((e) => e.id == product.id)) {
       createPurchaseReturnOrderModel.products
           .firstWhere((e) => e.id == product.id)
           .quantity++;
     } else {
-      if(purchaseOrderProducts.isNotEmpty){
+      if (purchaseOrderProducts.isNotEmpty) {
         purchaseOrderProducts.insert(0, product);
 
-        createPurchaseReturnOrderModel.products.insert(0, PurchaseReturnProductModel(
-            id: product.id,
-            unitPrice: product.wholesalePrice.toDouble(),
-            quantity:quantity?? 1,
-            vat: (product.vat/100 *  product
-                .wholesalePrice.toDouble()),
-            serialNo: snNo ?? []));
-      }else{
+        createPurchaseReturnOrderModel.products.insert(
+            0,
+            PurchaseReturnProductModel(
+                id: product.id,
+                unitPrice: product.wholesalePrice.toDouble(),
+                quantity: quantity ?? 1,
+                vat: (product.vat / 100 * product.wholesalePrice.toDouble()),
+                serialNo: snNo ?? []));
+      } else {
         purchaseOrderProducts.add(product);
 
         createPurchaseReturnOrderModel.products.add(PurchaseReturnProductModel(
             id: product.id,
             unitPrice: product.wholesalePrice.toDouble(),
-            quantity:quantity?? 1,
-            vat: (product.vat/100 *  product
-                .wholesalePrice.toDouble()),
+            quantity: quantity ?? 1,
+            vat: (product.vat / 100 * product.wholesalePrice.toDouble()),
             serialNo: snNo ?? []));
       }
     }
@@ -194,8 +192,7 @@ class PurchaseReturnController extends GetxController{
       if (e.id == product.id) {
         totalAmount -= product.mrpPrice * e.quantity;
         totalQTY -= e.quantity;
-        paidAmount =
-        (totalAmount  - totalDiscount - additionalExpense);
+        paidAmount = (totalAmount - totalDiscount - additionalExpense);
         return true;
       } else {
         return false;
@@ -214,7 +211,6 @@ class PurchaseReturnController extends GetxController{
     }
     update(['purchase_order_items', 'billing_summary_button']);
   }
-
 
   Future<void> getAllServiceStuff() async {
     serviceStuffListLoading = true;
@@ -252,7 +248,8 @@ class PurchaseReturnController extends GetxController{
       );
 
       if (response != null && response['success']) {
-        supplierList = SupplierListResponseModel.fromJson(response).supplierList;
+        supplierList =
+            SupplierListResponseModel.fromJson(response).supplierList;
       } else {
         hasError.value = true;
       }
@@ -272,7 +269,8 @@ class PurchaseReturnController extends GetxController{
       purchasePaymentMethods = null;
       update(['billing_payment_methods']);
       var response = await PurchaseReturnService.getBillingPaymentMethods(
-          usrToken: loginData!.token,);
+        usrToken: loginData!.token,
+      );
 
       if (response != null && response['success']) {
         purchasePaymentMethods = PaymentMethodsResponseModel.fromJson(response);
@@ -285,31 +283,28 @@ class PurchaseReturnController extends GetxController{
     } finally {
       isPaymentMethodListLoading = false;
       update(['billing_payment_methods']);
-      if(!isEditing){
+      if (!isEditing) {
         addPaymentMethod();
       }
     }
   }
 
-
-  void addPaymentMethod(){
+  void addPaymentMethod() {
     num excludeAmount = 0;
-    for(var e in paymentMethodTracker){
+    for (var e in paymentMethodTracker) {
       excludeAmount += e.paidAmount ?? 0;
     }
     totalPaid = excludeAmount;
-    if(totalPaid==paidAmount){
+    if (totalPaid == paidAmount) {
       Methods.showSnackbar(msg: "Full amount already distributed", duration: 5);
       return;
-
-    }else if(totalPaid> paidAmount){
+    } else if (totalPaid > paidAmount) {
       Methods.showSnackbar(msg: "Please reduce paid amount", duration: 5);
       return;
     }
     paymentMethodTracker.add(PaymentMethodTracker(
         id: paymentMethodTracker.length + 1,
-        paidAmount: paidAmount - excludeAmount
-    ));
+        paidAmount: paidAmount - excludeAmount));
     calculateAmount();
     update(['billing_summary_form']);
   }
@@ -324,11 +319,11 @@ class PurchaseReturnController extends GetxController{
     num excludeAmount = 0;
     for (var e in paymentMethodTracker) {
       excludeAmount += e.paidAmount ?? 0;
-      if(e.paymentMethod != null){
-        if(e.paymentMethod!.name.toLowerCase().contains("cash")){
+      if (e.paymentMethod != null) {
+        if (e.paymentMethod!.name.toLowerCase().contains("cash")) {
           cash = true;
         }
-        if(e.paymentMethod!.name.toLowerCase().contains("credit")){
+        if (e.paymentMethod!.name.toLowerCase().contains("credit")) {
           credit = true;
         }
       }
@@ -344,51 +339,56 @@ class PurchaseReturnController extends GetxController{
     totalAmount = totalA;
     totalQTY = totalQ;
     paidAmount = totalAmount + additionalExpense - totalDiscount;
-    if(firstTime == null){
-      totalDeu =   totalPaid - paidAmount ;
+    if (firstTime == null) {
+      totalDeu = totalPaid - paidAmount;
     }
 
-    update(['selling_party_selection','change-due-amount', 'billing_summary_form']);
+    update([
+      'selling_party_selection',
+      'change-due-amount',
+      'billing_summary_form'
+    ]);
   }
 
   bool createPurchaseReturnOrderLoading = false;
 
   void createPurchaseReturnOrder() async {
-
     createPurchaseReturnOrderLoading = true;
     update(["purchase_order_items"]);
     RandomLottieLoader.show();
-    try{
+    try {
       var response = await PurchaseReturnService.createPurchaseReturnOrder(
         usrToken: loginData!.token,
         purchaseReturnOrderModel: createPurchaseReturnOrderModel,
       );
       logger.e(response);
       if (response != null) {
-        if(response['success']){
+        if (response['success']) {
           selectedSupplier = null;
           supplierList.clear();
           paymentMethodTracker.clear();
           purchaseOrderProducts.clear();
-          createPurchaseReturnOrderModel = CreatePurchaseReturnOrderModel.defaultConstructor();
+          createPurchaseReturnOrderModel =
+              CreatePurchaseReturnOrderModel.defaultConstructor();
           additionalExpense = 0;
           totalDiscount = 0;
           RandomLottieLoader.hide();
           Get.back();
           Get.back();
-        }else{
+        } else {
           RandomLottieLoader.hide();
         }
-        Methods.showSnackbar(msg: response['message'], isSuccess: response['success']? true: null);
+        Methods.showSnackbar(
+            msg: response['message'],
+            isSuccess: response['success'] ? true : null);
       }
-    }catch(e){
+    } catch (e) {
       logger.e(e);
-    }finally{
+    } finally {
       createPurchaseReturnOrderLoading = false;
       update(["purchase_order_items"]);
     }
   }
-
 
   void updatePurchaseOrder() async {
     createPurchaseReturnOrderLoading = true;
@@ -416,7 +416,8 @@ class PurchaseReturnController extends GetxController{
         } else {
           RandomLottieLoader.hide();
         }
-        Methods.showSnackbar(msg: response['message'],
+        Methods.showSnackbar(
+            msg: response['message'],
             isSuccess: response['success'] ? true : null);
       }
     } catch (e) {
@@ -432,22 +433,22 @@ class PurchaseReturnController extends GetxController{
     isPurchaseReturnHistoryListLoading = page == 1;
     isPurchaseReturnHistoryLoadingMore = page > 1;
 
-    if(page == 1){
+    if (page == 1) {
       purchaseReturnHistoryResponseModel = null;
       purchaseReturnHistoryList.clear();
     }
 
     hasError.value = false;
 
-    update(['purchase_history_list','total_widget']);
+    update(['purchase_history_list', 'total_widget']);
 
     try {
       var response = await PurchaseReturnService.getPurchaseReturnHistory(
-          usrToken: loginData!.token,
-          page: page,
-          search: searchProductController.text,
-          startDate: selectedDateTimeRange.value?.start,
-          endDate: selectedDateTimeRange.value?.end,
+        usrToken: loginData!.token,
+        page: page,
+        search: searchProductController.text,
+        startDate: selectedDateTimeRange.value?.start,
+        endDate: selectedDateTimeRange.value?.end,
       );
 
       logger.i(response);
@@ -456,15 +457,16 @@ class PurchaseReturnController extends GetxController{
             PurchaseReturnHistoryResponseModel.fromJson(response);
 
         if (purchaseReturnHistoryResponseModel != null) {
-          purchaseReturnHistoryList.addAll(purchaseReturnHistoryResponseModel!.data.purchaseReturnHistoryList!);
+          purchaseReturnHistoryList.addAll(purchaseReturnHistoryResponseModel!
+              .data.purchaseReturnHistoryList!);
         }
       } else {
-        if(page != 1){
+        if (page != 1) {
           hasError.value = true;
         }
       }
     } catch (e) {
-      if(page != 1){
+      if (page != 1) {
         hasError.value = true;
       }
       purchaseReturnHistoryList.clear();
@@ -472,7 +474,7 @@ class PurchaseReturnController extends GetxController{
     } finally {
       isPurchaseReturnHistoryListLoading = false;
       isPurchaseReturnHistoryLoadingMore = false;
-      update(['purchase_history_list','total_widget']);
+      update(['purchase_history_list', 'total_widget']);
     }
   }
 
@@ -480,22 +482,22 @@ class PurchaseReturnController extends GetxController{
     isPurchaseReturnProductListLoading = page == 1;
     isPurchaseReturnProductsLoadingMore = page > 1;
 
-    if(page == 1){
+    if (page == 1) {
       purchaseReturnProductResponseModel = null;
       purchaseReturnProducts.clear();
     }
 
     hasError.value = false;
 
-    update(['purchase_product','total_status_widget']);
+    update(['purchase_product', 'total_status_widget']);
 
     try {
       var response = await PurchaseReturnService.getPurchaseReturnProducts(
-          usrToken: loginData!.token,
-          page: page,
-          search: searchProductController.text,
-          startDate: selectedDateTimeRange.value?.start,
-          endDate: selectedDateTimeRange.value?.end,
+        usrToken: loginData!.token,
+        page: page,
+        search: searchProductController.text,
+        startDate: selectedDateTimeRange.value?.start,
+        endDate: selectedDateTimeRange.value?.end,
       );
 
       logger.i(response);
@@ -504,15 +506,16 @@ class PurchaseReturnController extends GetxController{
             PurchaseReturnProductResponseModel.fromJson(response);
 
         if (purchaseReturnProductResponseModel != null) {
-          purchaseReturnProducts.addAll(purchaseReturnProductResponseModel!.data!.returnProducts!);
+          purchaseReturnProducts.addAll(
+              purchaseReturnProductResponseModel!.data!.returnProducts!);
         }
       } else {
-        if(page != 1){
+        if (page != 1) {
           hasError.value = true;
         }
       }
     } catch (e) {
-      if(page != 1){
+      if (page != 1) {
         hasError.value = true;
       }
       purchaseReturnProducts.clear();
@@ -520,21 +523,23 @@ class PurchaseReturnController extends GetxController{
     } finally {
       isPurchaseReturnProductsLoadingMore = false;
       isPurchaseReturnProductListLoading = false;
-      update(['purchase_product','total_status_widget']);
+      update(['purchase_product', 'total_status_widget']);
     }
   }
-
 
   PurchaseOrderDetailsResponseModel? purchaseOrderDetailsResponseModel;
   bool editPurchaseHistoryItemLoading = false;
 
-  Future<void> processEdit({required PurchaseReturnOrderInfo purchaseOrderInfo,required BuildContext context}) async{
+  Future<void> processEdit(
+      {required PurchaseReturnOrderInfo purchaseOrderInfo,
+      required BuildContext context}) async {
     editPurchaseHistoryItemLoading = true;
     isEditing = true;
     RandomLottieLoader.show();
     serviceStuffInfo = null;
     paymentMethodTracker.clear();
-    createPurchaseReturnOrderModel = CreatePurchaseReturnOrderModel.defaultConstructor();
+    createPurchaseReturnOrderModel =
+        CreatePurchaseReturnOrderModel.defaultConstructor();
 
     // Methods.showLoading();
     update(['edit_purchase_history_item']);
@@ -552,40 +557,44 @@ class PurchaseReturnController extends GetxController{
         purchaseOrderDetailsResponseModel =
             PurchaseOrderDetailsResponseModel.fromJson(response);
 
-        if(purchasePaymentMethods == null){
+        if (purchasePaymentMethods == null) {
           await getPaymentMethods();
         }
 
-        if(supplierList.isEmpty){
-         await getAllSupplierList();
+        if (supplierList.isEmpty) {
+          await getAllSupplierList();
         }
 
-
-        if(serviceStuffList.isEmpty){
+        if (serviceStuffList.isEmpty) {
           await getAllServiceStuff();
         }
 
         //selecting products
         for (var e in purchaseOrderDetailsResponseModel!.data.details) {
-          ProductInfo productInfo = productsListResponseModel!.data.productList.singleWhere((f) => f.id == e.id);
-          addPlaceOrderProduct(productInfo, quantity:  e.quantity,);
+          ProductInfo productInfo = productsListResponseModel!.data.productList
+              .singleWhere((f) => f.id == e.id);
+          addPlaceOrderProduct(
+            productInfo,
+            quantity: e.quantity,
+          );
         }
-        
 
         //Payment Methods
         for (var e in purchaseOrderDetailsResponseModel!.data.paymentDetails) {
-          PaymentMethod paymentMethod = purchasePaymentMethods!.data.singleWhere((f) => f.id == e.id);
+          PaymentMethod paymentMethod =
+              purchasePaymentMethods!.data.singleWhere((f) => f.id == e.id);
           PaymentOption? paymentOption;
 
-          if(paymentMethod.name.toLowerCase().contains("cash")){
+          if (paymentMethod.name.toLowerCase().contains("cash")) {
             cashSelected = true;
           }
-          if(paymentMethod.name.toLowerCase().contains("credit")){
+          if (paymentMethod.name.toLowerCase().contains("credit")) {
             creditSelected = true;
           }
 
-          if(e.bank != null){
-            paymentOption = paymentMethod.paymentOptions.singleWhere((f) => f.id == e.bank!.id);
+          if (e.bank != null) {
+            paymentOption = paymentMethod.paymentOptions
+                .singleWhere((f) => f.id == e.bank!.id);
           }
 
           paymentMethodTracker.add(PaymentMethodTracker(
@@ -596,8 +605,9 @@ class PurchaseReturnController extends GetxController{
           ));
           logger.i(paymentMethodTracker);
         }
-        
-        selectedSupplier = supplierList.singleWhere((e) => e.id == purchaseOrderDetailsResponseModel!.data.supplier.id);
+
+        selectedSupplier = supplierList.singleWhere(
+            (e) => e.id == purchaseOrderDetailsResponseModel!.data.supplier.id);
 
         //service stuff
         totalPaid = purchaseOrderDetailsResponseModel!.data.payable;
@@ -608,7 +618,6 @@ class PurchaseReturnController extends GetxController{
     } catch (e) {
       hasError.value = true;
     } finally {
-
       editPurchaseHistoryItemLoading = false;
       update(['edit_purchase_history_item']);
       // Methods.hideLoading();
@@ -619,7 +628,6 @@ class PurchaseReturnController extends GetxController{
   Future<void> deletePurchaseReturnOrder({
     required PurchaseReturnOrderInfo purchaseReturnOrderInfo,
   }) async {
-
     hasError.value = false;
     update(['purchase_history_list']);
 
@@ -641,22 +649,21 @@ class PurchaseReturnController extends GetxController{
     } catch (e) {
       hasError.value = true;
       logger.e(e);
-      Methods.showSnackbar(msg: 'Error: something went wrong while deleting the item');
+      Methods.showSnackbar(
+          msg: 'Error: something went wrong while deleting the item');
     } finally {
       update(['purchase_history_list']);
     }
   }
 
-
-
-  Future<void> downloadPurchaseReturnHistory(
-      {required bool isPdf, required PurchaseReturnOrderInfo purchaseReturnOrderInfo,}) async {
+  Future<void> downloadPurchaseReturnHistory({
+    required bool isPdf,
+    required PurchaseReturnOrderInfo purchaseReturnOrderInfo,
+  }) async {
     hasError.value = false;
 
-    String fileName = "${purchaseReturnOrderInfo.orderNo}-${DateTime
-        .now()
-        .microsecondsSinceEpoch
-        .toString()}${isPdf ? ".pdf" : ".xlsx"}";
+    String fileName =
+        "${purchaseReturnOrderInfo.orderNo}-${DateTime.now().microsecondsSinceEpoch.toString()}${isPdf ? ".pdf" : ".xlsx"}";
     try {
       var response = await PurchaseReturnService.downloadPurchaseReturnHistory(
         purchaseReturnOrderInfo: purchaseReturnOrderInfo,
@@ -664,18 +671,15 @@ class PurchaseReturnController extends GetxController{
       );
     } catch (e) {
       logger.e(e);
-    } finally {
-
-    }
+    } finally {}
   }
 
-  Future<void> downloadList({required bool isPdf,required bool purchaseHistory}) async {
+  Future<void> downloadList(
+      {required bool isPdf, required bool purchaseHistory}) async {
     hasError.value = false;
 
-    String fileName = "${purchaseHistory? "Return Order history": "Return Product History"}-${
-        selectedDateTimeRange.value != null ? "${selectedDateTimeRange.value!.start.toIso8601String().split("T")[0]}-${selectedDateTimeRange.value!.end.toIso8601String().split("T")[0]}": DateTime.now().toIso8601String().split("T")[0]
-            .toString()
-    }${isPdf ? ".pdf" : ".xlsx"}";
+    String fileName =
+        "${purchaseHistory ? "Return Order history" : "Return Product History"}-${selectedDateTimeRange.value != null ? "${selectedDateTimeRange.value!.start.toIso8601String().split("T")[0]}-${selectedDateTimeRange.value!.end.toIso8601String().split("T")[0]}" : DateTime.now().toIso8601String().split("T")[0].toString()}${isPdf ? ".pdf" : ".xlsx"}";
     try {
       var response = await PurchaseReturnService.downloadList(
         saleHistory: purchaseHistory,
@@ -688,20 +692,46 @@ class PurchaseReturnController extends GetxController{
       );
     } catch (e) {
       logger.e(e);
-    } finally {
-
-    }
+    } finally {}
   }
-  FutureOr<List<SupplierInfo>> supplierSuggestionsCallback(String search) async {
+
+  FutureOr<List<SupplierInfo>> supplierSuggestionsCallback(
+      String search) async {
     // Check if the search term is in the existing items
-    return  getAllSupplier(search);
+    return getAllSupplier(search);
   }
 
   getAllSupplier(search) {
     var filteredItems = supplierList
-        .where((item) => item.phone.toLowerCase().contains(search.toLowerCase()) || (item.name.toLowerCase().contains(search.toLowerCase())))
+        .where((item) =>
+            item.phone.toLowerCase().contains(search.toLowerCase()) ||
+            (item.name.toLowerCase().contains(search.toLowerCase())))
         .toList();
     return filteredItems;
   }
 
+  PurchaseReturnHistoryDetailsResponseModel? purchaseReturnHistoryDetailsResponseModel;
+
+  Future<void> getPurchaseReturnHistoryDetails(BuildContext context,
+      PurchaseReturnOrderInfo purchaseReturnOrderInfo) async {
+    detailsLoading = true;
+    purchaseReturnHistoryDetailsResponseModel = null;
+    update(['purchase_return_history_details']);
+    try {
+      var response = await PurchaseReturnService.getPurchaseReturnHistoryDetails(
+        usrToken: loginData!.token,
+        id: purchaseReturnOrderInfo.id,
+      );
+
+      logger.i(response);
+      if (response != null) {
+        purchaseReturnHistoryDetailsResponseModel =
+            PurchaseReturnHistoryDetailsResponseModel.fromJson(response);
+      }
+    } catch (e) {
+    } finally {
+      detailsLoading = false;
+      update(['purchase_return_history_details']);
+    }
+  }
 }

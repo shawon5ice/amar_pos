@@ -265,4 +265,15 @@ class PurchaseReturnService {
     );
     return response;
   }
+
+  static Future<dynamic> getPurchaseReturnHistoryDetails({
+    required String usrToken,
+    required int id,
+  }) async {
+    var response = await BaseClient.getData(
+      token: usrToken,
+      api: "purchase_return/get-purchase-return-details/$id",
+    );
+    return response;
+  }
 }

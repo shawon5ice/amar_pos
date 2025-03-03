@@ -1,9 +1,11 @@
 import 'package:amar_pos/features/purchase/data/models/purchase_history_response_model.dart';
 import 'package:amar_pos/features/purchase/presentation/purchase_controller.dart';
+import 'package:amar_pos/features/purchase_return/data/models/purchase_return_history_response_model.dart';
+import 'package:amar_pos/features/purchase_return/presentation/purchase_return_controller.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:barcode/barcode.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
@@ -11,29 +13,28 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/responsive/pixel_perfect.dart';
 import '../../../../core/widgets/methods/helper_methods.dart';
 
-class PurchaseHistoryDetailsView extends StatefulWidget {
+class PurchaseReturnHistoryDetailsView extends StatefulWidget {
   static const String routeName = '/purchase/history-details';
 
-  const PurchaseHistoryDetailsView(
-      {super.key, required this.purchaseOrderInfo});
+  const PurchaseReturnHistoryDetailsView({super.key, required this.orderInfo});
 
-  final PurchaseOrderInfo purchaseOrderInfo;
+  final PurchaseReturnOrderInfo orderInfo;
 
   @override
-  State<PurchaseHistoryDetailsView> createState() =>
-      _PurchaseHistoryDetailsViewState();
+  State<PurchaseReturnHistoryDetailsView> createState() =>
+      _PurchaseReturnHistoryDetailsViewState();
 }
 
-class _PurchaseHistoryDetailsViewState
-    extends State<PurchaseHistoryDetailsView> {
-  PurchaseController controller = Get.find();
+class _PurchaseReturnHistoryDetailsViewState
+    extends State<PurchaseReturnHistoryDetailsView> {
+  PurchaseReturnController controller = Get.find();
 
   int i = 1;
 
   @override
   void initState() {
     i = 1;
-    controller.getPurchaseHistoryDetails(context, widget.purchaseOrderInfo);
+    controller.getPurchaseReturnHistoryDetails(context, widget.orderInfo);
     super.initState();
   }
 
@@ -42,7 +43,7 @@ class _PurchaseHistoryDetailsViewState
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(widget.purchaseOrderInfo.orderNo),
+        title: Text(widget.orderInfo.orderNo),
       ),
       body: SafeArea(
         child: Padding(
@@ -52,8 +53,8 @@ class _PurchaseHistoryDetailsViewState
             children: [
               // Header Section
               Expanded(
-                child: GetBuilder<PurchaseController>(
-                  id: 'purchase_history_details',
+                child: GetBuilder<PurchaseReturnController>(
+                  id: 'purchase_return_history_details',
                   builder: (controller) {
                     if (controller.detailsLoading) {
                       return Center(
@@ -61,7 +62,8 @@ class _PurchaseHistoryDetailsViewState
                         size: 100,
                         color: AppColors.primary,
                       ));
-                    } else if (controller.purchaseHistoryDetailsResponseModel !=
+                    } else if (controller
+                            .purchaseReturnHistoryDetailsResponseModel !=
                         null) {
                       return Column(
                         children: [
@@ -69,8 +71,7 @@ class _PurchaseHistoryDetailsViewState
                           Column(
                             children: [
                               Row(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Expanded(
                                     child: Row(
@@ -82,7 +83,7 @@ class _PurchaseHistoryDetailsViewState
                                             children: [
                                               Text(
                                                 controller
-                                                    .purchaseHistoryDetailsResponseModel!
+                                                    .purchaseReturnHistoryDetailsResponseModel!
                                                     .data
                                                     .business
                                                     .name,
@@ -92,7 +93,7 @@ class _PurchaseHistoryDetailsViewState
                                                         FontWeight.bold),
                                               ),
                                               Text(
-                                                  "Phone: ${controller.purchaseHistoryDetailsResponseModel!.data.business.phone}"),
+                                                  "Phone: ${controller.purchaseReturnHistoryDetailsResponseModel!.data.business.phone}"),
                                             ],
                                           ),
                                         ),
@@ -105,7 +106,7 @@ class _PurchaseHistoryDetailsViewState
                                           alignment: Alignment.topRight,
                                           child: Image.network(
                                             controller
-                                                .purchaseHistoryDetailsResponseModel!
+                                                .purchaseReturnHistoryDetailsResponseModel!
                                                 .data
                                                 .business
                                                 .photoUrl,
@@ -115,38 +116,41 @@ class _PurchaseHistoryDetailsViewState
                               ),
                               addH(8),
                               Text(
-                                "Address: ${controller.purchaseHistoryDetailsResponseModel!.data.business.address}",
+                                "Address: ${controller.purchaseReturnHistoryDetailsResponseModel!.data.business.address}",
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                               ),
                               addH(20),
-                              SvgPicture.string(Barcode.code128(useCode128B: false, useCode128C: false).toSvg(widget.purchaseOrderInfo.orderNo, height: 80)),
+                              SvgPicture.string(Barcode.code128(useCode128B: false, useCode128C: false).toSvg(widget.orderInfo.orderNo, height: 80)),
+
                             ],
                           ),
                           addH(
                             12,
                           ),
-                          Divider(color: AppColors.inputBorderColor,),
+                          Divider(
+                            color: AppColors.inputBorderColor,
+                          ),
                           Row(
                             children: [
                               Expanded(
-                                flex: 2,
-                                child: Text(widget.purchaseOrderInfo.orderNo)
-                              ),
+                                  flex: 2,
+                                  child: Text(widget.orderInfo.orderNo)),
                               addW(8),
                               Expanded(
                                   flex: 3,
                                   child: Text(
-                                    'PURCHASE ORDER',
+                                    'PURCHASE RETURN ORDER',
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 16),
+                                    textAlign: TextAlign.center,
                                   )),
                               addW(8),
                               Expanded(
                                 flex: 2,
                                 child: Text(
-                                  "${widget.purchaseOrderInfo.dateTime.split(',').first}\n${widget.purchaseOrderInfo.dateTime.split(',').last}",
+                                  "${widget.orderInfo.dateTime.split(',').first}\n${widget.orderInfo.dateTime.split(',').last}",
                                   textAlign: TextAlign.end,
                                 ),
                               ),
@@ -155,19 +159,16 @@ class _PurchaseHistoryDetailsViewState
                           Divider(color: AppColors.inputBorderColor),
                           addH(12),
                           Column(
-                            crossAxisAlignment:
-                                CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                  "Supplier Name: ${widget.purchaseOrderInfo.supplier}",
-                                  style: TextStyle(
-                                      fontWeight:
-                                          FontWeight.bold)),
+                                  "Supplier Name: ${widget.orderInfo.supplier}",
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
+                              Text("Phone: ${widget.orderInfo.phone}"),
                               Text(
-                                  "Phone: ${widget.purchaseOrderInfo.phone}"),
-                              Text(
-                                  "Address: ${controller.purchaseHistoryDetailsResponseModel?.data.supplier.address}"),
+                                  "Address: ${controller.purchaseReturnHistoryDetailsResponseModel?.data.supplier.address}"),
                             ],
                           ),
                           addH(12),
@@ -212,8 +213,10 @@ class _PurchaseHistoryDetailsViewState
                                           textAlign: TextAlign.center)),
                                 ],
                               ),
-                              ...controller.purchaseHistoryDetailsResponseModel!
-                                  .data.details
+                              ...controller
+                                  .purchaseReturnHistoryDetailsResponseModel!
+                                  .data
+                                  .details
                                   .map((product) {
                                 return TableRow(
                                   children: [
@@ -306,7 +309,7 @@ class _PurchaseHistoryDetailsViewState
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold)),
                                     Text(controller
-                                        .purchaseHistoryDetailsResponseModel!
+                                        .purchaseReturnHistoryDetailsResponseModel!
                                         .data
                                         .subTotal
                                         .toStringAsFixed(2)),
@@ -318,7 +321,7 @@ class _PurchaseHistoryDetailsViewState
                                   children: [
                                     Text("Expense:"),
                                     Text(controller
-                                        .purchaseHistoryDetailsResponseModel!
+                                        .purchaseReturnHistoryDetailsResponseModel!
                                         .data
                                         .expense
                                         .toStringAsFixed(2)),
@@ -330,7 +333,7 @@ class _PurchaseHistoryDetailsViewState
                                 //   children: [
                                 //     Text("VAT:"),
                                 //     Text(controller
-                                //         .purchaseHistoryDetailsResponseModel!
+                                //         .purchaseReturnHistoryDetailsResponseModel!
                                 //         .data
                                 //         .vat
                                 //         .toStringAsFixed(2)),
@@ -340,11 +343,11 @@ class _PurchaseHistoryDetailsViewState
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text("Discount:"),
+                                    Text("Deduction:"),
                                     Text(controller
-                                        .purchaseHistoryDetailsResponseModel!
+                                        .purchaseReturnHistoryDetailsResponseModel!
                                         .data
-                                        .discount
+                                        .deduction
                                         .toStringAsFixed(2)),
                                   ],
                                 ),
@@ -357,14 +360,14 @@ class _PurchaseHistoryDetailsViewState
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold)),
                                     Text(controller
-                                        .purchaseHistoryDetailsResponseModel!
+                                        .purchaseReturnHistoryDetailsResponseModel!
                                         .data
                                         .payable
                                         .toStringAsFixed(2)),
                                   ],
                                 ),
                                 ...controller
-                                    .purchaseHistoryDetailsResponseModel!
+                                    .purchaseReturnHistoryDetailsResponseModel!
                                     .data
                                     .paymentDetails
                                     .map(
@@ -387,7 +390,7 @@ class _PurchaseHistoryDetailsViewState
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold)),
                                     Text(controller
-                                        .purchaseHistoryDetailsResponseModel!
+                                        .purchaseReturnHistoryDetailsResponseModel!
                                         .data
                                         .dueAmount
                                         .toStringAsFixed(2)),
@@ -401,7 +404,7 @@ class _PurchaseHistoryDetailsViewState
                           Align(
                             alignment: Alignment.centerRight,
                             child: Text(
-                                "Created by: ${controller.purchaseHistoryDetailsResponseModel!.data.createdBy}",
+                                "Created by: ${controller.purchaseReturnHistoryDetailsResponseModel!.data.createdBy}",
                                 style: TextStyle(fontWeight: FontWeight.bold)),
                           ),
                         ],

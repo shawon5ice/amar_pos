@@ -48,16 +48,20 @@ class _PurchaseOrderProductSnSelectionDialogState
 
   void addSN(){
     String value = textEditingController.text;
+    if(value.isEmpty){
+      ErrorExtractor.showSingleErrorDialog(context, "Please insert a valid sn code");
+      return;
+    }
 
     for(int i = 0;i<widget.product.serialNo.length; i++){
       if(value == widget.product.serialNo[i]){
-        ErrorExtractor.showSingleErrorDialog(context, "Please don't insert \"$value\" code again");
+        ErrorExtractor.showSingleErrorDialog(context, "You've already added \"$value\" SN code");
         return;
       }
     }
     widget.product.serialNo.add(value);
     textEditingController.text = '';
-    widget.controller.update(['purchase_order_product_sn_list']);
+    widget.controller.update(['purchase_order_product_sn_list','sn_input_field']);
   }
 
   @override
