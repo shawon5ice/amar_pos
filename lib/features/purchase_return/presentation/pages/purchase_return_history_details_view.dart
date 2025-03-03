@@ -331,9 +331,10 @@ class _PurchaseReturnHistoryDetailsViewState
                                   isTitleBold: true,
                                   isValueBold: true,
                                 ),
+                                Text("Paid By "),
                                 ...data.paymentDetails.map(
                                       (e) => TitleWithValue(
-                                    title: "Paid By ${e.name}",
+                                    title: "${e.bank != null ? e.bank!.name : e.name }",
                                     value: e.amount,
                                   ),
                                 ),
@@ -435,7 +436,7 @@ class TitleWithValue extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text("$title : ",
+        Text("$title",
             style: TextStyle(
                 fontWeight:
                 isTitleBold != null ? FontWeight.bold : FontWeight.normal)),
