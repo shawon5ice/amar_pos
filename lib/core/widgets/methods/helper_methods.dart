@@ -47,6 +47,9 @@ class Methods {
     return NumberFormat('#,##,###').format(value);
   }
 
+  static String getFormattedNumberWithDecimal(double value) {
+    return NumberFormat.decimalPatternDigits(decimalDigits: 2).format(value);
+  }
 
   static void showLoading() {
     if (!EasyLoading.isShow) {
@@ -386,4 +389,5 @@ class Methods {
         return '';
     }
   }
+
 }

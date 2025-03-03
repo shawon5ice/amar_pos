@@ -1,3 +1,4 @@
+import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:amar_pos/features/purchase/data/models/purchase_history_response_model.dart';
 import 'package:amar_pos/features/purchase/presentation/purchase_controller.dart';
 import 'package:auto_size_text/auto_size_text.dart';
@@ -5,19 +6,18 @@ import 'package:barcode/barcode.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:intl/intl.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/responsive/pixel_perfect.dart';
 import '../../../../core/widgets/methods/helper_methods.dart';
+import '../../../../core/widgets/methods/number_to_word.dart';
+import '../../data/models/purchase_history_details/purchase_history_details_response_model.dart';
 
 class PurchaseHistoryDetailsView extends StatefulWidget {
   static const String routeName = '/purchase/history-details';
 
-  const PurchaseHistoryDetailsView(
-      {super.key, required this.purchaseOrderInfo});
-
-  final PurchaseOrderInfo purchaseOrderInfo;
+  const PurchaseHistoryDetailsView({super.key,});
 
   @override
   State<PurchaseHistoryDetailsView> createState() =>
@@ -30,10 +30,16 @@ class _PurchaseHistoryDetailsViewState
 
   int i = 1;
 
+  late int orderId;
+  late String orderNo;
+
   @override
   void initState() {
+    orderId = Get.arguments[0];
+    orderNo = Get.arguments[1];
+
     i = 1;
-    controller.getPurchaseHistoryDetails(context, widget.purchaseOrderInfo);
+    controller.getPurchaseHistoryDetails(context, orderId);
     super.initState();
   }
 
@@ -42,7 +48,7 @@ class _PurchaseHistoryDetailsViewState
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(widget.purchaseOrderInfo.orderNo),
+        title: Text(orderNo),
       ),
       body: SafeArea(
         child: Padding(
@@ -51,19 +57,19 @@ class _PurchaseHistoryDetailsViewState
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Header Section
-              Expanded(
-                child: GetBuilder<PurchaseController>(
-                  id: 'purchase_history_details',
-                  builder: (controller) {
-                    if (controller.detailsLoading) {
-                      return Center(
-                          child: SpinKitFoldingCube(
-                        size: 100,
-                        color: AppColors.primary,
-                      ));
-                    } else if (controller.purchaseHistoryDetailsResponseModel !=
-                        null) {
-                      return Column(
+              GetBuilder<PurchaseController>(
+                id: 'purchase_history_details',
+                builder: (controller) {
+                  if (controller.detailsLoading) {
+                    return Expanded(
+                      child: Center(
+                          child: RandomLottieLoader.lottieLoader()),
+                    );
+                  } else if (controller.purchaseHistoryDetailsResponseModel !=
+                      null) {
+                    PurchaseHistoryDetailsData data = controller.purchaseHistoryDetailsResponseModel!.data;
+                    return SingleChildScrollView(
+                      child: Column(
                         children: [
                           addH(12),
                           Column(
@@ -81,11 +87,7 @@ class _PurchaseHistoryDetailsViewState
                                                 CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                controller
-                                                    .purchaseHistoryDetailsResponseModel!
-                                                    .data
-                                                    .business
-                                                    .name,
+                                                data.business.name,
                                                 style: const TextStyle(
                                                     fontSize: 20,
                                                     fontWeight:
@@ -104,9 +106,7 @@ class _PurchaseHistoryDetailsViewState
                                       child: Align(
                                           alignment: Alignment.topRight,
                                           child: Image.network(
-                                            controller
-                                                .purchaseHistoryDetailsResponseModel!
-                                                .data
+                                            data
                                                 .business
                                                 .photoUrl,
                                             width: 100,
@@ -115,12 +115,10 @@ class _PurchaseHistoryDetailsViewState
                               ),
                               addH(8),
                               Text(
-                                "Address: ${controller.purchaseHistoryDetailsResponseModel!.data.business.address}",
+                                "Address: ${data.business.address}",
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                               ),
-                              addH(20),
-                              SvgPicture.string(Barcode.code128(useCode128B: false, useCode128C: false).toSvg(widget.purchaseOrderInfo.orderNo, height: 80)),
                             ],
                           ),
                           addH(
@@ -131,10 +129,10 @@ class _PurchaseHistoryDetailsViewState
                             children: [
                               Expanded(
                                 flex: 2,
-                                child: Text(widget.purchaseOrderInfo.orderNo)
+                                child: Text(data.orderNo)
                               ),
                               addW(8),
-                              Expanded(
+                              const Expanded(
                                   flex: 3,
                                   child: Text(
                                     'PURCHASE ORDER',
@@ -146,31 +144,39 @@ class _PurchaseHistoryDetailsViewState
                               Expanded(
                                 flex: 2,
                                 child: Text(
-                                  "${widget.purchaseOrderInfo.dateTime.split(',').first}\n${widget.purchaseOrderInfo.dateTime.split(',').last}",
+                                  "${data.dateTime.split(',').first}\n${data.dateTime.split(',').last}",
                                   textAlign: TextAlign.end,
                                 ),
                               ),
                             ],
                           ),
-                          Divider(color: AppColors.inputBorderColor),
+                          const Divider(color: AppColors.inputBorderColor),
                           addH(12),
-                          Column(
-                            crossAxisAlignment:
-                                CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
+                          Row(
                             children: [
-                              Text(
-                                  "Supplier Name: ${widget.purchaseOrderInfo.supplier}",
-                                  style: TextStyle(
-                                      fontWeight:
-                                          FontWeight.bold)),
-                              Text(
-                                  "Phone: ${widget.purchaseOrderInfo.phone}"),
-                              Text(
-                                  "Address: ${controller.purchaseHistoryDetailsResponseModel?.data.supplier.address}"),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                        "Supplier Name: ${data.supplier.name}",
+                                        style: const TextStyle(
+                                            fontWeight:
+                                                FontWeight.bold)),
+                                    Text(
+                                        "Phone: ${data.supplier.phone}"),
+                                    Text(
+                                        "Address: ${data.supplier.address}"),
+                                  ],
+                                ),
+                              ),
+                              SvgPicture.string(Barcode.code128(useCode128B: false, useCode128C: false).toSvg(data.orderNo, height: 60, width: context.width /3)),
                             ],
                           ),
-                          addH(12),
+                          addH(20),
                           // Product Table
                           Table(
                             border: TableBorder.all(color: Colors.grey),
@@ -212,18 +218,17 @@ class _PurchaseHistoryDetailsViewState
                                           textAlign: TextAlign.center)),
                                 ],
                               ),
-                              ...controller.purchaseHistoryDetailsResponseModel!
-                                  .data.details
+                              ...data.details
                                   .map((product) {
                                 return TableRow(
                                   children: [
                                     Padding(
-                                        padding: EdgeInsets.symmetric(
+                                        padding: const EdgeInsets.symmetric(
                                             horizontal: 4, vertical: 8),
                                         child: AutoSizeText("${i++}",
                                             textAlign: TextAlign.center)),
                                     Padding(
-                                        padding: EdgeInsets.symmetric(
+                                        padding: const EdgeInsets.symmetric(
                                             horizontal: 4, vertical: 8),
                                         child: Column(
                                           crossAxisAlignment:
@@ -265,21 +270,21 @@ class _PurchaseHistoryDetailsViewState
                                           ],
                                         )),
                                     Padding(
-                                        padding: EdgeInsets.symmetric(
+                                        padding: const EdgeInsets.symmetric(
                                             horizontal: 4, vertical: 8),
                                         child: AutoSizeText(
                                             Methods.getFormattedNumber(
                                                 product.unitPrice.toDouble()),
                                             textAlign: TextAlign.center)),
                                     Padding(
-                                        padding: EdgeInsets.symmetric(
+                                        padding: const EdgeInsets.symmetric(
                                             horizontal: 4, vertical: 8),
                                         child: AutoSizeText(
                                             Methods.getFormattedNumber(
                                                 product.quantity.toDouble()),
                                             textAlign: TextAlign.center)),
                                     Padding(
-                                        padding: EdgeInsets.symmetric(
+                                        padding: const EdgeInsets.symmetric(
                                             horizontal: 4, vertical: 8),
                                         child: AutoSizeText(
                                             Methods.getFormattedNumber(
@@ -290,128 +295,79 @@ class _PurchaseHistoryDetailsViewState
                               }).toList(),
                             ],
                           ),
-                          SizedBox(height: 20),
-
+                          Row(
+                            children: [
+                              Text("In Words : ",
+                                  style: TextStyle(
+                                      fontWeight:  FontWeight.bold)),
+                              Expanded(child: Text(_convertToWords(data.payable), style: TextStyle(fontWeight: FontWeight.bold),)),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
                           // Summary Section
                           Align(
                             alignment: Alignment.centerRight,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text("Sub Total:",
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                    Text(controller
-                                        .purchaseHistoryDetailsResponseModel!
-                                        .data
-                                        .subTotal
-                                        .toStringAsFixed(2)),
-                                  ],
+                                TitleWithValue(
+                                  title: "Sub Total",
+                                  value: data
+                                      .subTotal,
+                                  isTitleBold: true,
+                                  isValueBold: true,
                                 ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text("Expense:"),
-                                    Text(controller
-                                        .purchaseHistoryDetailsResponseModel!
-                                        .data
-                                        .expense
-                                        .toStringAsFixed(2)),
-                                  ],
+                                TitleWithValue(
+                                  title: "Expense",
+                                  value: data
+                                      .expense,
                                 ),
-                                // Row(
-                                //   mainAxisAlignment:
-                                //   MainAxisAlignment.spaceBetween,
-                                //   children: [
-                                //     Text("VAT:"),
-                                //     Text(controller
-                                //         .purchaseHistoryDetailsResponseModel!
-                                //         .data
-                                //         .vat
-                                //         .toStringAsFixed(2)),
-                                //   ],
-                                // ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text("Discount:"),
-                                    Text(controller
-                                        .purchaseHistoryDetailsResponseModel!
-                                        .data
-                                        .discount
-                                        .toStringAsFixed(2)),
-                                  ],
+                                TitleWithValue(
+                                  title: "Discount",
+                                  value: data
+                                      .discount,
                                 ),
-                                Divider(color: Colors.black),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text("Payable Amount:",
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                    Text(controller
-                                        .purchaseHistoryDetailsResponseModel!
-                                        .data
-                                        .payable
-                                        .toStringAsFixed(2)),
-                                  ],
+                                const Divider(color: Colors.black),
+                                TitleWithValue(
+                                  title: "Payable Amount",
+                                  value: data
+                                      .payable,
+                                  isTitleBold: true,
+                                  isValueBold: true,
                                 ),
-                                ...controller
-                                    .purchaseHistoryDetailsResponseModel!
-                                    .data
+                                ...data
                                     .paymentDetails
                                     .map(
-                                  (e) => Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text("Paid By " + e.name,
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold)),
-                                      Text(e.amount.toStringAsFixed(2)),
-                                    ],
+                                  (e) => TitleWithValue(
+                                    title: "Paid By ${e.name}",
+                                    value: e.amount,
                                   ),
                                 ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text("Due Amount:",
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                    Text(controller
-                                        .purchaseHistoryDetailsResponseModel!
-                                        .data
-                                        .dueAmount
-                                        .toStringAsFixed(2)),
-                                  ],
+                                TitleWithValue(
+                                  title: "Due Amount",
+                                  value: data
+                                      .dueAmount,
+                                  isTitleBold: true,
+                                  isValueBold: true,
                                 ),
                               ],
                             ),
                           ),
-                          SizedBox(height: 20),
-                          SizedBox(height: 20),
+                          const SizedBox(height: 40),
                           Align(
                             alignment: Alignment.centerRight,
                             child: Text(
-                                "Created by: ${controller.purchaseHistoryDetailsResponseModel!.data.createdBy}",
+                                "Created by: ${data.createdBy}",
                                 style: TextStyle(fontWeight: FontWeight.bold)),
                           ),
                         ],
-                      );
-                    }
-                    return Center(
-                      child: Text("No data found!"),
+                      ),
                     );
-                  },
-                ),
+                  }
+                  return const Center(
+                    child: Text("No data found!"),
+                  );
+                },
               ),
             ],
           ),
@@ -422,7 +378,29 @@ class _PurchaseHistoryDetailsViewState
 
   // Helper function to convert amount to words (a basic implementation)
   String _convertToWords(double amount) {
-    // Replace this with a proper implementation or library for converting numbers to words
-    return "One Thousand Ten Taka Only";
+    return numberToWords(amount);
+  }
+}
+
+
+class TitleWithValue extends StatelessWidget {
+  const TitleWithValue({super.key, required this.value, required this.title, this.isTitleBold, this.isValueBold});
+
+  final num value;
+  final String title;
+  final bool? isTitleBold;
+  final bool? isValueBold;
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment:
+      MainAxisAlignment.spaceBetween,
+      children: [
+        Text("$title : ",
+            style: TextStyle(
+                fontWeight: isTitleBold != null ? FontWeight.bold : FontWeight.normal)),
+        Text(Methods.getFormattedNumberWithDecimal(value.toDouble()), style: TextStyle(fontWeight: isValueBold!= null ? FontWeight.bold : FontWeight.normal),),
+      ],
+    );
   }
 }

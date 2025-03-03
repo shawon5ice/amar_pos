@@ -386,8 +386,12 @@ class PurchaseController extends GetxController{
 
   bool createPurchaseOrderLoading = false;
 
-  Future<bool> createPurchaseOrder() async {
+  int? pOrderId;
+  String? pOrderNo;
 
+  Future<bool> createPurchaseOrder() async {
+    pOrderId = null;
+    pOrderNo = null;
     createPurchaseOrderLoading = true;
     update(["purchase_order_items"]);
     RandomLottieLoader.show();
@@ -399,6 +403,8 @@ class PurchaseController extends GetxController{
       logger.e(response);
       if (response != null) {
         if(response['success']){
+          pOrderNo = response['data']['order_no'];
+          pOrderNo = response['data']['order_no'];
           selectedSupplier = null;
           supplierList.clear();
           paymentMethodTracker.clear();
@@ -737,14 +743,14 @@ class PurchaseController extends GetxController{
 
   PurchaseHistoryDetailsResponseModel? purchaseHistoryDetailsResponseModel;
 
-  Future<void> getPurchaseHistoryDetails(BuildContext context, PurchaseOrderInfo purchaseOrderInfo) async {
+  Future<void> getPurchaseHistoryDetails(BuildContext context, int orderId) async {
     detailsLoading = true;
     purchaseHistoryDetailsResponseModel = null;
     update(['purchase_history_details']);
     try {
       var response = await PurchaseService.getPurchaseHistoryDetails(
         usrToken: loginData!.token,
-        id: purchaseOrderInfo.id,
+        id: orderId,
       );
 
       logger.i(response);

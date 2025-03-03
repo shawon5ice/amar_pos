@@ -25,7 +25,7 @@ class PurchaseHistoryItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: (){
-        Get.to(PurchaseHistoryDetailsView(purchaseOrderInfo: purchaseHistory,));
+        Get.to(const PurchaseHistoryDetailsView(),arguments: [purchaseHistory.id,purchaseHistory.orderNo]);
       },
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 5.h),
