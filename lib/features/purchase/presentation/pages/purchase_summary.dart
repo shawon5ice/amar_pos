@@ -6,6 +6,7 @@ import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/core/widgets/custom_button.dart';
 import 'package:amar_pos/core/widgets/custom_text_field.dart';
 import 'package:amar_pos/core/widgets/field_title.dart';
+import 'package:amar_pos/features/purchase/presentation/pages/purchase_history_details_view.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:amar_pos/features/purchase/presentation/purchase_controller.dart';
 import 'package:amar_pos/features/purchase/presentation/widgets/purchase_summary_payment_option_selection_widget.dart';
@@ -22,8 +23,7 @@ import '../../../../core/widgets/dashed_line.dart';
 import '../../data/models/create_purchase_order_model.dart';
 
 class PurchaseSummary extends StatefulWidget {
-  PurchaseSummary({super.key, required this.onSuccess});
-  Function(bool success) onSuccess;
+  PurchaseSummary({super.key,});
 
   @override
   State<PurchaseSummary> createState() => _PurchaseSummaryState();
@@ -469,17 +469,14 @@ class _PurchaseSummaryState extends State<PurchaseSummary> {
                       if(controller.isEditing){
                         controller.updatePurchaseOrder().then((value){
                           if(value){
-                            widget.onSuccess(true);
-                          }else{
-                            widget.onSuccess(false);
+                            Get.to(const PurchaseHistoryDetailsView(),arguments: [controller.pOrderId, controller.pOrderNo]);
                           }
+
                         });
                       }else{
                         controller.createPurchaseOrder().then((value){
                           if(value){
-                            widget.onSuccess(true);
-                          }else{
-                            widget.onSuccess(false);
+                            Get.to(const PurchaseHistoryDetailsView(),arguments: [controller.pOrderId, controller.pOrderNo]);
                           }
                         });
                       }

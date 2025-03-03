@@ -1,13 +1,11 @@
+import 'package:amar_pos/core/widgets/custom_button.dart';
 import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
-import 'package:amar_pos/features/purchase/data/models/purchase_history_response_model.dart';
 import 'package:amar_pos/features/purchase/presentation/purchase_controller.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:barcode/barcode.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
-
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/responsive/pixel_perfect.dart';
 import '../../../../core/widgets/methods/helper_methods.dart';
@@ -17,7 +15,9 @@ import '../../data/models/purchase_history_details/purchase_history_details_resp
 class PurchaseHistoryDetailsView extends StatefulWidget {
   static const String routeName = '/purchase/history-details';
 
-  const PurchaseHistoryDetailsView({super.key,});
+  const PurchaseHistoryDetailsView({
+    super.key,
+  });
 
   @override
   State<PurchaseHistoryDetailsView> createState() =>
@@ -62,12 +62,12 @@ class _PurchaseHistoryDetailsViewState
                 builder: (controller) {
                   if (controller.detailsLoading) {
                     return Expanded(
-                      child: Center(
-                          child: RandomLottieLoader.lottieLoader()),
+                      child: Center(child: RandomLottieLoader.lottieLoader()),
                     );
                   } else if (controller.purchaseHistoryDetailsResponseModel !=
                       null) {
-                    PurchaseHistoryDetailsData data = controller.purchaseHistoryDetailsResponseModel!.data;
+                    PurchaseHistoryDetailsData data =
+                        controller.purchaseHistoryDetailsResponseModel!.data;
                     return SingleChildScrollView(
                       child: Column(
                         children: [
@@ -75,8 +75,7 @@ class _PurchaseHistoryDetailsViewState
                           Column(
                             children: [
                               Row(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Expanded(
                                     child: Row(
@@ -106,9 +105,7 @@ class _PurchaseHistoryDetailsViewState
                                       child: Align(
                                           alignment: Alignment.topRight,
                                           child: Image.network(
-                                            data
-                                                .business
-                                                .photoUrl,
+                                            data.business.photoUrl,
                                             width: 100,
                                           ))),
                                 ],
@@ -124,13 +121,12 @@ class _PurchaseHistoryDetailsViewState
                           addH(
                             12,
                           ),
-                          Divider(color: AppColors.inputBorderColor,),
+                          Divider(
+                            color: AppColors.inputBorderColor,
+                          ),
                           Row(
                             children: [
-                              Expanded(
-                                flex: 2,
-                                child: Text(data.orderNo)
-                              ),
+                              Expanded(flex: 2, child: Text(data.orderNo)),
                               addW(8),
                               const Expanded(
                                   flex: 3,
@@ -144,7 +140,7 @@ class _PurchaseHistoryDetailsViewState
                               Expanded(
                                 flex: 2,
                                 child: Text(
-                                  "${data.dateTime.split(',').first}\n${data.dateTime.split(',').last}",
+                                  data.dateTime,
                                   textAlign: TextAlign.end,
                                 ),
                               ),
@@ -153,6 +149,7 @@ class _PurchaseHistoryDetailsViewState
                           const Divider(color: AppColors.inputBorderColor),
                           addH(12),
                           Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Expanded(
                                 child: Column(
@@ -161,19 +158,19 @@ class _PurchaseHistoryDetailsViewState
                                   mainAxisSize: MainAxisSize.min,
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
-                                    Text(
-                                        "Supplier Name: ${data.supplier.name}",
+                                    Text("Supplier Name: ${data.supplier.name}",
                                         style: const TextStyle(
-                                            fontWeight:
-                                                FontWeight.bold)),
-                                    Text(
-                                        "Phone: ${data.supplier.phone}"),
-                                    Text(
-                                        "Address: ${data.supplier.address}"),
+                                            fontWeight: FontWeight.bold)),
+                                    Text("Phone: ${data.supplier.phone}"),
+                                    Text("Address: ${data.supplier.address}"),
                                   ],
                                 ),
                               ),
-                              SvgPicture.string(Barcode.code128(useCode128B: false, useCode128C: false).toSvg(data.orderNo, height: 60, width: context.width /3)),
+                              addW(20),
+                              SvgPicture.string(Barcode.code128(
+                                      useCode128B: false, useCode128C: false)
+                                  .toSvg(data.orderNo,
+                                      height: 60, width: context.width / 3)),
                             ],
                           ),
                           addH(20),
@@ -218,8 +215,7 @@ class _PurchaseHistoryDetailsViewState
                                           textAlign: TextAlign.center)),
                                 ],
                               ),
-                              ...data.details
-                                  .map((product) {
+                              ...data.details.map((product) {
                                 return TableRow(
                                   children: [
                                     Padding(
@@ -295,12 +291,17 @@ class _PurchaseHistoryDetailsViewState
                               }).toList(),
                             ],
                           ),
+                          addH(8),
                           Row(
                             children: [
                               Text("In Words : ",
-                                  style: TextStyle(
-                                      fontWeight:  FontWeight.bold)),
-                              Expanded(child: Text(_convertToWords(data.payable), style: TextStyle(fontWeight: FontWeight.bold),)),
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
+                              Expanded(
+                                  child: Text(
+                                _convertToWords(data.payable),
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              )),
                             ],
                           ),
                           const SizedBox(height: 20),
@@ -312,32 +313,26 @@ class _PurchaseHistoryDetailsViewState
                               children: [
                                 TitleWithValue(
                                   title: "Sub Total",
-                                  value: data
-                                      .subTotal,
+                                  value: data.subTotal,
                                   isTitleBold: true,
                                   isValueBold: true,
                                 ),
                                 TitleWithValue(
                                   title: "Expense",
-                                  value: data
-                                      .expense,
+                                  value: data.expense,
                                 ),
                                 TitleWithValue(
                                   title: "Discount",
-                                  value: data
-                                      .discount,
+                                  value: data.discount,
                                 ),
                                 const Divider(color: Colors.black),
                                 TitleWithValue(
                                   title: "Payable Amount",
-                                  value: data
-                                      .payable,
+                                  value: data.payable,
                                   isTitleBold: true,
                                   isValueBold: true,
                                 ),
-                                ...data
-                                    .paymentDetails
-                                    .map(
+                                ...data.paymentDetails.map(
                                   (e) => TitleWithValue(
                                     title: "Paid By ${e.name}",
                                     value: e.amount,
@@ -345,8 +340,7 @@ class _PurchaseHistoryDetailsViewState
                                 ),
                                 TitleWithValue(
                                   title: "Due Amount",
-                                  value: data
-                                      .dueAmount,
+                                  value: data.dueAmount,
                                   isTitleBold: true,
                                   isValueBold: true,
                                 ),
@@ -356,8 +350,7 @@ class _PurchaseHistoryDetailsViewState
                           const SizedBox(height: 40),
                           Align(
                             alignment: Alignment.centerRight,
-                            child: Text(
-                                "Created by: ${data.createdBy}",
+                            child: Text("Created by: ${data.createdBy}",
                                 style: TextStyle(fontWeight: FontWeight.bold)),
                           ),
                         ],
@@ -373,7 +366,47 @@ class _PurchaseHistoryDetailsViewState
           ),
         ),
       ),
-    );
+      bottomNavigationBar: GetBuilder<PurchaseController>(
+        id: 'download_print_buttons',
+        builder: (controller){
+          if(controller.purchaseHistoryDetailsResponseModel != null){
+            return Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: CustomButton(
+                      text: "Download",
+                      color: Color(0xff03346E),
+                      radius: 8,
+                      onTap: () {
+                        controller.downloadPurchaseHistory(
+                            isPdf: true, orderId: orderId, orderNo: orderNo);
+                      },
+                    ),
+                  ),
+                  addW(20),
+                  Expanded(
+                    child: CustomButton(
+                      text: "Print",
+                      radius: 8,
+                      color: Color(0xffFF9000),
+                      onTap: () {
+                        controller.downloadPurchaseHistory(
+                            shouldPrint: true,
+                            orderNo: orderNo,
+                            isPdf: true,
+                            orderId: orderId);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }else{
+            return SizedBox.shrink();
+          }
+    }));
   }
 
   // Helper function to convert amount to words (a basic implementation)
@@ -382,24 +415,34 @@ class _PurchaseHistoryDetailsViewState
   }
 }
 
-
 class TitleWithValue extends StatelessWidget {
-  const TitleWithValue({super.key, required this.value, required this.title, this.isTitleBold, this.isValueBold});
+  const TitleWithValue(
+      {super.key,
+      required this.value,
+      required this.title,
+      this.isTitleBold,
+      this.isValueBold});
 
   final num value;
   final String title;
   final bool? isTitleBold;
   final bool? isValueBold;
+
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment:
-      MainAxisAlignment.spaceBetween,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text("$title : ",
             style: TextStyle(
-                fontWeight: isTitleBold != null ? FontWeight.bold : FontWeight.normal)),
-        Text(Methods.getFormattedNumberWithDecimal(value.toDouble()), style: TextStyle(fontWeight: isValueBold!= null ? FontWeight.bold : FontWeight.normal),),
+                fontWeight:
+                    isTitleBold != null ? FontWeight.bold : FontWeight.normal)),
+        Text(
+          Methods.getFormattedNumberWithDecimal(value.toDouble()),
+          style: TextStyle(
+              fontWeight:
+                  isValueBold != null ? FontWeight.bold : FontWeight.normal),
+        ),
       ],
     );
   }

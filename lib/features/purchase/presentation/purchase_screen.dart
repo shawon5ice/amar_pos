@@ -122,20 +122,13 @@ class _PurchaseScreenState extends State<PurchaseScreen>
                 bool discard = await showDiscardDialog(context);
                 logger.d(discard);
                 if(discard){
+                  controller.purchaseOrderProducts.clear();
+                  controller.clearEditing();
                   drawerMenuController.openDrawer();
                 }
               }else{
                 drawerMenuController.openDrawer();
               }
-              // if(controller.isEditing){
-              //   bool openDrawer = await showDiscardDialog(context);
-              //   if(openDrawer){
-              //     controller.clearEditing();
-              //     drawerMenuController.openDrawer();
-              //   }
-              // }else{
-              //   drawerMenuController.openDrawer();
-              // }
             },
           ),
           actions: [
@@ -143,7 +136,7 @@ class _PurchaseScreenState extends State<PurchaseScreen>
               id: 'action_icon',
               builder: (controller) => _tabController.index == 0? GestureDetector(
                 child: SvgPicture.asset(AppAssets.pauseBillingIcon),
-              ): IconButton(
+              ): _tabController.index == 2 ? IconButton(
                 onPressed: () async {
                   showModalBottomSheet(context: context, builder: (context) => SimpleFilterBottomSheetWidget(
                     selectedBrand: controller.brand,
@@ -166,6 +159,25 @@ class _PurchaseScreenState extends State<PurchaseScreen>
                   ));
                 },
                 icon: Icon(Icons.filter_alt_outlined, color: (controller.brand != null || controller.category != null || controller.selectedDateTimeRange.value != null) ? AppColors.error : null,),
+              ):  GestureDetector(
+                onTap: () async {
+                  DateTimeRange? selectedDate =
+                  await showDateRangePicker(
+                    context: context,
+                    firstDate: DateTime.now()
+                        .subtract(const Duration(days: 1000)),
+                    lastDate: DateTime.now()
+                        .add(const Duration(days: 1000)),
+                    initialDateRange:
+                    controller.selectedDateTimeRange.value,
+                  );
+                  if (selectedDate != null) {
+                    controller.selectedDateTimeRange.value =
+                        selectedDate;
+                    controller.getPurchaseHistory();
+                  }
+                },
+                child: SvgPicture.asset(AppAssets.calenderIcon),
               )
             ),
             addW(12),

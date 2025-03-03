@@ -9,6 +9,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 
 import '../../../../core/constants/app_assets.dart';
+import '../../../../core/constants/app_colors.dart';
+import '../../../../core/methods/helper_methods.dart';
 import '../../../../core/responsive/pixel_perfect.dart';
 import '../../../../core/widgets/pager_list_view.dart';
 import '../../../inventory/presentation/stock_report/widget/custom_svg_icon_widget.dart';
@@ -86,20 +88,19 @@ class _PurchaseHistoryScreenState extends State<PurchaseHistoryScreen> {
                 )
               ],
             ),
-            addH(8.px),
-            // Obx(() {
-            //   return controller.selectedDateTimeRange.value == null ? addH(8) : Row(
-            //     mainAxisAlignment: MainAxisAlignment.center,
-            //     children: [
-            //       Text("${formatDate(controller.selectedDateTimeRange.value!.start)} - ${formatDate(controller.selectedDateTimeRange.value!.end)}", style:const TextStyle(fontSize: 14, color: AppColors.error),),
-            //       addW(16),
-            //       IconButton(onPressed: (){
-            //         controller.selectedDateTimeRange.value = null;
-            //         controller.getPurchaseHistory();
-            //       }, icon: const Icon(Icons.cancel_outlined, size: 18, color: AppColors.error,))
-            //     ],
-            //   );
-            // }),
+            Obx(() {
+              return controller.selectedDateTimeRange.value == null ? addH(8) : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("${formatDate(controller.selectedDateTimeRange.value!.start)} - ${formatDate(controller.selectedDateTimeRange.value!.end)}", style:const TextStyle(fontSize: 14, color: AppColors.error),),
+                  addW(16),
+                  IconButton(onPressed: (){
+                    controller.selectedDateTimeRange.value = null;
+                    controller.getPurchaseHistory();
+                  }, icon: const Icon(Icons.cancel_outlined, size: 18, color: AppColors.error,))
+                ],
+              );
+            }),
             GetBuilder<PurchaseController>(
               id: 'total_widget',
               builder: (controller) => Row(

@@ -137,16 +137,17 @@ class PurchaseReturnService {
   }
 
   static downloadPurchaseReturnHistory(
-      {required String usrToken, required PurchaseReturnOrderInfo purchaseReturnOrderInfo}) async {
+      {required String usrToken, required int orderId, required String fileName, bool? shouldPrint}) async {
     // logger.d("PDF: $isPdf");
 
     String downloadUrl =
-        "${NetWorkStrings.baseUrl}/purchase_return/download-purchase-return-invoice/${purchaseReturnOrderInfo.id}";
+        "${NetWorkStrings.baseUrl}/purchase_return/download-purchase-return-invoice/$orderId";
 
     FileDownloader().downloadFile(
       url: downloadUrl,
       token: usrToken,
-      fileName: "${purchaseReturnOrderInfo.orderNo}.pdf",);
+      shouldPrint: shouldPrint,
+      fileName: fileName,);
   }
 
   static Future<dynamic> getSoldHistoryDetails({
@@ -175,7 +176,7 @@ class PurchaseReturnService {
     required DateTime? startDate,
     required DateTime? endDate,
     required String? search,
-
+    bool? shouldPrint,
   }) async {
     // logger.d("PDF: $isPdf");
 
@@ -189,15 +190,15 @@ class PurchaseReturnService {
 
     if(saleHistory){
       if(isPdf){
-        downloadUrl = "${NetWorkStrings.baseUrl}/purchase/download-pdf-purchase-list/";
+        downloadUrl = "${NetWorkStrings.baseUrl}/purchase_return/download-pdf-purchase-return-list";
       }else{
-        downloadUrl = "${NetWorkStrings.baseUrl}/purchase/download-excel-purchase-list";
+        downloadUrl = "${NetWorkStrings.baseUrl}/purchase_return/download-excel-purchase-return-list";
       }
     }else{
       if(isPdf){
-        downloadUrl = "${NetWorkStrings.baseUrl}/purchase/download-pdf-purchase-product/";
+        downloadUrl = "${NetWorkStrings.baseUrl}/purchase_return/download-pdf-purchase-return-product";
       }else{
-        downloadUrl = "${NetWorkStrings.baseUrl}/purchase/download-excel-purchase-product/";
+        downloadUrl = "${NetWorkStrings.baseUrl}/purchase_return/download-excel-purchase-return-product";
       }
     }
 
@@ -206,6 +207,7 @@ class PurchaseReturnService {
       url: downloadUrl,
       token: usrToken,
       query: query,
+      shouldPrint: shouldPrint,
       fileName: fileName,);
   }
 
@@ -215,6 +217,8 @@ class PurchaseReturnService {
     String? search,
     DateTime? startDate,
     DateTime? endDate,
+    int? categoryId,
+    int? brandId,
   }) async {
     logger.d("Page: $page");
     var response = await BaseClient.getData(
@@ -226,6 +230,8 @@ class PurchaseReturnService {
           "search": search,
           "start_date": startDate,
           "end_date": endDate,
+          "category_id": categoryId,
+          "brand_id": brandId,
           "limit": 10,
         });
     return response;
@@ -238,6 +244,8 @@ class PurchaseReturnService {
     int? saleType,
     DateTime? startDate,
     DateTime? endDate,
+    int? categoryId,
+    int? brandId,
   }) async {
     logger.d("Page: $page");
     var response = await BaseClient.getData(
@@ -250,6 +258,8 @@ class PurchaseReturnService {
           "start_date": startDate,
           "end_date": endDate,
           "sale_type": saleType,
+          "category_id": categoryId,
+          "brand_id": brandId,
           "limit": 10,
         });
     return response;

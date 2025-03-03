@@ -1,12 +1,12 @@
-class PurchaseOrderDetailsResponseModel {
-  PurchaseOrderDetailsResponseModel({
+class PurchaseReturnOrderDetailsResponseModel {
+  PurchaseReturnOrderDetailsResponseModel({
     required this.success,
     required this.data,
   });
   late final bool success;
   late final Data data;
 
-  PurchaseOrderDetailsResponseModel.fromJson(Map<String, dynamic> json){
+  PurchaseReturnOrderDetailsResponseModel.fromJson(Map<String, dynamic> json){
     success = json['success'];
     data = Data.fromJson(json['data']);
   }
@@ -34,7 +34,7 @@ class Data {
     required this.details,
     required this.paymentDetails,
     required this.dueAmount,
-    required this.discount,
+    required this.deduction,
   });
   late final int id;
   late final String dateTime;
@@ -42,14 +42,14 @@ class Data {
   late final String purchaseType;
   late final Supplier supplier;
   late final String createdBy;
-  late final int subTotal;
-  late final int expense;
-  late final int payable;
+  late final num subTotal;
+  late final num expense;
+  late final num payable;
   late final Business business;
   late final List<Details> details;
   late final List<PaymentDetails> paymentDetails;
-  late final int dueAmount;
-  late final int discount;
+  late final num dueAmount;
+  late final num deduction;
 
   Data.fromJson(Map<String, dynamic> json){
     id = json['id'];
@@ -65,7 +65,7 @@ class Data {
     details = List.from(json['details']).map((e)=>Details.fromJson(e)).toList();
     paymentDetails = List.from(json['payment_details']).map((e)=>PaymentDetails.fromJson(e)).toList();
     dueAmount = json['due_amount'];
-    discount = json['discount'];
+    deduction = json['deduction'];
   }
 
   Map<String, dynamic> toJson() {
@@ -83,7 +83,7 @@ class Data {
     _data['details'] = details.map((e)=>e.toJson()).toList();
     _data['payment_details'] = paymentDetails.map((e)=>e.toJson()).toList();
     _data['due_amount'] = dueAmount;
-    _data['discount'] = discount;
+    _data['discount'] = deduction;
     return _data;
   }
 }
@@ -169,11 +169,11 @@ class Details {
     required this.snNo,
   });
   late final int id;
-  late final int lineId;
+  late final num lineId;
   late final String name;
   late final int quantity;
-  late final int unitPrice;
-  late final int total;
+  late final num unitPrice;
+  late final num total;
   late final List<dynamic> snNo;
 
   Details.fromJson(Map<String, dynamic> json){
@@ -209,11 +209,11 @@ class PaymentDetails {
     this.bank,
   });
   late final int id;
-  late final int orderPaymentId;
+  late final num orderPaymentId;
   late final String name;
-  late final int amount;
+  late final num amount;
   late final List<dynamic> details;
-  late final Null bank;
+  late final Bank? bank;
 
   PaymentDetails.fromJson(Map<String, dynamic> json){
     id = json['id'];
@@ -221,7 +221,7 @@ class PaymentDetails {
     name = json['name'];
     amount = json['amount'];
     details = List.castFrom<dynamic, dynamic>(json['details']);
-    bank = null;
+    bank = json['bank'] is Map? Bank.fromJson(json['bank']) : null ;
   }
 
   Map<String, dynamic> toJson() {
@@ -232,6 +232,27 @@ class PaymentDetails {
     _data['amount'] = amount;
     _data['details'] = details;
     _data['bank'] = bank;
+    return _data;
+  }
+}
+
+class Bank {
+  Bank({
+    required this.id,
+    required this.name,
+  });
+  late final int id;
+  late final String name;
+
+  Bank.fromJson(Map<String, dynamic> json){
+    id = json['id'];
+    name = json['name'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final _data = <String, dynamic>{};
+    _data['id'] = id;
+    _data['name'] = name;
     return _data;
   }
 }

@@ -6,6 +6,7 @@ import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/core/widgets/custom_button.dart';
 import 'package:amar_pos/core/widgets/custom_text_field.dart';
 import 'package:amar_pos/core/widgets/field_title.dart';
+import 'package:amar_pos/features/purchase_return/presentation/pages/purchase_return_history_details_view.dart';
 import 'package:amar_pos/features/purchase_return/presentation/purchase_return_controller.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
@@ -510,9 +511,17 @@ class _PurchaseReturnSummaryState extends State<PurchaseReturnSummary> {
                       }
                       logger.d(controller.createPurchaseReturnOrderModel.toJson());
                       if(controller.isEditing){
-                        controller.updatePurchaseOrder();
+                        controller.updatePurchaseOrder().then((value){
+                          if(value){
+                            Get.to(const PurchaseReturnHistoryDetailsView(),arguments: [controller.pOrderId, controller.pOrderNo]);
+                          }
+                        });
                       }else{
-                        controller.createPurchaseReturnOrder();
+                        controller.createPurchaseReturnOrder().then((value){
+                          if(value){
+                            Get.to(const PurchaseReturnHistoryDetailsView(),arguments: [controller.pOrderId, controller.pOrderNo]);
+                          }
+                        });
                       }
       
                     }

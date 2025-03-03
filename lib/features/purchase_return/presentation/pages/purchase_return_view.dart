@@ -141,7 +141,7 @@ class _PurchaseReturnViewState extends State<PurchaseReturnView> {
                                         if (items.length == 1) {
                                           suggestionEditingController.clear();
                                           controller
-                                              .addPlaceOrderProduct(items.first);
+                                              .addPlaceOrderProduct(items.first, unitPrice: items.first.wholesalePrice);
                                           int value = controller
                                               .createPurchaseReturnOrderModel.products
                                               .singleWhere(
@@ -265,7 +265,7 @@ class _PurchaseReturnViewState extends State<PurchaseReturnView> {
                                     .add(TextEditingController(text: "1"));
                               }
                             }
-                            controller.addPlaceOrderProduct(product);
+                            controller.addPlaceOrderProduct(product, unitPrice: product.wholesalePrice);
                             suggestionEditingController.clear();
                             FocusScope.of(context).unfocus();
                           },

@@ -135,7 +135,7 @@ class PurchaseReturnProductListItem extends StatelessWidget {
                           color: const Color(0xff94DB8C).withOpacity(.3))),
                   child: Center(
                       child: Text(
-                        "Sold Price : ${Methods.getFormatedPrice(productInfo.totalPrice.toDouble())}",
+                        "Price : ${Methods.getFormatedPrice(productInfo.totalPrice.toDouble())}",
                         style: context.textTheme.titleSmall?.copyWith(
                             color: Color(0xff009D5D),
                             fontSize: 14.sp,

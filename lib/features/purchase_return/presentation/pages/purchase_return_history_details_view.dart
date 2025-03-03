@@ -1,24 +1,22 @@
-import 'package:amar_pos/features/purchase/data/models/purchase_history_response_model.dart';
-import 'package:amar_pos/features/purchase/presentation/purchase_controller.dart';
-import 'package:amar_pos/features/purchase_return/data/models/purchase_return_history_response_model.dart';
 import 'package:amar_pos/features/purchase_return/presentation/purchase_return_controller.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:barcode/barcode.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/responsive/pixel_perfect.dart';
+import '../../../../core/widgets/custom_button.dart';
+import '../../../../core/widgets/loading/random_lottie_loader.dart';
 import '../../../../core/widgets/methods/helper_methods.dart';
+import '../../../../core/widgets/methods/number_to_word.dart';
+import '../../../purchase/data/models/purchase_return_history_details/purchase_return_history_details_response_model.dart';
 
 class PurchaseReturnHistoryDetailsView extends StatefulWidget {
-  static const String routeName = '/purchase/history-details';
+  static const String routeName = '/purchase-return/history-details';
 
-  const PurchaseReturnHistoryDetailsView({super.key, required this.orderInfo});
+  const PurchaseReturnHistoryDetailsView({super.key,});
 
-  final PurchaseReturnOrderInfo orderInfo;
 
   @override
   State<PurchaseReturnHistoryDetailsView> createState() =>
@@ -31,10 +29,15 @@ class _PurchaseReturnHistoryDetailsViewState
 
   int i = 1;
 
+  late int orderId;
+  late String orderNo;
+
   @override
   void initState() {
+    orderId = Get.arguments[0];
+    orderNo = Get.arguments[1];
     i = 1;
-    controller.getPurchaseReturnHistoryDetails(context, widget.orderInfo);
+    controller.getPurchaseReturnHistoryDetails(context, orderId);
     super.initState();
   }
 
@@ -43,7 +46,7 @@ class _PurchaseReturnHistoryDetailsViewState
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(widget.orderInfo.orderNo),
+        title: Text(orderNo),
       ),
       body: SafeArea(
         child: Padding(
@@ -52,20 +55,19 @@ class _PurchaseReturnHistoryDetailsViewState
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Header Section
-              Expanded(
-                child: GetBuilder<PurchaseReturnController>(
-                  id: 'purchase_return_history_details',
-                  builder: (controller) {
-                    if (controller.detailsLoading) {
-                      return Center(
-                          child: SpinKitFoldingCube(
-                        size: 100,
-                        color: AppColors.primary,
-                      ));
-                    } else if (controller
-                            .purchaseReturnHistoryDetailsResponseModel !=
-                        null) {
-                      return Column(
+              GetBuilder<PurchaseReturnController>(
+                id: 'purchase_return_history_details',
+                builder: (controller) {
+                  if (controller.detailsLoading) {
+                    return Expanded(
+                      child: Center(child: RandomLottieLoader.lottieLoader()),
+                    );
+                  } else if (controller.purchaseReturnHistoryDetailsResponseModel !=
+                      null) {
+                    PurchaseReturnHistoryDetailsData data =
+                        controller.purchaseReturnHistoryDetailsResponseModel!.data;
+                    return SingleChildScrollView(
+                      child: Column(
                         children: [
                           addH(12),
                           Column(
@@ -79,21 +81,17 @@ class _PurchaseReturnHistoryDetailsViewState
                                         Expanded(
                                           child: Column(
                                             crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                            CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                controller
-                                                    .purchaseReturnHistoryDetailsResponseModel!
-                                                    .data
-                                                    .business
-                                                    .name,
+                                                data.business.name,
                                                 style: const TextStyle(
                                                     fontSize: 20,
                                                     fontWeight:
-                                                        FontWeight.bold),
+                                                    FontWeight.bold),
                                               ),
                                               Text(
-                                                  "Phone: ${controller.purchaseReturnHistoryDetailsResponseModel!.data.business.phone}"),
+                                                  "Phone: ${data.business.phone}"),
                                             ],
                                           ),
                                         ),
@@ -105,24 +103,17 @@ class _PurchaseReturnHistoryDetailsViewState
                                       child: Align(
                                           alignment: Alignment.topRight,
                                           child: Image.network(
-                                            controller
-                                                .purchaseReturnHistoryDetailsResponseModel!
-                                                .data
-                                                .business
-                                                .photoUrl,
+                                            data.business.photoUrl,
                                             width: 100,
                                           ))),
                                 ],
                               ),
                               addH(8),
                               Text(
-                                "Address: ${controller.purchaseReturnHistoryDetailsResponseModel!.data.business.address}",
+                                "Address: ${data.business.address}",
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                               ),
-                              addH(20),
-                              SvgPicture.string(Barcode.code128(useCode128B: false, useCode128C: false).toSvg(widget.orderInfo.orderNo, height: 80)),
-
                             ],
                           ),
                           addH(
@@ -133,45 +124,55 @@ class _PurchaseReturnHistoryDetailsViewState
                           ),
                           Row(
                             children: [
-                              Expanded(
-                                  flex: 2,
-                                  child: Text(widget.orderInfo.orderNo)),
+                              Expanded(flex: 2, child: Text(data.orderNo)),
                               addW(8),
-                              Expanded(
+                              const Expanded(
                                   flex: 3,
                                   child: Text(
+                                    textAlign: TextAlign.center,
                                     'PURCHASE RETURN ORDER',
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 16),
-                                    textAlign: TextAlign.center,
                                   )),
                               addW(8),
                               Expanded(
                                 flex: 2,
                                 child: Text(
-                                  "${widget.orderInfo.dateTime.split(',').first}\n${widget.orderInfo.dateTime.split(',').last}",
+                                  data.dateTime,
                                   textAlign: TextAlign.end,
                                 ),
                               ),
                             ],
                           ),
-                          Divider(color: AppColors.inputBorderColor),
+                          const Divider(color: AppColors.inputBorderColor),
                           addH(12),
-                          Column(
+                          Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text(
-                                  "Supplier Name: ${widget.orderInfo.supplier}",
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.bold)),
-                              Text("Phone: ${widget.orderInfo.phone}"),
-                              Text(
-                                  "Address: ${controller.purchaseReturnHistoryDetailsResponseModel?.data.supplier.address}"),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.stretch,
+                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Text("Supplier Name: ${data.supplier.name}",
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold)),
+                                    Text("Phone: ${data.supplier.phone}"),
+                                    Text("Address: ${data.supplier.address}"),
+                                  ],
+                                ),
+                              ),
+                              addW(20),
+                              SvgPicture.string(Barcode.code128(
+                                  useCode128B: false, useCode128C: false)
+                                  .toSvg(data.orderNo,
+                                  height: 60, width: context.width / 3)),
                             ],
                           ),
-                          addH(12),
+                          addH(20),
                           // Product Table
                           Table(
                             border: TableBorder.all(color: Colors.grey),
@@ -185,7 +186,7 @@ class _PurchaseReturnHistoryDetailsViewState
                             children: [
                               TableRow(
                                 decoration:
-                                    BoxDecoration(color: Colors.grey[200]),
+                                BoxDecoration(color: Colors.grey[200]),
                                 children: const [
                                   Padding(
                                       padding: EdgeInsets.symmetric(
@@ -213,24 +214,20 @@ class _PurchaseReturnHistoryDetailsViewState
                                           textAlign: TextAlign.center)),
                                 ],
                               ),
-                              ...controller
-                                  .purchaseReturnHistoryDetailsResponseModel!
-                                  .data
-                                  .details
-                                  .map((product) {
+                              ...data.details.map((product) {
                                 return TableRow(
                                   children: [
                                     Padding(
-                                        padding: EdgeInsets.symmetric(
+                                        padding: const EdgeInsets.symmetric(
                                             horizontal: 4, vertical: 8),
                                         child: AutoSizeText("${i++}",
                                             textAlign: TextAlign.center)),
                                     Padding(
-                                        padding: EdgeInsets.symmetric(
+                                        padding: const EdgeInsets.symmetric(
                                             horizontal: 4, vertical: 8),
                                         child: Column(
                                           crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                          CrossAxisAlignment.start,
                                           children: [
                                             AutoSizeText(product.name),
                                             addH(4),
@@ -240,49 +237,49 @@ class _PurchaseReturnHistoryDetailsViewState
                                                 runSpacing: 4,
                                                 children: product.snNo!
                                                     .map((e) => Container(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .symmetric(
-                                                                  horizontal:
-                                                                      12,
-                                                                  vertical: 4),
-                                                          decoration:
-                                                              const BoxDecoration(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .all(Radius
-                                                                        .circular(
-                                                                            8)),
-                                                            color: Colors.black,
-                                                          ),
-                                                          child: AutoSizeText(
-                                                            e.serialNo,
-                                                            style:
-                                                                const TextStyle(
-                                                                    color: Colors
-                                                                        .white),
-                                                          ),
-                                                        ))
+                                                  padding:
+                                                  const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal:
+                                                      12,
+                                                      vertical: 4),
+                                                  decoration:
+                                                  const BoxDecoration(
+                                                    borderRadius:
+                                                    BorderRadius
+                                                        .all(Radius
+                                                        .circular(
+                                                        8)),
+                                                    color: Colors.black,
+                                                  ),
+                                                  child: AutoSizeText(
+                                                    e.serialNo,
+                                                    style:
+                                                    const TextStyle(
+                                                        color: Colors
+                                                            .white),
+                                                  ),
+                                                ))
                                                     .toList(),
                                               )
                                           ],
                                         )),
                                     Padding(
-                                        padding: EdgeInsets.symmetric(
+                                        padding: const EdgeInsets.symmetric(
                                             horizontal: 4, vertical: 8),
                                         child: AutoSizeText(
                                             Methods.getFormattedNumber(
                                                 product.unitPrice.toDouble()),
                                             textAlign: TextAlign.center)),
                                     Padding(
-                                        padding: EdgeInsets.symmetric(
+                                        padding: const EdgeInsets.symmetric(
                                             horizontal: 4, vertical: 8),
                                         child: AutoSizeText(
                                             Methods.getFormattedNumber(
                                                 product.quantity.toDouble()),
                                             textAlign: TextAlign.center)),
                                     Padding(
-                                        padding: EdgeInsets.symmetric(
+                                        padding: const EdgeInsets.symmetric(
                                             horizontal: 4, vertical: 8),
                                         child: AutoSizeText(
                                             Methods.getFormattedNumber(
@@ -293,139 +290,162 @@ class _PurchaseReturnHistoryDetailsViewState
                               }).toList(),
                             ],
                           ),
-                          SizedBox(height: 20),
-
+                          addH(8),
+                          Row(
+                            children: [
+                              Text("In Words : ",
+                                  style:
+                                  TextStyle(fontWeight: FontWeight.bold)),
+                              Expanded(
+                                  child: Text(
+                                    _convertToWords(data.payable.toDouble()),
+                                    style: TextStyle(fontWeight: FontWeight.bold),
+                                  )),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
                           // Summary Section
                           Align(
                             alignment: Alignment.centerRight,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text("Sub Total:",
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                    Text(controller
-                                        .purchaseReturnHistoryDetailsResponseModel!
-                                        .data
-                                        .subTotal
-                                        .toStringAsFixed(2)),
-                                  ],
+                                TitleWithValue(
+                                  title: "Sub Total",
+                                  value: data.subTotal,
+                                  isTitleBold: true,
+                                  isValueBold: true,
                                 ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text("Expense:"),
-                                    Text(controller
-                                        .purchaseReturnHistoryDetailsResponseModel!
-                                        .data
-                                        .expense
-                                        .toStringAsFixed(2)),
-                                  ],
+                                TitleWithValue(
+                                  title: "Expense",
+                                  value: data.expense,
                                 ),
-                                // Row(
-                                //   mainAxisAlignment:
-                                //   MainAxisAlignment.spaceBetween,
-                                //   children: [
-                                //     Text("VAT:"),
-                                //     Text(controller
-                                //         .purchaseReturnHistoryDetailsResponseModel!
-                                //         .data
-                                //         .vat
-                                //         .toStringAsFixed(2)),
-                                //   ],
-                                // ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text("Deduction:"),
-                                    Text(controller
-                                        .purchaseReturnHistoryDetailsResponseModel!
-                                        .data
-                                        .deduction
-                                        .toStringAsFixed(2)),
-                                  ],
+                                TitleWithValue(
+                                  title: "Deduction",
+                                  value: data.deduction,
                                 ),
-                                Divider(color: Colors.black),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text("Payable Amount:",
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                    Text(controller
-                                        .purchaseReturnHistoryDetailsResponseModel!
-                                        .data
-                                        .payable
-                                        .toStringAsFixed(2)),
-                                  ],
+                                const Divider(color: Colors.black),
+                                TitleWithValue(
+                                  title: "Payable Amount",
+                                  value: data.payable,
+                                  isTitleBold: true,
+                                  isValueBold: true,
                                 ),
-                                ...controller
-                                    .purchaseReturnHistoryDetailsResponseModel!
-                                    .data
-                                    .paymentDetails
-                                    .map(
-                                  (e) => Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text("Paid By " + e.name,
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold)),
-                                      Text(e.amount.toStringAsFixed(2)),
-                                    ],
+                                ...data.paymentDetails.map(
+                                      (e) => TitleWithValue(
+                                    title: "Paid By ${e.name}",
+                                    value: e.amount,
                                   ),
                                 ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text("Due Amount:",
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                    Text(controller
-                                        .purchaseReturnHistoryDetailsResponseModel!
-                                        .data
-                                        .dueAmount
-                                        .toStringAsFixed(2)),
-                                  ],
+                                TitleWithValue(
+                                  title: "Due Amount",
+                                  value: data.dueAmount,
+                                  isTitleBold: true,
+                                  isValueBold: true,
                                 ),
                               ],
                             ),
                           ),
-                          SizedBox(height: 20),
-                          SizedBox(height: 20),
+                          const SizedBox(height: 40),
                           Align(
                             alignment: Alignment.centerRight,
-                            child: Text(
-                                "Created by: ${controller.purchaseReturnHistoryDetailsResponseModel!.data.createdBy}",
+                            child: Text("Created by: ${data.createdBy}",
                                 style: TextStyle(fontWeight: FontWeight.bold)),
                           ),
                         ],
-                      );
-                    }
-                    return Center(
-                      child: Text("No data found!"),
+                      ),
                     );
-                  },
-                ),
+                  }
+                  return const Center(
+                    child: Text("No data found!"),
+                  );
+                },
               ),
             ],
           ),
         ),
       ),
+        bottomNavigationBar: GetBuilder<PurchaseReturnController>(
+            id: 'download_print_buttons',
+            builder: (controller){
+              if(controller.purchaseReturnHistoryDetailsResponseModel != null){
+                return Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: CustomButton(
+                          text: "Download",
+                          color: Color(0xff03346E),
+                          radius: 8,
+                          onTap: () {
+                            controller.downloadPurchaseReturnHistory(
+                                isPdf: true, orderId: orderId, orderNo: orderNo);
+                          },
+                        ),
+                      ),
+                      addW(20),
+                      Expanded(
+                        child: CustomButton(
+                          text: "Print",
+                          radius: 8,
+                          color: Color(0xffFF9000),
+                          onTap: () {
+                            controller.downloadPurchaseReturnHistory(
+                                shouldPrint: true,
+                                orderNo: orderNo,
+                                isPdf: true,
+                                orderId: orderId);
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }else{
+                return SizedBox.shrink();
+              }
+            })
     );
   }
 
   // Helper function to convert amount to words (a basic implementation)
   String _convertToWords(double amount) {
     // Replace this with a proper implementation or library for converting numbers to words
-    return "One Thousand Ten Taka Only";
+    return numberToWords(amount);
+  }
+}
+
+
+class TitleWithValue extends StatelessWidget {
+  const TitleWithValue(
+      {super.key,
+        required this.value,
+        required this.title,
+        this.isTitleBold,
+        this.isValueBold});
+
+  final num value;
+  final String title;
+  final bool? isTitleBold;
+  final bool? isValueBold;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text("$title : ",
+            style: TextStyle(
+                fontWeight:
+                isTitleBold != null ? FontWeight.bold : FontWeight.normal)),
+        Text(
+          Methods.getFormattedNumberWithDecimal(value.toDouble()),
+          style: TextStyle(
+              fontWeight:
+              isValueBold != null ? FontWeight.bold : FontWeight.normal),
+        ),
+      ],
+    );
   }
 }

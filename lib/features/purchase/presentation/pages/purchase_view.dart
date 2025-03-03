@@ -146,7 +146,7 @@ class _PurchaseViewState extends State<PurchaseView> {
                                         if (items.length == 1) {
                                           suggestionEditingController.clear();
                                           controller
-                                              .addPlaceOrderProduct(items.first);
+                                              .addPlaceOrderProduct(items.first, unitPrice: items.first.wholesalePrice);
                                           int value = controller
                                               .createPurchaseOrderModel.products
                                               .singleWhere(
@@ -269,7 +269,7 @@ class _PurchaseViewState extends State<PurchaseView> {
                                     .add(TextEditingController(text: "1"));
                               }
                             }
-                            controller.addPlaceOrderProduct(product);
+                            controller.addPlaceOrderProduct(product, unitPrice: product.wholesalePrice);
                             suggestionEditingController.clear();
                             FocusScope.of(context).unfocus();
                           },
@@ -718,12 +718,14 @@ class _PurchaseViewState extends State<PurchaseView> {
                       }
                     }
                     if (formKey.currentState!.validate()) {
-                      await Get.to(() => PurchaseSummary(onSuccess: (value){
-                        if(value){
-                          controller.clearEditing();
-                          widget.onSuccess(1);
-                        }
-                      },))
+                      await Get.to(() => PurchaseSummary(
+                      //   onSuccess: (value){
+                      //   if(value){
+                      //     controller.clearEditing();
+                      //     widget.onSuccess(1);
+                      //   }
+                      // },
+                      ))
                           ?.then((value) {
                         FocusScope.of(context).unfocus();
                       });

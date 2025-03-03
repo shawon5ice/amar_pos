@@ -132,16 +132,17 @@ class PurchaseService {
   }
 
   static downloadPurchaseHistory(
-      {required String usrToken, required PurchaseOrderInfo purchaseOrderInfo, required String fileName}) async {
+      {required String usrToken, required int orderId, required String fileName, bool? shouldPrint}) async {
     // logger.d("PDF: $isPdf");
 
     String downloadUrl =
-        "${NetWorkStrings.baseUrl}/purchase/download-purchase-invoice/${purchaseOrderInfo.id}";
+        "${NetWorkStrings.baseUrl}/purchase/download-purchase-invoice/$orderId";
 
     FileDownloader().downloadFile(
       url: downloadUrl,
       token: usrToken,
-      fileName: "${purchaseOrderInfo.orderNo}.pdf",);
+      shouldPrint: shouldPrint,
+      fileName: fileName,);
   }
 
   static Future<dynamic> getPurchaseHistoryDetails({
@@ -170,7 +171,7 @@ class PurchaseService {
     required DateTime? startDate,
     required DateTime? endDate,
     required String? search,
-
+    bool? shouldPrint
   }) async {
     // logger.d("PDF: $isPdf");
 
@@ -201,6 +202,7 @@ class PurchaseService {
       url: downloadUrl,
       token: usrToken,
       query: query,
+      shouldPrint: shouldPrint,
       fileName: fileName,);
   }
 

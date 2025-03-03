@@ -6,6 +6,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 
 import '../../../../core/constants/app_assets.dart';
+import '../../../../core/constants/app_colors.dart';
+import '../../../../core/methods/helper_methods.dart';
 import '../../../../core/responsive/pixel_perfect.dart';
 import '../../../../core/widgets/pager_list_view.dart';
 import '../../../inventory/presentation/stock_report/widget/custom_svg_icon_widget.dart';
@@ -80,12 +82,26 @@ class _PurchaseReturnHistoryScreenState extends State<PurchaseReturnHistoryScree
                 addW(4),
                 CustomSvgIconButton(
                   bgColor: const Color(0xffFFFCF8),
-                  onTap: () {},
+                  onTap: () {
+                    controller.downloadList(isPdf: true, purchaseHistory: true,shouldPrint: true);
+                  },
                   assetPath: AppAssets.printIcon,
                 )
               ],
             ),
-            addH(8.px),
+            Obx(() {
+              return controller.selectedDateTimeRange.value == null ? addH(8) : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("${formatDate(controller.selectedDateTimeRange.value!.start)} - ${formatDate(controller.selectedDateTimeRange.value!.end)}", style:const TextStyle(fontSize: 14, color: AppColors.error),),
+                  addW(16),
+                  IconButton(onPressed: (){
+                    controller.selectedDateTimeRange.value = null;
+                    controller.getPurchaseReturnHistory();
+                  }, icon: const Icon(Icons.cancel_outlined, size: 18, color: AppColors.error,))
+                ],
+              );
+            }),
             GetBuilder<PurchaseReturnController>(
               id: 'total_widget',
               builder: (controller) => Row(

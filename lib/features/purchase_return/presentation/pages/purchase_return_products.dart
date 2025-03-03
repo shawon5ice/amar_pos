@@ -77,7 +77,9 @@ class _SoldHistoryState extends State<PurchaseReturnProducts> {
                 addW(4),
                 CustomSvgIconButton(
                   bgColor: const Color(0xffFFFCF8),
-                  onTap: () {},
+                  onTap: () {
+                    controller.downloadList(isPdf: true, purchaseHistory: false, shouldPrint: true);
+                  },
                   assetPath: AppAssets.printIcon,
                 )
               ],

@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../../core/constants/app_assets.dart';
+import '../../../../core/network/helpers/error_extractor.dart';
 import '../../../inventory/presentation/stock_report/widget/custom_svg_icon_widget.dart';
 import '../purchase_return_controller.dart';
 
@@ -26,7 +27,7 @@ class PurchaseReturnHistoryItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: (){
-        Get.to(PurchaseReturnHistoryDetailsView(orderInfo: purchaseReturnHistory));
+        Get.to(PurchaseReturnHistoryDetailsView(), arguments: [purchaseReturnHistory.id, purchaseReturnHistory.orderNo]);
       },
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 5.h),
@@ -97,7 +98,7 @@ class PurchaseReturnHistoryItemWidget extends StatelessWidget {
                   bgColor: const Color(0xffE1F2FF),
                   onTap: () {
                     controller.downloadPurchaseReturnHistory(
-                        isPdf: true, purchaseReturnOrderInfo: purchaseReturnHistory);
+                        isPdf: true, orderNo: purchaseReturnHistory.orderNo, orderId: purchaseReturnHistory.id);
                   },
                   assetPath: AppAssets.downloadIcon,
                 ),
@@ -105,12 +106,19 @@ class PurchaseReturnHistoryItemWidget extends StatelessWidget {
                 CustomSvgSmallIconButton(
                   borderColor: const Color(0xffFF9000),
                   bgColor: const Color(0xffFFFCF8),
-                  onTap: () {},
+                  onTap: () {
+                    controller.downloadPurchaseReturnHistory(
+                        isPdf: true, orderNo: purchaseReturnHistory.orderNo, orderId: purchaseReturnHistory.id, shouldPrint: true);
+                  },
                   assetPath: AppAssets.printIcon,
                 ),
                 addW(8),
                 SoldHistoryItemActionMenu(
                   onSelected: (value) async{
+                    if(purchaseReturnHistory.isActionable == false){
+                      ErrorExtractor.showSingleErrorDialog(context, "You can't perform any action on this invoice due to changed stock Value!");
+                      return;
+                    }
                     switch (value) {
                       case "edit":
                         await controller.processEdit(purchaseOrderInfo: purchaseReturnHistory, context: context);

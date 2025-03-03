@@ -1,19 +1,20 @@
 import 'dart:async';
 import 'package:amar_pos/core/data/model/reusable/supplier_list_response_model.dart';
-import 'package:amar_pos/features/purchase/data/models/purchase_order_details_response_model.dart';
+import 'package:amar_pos/core/widgets/reusable/filter_bottom_sheet/product_brand_category_warranty_unit_response_model.dart';
 import 'package:amar_pos/features/sales/data/models/payment_method_tracker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/constants/logger/logger.dart';
 import '../../../core/core.dart';
+import '../../../core/network/helpers/error_extractor.dart';
 import '../../../core/widgets/loading/random_lottie_loader.dart';
 import '../../auth/data/model/hive/login_data.dart';
 import '../../auth/data/model/hive/login_data_helper.dart';
 import '../../inventory/data/products/product_list_response_model.dart';
-import '../../purchase/data/models/purchase_history_details/purchase_history_details_response_model.dart';
 import '../../purchase/data/models/purchase_return_history_details/purchase_return_history_details_response_model.dart';
 import '../data/models/create_purchase_return_order_model.dart';
 import '../data/models/purchase_return_history_response_model.dart';
+import '../data/models/purchase_return_order_details_response_model.dart';
 import '../data/models/purchase_return_products_response_model.dart';
 import '../data/purchase_return_service.dart';
 
@@ -38,6 +39,9 @@ class PurchaseReturnController extends GetxController {
   bool isRetailSale = true;
 
   num paidAmount = 0;
+
+  FilterItem? brand;
+  FilterItem? category;
 
   LoginData? loginData = LoginDataBoxManager().loginData;
 
@@ -89,6 +93,21 @@ class PurchaseReturnController extends GetxController {
 
   void setSelectedDateRange(DateTimeRange? range) {
     selectedDateTimeRange.value = range;
+  }
+
+  void clearEditing(){
+    purchaseOrderProducts.clear();
+    isEditing = false;
+    selectedSupplier = null;
+    selectedDateTimeRange.value = null;
+    paidAmount = 0;
+    searchProductController.clear();
+    totalDiscount = 0;
+    totalPaid = 0;
+    totalDeu = 0;
+    totalDiscount = 0;
+    totalQTY = 0;
+    paymentMethodTracker.clear();
   }
 
   Future<void> getAllProducts(
@@ -155,7 +174,7 @@ class PurchaseReturnController extends GetxController {
   }
 
   void addPlaceOrderProduct(ProductInfo product,
-      {List<String>? snNo, int? quantity}) {
+      {List<String>? snNo, int? quantity,required num unitPrice}) {
     if (purchaseOrderProducts.any((e) => e.id == product.id)) {
       createPurchaseReturnOrderModel.products
           .firstWhere((e) => e.id == product.id)
@@ -168,7 +187,7 @@ class PurchaseReturnController extends GetxController {
             0,
             PurchaseReturnProductModel(
                 id: product.id,
-                unitPrice: product.wholesalePrice.toDouble(),
+                unitPrice: unitPrice.toDouble(),
                 quantity: quantity ?? 1,
                 vat: (product.vat / 100 * product.wholesalePrice.toDouble()),
                 serialNo: snNo ?? []));
@@ -177,7 +196,7 @@ class PurchaseReturnController extends GetxController {
 
         createPurchaseReturnOrderModel.products.add(PurchaseReturnProductModel(
             id: product.id,
-            unitPrice: product.wholesalePrice.toDouble(),
+            unitPrice: unitPrice.toDouble(),
             quantity: quantity ?? 1,
             vat: (product.vat / 100 * product.wholesalePrice.toDouble()),
             serialNo: snNo ?? []));
@@ -352,7 +371,12 @@ class PurchaseReturnController extends GetxController {
 
   bool createPurchaseReturnOrderLoading = false;
 
-  void createPurchaseReturnOrder() async {
+  int? pOrderId;
+  String? pOrderNo;
+
+  Future<bool> createPurchaseReturnOrder() async {
+    pOrderId = null;
+    pOrderNo = null;
     createPurchaseReturnOrderLoading = true;
     update(["purchase_order_items"]);
     RandomLottieLoader.show();
@@ -364,17 +388,13 @@ class PurchaseReturnController extends GetxController {
       logger.e(response);
       if (response != null) {
         if (response['success']) {
-          selectedSupplier = null;
-          supplierList.clear();
-          paymentMethodTracker.clear();
-          purchaseOrderProducts.clear();
-          createPurchaseReturnOrderModel =
-              CreatePurchaseReturnOrderModel.defaultConstructor();
-          additionalExpense = 0;
-          totalDiscount = 0;
+          pOrderId = response['data']['id'];
+          pOrderNo = response['data']['order_no'];
+          clearEditing();
           RandomLottieLoader.hide();
           Get.back();
           Get.back();
+          return true;
         } else {
           RandomLottieLoader.hide();
         }
@@ -388,9 +408,10 @@ class PurchaseReturnController extends GetxController {
       createPurchaseReturnOrderLoading = false;
       update(["purchase_order_items"]);
     }
+    return false;
   }
 
-  void updatePurchaseOrder() async {
+  Future<bool> updatePurchaseOrder() async {
     createPurchaseReturnOrderLoading = true;
     update(["purchase_order_items"]);
     RandomLottieLoader.show();
@@ -398,21 +419,18 @@ class PurchaseReturnController extends GetxController {
       var response = await PurchaseReturnService.updatePurchaseReturnOrder(
         usrToken: loginData!.token,
         purchaseReturnOrderModel: createPurchaseReturnOrderModel,
-        orderId: purchaseOrderDetailsResponseModel!.data.id,
+        orderId: purchaseReturnOrderDetailsResponseModel!.data.id,
       );
       logger.e(response);
       if (response != null) {
         if (response['success']) {
-          purchaseOrderProducts.clear();
-          selectedSupplier = null;
-          paymentMethodTracker.clear();
-          additionalExpense = 0;
-          totalPaid = 0;
-          paidAmount = 0;
-          totalDiscount = 0;
+          pOrderId = response['data']['id'];
+          pOrderNo = response['data']['order_no'];
+          clearEditing();
           RandomLottieLoader.hide();
           Get.back();
           Get.back();
+          return true;
         } else {
           RandomLottieLoader.hide();
         }
@@ -427,6 +445,7 @@ class PurchaseReturnController extends GetxController {
       isEditing = false;
       update(["purchase_order_items"]);
     }
+    return false;
   }
 
   Future<void> getPurchaseReturnHistory({int page = 1}) async {
@@ -449,6 +468,8 @@ class PurchaseReturnController extends GetxController {
         search: searchProductController.text,
         startDate: selectedDateTimeRange.value?.start,
         endDate: selectedDateTimeRange.value?.end,
+        categoryId: category?.id,
+        brandId: brand?.id,
       );
 
       logger.i(response);
@@ -498,6 +519,8 @@ class PurchaseReturnController extends GetxController {
         search: searchProductController.text,
         startDate: selectedDateTimeRange.value?.start,
         endDate: selectedDateTimeRange.value?.end,
+        categoryId: category?.id,
+        brandId: brand?.id,
       );
 
       logger.i(response);
@@ -527,7 +550,7 @@ class PurchaseReturnController extends GetxController {
     }
   }
 
-  PurchaseOrderDetailsResponseModel? purchaseOrderDetailsResponseModel;
+  PurchaseReturnOrderDetailsResponseModel? purchaseReturnOrderDetailsResponseModel;
   bool editPurchaseHistoryItemLoading = false;
 
   Future<void> processEdit(
@@ -554,8 +577,8 @@ class PurchaseReturnController extends GetxController {
         purchaseOrderProducts.clear();
         getAllProducts(search: '', page: 1);
 
-        purchaseOrderDetailsResponseModel =
-            PurchaseOrderDetailsResponseModel.fromJson(response);
+        purchaseReturnOrderDetailsResponseModel =
+            PurchaseReturnOrderDetailsResponseModel.fromJson(response);
 
         if (purchasePaymentMethods == null) {
           await getPaymentMethods();
@@ -570,20 +593,22 @@ class PurchaseReturnController extends GetxController {
         }
 
         //selecting products
-        for (var e in purchaseOrderDetailsResponseModel!.data.details) {
+        for (var e in purchaseReturnOrderDetailsResponseModel!.data.details) {
           ProductInfo productInfo = productsListResponseModel!.data.productList
               .singleWhere((f) => f.id == e.id);
           addPlaceOrderProduct(
             productInfo,
             quantity: e.quantity,
+            unitPrice: e.unitPrice
           );
         }
 
         //Payment Methods
-        for (var e in purchaseOrderDetailsResponseModel!.data.paymentDetails) {
+        for (var e in purchaseReturnOrderDetailsResponseModel!.data.paymentDetails) {
           PaymentMethod paymentMethod =
               purchasePaymentMethods!.data.singleWhere((f) => f.id == e.id);
           PaymentOption? paymentOption;
+
 
           if (paymentMethod.name.toLowerCase().contains("cash")) {
             cashSelected = true;
@@ -592,9 +617,8 @@ class PurchaseReturnController extends GetxController {
             creditSelected = true;
           }
 
-          if (e.bank != null) {
-            paymentOption = paymentMethod.paymentOptions
-                .singleWhere((f) => f.id == e.bank!.id);
+          if(e.bank != null){
+            paymentOption = paymentMethod.paymentOptions.singleWhere((f) => f.id == e.bank!.id);
           }
 
           paymentMethodTracker.add(PaymentMethodTracker(
@@ -607,12 +631,12 @@ class PurchaseReturnController extends GetxController {
         }
 
         selectedSupplier = supplierList.singleWhere(
-            (e) => e.id == purchaseOrderDetailsResponseModel!.data.supplier.id);
+            (e) => e.id == purchaseReturnOrderDetailsResponseModel!.data.supplier.id);
 
         //service stuff
-        totalPaid = purchaseOrderDetailsResponseModel!.data.payable;
-        totalDiscount = purchaseOrderDetailsResponseModel!.data.discount;
-        additionalExpense = purchaseOrderDetailsResponseModel!.data.expense;
+        totalPaid = purchaseReturnOrderDetailsResponseModel!.data.payable;
+        totalDiscount = purchaseReturnOrderDetailsResponseModel!.data.deduction;
+        additionalExpense = purchaseReturnOrderDetailsResponseModel!.data.expense;
         logger.d(createPurchaseReturnOrderModel.products.length);
       }
     } catch (e) {
@@ -656,18 +680,17 @@ class PurchaseReturnController extends GetxController {
     }
   }
 
-  Future<void> downloadPurchaseReturnHistory({
-    required bool isPdf,
-    required PurchaseReturnOrderInfo purchaseReturnOrderInfo,
-  }) async {
+  Future<void> downloadPurchaseReturnHistory({required bool isPdf, required int orderId,required String orderNo, bool? shouldPrint})  async {
     hasError.value = false;
 
     String fileName =
-        "${purchaseReturnOrderInfo.orderNo}-${DateTime.now().microsecondsSinceEpoch.toString()}${isPdf ? ".pdf" : ".xlsx"}";
+        "$orderNo${isPdf ? ".pdf" : ".xlsx"}";
     try {
       var response = await PurchaseReturnService.downloadPurchaseReturnHistory(
-        purchaseReturnOrderInfo: purchaseReturnOrderInfo,
-        usrToken: loginData!.token,
+          orderId: orderId,
+          usrToken: loginData!.token,
+          fileName: fileName,
+          shouldPrint: shouldPrint
       );
     } catch (e) {
       logger.e(e);
@@ -675,9 +698,12 @@ class PurchaseReturnController extends GetxController {
   }
 
   Future<void> downloadList(
-      {required bool isPdf, required bool purchaseHistory}) async {
+      {required bool isPdf, required bool purchaseHistory, bool? shouldPrint}) async {
     hasError.value = false;
-
+    if(purchaseHistory && purchaseReturnHistoryList.isEmpty || !purchaseHistory && purchaseReturnProducts.isEmpty){
+      ErrorExtractor.showSingleErrorDialog(Get.context!, "There is no associated data to perform your action!");
+      return;
+    }
     String fileName =
         "${purchaseHistory ? "Return Order history" : "Return Product History"}-${selectedDateTimeRange.value != null ? "${selectedDateTimeRange.value!.start.toIso8601String().split("T")[0]}-${selectedDateTimeRange.value!.end.toIso8601String().split("T")[0]}" : DateTime.now().toIso8601String().split("T")[0].toString()}${isPdf ? ".pdf" : ".xlsx"}";
     try {
@@ -689,6 +715,7 @@ class PurchaseReturnController extends GetxController {
         startDate: selectedDateTimeRange.value?.start,
         endDate: selectedDateTimeRange.value?.end,
         fileName: fileName,
+        shouldPrint: shouldPrint,
       );
     } catch (e) {
       logger.e(e);
@@ -713,14 +740,14 @@ class PurchaseReturnController extends GetxController {
   PurchaseReturnHistoryDetailsResponseModel? purchaseReturnHistoryDetailsResponseModel;
 
   Future<void> getPurchaseReturnHistoryDetails(BuildContext context,
-      PurchaseReturnOrderInfo purchaseReturnOrderInfo) async {
+      int orderId) async {
     detailsLoading = true;
     purchaseReturnHistoryDetailsResponseModel = null;
-    update(['purchase_return_history_details']);
+    update(['purchase_return_history_details','download_print_buttons']);
     try {
       var response = await PurchaseReturnService.getPurchaseReturnHistoryDetails(
         usrToken: loginData!.token,
-        id: purchaseReturnOrderInfo.id,
+        id: orderId,
       );
 
       logger.i(response);
@@ -731,7 +758,7 @@ class PurchaseReturnController extends GetxController {
     } catch (e) {
     } finally {
       detailsLoading = false;
-      update(['purchase_return_history_details']);
+      update(['purchase_return_history_details','download_print_buttons']);
     }
   }
 }

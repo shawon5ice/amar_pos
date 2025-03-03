@@ -191,19 +191,21 @@ class PurchaseController extends GetxController{
 
 
 
-  void addPlaceOrderProduct(ProductInfo product, {List<String>? snNo, int? quantity}) {
+  void addPlaceOrderProduct(ProductInfo product, {List<String>? snNo, int? quantity, required num unitPrice}) {
     logger.i(snNo);
     if (purchaseOrderProducts.any((e) => e.id == product.id)) {
-      createPurchaseOrderModel.products
-          .firstWhere((e) => e.id  == product.id)
-          .quantity++;
+      var x  = createPurchaseOrderModel.products
+          .firstWhere((e) => e.id  == product.id);
+      x.quantity++;
+      x.unitPrice = unitPrice.toDouble();
+
     } else {
       if(purchaseOrderProducts.isNotEmpty){
         purchaseOrderProducts.insert(0, product);
 
         createPurchaseOrderModel.products.insert(0, PurchaseProductModel(
             id: product.id,
-            unitPrice: product.wholesalePrice.toDouble(),
+            unitPrice: unitPrice.toDouble(),
             quantity:quantity?? 1,
             vat: (product.vat/100 *  product
                 .wholesalePrice.toDouble()),
@@ -213,7 +215,7 @@ class PurchaseController extends GetxController{
 
         createPurchaseOrderModel.products.add(PurchaseProductModel(
             id: product.id,
-            unitPrice: product.wholesalePrice.toDouble(),
+            unitPrice: unitPrice.toDouble(),
             quantity:quantity?? 1,
             vat: (product.vat/100 *  product
                 .wholesalePrice.toDouble()),
@@ -403,7 +405,7 @@ class PurchaseController extends GetxController{
       logger.e(response);
       if (response != null) {
         if(response['success']){
-          pOrderNo = response['data']['order_no'];
+          pOrderId = response['data']['id'];
           pOrderNo = response['data']['order_no'];
           selectedSupplier = null;
           supplierList.clear();
@@ -433,6 +435,8 @@ class PurchaseController extends GetxController{
 
 
   Future<bool> updatePurchaseOrder() async {
+    pOrderNo = null;
+    pOrderId = null;
     createPurchaseOrderLoading = true;
     update(["purchase_order_items"]);
     RandomLottieLoader.show();
@@ -445,13 +449,9 @@ class PurchaseController extends GetxController{
       logger.e(response);
       if (response != null) {
         if (response['success']) {
-          purchaseOrderProducts.clear();
-          selectedSupplier = null;
-          paymentMethodTracker.clear();
-          additionalExpense = 0;
-          totalPaid = 0;
-          paidAmount = 0;
-          totalDiscount = 0;
+          pOrderId = response['data']['id'];
+          pOrderNo = response['data']['order_no'];
+          clearEditing();
           RandomLottieLoader.hide();
           Get.back();
           Get.back();
@@ -612,7 +612,7 @@ class PurchaseController extends GetxController{
         //selecting products
         for (var e in purchaseOrderDetailsResponseModel!.data.details) {
           ProductInfo productInfo = productsListResponseModel!.data.productList.singleWhere((f) => f.id == e.id);
-          addPlaceOrderProduct(productInfo, quantity:  e.quantity,snNo: e.snNo);
+          addPlaceOrderProduct(productInfo, quantity:  e.quantity,snNo: e.snNo, unitPrice: e.unitPrice);
         }
         
 
@@ -693,18 +693,19 @@ class PurchaseController extends GetxController{
 
 
   Future<void> downloadPurchaseHistory(
-      {required bool isPdf, required PurchaseOrderInfo purchaseOrderInfo,}) async {
+      {required bool isPdf, required int orderId,required String orderNo, bool? shouldPrint}) async {
     hasError.value = false;
 
-    String fileName = "${purchaseOrderInfo.orderNo}-${DateTime
+    String fileName = "$orderNo-${DateTime
         .now()
         .microsecondsSinceEpoch
         .toString()}${isPdf ? ".pdf" : ".xlsx"}";
     try {
       var response = await PurchaseService.downloadPurchaseHistory(
-        purchaseOrderInfo: purchaseOrderInfo,
+        orderId: orderId,
         usrToken: loginData!.token,
-        fileName: fileName
+        fileName: fileName,
+        shouldPrint: shouldPrint
       );
     } catch (e) {
       logger.e(e);
@@ -713,7 +714,7 @@ class PurchaseController extends GetxController{
     }
   }
 
-  Future<void> downloadList({required bool isPdf,required bool purchaseHistory}) async {
+  Future<void> downloadList({required bool isPdf,required bool purchaseHistory, bool? shouldPrint}) async {
     if(purchaseHistory && purchaseHistoryList.isEmpty || !purchaseHistory && purchaseProducts.isEmpty){
       ErrorExtractor.showSingleErrorDialog(Get.context!, "There is no associated data to perform your action!");
       return;
@@ -733,6 +734,7 @@ class PurchaseController extends GetxController{
         startDate: selectedDateTimeRange.value?.start,
         endDate: selectedDateTimeRange.value?.end,
         fileName: fileName,
+        shouldPrint: shouldPrint
       );
     } catch (e) {
       logger.e(e);
@@ -746,7 +748,7 @@ class PurchaseController extends GetxController{
   Future<void> getPurchaseHistoryDetails(BuildContext context, int orderId) async {
     detailsLoading = true;
     purchaseHistoryDetailsResponseModel = null;
-    update(['purchase_history_details']);
+    update(['purchase_history_details', 'download_print_buttons']);
     try {
       var response = await PurchaseService.getPurchaseHistoryDetails(
         usrToken: loginData!.token,
@@ -761,7 +763,7 @@ class PurchaseController extends GetxController{
     } catch (e) {
     } finally {
       detailsLoading = false;
-      update(['purchase_history_details']);
+      update(['purchase_history_details', 'download_print_buttons']);
     }
   }
 }

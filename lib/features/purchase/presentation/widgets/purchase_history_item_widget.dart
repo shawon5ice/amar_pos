@@ -96,7 +96,7 @@ class PurchaseHistoryItemWidget extends StatelessWidget {
                   bgColor: const Color(0xffE1F2FF),
                   onTap: () {
                     controller.downloadPurchaseHistory(
-                        isPdf: true, purchaseOrderInfo: purchaseHistory);
+                        isPdf: true, orderId: purchaseHistory.id, orderNo: purchaseHistory.orderNo);
                   },
                   assetPath: AppAssets.downloadIcon,
                 ),
@@ -104,7 +104,12 @@ class PurchaseHistoryItemWidget extends StatelessWidget {
                 CustomSvgSmallIconButton(
                   borderColor: const Color(0xffFF9000),
                   bgColor: const Color(0xffFFFCF8),
-                  onTap: () {},
+                  onTap: () {
+                    controller.downloadPurchaseHistory(
+                      shouldPrint: true,
+                        orderNo: purchaseHistory.orderNo,
+                        isPdf: true, orderId: purchaseHistory.id);
+                  },
                   assetPath: AppAssets.printIcon,
                 ),
                 addW(8),
