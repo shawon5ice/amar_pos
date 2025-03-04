@@ -16,6 +16,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:lottie/lottie.dart';
 import '../../../../core/core.dart';
 import '../../../../core/responsive/pixel_perfect.dart';
+import '../../../../core/widgets/reusable/custom_svg_icon_widget.dart';
 import '../../../../core/widgets/search_widget.dart';
 
 class ProductsScreen extends StatefulWidget {
@@ -121,30 +122,75 @@ class _ProductsScreenState extends State<ProductsScreen>
                     ],
                   ),
                 ),
-                addH(12),
-                CustomTextField(
-                  textCon: searchController,
-                  hintText: "Search Here",
-                  onChanged: (value){
-                    if(value == ""){
-                      search = "";
-                      controller.getAllProducts(activeStatus: _tabController.index == 0, page: 1, search: search);
-                    }
-                  },
-                  onSubmitted: (value) {
-                    search = value;
-                    controller.getAllProducts(activeStatus: _tabController.index == 0, page: 1, search: search);
-                  },
-                  brdrClr: Colors.transparent,
-                  brdrRadius: 20,
-                  prefixWidget: const Icon(Icons.search),
+                addH(8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: CustomTextField(
+                        textCon: TextEditingController(),
+                        hintText: "Search...",
+                        brdrClr: Colors.transparent,
+                        txtSize: 12.sp,
+                        debounceDuration: const Duration(
+                          milliseconds: 300,
+                        ),
+                        // noInputBorder: true,
+                        brdrRadius: 40.r,
+                        prefixWidget: Icon(Icons.search),
+                        onChanged: (value){
+                          // controller.getPurchaseHistory();
+                        },
+                      ),
+                    ),
+                    addW(8),
+                    CustomSvgIconButton(
+                      bgColor: const Color(0xffEBFFDF),
+                      onTap: () {
+                        // controller.downloadList(isPdf: false, purchaseHistory: true);
+                        // controller.downloadStockLedgerReport(
+                        //     isPdf: false, context: context);
+                      },
+                      assetPath: AppAssets.excelIcon,
+                    ),
+                    addW(4),
+                    CustomSvgIconButton(
+                      bgColor: const Color(0xffE1F2FF),
+                      onTap: () {
+                        // controller.downloadList(isPdf: true, purchaseHistory: true);
+                      },
+                      assetPath: AppAssets.downloadIcon,
+                    ),
+                    addW(4),
+                    CustomSvgIconButton(
+                      bgColor: const Color(0xffFFFCF8),
+                      onTap: () {},
+                      assetPath: AppAssets.printIcon,
+                    )
+                  ],
                 ),
+                // CustomTextField(
+                //   textCon: searchController,
+                //   hintText: "Search Here",
+                //   onChanged: (value){
+                //     if(value == ""){
+                //       search = "";
+                //       controller.getAllProducts(activeStatus: _tabController.index == 0, page: 1, search: search);
+                //     }
+                //   },
+                //   onSubmitted: (value) {
+                //     search = value;
+                //     controller.getAllProducts(activeStatus: _tabController.index == 0, page: 1, search: search);
+                //   },
+                //   brdrClr: Colors.transparent,
+                //   brdrRadius: 20,
+                //   prefixWidget: const Icon(Icons.search),
+                // ),
                 // SearchWidget(
                 //   onChanged: (value) {
                 //     controller.getAllProducts(activeStatus: _tabController.index == 0, page: 1, search: value);
                 //   },
                 // ),
-                addH(16),
+                addH(8),
                 Expanded(
                   child: GetBuilder<ProductController>(
                     id: 'product_list',
