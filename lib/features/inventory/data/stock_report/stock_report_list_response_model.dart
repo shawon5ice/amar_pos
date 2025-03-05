@@ -5,8 +5,9 @@ part 'stock_report_list_response_model.g.dart';
 @JsonSerializable()
 class StockReportListResponseModel {
   final bool success;
-  @JsonKey(name: 'data')
-  final StockReportResponse stockReportResponse;
+  @DataConverter()
+  @JsonKey(name: 'data',)
+  final StockReportResponse? stockReportResponse;
   @JsonKey(name: 'total_stock')
   final int totalStock;
   @JsonKey(name: 'total_value')
@@ -166,4 +167,24 @@ class Warranty {
       _$WarrantyFromJson(json);
 
   Map<String, dynamic> toJson() => _$WarrantyToJson(this);
+}
+
+
+
+class DataConverter implements JsonConverter<StockReportResponse?, dynamic> {
+  const DataConverter();
+
+  @override
+  StockReportResponse? fromJson(dynamic json) {
+    if (json is List) {
+      return null;
+    } else if (json is Map<String, dynamic>) {
+      return StockReportResponse.fromJson(json);
+    } else {
+      throw Exception('Unexpected type for data: ${json.runtimeType}');
+    }
+  }
+
+  @override
+  dynamic toJson(StockReportResponse? object) => object?.toJson();
 }

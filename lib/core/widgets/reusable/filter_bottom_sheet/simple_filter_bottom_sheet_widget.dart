@@ -19,9 +19,11 @@ class SimpleFilterBottomSheetWidget extends StatefulWidget {
     required this.selectedCategory,
     required this.selectedDateTimeRange,
     required this.onSubmit,
+    this.disableDateTime
   });
 
   FilterItem? selectedBrand;
+  bool? disableDateTime;
   FilterItem? selectedCategory;
   DateTimeRange? selectedDateTimeRange;
   Function(FilterItem? selectedBrand, FilterItem? selectedCategory,
@@ -80,53 +82,58 @@ class _SimpleFilterBottomSheetWidgetState
                         style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                       ),
                     ),
-                    const FieldTitle('Date Range'),
-                    addH(4),
-                    GetBuilder<FilterController>(
-                        id: 'date_time',
-                        builder: (controller) {
-                          return CustomTextField(
-                              readOnly: true,
-                              onTap: () async {
-                                DateTimeRange? selectedDate =
+                    if(widget.disableDateTime == null)Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const FieldTitle('Date Range'),
+                        addH(4),
+                        GetBuilder<FilterController>(
+                            id: 'date_time',
+                            builder: (controller) {
+                              return CustomTextField(
+                                  readOnly: true,
+                                  onTap: () async {
+                                    DateTimeRange? selectedDate =
                                     await showDateRangePicker(
-                                  context: context,
-                                  firstDate: DateTime.now()
-                                      .subtract(const Duration(days: 1000)),
-                                  lastDate: DateTime.now()
-                                      .add(const Duration(days: 1000)),
-                                  initialDateRange:
+                                      context: context,
+                                      firstDate: DateTime.now()
+                                          .subtract(const Duration(days: 1000)),
+                                      lastDate: DateTime.now()
+                                          .add(const Duration(days: 1000)),
+                                      initialDateRange:
                                       controller.selectedDateTimeRange.value,
-                                );
-                                if (selectedDate != null) {
-                                  controller.selectedDateTimeRange.value =
-                                      selectedDate;
-                                  _dateTimeController.text =
+                                    );
+                                    if (selectedDate != null) {
+                                      controller.selectedDateTimeRange.value =
+                                          selectedDate;
+                                      _dateTimeController.text =
                                       "${formatDate(controller.selectedDateTimeRange.value!.start)} - ${formatDate(controller.selectedDateTimeRange.value!.end)}";
-                                  controller.update(['date_time']);
-                                }
-                              },
-                              suffixWidget:
+                                      controller.update(['date_time']);
+                                    }
+                                  },
+                                  suffixWidget:
                                   controller.selectedDateTimeRange.value != null
                                       ? IconButton(
-                                          onPressed: () {
-                                            controller.selectedDateTimeRange.value =
-                                                null;
-                                            _dateTimeController.clear();
-                                            controller.update(['date_time']);
-                                          },
-                                          icon: const Icon(
-                                            Icons.cancel_outlined,
-                                            color: AppColors.error,
-                                          ))
+                                      onPressed: () {
+                                        controller.selectedDateTimeRange.value =
+                                        null;
+                                        _dateTimeController.clear();
+                                        controller.update(['date_time']);
+                                      },
+                                      icon: const Icon(
+                                        Icons.cancel_outlined,
+                                        color: AppColors.error,
+                                      ))
                                       : IconButton(
-                                          onPressed: null,
-                                          icon: Icon(Icons.calendar_month_outlined),
-                                        ),
-                              textCon: _dateTimeController,
-                              txtSize: 12,
-                              hintText: "Select Date Range");
-                        }),
+                                    onPressed: null,
+                                    icon: Icon(Icons.calendar_month_outlined),
+                                  ),
+                                  textCon: _dateTimeController,
+                                  txtSize: 12,
+                                  hintText: "Select Date Range");
+                            }),
+                      ],
+                    ),
                     addH(8),
                     GetBuilder<FilterController>(
                         id: 'brand_dd',

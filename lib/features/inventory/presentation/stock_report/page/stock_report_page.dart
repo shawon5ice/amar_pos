@@ -1,3 +1,4 @@
+import 'package:amar_pos/core/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../../core/constants/app_assets.dart';
@@ -17,24 +18,34 @@ class StockReportPage extends StatefulWidget {
 }
 
 class _StockReportPageState extends State<StockReportPage> {
-
   final StockReportController controller = Get.find();
 
   @override
   void initState() {
+    searchController = TextEditingController();
     controller.getStockReportList(page: 1, context: context);
     super.initState();
   }
+
+  late TextEditingController searchController;
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        SearchWidget(
-          onChanged: (value) {
-            // _brandController.searchBrand(search: value);
+        CustomTextField(
+          textCon: controller.searchEditingController,
+          hintText: "Search...",
+          prefixWidget: Icon(Icons.search),
+          brdrRadius: 40.r,
+          debounceDuration: Duration(milliseconds: 300),
+          brdrClr: Colors.transparent,
+          txtSize: 14,
+          onChanged: (value){
+            controller.getStockReportList(page: 1,);
           },
         ),
-        addH(16),
+        addH(8),
         GetBuilder<StockReportController>(
           id: 'total_widget',
           builder: (controller) => Row(
@@ -45,8 +56,8 @@ class _StockReportPageState extends State<StockReportPage> {
                 title: 'Stock',
                 value: controller.stockReportListResponseModel != null
                     ? Methods.getFormattedNumber(controller
-                    .stockReportListResponseModel!.totalStock
-                    .toDouble())
+                        .stockReportListResponseModel!.totalStock
+                        .toDouble())
                     : null,
                 asset: AppAssets.productBox,
               ),
@@ -57,8 +68,8 @@ class _StockReportPageState extends State<StockReportPage> {
                 title: 'Total Amount',
                 value: controller.stockReportListResponseModel != null
                     ? Methods.getFormatedPrice(controller
-                    .stockReportListResponseModel!.totalValue
-                    .toDouble())
+                        .stockReportListResponseModel!.totalValue
+                        .toDouble())
                     : null,
                 asset: AppAssets.amount,
               ),
@@ -77,7 +88,7 @@ class _StockReportPageState extends State<StockReportPage> {
               }
               return RefreshIndicator(
                 onRefresh: () async {
-                  controller.getStockReportList(page: 1);
+                  await controller.getStockReportList(page: 1,);
                 },
                 child: PagerListView(
                   items: controller.stockReportList,
@@ -87,13 +98,13 @@ class _StockReportPageState extends State<StockReportPage> {
                   isLoading: controller.isLoadingMore,
                   hasError: controller.hasError,
                   onNewLoad: (int nextPage) async {
-                    await controller.getStockReportList(page: nextPage);
+                    await controller.getStockReportList(page: nextPage, );
                   },
-                  totalPage: controller
-                      .stockReportListResponseModel?.stockReportResponse.meta.lastPage ??
+                  totalPage: controller.stockReportListResponseModel
+                          ?.stockReportResponse?.meta.lastPage ??
                       0,
-                  totalSize: controller
-                      .stockReportListResponseModel?.stockReportResponse.meta.total ??
+                  totalSize: controller.stockReportListResponseModel
+                          ?.stockReportResponse?.meta.total ??
                       0,
                   itemPerPage: 10,
                 ),

@@ -92,6 +92,8 @@ class PurchaseController extends GetxController{
 
   //Purchase Products
   PurchaseProductResponseModel? purchaseProductResponseModel;
+  num countTotal = 0;
+  num purchaseAmount = 0;
   List<PurchaseProduct> purchaseProducts = [];
   bool isPurchaseProductListLoading = false;
   bool isPurchaseProductsLoadingMore = false;
@@ -159,10 +161,11 @@ class PurchaseController extends GetxController{
 
   FutureOr<List<ProductInfo>> suggestionsCallback(String search) async {
     // Check if the search term is in the existing items
-    var x = getAll(search);
-    if (x.isNotEmpty) {
-      return x;
-    } else {
+    List<ProductInfo> exactlyFound = currentSearchList.where((item) => item.sku.toLowerCase() == search.toString().toLowerCase()).toList();
+
+    if(exactlyFound.isNotEmpty){
+      return exactlyFound;
+    }else {
       // If not found locally, fetch from API
       await getAllProducts(search: search, page: 1);
       return getAll(search);
@@ -525,8 +528,10 @@ class PurchaseController extends GetxController{
     isPurchaseProductsLoadingMore = page > 1;
 
     if(page == 1){
-      purchaseProductResponseModel = null;
+      countTotal = 0;
+      purchaseAmount =  0;
       purchaseProducts.clear();
+      purchaseProductResponseModel = null;
     }
 
     hasError.value = false;
@@ -551,6 +556,8 @@ class PurchaseController extends GetxController{
 
         if (purchaseProductResponseModel != null) {
           purchaseProducts.addAll(purchaseProductResponseModel!.data.returnProducts??[]);
+          countTotal += purchaseProductResponseModel!.countTotal;
+          purchaseAmount += purchaseProductResponseModel!.amountTotal;
         }
       } else {
         if(page != 1){
@@ -721,7 +728,7 @@ class PurchaseController extends GetxController{
     }
     hasError.value = false;
 
-    String fileName = "${purchaseHistory? "Return Order history": "Return Product History"}-${
+    String fileName = "${purchaseHistory? "Purchase Order history": "Purchase Return Product History"}-${
         selectedDateTimeRange.value != null ? "${selectedDateTimeRange.value!.start.toIso8601String().split("T")[0]}-${selectedDateTimeRange.value!.end.toIso8601String().split("T")[0]}": DateTime.now().toIso8601String().split("T")[0]
             .toString()
     }${isPdf ? ".pdf" : ".xlsx"}";

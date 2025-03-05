@@ -64,8 +64,7 @@ class PurchaseProductListItem extends StatelessWidget {
                         style: context.textTheme.titleSmall?.copyWith(
                           fontSize: 13.sp,
                         ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                        overflow: TextOverflow.visible,
                       ),
                       addH(8.h),
                       Row(

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:amar_pos/core/methods/helper_methods.dart';
+import 'package:amar_pos/core/widgets/reusable/filter_bottom_sheet/product_brand_category_warranty_unit_response_model.dart';
 import 'package:amar_pos/features/inventory/data/service/stock_report_service.dart';
 import 'package:amar_pos/features/inventory/data/stock_report/stock_ledger_list_response_model.dart';
 import 'package:amar_pos/features/inventory/data/stock_report/stock_report_list_response_model.dart';
@@ -34,6 +35,9 @@ class StockReportController extends GetxController {
   Rx<ProductModel?> selectedProduct = Rx<ProductModel?>(null);
   Rx<OutletModel?> selectedOutlet = Rx<OutletModel?>(null);
 
+  FilterItem? brand;
+  FilterItem? category;
+
   // Clear Filters
   void clearFilters() {
     stockLedgerList.clear();
@@ -64,8 +68,11 @@ class StockReportController extends GetxController {
         "Filters applied: Outlet: $selectedOutlet, Product: $selectedProduct, Date Range: $selectedDateTimeRange");
   }
 
+  TextEditingController searchEditingController= TextEditingController();
+
+
   Future<void> getStockReportList(
-      {required int page, BuildContext? context}) async {
+      {int page = 1, BuildContext? context, String? search}) async {
     if (page == 1) {
       isStockReportListLoading = true;
       stockReportList.clear();
@@ -73,12 +80,14 @@ class StockReportController extends GetxController {
       isLoadingMore = true;
     }
 
-    hasError = false; // Reset error before loading
     update(['stock_report_list', 'total_widget']);
     try {
       var response = await StockReportService.getStockReportList(
         usrToken: loginData!.token,
         page: page,
+        brandId: brand?.id,
+        categoryId: category?.id,
+        search: searchEditingController.text,
       );
 
       if (response != null) {
@@ -86,16 +95,15 @@ class StockReportController extends GetxController {
         stockReportListResponseModel =
             StockReportListResponseModel.fromJson(response);
 
-        if (stockReportListResponseModel != null) {
-          stockReportList.addAll(stockReportListResponseModel!.stockReportResponse
+        if (stockReportListResponseModel != null && stockReportListResponseModel!.stockReportResponse != null) {
+          stockReportList.addAll(stockReportListResponseModel!.stockReportResponse!
               .stockReportList);
-        } else {
-          hasError = true; // Error occurred while parsing data
         }
-      } else {
-        hasError = true; // Error occurred with the response
       }
     } catch (e) {
+      if(page != 1 && stockReportListResponseModel == null){
+        hasError = true; // Error occurred with the response
+      }
       // hasError = true; // Handle any exceptions
       logger.e(e);
     } finally {

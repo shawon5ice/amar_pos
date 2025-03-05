@@ -11,6 +11,9 @@ class StockReportService {
   static Future<dynamic> getStockReportList({
     required String usrToken,
     required int page,
+    String? search,
+    int? brandId,
+    int? categoryId,
   }) async {
     logger.d("Page: $page");
     var response = await BaseClient.getData(
@@ -19,6 +22,9 @@ class StockReportService {
         parameter: {
           "page": page,
           "limit": 10,
+          "search": search,
+          "brand_id": brandId,
+          "category_id": categoryId,
         });
     return response;
   }

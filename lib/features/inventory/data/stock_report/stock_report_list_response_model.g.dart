@@ -10,8 +10,7 @@ StockReportListResponseModel _$StockReportListResponseModelFromJson(
         Map<String, dynamic> json) =>
     StockReportListResponseModel(
       success: json['success'] as bool,
-      stockReportResponse:
-          StockReportResponse.fromJson(json['data'] as Map<String, dynamic>),
+      stockReportResponse: const DataConverter().fromJson(json['data']),
       totalStock: (json['total_stock'] as num).toInt(),
       totalValue: json['total_value'] as num,
     );
@@ -20,7 +19,7 @@ Map<String, dynamic> _$StockReportListResponseModelToJson(
         StockReportListResponseModel instance) =>
     <String, dynamic>{
       'success': instance.success,
-      'data': instance.stockReportResponse,
+      'data': const DataConverter().toJson(instance.stockReportResponse),
       'total_stock': instance.totalStock,
       'total_value': instance.totalValue,
     };

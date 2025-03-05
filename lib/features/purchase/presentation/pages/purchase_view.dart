@@ -1,6 +1,8 @@
 import 'package:amar_pos/core/constants/logger/logger.dart';
 import 'package:amar_pos/core/methods/number_input_formatter.dart';
 import 'package:amar_pos/core/widgets/custom_text_field.dart';
+import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:amar_pos/features/inventory/presentation/products/add_product_screen.dart';
 import 'package:amar_pos/features/purchase/data/models/create_purchase_order_model.dart';
 import 'package:amar_pos/features/purchase/presentation/pages/purchase_summary.dart';
@@ -188,6 +190,8 @@ class _PurchaseViewState extends State<PurchaseView> {
                                           }
         
                                           FocusScope.of(context).unfocus();
+                                        }else{
+                                          Methods.showSnackbar(msg: "No product found with SKU:$scannedCode");
                                         }
                                       }
                                     },
@@ -288,8 +292,8 @@ class _PurchaseViewState extends State<PurchaseView> {
                           emptyBuilder: (_) => const Center(
                             child: Text("No Items found!"),
                           ),
-                          loadingBuilder: (_) => const Center(
-                            child: CircularProgressIndicator(),
+                          loadingBuilder: (_) => Center(
+                            child:RandomLottieLoader.lottieLoader(),
                           ),
                         );
                       },
