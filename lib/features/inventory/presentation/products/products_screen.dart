@@ -127,7 +127,7 @@ class _ProductsScreenState extends State<ProductsScreen>
                   children: [
                     Expanded(
                       child: CustomTextField(
-                        textCon: TextEditingController(),
+                        textCon: searchController,
                         hintText: "Search...",
                         brdrClr: Colors.transparent,
                         txtSize: 12.sp,
@@ -138,7 +138,7 @@ class _ProductsScreenState extends State<ProductsScreen>
                         brdrRadius: 40.r,
                         prefixWidget: Icon(Icons.search),
                         onChanged: (value){
-                          // controller.getPurchaseHistory();
+                          controller.getAllProducts(activeStatus: _tabController.index == 0, page: 1, search: value);
                         },
                       ),
                     ),
@@ -146,9 +146,7 @@ class _ProductsScreenState extends State<ProductsScreen>
                     CustomSvgIconButton(
                       bgColor: const Color(0xffEBFFDF),
                       onTap: () {
-                        // controller.downloadList(isPdf: false, purchaseHistory: true);
-                        // controller.downloadStockLedgerReport(
-                        //     isPdf: false, context: context);
+                        controller.downloadList(isPdf: false, activeStatus: _tabController.index == 0,search: searchController.text);
                       },
                       assetPath: AppAssets.excelIcon,
                     ),
@@ -156,14 +154,16 @@ class _ProductsScreenState extends State<ProductsScreen>
                     CustomSvgIconButton(
                       bgColor: const Color(0xffE1F2FF),
                       onTap: () {
-                        // controller.downloadList(isPdf: true, purchaseHistory: true);
+                        controller.downloadList(isPdf: true, activeStatus: _tabController.index == 0, search: searchController.text);
                       },
                       assetPath: AppAssets.downloadIcon,
                     ),
                     addW(4),
                     CustomSvgIconButton(
                       bgColor: const Color(0xffFFFCF8),
-                      onTap: () {},
+                      onTap: () {
+                        controller.downloadList(isPdf: true, activeStatus: _tabController.index == 0, shouldPrint: true, search: searchController.text);
+                      },
                       assetPath: AppAssets.printIcon,
                     )
                   ],

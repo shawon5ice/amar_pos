@@ -16,6 +16,7 @@ class CustomDropdownWithSearchWidget<T> extends StatefulWidget {
   final bool isMandatory;
   final int buttonHeight;
   final bool noTitle;
+  final bool? suffix;
   final bool? filled;
   final String? Function(T?)? validator;
 
@@ -25,6 +26,7 @@ class CustomDropdownWithSearchWidget<T> extends StatefulWidget {
     required this.isMandatory,
     required this.title,
     this.filled,
+    this.suffix,
     required this.itemLabel,
     required this.onChanged,
     required this.hintText,
@@ -64,128 +66,150 @@ class _CustomDropdownWithSearchWidgetState<T>
       children: [
         if (!widget.noTitle)
           Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
+            padding: const EdgeInsets.only(bottom: 4.0),
             child: widget.isMandatory
                 ? RichFieldTitle(text: widget.title)
                 : FieldTitle(widget.title),
           ),
-        DropdownButtonHideUnderline(
-          child: DropdownButtonFormField2<T>(
-            isExpanded: true,
-            hint: Text(
-              widget.hintText,
-              style: TextStyle(
-                fontSize: 12,
-                color: Theme.of(context).hintColor,
-              ),
-            ),
-            decoration: InputDecoration(
-              isDense: true,
-              contentPadding: EdgeInsets.zero,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(8)),
-                borderSide: BorderSide(
-                  color: AppColors.inputBorderColor,
-                ),
-              ),
-              filled: widget.filled,
-              fillColor: Colors.white,
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(8)),
-                borderSide: BorderSide(
-                  color: AppColors.inputBorderColor,
-                ),
-              ),
-              errorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(8)),
-                borderSide: BorderSide(
-                  color: Colors.red, // Red border for error state
-                ),
-              ),
-              focusedErrorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(8)),
-                borderSide: BorderSide(
-                  color: Colors.red,
-                ),
-              ),
-            ),
-            validator: widget.isMandatory
-                ? widget.validator ??
-                    (value) {
-                  if (value == null) {
-                    return "This field is required.";
-                  }
-                  return null;
-                }
-                : widget.validator,
-            items: widget.items
-                .map(
-                  (item) => DropdownMenuItem<T>(
-                    alignment: Alignment.centerLeft,
-                value: item,
-                child: Text(
-                  widget.itemLabel(item),
-                  style: const TextStyle(fontSize: 12),
-                  overflow: TextOverflow.visible,
-                ),
-              ),
-            )
-                .toList(),
-
-            value: widget.value,
-            onChanged: (value) {
-              widget.onChanged(value);
-            },
-            buttonStyleData: ButtonStyleData(
-              height: widget.buttonHeight.toDouble(),
-              padding: EdgeInsets.only(right: 8),
-              decoration: BoxDecoration(
-                border: Border.all(color: AppColors.inputBorderColor),
-                borderRadius: const BorderRadius.all(Radius.circular(8)),
-              ),
-            ),
-            dropdownStyleData: DropdownStyleData(
-              maxHeight: 300,
-              // width: context.width - 100,
-              // offset: Offset(0, 48),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.all(Radius.circular(8)),
-              ),
-            ),
-            menuItemStyleData: const MenuItemStyleData(
-              height: 48,
-            ),
-            dropdownSearchData: DropdownSearchData(
-              searchController: _textEditingController,
-              searchInnerWidgetHeight: 48,
-              searchInnerWidget: Padding(
-                padding:
-                const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
-                child: TextFormField(
-                  controller: _textEditingController,
-                  decoration: InputDecoration(
-                    isDense: true,
-                    hintText: widget.searchHintText,
-                    hintStyle: const TextStyle(fontSize: 12),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
+        Row(
+          children: [
+            Expanded(
+              child: DropdownButtonHideUnderline(
+                child: DropdownButtonFormField2<T>(
+                  isExpanded: true,
+                  hint: Text(
+                    widget.hintText,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Theme.of(context).hintColor,
                     ),
                   ),
+                  decoration: InputDecoration(
+                    isDense: true,
+                    contentPadding: EdgeInsets.zero,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                      borderSide: BorderSide(
+                        color: AppColors.inputBorderColor,
+                      ),
+                    ),
+                    filled: widget.filled,
+                    fillColor: Colors.white,
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                      borderSide: BorderSide(
+                        color: AppColors.inputBorderColor,
+                      ),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                      borderSide: BorderSide(
+                        color: Colors.red, // Red border for error state
+                      ),
+                    ),
+                    focusedErrorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                      borderSide: BorderSide(
+                        color: Colors.red,
+                      ),
+                    ),
+                  ),
+                  validator: widget.isMandatory
+                      ? widget.validator ??
+                          (value) {
+                        if (value == null) {
+                          return "This field is required.";
+                        }
+                        return null;
+                      }
+                      : widget.validator,
+                  items: widget.items
+                      .map(
+                        (item) => DropdownMenuItem<T>(
+                          alignment: Alignment.centerLeft,
+                      value: item,
+                      child: Text(
+                        widget.itemLabel(item),
+                        style: const TextStyle(fontSize: 12),
+                        overflow: TextOverflow.visible,
+                      ),
+                    ),
+                  )
+                      .toList(),
+              
+                  value: widget.value,
+                  onChanged: (value) {
+                    widget.onChanged(value);
+                  },
+                  buttonStyleData: ButtonStyleData(
+                    height: widget.buttonHeight.toDouble(),
+                    padding: EdgeInsets.only(right: 8),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: AppColors.inputBorderColor),
+                      borderRadius: const BorderRadius.all(Radius.circular(8)),
+                    ),
+                  ),
+                  dropdownStyleData: DropdownStyleData(
+                    maxHeight: 300,
+                    // width: context.width - 100,
+                    // offset: Offset(0, 48),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                    ),
+                  ),
+                  menuItemStyleData: MenuItemStyleData(
+                    height: 48,
+                    selectedMenuItemBuilder: (ctx, child) {
+                      return Container(
+                        color: AppColors.primary.withOpacity(.1),
+                        child: child,
+                      );
+                    }
+                  ),
+                  dropdownSearchData: DropdownSearchData(
+                    searchController: _textEditingController,
+                    searchInnerWidgetHeight: 48,
+                    searchInnerWidget: Padding(
+                      padding:
+                      const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+                      child: TextFormField(
+                        controller: _textEditingController,
+                        decoration: InputDecoration(
+                          isDense: true,
+                          hintText: widget.searchHintText,
+                          hintStyle: const TextStyle(fontSize: 12),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                    ),
+                    searchMatchFn: (item, searchValue) {
+                      return widget.itemLabel(item.value!)
+                          .toLowerCase()
+                          .contains(searchValue.toLowerCase());
+                    },
+                  ),
+                  onMenuStateChange: (isOpen) {
+                    if (!isOpen) {
+                      _textEditingController.clear();
+                    }
+                  },
                 ),
               ),
-              searchMatchFn: (item, searchValue) {
-                return widget.itemLabel(item.value!)
-                    .toLowerCase()
-                    .contains(searchValue.toLowerCase());
-              },
             ),
-            onMenuStateChange: (isOpen) {
-              if (!isOpen) {
-                _textEditingController.clear();
-              }
-            },
-          ),
+
+            if(widget.suffix != null && widget.value != null)GestureDetector(
+              onTap: (){
+                widget.onChanged(null);
+              },
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8),
+                child: Icon(Icons.remove_circle_outline_sharp, color: AppColors.error,),
+              ),
+            )
+          ],
         ),
       ],
     );

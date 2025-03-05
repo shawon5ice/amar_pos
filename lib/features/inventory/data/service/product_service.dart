@@ -1,6 +1,7 @@
 import 'package:amar_pos/core/constants/logger/logger.dart';
 
 import '../../../../core/network/base_client.dart';
+import '../../../../core/network/download/file_downloader.dart';
 import '../../../../core/network/network_strings.dart';
 import 'package:dio/dio.dart';
 
@@ -11,7 +12,7 @@ class ProductService {
     required int page,
     String? search,
   }) async {
-    logger.d("Page: $page");
+    logger.d("active: $activeStatus");
     var response = await BaseClient.getData(
         token: usrToken,
         api: NetWorkStrings.getAllProducts,
@@ -40,6 +41,7 @@ class ProductService {
     required String name,
     int? brandId,
     required int categoryId,
+    required int isVatApplicable,
     required int unitId,
     int? warrantyId,
     required num wholesalePrice,
@@ -60,6 +62,7 @@ class ProductService {
       "wholesale_price": wholesalePrice,
       "mrp_price": mrpPrice,
       "vat": vat,
+      "is_vat_applicable": isVatApplicable,
       "alert_quantity": alertQuantity,
       "mfg_date": mfgDate,
       "expired_date": expiredDate,
@@ -89,6 +92,8 @@ class ProductService {
     required String token,
     required int id,
     required String name,
+    required String sku,
+    required int isVatApplicable,
     int? brandId,
     required int categoryId,
     required int unitId,
@@ -101,9 +106,11 @@ class ProductService {
     String? expiredDate,
     String? photo,
   }) async {
-    FormData formData = FormData.fromMap({
+
+    Map<String, dynamic> requestMap = {
       "name": name,
       "brand_id": brandId,
+      "sku": sku,
       "category_id": categoryId,
       "unit_id": unitId,
       "warranty_id": warrantyId,
@@ -112,8 +119,14 @@ class ProductService {
       "vat": vat,
       "alert_quantity": alertQuantity,
       "mfg_date": mfgDate,
+      "is_vat_applicable": isVatApplicable,
       "expired_date": expiredDate,
-    });
+    };
+
+
+    logger.e(requestMap);
+
+    FormData formData = FormData.fromMap(requestMap);
 
     if (photo != null && !photo.contains("http")) {
       formData.files.add(
@@ -129,7 +142,7 @@ class ProductService {
 
     var response = await BaseClient.postData(
       token: token,
-      api: "${NetWorkStrings.updateProduct}id",
+      api: "product/update/$id",
       body: formData,
     );
     return response;
@@ -197,4 +210,38 @@ class ProductService {
         });
     return response;
   }
+
+  static Future<void> downloadList({required bool isPdf, required String fileName,
+    required String usrToken, bool? shouldPrint, required activeStatus, String? search,
+    int? categoryId,
+    int? brandId,
+  }) async {
+    // logger.d("PDF: $isPdf");
+
+    Map<String, dynamic> query = {
+      "search": search,
+      "status": activeStatus ? 1 : 0,
+      "category_id": categoryId,
+      "brand_id": brandId,
+    };
+
+    logger.i(query);
+
+    String downloadUrl = "";
+
+    if(isPdf){
+      downloadUrl = "${NetWorkStrings.baseUrl}/product/download-pdf-product-list/";
+    }else{
+      downloadUrl = "${NetWorkStrings.baseUrl}/product/download-excel-product-list/";
+    }
+
+
+    FileDownloader().downloadFile(
+      url: downloadUrl,
+      token: usrToken,
+      query: query,
+      shouldPrint: shouldPrint,
+      fileName: fileName,);
+  }
+
 }

@@ -74,10 +74,10 @@ class ProductListItemWidget extends StatelessWidget {
                         Text(
                           productInfo.name,
                           style: context.textTheme.titleSmall?.copyWith(
-                            fontSize: 13,
+                            fontSize: 12,
                           ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
+                          // maxLines: 2,
+                          overflow: TextOverflow.visible,
                         ),
                         addH(8),
                         Row(
@@ -90,7 +90,7 @@ class ProductListItemWidget extends StatelessWidget {
                             Flexible(
                               flex: 8,
                               child: Text(
-                                  productInfo.brand?.name.toString() ?? '--'),
+                                  productInfo.brand?.name.toString() ?? 'N/A'),
                             ),
                           ],
                         ),
@@ -104,7 +104,7 @@ class ProductListItemWidget extends StatelessWidget {
                             const Text(" : "),
                             Flexible(
                               flex: 8,
-                              child: Text(productInfo.sku.toString() ?? '--'),
+                              child: Text(productInfo.sku.toString() ?? 'N/A'),
                             ),
                           ],
                         ),

@@ -1,10 +1,12 @@
 import 'package:amar_pos/features/inventory/data/products/product_brand_category_warranty_unit_list_response_model.dart';
 import 'package:amar_pos/features/inventory/data/products/product_list_response_model.dart';
 import 'package:amar_pos/features/inventory/data/service/product_service.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 
 import '../../../../core/constants/logger/logger.dart';
+import '../../../../core/network/helpers/error_extractor.dart';
 import '../../../../core/widgets/methods/helper_methods.dart';
 import '../../../auth/data/model/hive/login_data.dart';
 import '../../../auth/data/model/hive/login_data_helper.dart';
@@ -25,6 +27,7 @@ class ProductController extends GetxController {
 
   List<Brands> brands = [];
   List<Categories> categories = [];
+  List<Warranties> warranties = [];
 
 
   ProductsListResponseModel? productsListResponseModel;
@@ -36,7 +39,7 @@ class ProductController extends GetxController {
   bool hasError = false;
 
   Future<void> getAllProducts(
-      {required bool activeStatus, required int page, String? search}) async {
+      {required bool activeStatus, int page = 1, String? search}) async {
     if (page == 1) {
       isProductListLoading = true;
       productList.clear();
@@ -85,6 +88,7 @@ class ProductController extends GetxController {
     required String name,
     int? brandId,
     required int categoryId,
+    required int isVatApplicable,
     required int unitId,
     int? warrantyId,
     required num wholesalePrice,
@@ -110,6 +114,7 @@ class ProductController extends GetxController {
         wholesalePrice: wholesalePrice,
         mrpPrice: mrpPrice,
         vat: vat,
+        isVatApplicable: isVatApplicable,
         alertQuantity: alertQuantity,
         mfgDate: mfgDate,
         expiredDate: expiredDate,
@@ -137,6 +142,7 @@ class ProductController extends GetxController {
   //Update product
   void updateProduct({
     required int id,
+    required int isVatApplicable,
     required String name,
     required String sku,
     int? brandId,
@@ -162,6 +168,8 @@ class ProductController extends GetxController {
         brandId: brandId,
         categoryId: categoryId,
         unitId: unitId,
+        sku: sku,
+        isVatApplicable: isVatApplicable,
         warrantyId: warrantyId,
         wholesalePrice: wholesalePrice,
         mrpPrice: mrpPrice,
@@ -339,6 +347,33 @@ class ProductController extends GetxController {
     }
   }
 
+  Future<void> getWarranties() async {
+    hasError = false; // Reset error before loading
+    update(['filter_list']);
+
+    try {
+      var response = await ProductService.getCategoriesBrandWarrantyUnits(
+        usrToken: loginData!.token,
+      );
+
+      if (response != null) {
+        logger.d(response);
+        productBrandCategoryWarrantyUnitListResponseModel =
+            ProductBrandCategoryWarrantyUnitListResponseModel.fromJson(response);
+
+        if (productBrandCategoryWarrantyUnitListResponseModel != null) {
+          brands = productBrandCategoryWarrantyUnitListResponseModel!.data.brands;
+          categories = productBrandCategoryWarrantyUnitListResponseModel!.data.categories;
+        }
+      }
+    } catch (e) {
+      hasError = true; // Handle any exceptions
+      logger.e(e);
+    } finally {
+      update(['filter_list']);
+    }
+  }
+
 
   void addFilterItem(List<dynamic> item){
     selectedFilterItems.addAll(item);
@@ -367,5 +402,31 @@ class ProductController extends GetxController {
       return categories.where((e) => e.name.toLowerCase().contains(search.toLowerCase())).toList();
     }
   }
+
+
+  Future<void> downloadList({required bool isPdf, bool? shouldPrint, required activeStatus, String? search}) async {
+    if(productList.isEmpty){
+      ErrorExtractor.showSingleErrorDialog(Get.context!, "There is no associated data to perform your action!");
+      return;
+    }
+
+    String fileName = "${activeStatus? "Active product list" : "Inactive product list"}- ${search != null && search.isNotEmpty? "with keyword $search" : ''}${isPdf ? ".pdf" : ".xlsx"}";
+
+    try {
+      var response = await ProductService.downloadList(
+          usrToken: loginData!.token,
+          isPdf: isPdf,
+          search: search,
+          fileName: fileName,
+          shouldPrint: shouldPrint,
+        activeStatus: activeStatus,
+      );
+    } catch (e) {
+      logger.e(e);
+    } finally {
+
+    }
+  }
+
 
 }

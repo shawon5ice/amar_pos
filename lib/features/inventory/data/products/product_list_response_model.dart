@@ -91,6 +91,7 @@ class ProductInfo {
   late final num wholesalePrice;
   late final num mrpPrice;
   late final num vat;
+  late final int isVatApplicable;
   late final num alertQuantity;
   late final num stock;
   late final num totalCosting;
@@ -102,6 +103,7 @@ class ProductInfo {
     business = json['business'] ?? '';
     sku = json['sku'] ?? '';
     name = json['name'] ?? '';
+    isVatApplicable = json['is_vat_applicable'] ?? 0;
     slug = json['slug'] ?? '';
     image = json['image'] ?? '';
     thumbnailImage = json['thumbnail_image'] ?? '';
@@ -131,6 +133,7 @@ class ProductInfo {
     _data['business'] = business;
     _data['sku'] = sku;
     _data['name'] = name;
+    _data['is_vat_applicable'] = isVatApplicable;
     _data['slug'] = slug;
     _data['image'] = image;
     _data['thumbnail_image'] = thumbnailImage;

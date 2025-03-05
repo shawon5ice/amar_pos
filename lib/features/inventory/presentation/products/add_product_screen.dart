@@ -37,6 +37,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
   late TextEditingController noStockAlertController;
   String? manufacturingDate;
   String? expireDate;
+  bool isVatApplicable = true;
   Categories? selectedCategory;
   Brands? selectedBrand;
   Units? selectedUnits;
@@ -90,14 +91,14 @@ class _AddProductScreenState extends State<AddProductScreen> {
         productInfo?.wholesalePrice.toString() ?? '';
     vatController.text = productInfo?.vat.toString() ?? '';
     noStockAlertController.text = productInfo?.alertQuantity.toString() ?? '';
-
+    isVatApplicable = productInfo?.isVatApplicable == 1;
     if (productInfo?.category != null) {
       selectedCategory = controller
           .productBrandCategoryWarrantyUnitListResponseModel?.data.categories
           .singleWhere((e) => e.id == productInfo?.category!.id);
     }
 
-    if (productInfo?.brand != null) {
+    if (productInfo?.brand != null && productInfo?.brand!.id != null) {
       selectedBrand = controller
           .productBrandCategoryWarrantyUnitListResponseModel?.data.brands
           .singleWhere((e) => e.id == productInfo?.brand!.id);
@@ -196,10 +197,12 @@ class _AddProductScreenState extends State<AddProductScreen> {
                       "Product ID",
                     ),
                   ),
+                  addH(16.h),
                   GetBuilder<ProductController>(
                     id: 'category_dd',
                     builder: (controller) => CustomDropdownWithSearchWidget<Categories>(
-                      isMandatory: true,
+                      isMandatory: false,
+                      suffix: true,
                       items: controller
                               .productBrandCategoryWarrantyUnitListResponseModel
                               ?.data
@@ -229,10 +232,12 @@ class _AddProductScreenState extends State<AddProductScreen> {
                       },
                     ),
                   ),
+                  addH(16.h),
                   GetBuilder<ProductController>(
                     id: 'brand_dd',
                     builder: (controller) => CustomDropdownWithSearchWidget<Brands>(
                       isMandatory: false,
+                      suffix: true,
                       items: controller
                               .productBrandCategoryWarrantyUnitListResponseModel
                               ?.data
@@ -255,6 +260,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                       },
                     ),
                   ),
+                  addH(16.h),
                   GetBuilder<ProductController>(
                     id: 'unit_dd',
                     builder: (controller) => CustomDropdownWithSearchWidget<Units>(
@@ -287,10 +293,12 @@ class _AddProductScreenState extends State<AddProductScreen> {
                       },
                     ),
                   ),
+                  addH(16.h),
                   GetBuilder<ProductController>(
                     id: 'warranty_dd',
                     builder: (controller) => CustomDropdownWithSearchWidget<Warranties>(
                       isMandatory: false,
+                      suffix: true,
                       items: controller
                               .productBrandCategoryWarrantyUnitListResponseModel
                               ?.data
@@ -375,18 +383,43 @@ class _AddProductScreenState extends State<AddProductScreen> {
                       value,
                       "MRP",
                     ),
-                  ),
-                  addH(16.h),
-                  const FieldTitle(
-                    "VAT",
-                  ),
-                  addH(8.h),
-                  CustomTextField(
-                    textCon: vatController,
-                    hintText: "Type here...",
-                    inputType: TextInputType.number,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
+                  ), addH(16.h),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const FieldTitle(
+                              "VAT",
+                            ),
+                            addH(8.h),
+                            CustomTextField(
+                              textCon: vatController,
+                              hintText: "Type here...",
+                              inputType: TextInputType.number,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      Center(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Checkbox(value: isVatApplicable, onChanged: (value){
+                             if(value != null){
+                               setState(() {
+                                 isVatApplicable = value;
+                               });
+                             }
+                            }),
+                            Text("Is Vat Applicable")
+                          ],
+                        ),
+                      )
                     ],
                   ),
                   addH(16.h),
@@ -464,12 +497,14 @@ class _AddProductScreenState extends State<AddProductScreen> {
                         if(productInfo != null){
                           controller.updateProduct(
                             id: productInfo!.id,
+                            isVatApplicable: isVatApplicable ? 1 : 0,
                             sku: productIdController.text.trim(),
                             name: productNameController.text.trim(),
                             brandId: selectedBrand?.id,
                             categoryId: selectedCategory!.id,
                             unitId: selectedUnits!.id,
                             warrantyId: selectedWarranties?.id,
+
                             wholesalePrice:
                             num.parse(wholeSalePriceController.text.trim()),
                             mrpPrice: num.parse(mrpPriceController.text.trim()),
@@ -486,6 +521,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                             sku: productIdController.text.trim(),
                             name: productNameController.text.trim(),
                             brandId: selectedBrand?.id,
+                            isVatApplicable:isVatApplicable ? 1: 0,
                             categoryId: selectedCategory!.id,
                             unitId: selectedUnits!.id,
                             warrantyId: selectedWarranties?.id,

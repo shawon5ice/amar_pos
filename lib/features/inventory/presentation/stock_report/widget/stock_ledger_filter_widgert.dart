@@ -124,6 +124,7 @@ class _ProductListFilterBottomSheetState
                             ],
                           ),
                           addH(10),
+
                           ProductDropDownWidget(
                             onProductSelection: controller.setSelectedProduct,
                             initialProductModel: controller.selectedProduct.value,
