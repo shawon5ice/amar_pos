@@ -19,6 +19,7 @@ class PurchaseService {
           "status": 1,
           "page": page,
           "search": search,
+          "limit": 50
         });
     return response;
   }

@@ -201,7 +201,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                   GetBuilder<ProductController>(
                     id: 'category_dd',
                     builder: (controller) => CustomDropdownWithSearchWidget<Categories>(
-                      isMandatory: false,
+                      isMandatory: true,
                       suffix: true,
                       items: controller
                               .productBrandCategoryWarrantyUnitListResponseModel
