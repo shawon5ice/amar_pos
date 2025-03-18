@@ -8,16 +8,15 @@ import 'package:amar_pos/core/widgets/pager_list_view.dart';
 import 'package:amar_pos/features/drawer/drawer_menu_controller.dart';
 import 'package:amar_pos/features/inventory/presentation/products/add_product_screen.dart';
 import 'package:amar_pos/features/inventory/presentation/products/product_controller.dart';
-import 'package:amar_pos/features/inventory/presentation/products/widgets/product_list_filter_bottom_sheet.dart';
 import 'package:amar_pos/features/inventory/presentation/products/widgets/product_list_item_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
 import 'package:lottie/lottie.dart';
 import '../../../../core/core.dart';
 import '../../../../core/responsive/pixel_perfect.dart';
 import '../../../../core/widgets/reusable/custom_svg_icon_widget.dart';
-import '../../../../core/widgets/search_widget.dart';
+import '../../../../core/widgets/reusable/filter_bottom_sheet/product_brand_category_warranty_unit_response_model.dart' show FilterItem;
+import '../../../../core/widgets/reusable/filter_bottom_sheet/simple_filter_bottom_sheet_widget.dart';
 
 class ProductsScreen extends StatefulWidget {
   static const String routeName = "/products-list-screen";
@@ -52,11 +51,21 @@ class _ProductsScreenState extends State<ProductsScreen>
     _tabController.addListener(() {
       if (_tabController.index != _tabController.previousIndex && !_tabController.indexIsChanging) {
         search = "";
+        controller.brand = null;
+        controller.category = null;
         searchController.clear();
+        controller.update(['action_icon']);
         controller.getAllProducts(activeStatus: _tabController.index == 0, page: 1);
       }
     });
     super.initState();
+  }
+
+
+  @override
+  void dispose() {
+    Get.delete<ProductController>();
+    super.dispose();
   }
 
   String search = "";
@@ -71,15 +80,32 @@ class _ProductsScreenState extends State<ProductsScreen>
           onPressed: _menuController.openDrawer,
         ),
         actions: [
-          IconButton(
-              onPressed: () {
-                showModalBottomSheet(
-                    context: context,
-                    builder: (context) {
-                      return const ProductListFilterBottomSheet();
-                    });
+          GetBuilder<ProductController>(
+            id: 'action_icon',
+            builder: (controller) => IconButton(
+              onPressed: (){
+                showModalBottomSheet(context: context, builder: (context) => SimpleFilterBottomSheetWidget(
+                  selectedBrand: controller.brand,
+                  disableDateTime: true,
+                  selectedCategory: controller.category,
+                  selectedDateTimeRange: null,
+                  onSubmit: (FilterItem? brand,FilterItem? category,DateTimeRange? dateTimeRange){
+                    controller.update(['action_icon']);
+                    controller.brand = brand;
+                    controller.category = category;
+                    // controller.selectedDateTimeRange.value = dateTimeRange;
+                    logger.i(controller.brand);
+                    logger.i(controller.category?.id);
+                    // logger.i(controller.selectedDateTimeRange.value);
+                    Get.back();
+                    controller.getAllProducts(activeStatus: _tabController.index == 0);
+                  },
+                ));
               },
-              icon: const Icon(Icons.filter_alt_outlined))
+              icon: Icon(Icons.filter_alt_outlined, color: (controller.brand != null || controller.category != null) ? AppColors.error : null,),
+            ),
+          ),
+          addW(12),
         ],
       ),
       body: SafeArea(

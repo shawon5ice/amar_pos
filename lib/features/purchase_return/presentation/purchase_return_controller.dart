@@ -152,14 +152,19 @@ class PurchaseReturnController extends GetxController {
     }
   }
 
+  String previousSearch = '';
   FutureOr<List<ProductInfo>> suggestionsCallback(String search) async {
-    // Check if the search term is in the existing items
-    var x = getAll(search);
-    if (x.isNotEmpty) {
-      return x;
-    } else {
+    List<ProductInfo> exactlyFound = currentSearchList.where((item) => item.sku.toLowerCase() == search.toString().toLowerCase()).toList();
+
+    if(exactlyFound.isNotEmpty){
+      return exactlyFound;
+    }else {
       // If not found locally, fetch from API
-      await getAllProducts(search: search, page: 1);
+      if(previousSearch != search){
+        previousSearch = search;
+        await getAllProducts(search: search, page: 1);
+      }
+
       return getAll(search);
     }
   }
@@ -175,30 +180,33 @@ class PurchaseReturnController extends GetxController {
 
   void addPlaceOrderProduct(ProductInfo product,
       {List<String>? snNo, int? quantity,required num unitPrice}) {
+    logger.i(snNo);
     if (purchaseOrderProducts.any((e) => e.id == product.id)) {
-      createPurchaseReturnOrderModel.products
-          .firstWhere((e) => e.id == product.id)
-          .quantity++;
+      var x  = createPurchaseReturnOrderModel.products
+          .firstWhere((e) => e.id  == product.id);
+      x.quantity++;
+      x.unitPrice = unitPrice.toDouble();
+
     } else {
-      if (purchaseOrderProducts.isNotEmpty) {
+      if(purchaseOrderProducts.isNotEmpty && !isEditing){
         purchaseOrderProducts.insert(0, product);
 
-        createPurchaseReturnOrderModel.products.insert(
-            0,
-            PurchaseReturnProductModel(
-                id: product.id,
-                unitPrice: unitPrice.toDouble(),
-                quantity: quantity ?? 1,
-                vat: (product.vat / 100 * product.wholesalePrice.toDouble()),
-                serialNo: snNo ?? []));
-      } else {
+        createPurchaseReturnOrderModel.products.insert(0, PurchaseReturnProductModel(
+            id: product.id,
+            unitPrice: unitPrice.toDouble(),
+            quantity:quantity?? 1,
+            vat: (product.vat/100 *  product
+                .wholesalePrice.toDouble()),
+            serialNo: snNo ?? []));
+      }else{
         purchaseOrderProducts.add(product);
 
         createPurchaseReturnOrderModel.products.add(PurchaseReturnProductModel(
             id: product.id,
             unitPrice: unitPrice.toDouble(),
-            quantity: quantity ?? 1,
-            vat: (product.vat / 100 * product.wholesalePrice.toDouble()),
+            quantity:quantity?? 1,
+            vat: (product.vat/100 *  product
+                .wholesalePrice.toDouble()),
             serialNo: snNo ?? []));
       }
     }
@@ -400,7 +408,7 @@ class PurchaseReturnController extends GetxController {
         }
         Methods.showSnackbar(
             msg: response['message'],
-            isSuccess: response['success'] ? true : null);
+            isSuccess: response['success'] ? true : null, duration: response['success']? 3:5);
       }
     } catch (e) {
       logger.e(e);
@@ -599,7 +607,8 @@ class PurchaseReturnController extends GetxController {
           addPlaceOrderProduct(
             productInfo,
             quantity: e.quantity,
-            unitPrice: e.unitPrice
+            unitPrice: e.unitPrice,
+            snNo: e.snNo
           );
         }
 
@@ -705,7 +714,7 @@ class PurchaseReturnController extends GetxController {
       return;
     }
     String fileName =
-        "${purchaseHistory ? "Return Order history" : "Return Product History"}-${selectedDateTimeRange.value != null ? "${selectedDateTimeRange.value!.start.toIso8601String().split("T")[0]}-${selectedDateTimeRange.value!.end.toIso8601String().split("T")[0]}" : DateTime.now().toIso8601String().split("T")[0].toString()}${isPdf ? ".pdf" : ".xlsx"}";
+        "${purchaseHistory ? "Purchase Return Order history" : "Purchase Return Product History"}-${selectedDateTimeRange.value != null ? "${selectedDateTimeRange.value!.start.toIso8601String().split("T")[0]}-${selectedDateTimeRange.value!.end.toIso8601String().split("T")[0]}" : DateTime.now().toIso8601String().split("T")[0].toString()}${isPdf ? ".pdf" : ".xlsx"}";
     try {
       var response = await PurchaseReturnService.downloadList(
         saleHistory: purchaseHistory,
@@ -716,6 +725,8 @@ class PurchaseReturnController extends GetxController {
         endDate: selectedDateTimeRange.value?.end,
         fileName: fileName,
         shouldPrint: shouldPrint,
+        categoryId: category?.id,
+        brandId: brand?.id,
       );
     } catch (e) {
       logger.e(e);

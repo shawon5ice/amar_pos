@@ -19,6 +19,7 @@ import '../../../../core/responsive/pixel_perfect.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_text_field.dart';
 import '../../../../core/widgets/dashed_line.dart';
+import '../../../../core/widgets/loading/random_lottie_loader.dart';
 import '../../../../core/widgets/methods/helper_methods.dart';
 import '../../../../core/widgets/qr_code_scanner.dart';
 import 'package:get/get.dart';
@@ -49,13 +50,9 @@ class _PurchaseReturnViewState extends State<PurchaseReturnView> {
     if(!controller.isEditing){
       controller.createPurchaseReturnOrderModel = CreatePurchaseReturnOrderModel.defaultConstructor();
       controller.purchaseOrderProducts.clear();
-      controller.getAllProducts(
-        search: "",
-        page: 1,
-      );
     }else{
       for (var e in controller.createPurchaseReturnOrderModel.products) {
-        if(purchaseControllers.isNotEmpty){
+        if(purchaseControllers.isNotEmpty && !controller.isEditing){
           purchaseControllers.insert(0,TextEditingController(
             text: e.unitPrice.toString(),
           ));
@@ -147,7 +144,7 @@ class _PurchaseReturnViewState extends State<PurchaseReturnView> {
                                               .singleWhere(
                                                   (e) => e.id == items.first.id)
                                               .quantity;
-
+                                          logger.i(value);
                                           if (value>1) {
                                             logger.e("HERE");
                                             int index = controller
@@ -182,9 +179,9 @@ class _PurchaseReturnViewState extends State<PurchaseReturnView> {
                                             }
                                           }
 
-
-                                          // purchaseControllers.add(TextEditingController(text: items.first.wholesalePrice.toString()));
                                           FocusScope.of(context).unfocus();
+                                        }else{
+                                          Methods.showSnackbar(msg: "No product found with SKU:$scannedCode");
                                         }
                                       }
                                     },
@@ -284,8 +281,8 @@ class _PurchaseReturnViewState extends State<PurchaseReturnView> {
                           emptyBuilder: (_) => const Center(
                             child: Text("No Items found!"),
                           ),
-                          loadingBuilder: (_) => const Center(
-                            child: CircularProgressIndicator(),
+                          loadingBuilder: (_) => Center(
+                            child:RandomLottieLoader.lottieLoader(),
                           ),
                         );
                       },

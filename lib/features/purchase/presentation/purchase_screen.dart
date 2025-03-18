@@ -1,6 +1,7 @@
 import 'package:amar_pos/core/widgets/reusable/filter_bottom_sheet/filter_controller.dart';
 import 'package:amar_pos/core/widgets/reusable/filter_bottom_sheet/product_brand_category_warranty_unit_response_model.dart';
 import 'package:amar_pos/core/widgets/reusable/filter_bottom_sheet/simple_filter_bottom_sheet_widget.dart';
+import 'package:amar_pos/features/inventory/presentation/products/product_controller.dart';
 import 'package:amar_pos/features/purchase/presentation/pages/purchase_history_screen.dart';
 import 'package:amar_pos/features/purchase/presentation/pages/purchase_products.dart';
 import 'package:amar_pos/features/purchase/presentation/pages/purchase_view.dart';
@@ -71,6 +72,7 @@ class _PurchaseScreenState extends State<PurchaseScreen>
   @override
   void dispose() {
     Get.delete<PurchaseController>();
+    Get.delete<ProductController>();
     Get.delete<FilterController>();
     super.dispose();
   }
@@ -140,6 +142,7 @@ class _PurchaseScreenState extends State<PurchaseScreen>
                 onPressed: () async {
                   showModalBottomSheet(context: context, builder: (context) => SimpleFilterBottomSheetWidget(
                     selectedBrand: controller.brand,
+                    disableDateTime: true,
                     selectedCategory: controller.category,
                     selectedDateTimeRange: controller.selectedDateTimeRange.value,
                     onSubmit: (FilterItem? brand,FilterItem? category,DateTimeRange? dateTimeRange){

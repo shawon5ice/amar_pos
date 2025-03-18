@@ -10,6 +10,8 @@ class ProductService {
     required String usrToken,
     required bool activeStatus,
     required int page,
+    required int? categoryId,
+    required int? brandId,
     String? search,
   }) async {
     logger.d("active: $activeStatus");
@@ -21,6 +23,8 @@ class ProductService {
           "page": page,
           "limit": 10,
           "search": search,
+          "category_id":categoryId,
+          "brand_id":brandId,
         });
     return response;
   }

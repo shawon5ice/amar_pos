@@ -45,8 +45,8 @@ PurchaseReturnProduct _$PurchaseReturnProductFromJson(
         Map<String, dynamic> json) =>
     PurchaseReturnProduct(
       id: (json['id'] as num).toInt(),
-      category: json['category'] as String,
-      brand: json['brand'] as String,
+      category: json['category'] as String?,
+      brand: json['brand'] as String?,
       product: json['product'] as String,
       quantity: (json['quantity'] as num).toInt(),
       totalPrice: (json['total_price'] as num).toInt(),

@@ -141,6 +141,7 @@ class _PurchaseReturnScreenState extends State<PurchaseReturnScreen>
                 onPressed: (){
                   showModalBottomSheet(context: context, builder: (context) => SimpleFilterBottomSheetWidget(
                     selectedBrand: controller.brand,
+                    disableDateTime: true,
                     selectedCategory: controller.category,
                     selectedDateTimeRange: controller.selectedDateTimeRange.value,
                     onSubmit: (FilterItem? brand,FilterItem? category,DateTimeRange? dateTimeRange){

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:amar_pos/core/constants/app_colors.dart';
 import 'package:amar_pos/core/constants/logger/logger.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/core/widgets/date_selection_field_widget.dart';
@@ -117,6 +118,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
     }
 
     fileName = productInfo?.image;
+    logger.i(fileName);
   }
 
   @override
@@ -464,16 +466,33 @@ class _AddProductScreenState extends State<AddProductScreen> {
                                     ),
                                   ],
                                 )
-                              : Padding(
-                            padding: const EdgeInsets.all(8.0),
-                                  child: fileName!.contains('https://') &&
-                                          productInfo != null
-                                      ? Image.network(fileName!)
-                                      : Image.file(
-                                          fit: BoxFit.cover,
-                                          File(fileName!),
-                                        ),
-                          ),
+                              : Stack(
+                                children: [
+                                  Center(
+                                    child: Padding(
+                                                                padding: const EdgeInsets.all(8.0),
+                                        child: fileName!.contains('https://') &&
+                                                productInfo != null
+                                            ? Image.network(fileName!)
+                                            : Image.file(
+                                                fit: BoxFit.cover,
+                                                File(fileName!),
+                                              ),
+                                                              ),
+                                  ),
+                                  Positioned(
+                                    top: 8,
+                                    right: 8,
+                                    child: GestureDetector(
+                                        onTap: (){
+                                          fileName = null;
+                                          setState(() {
+
+                                          });
+                                        },
+                                        child: Icon(Icons.remove_circle_outline_sharp,color: AppColors.error,)),)
+                                ],
+                              ),
                         ),
                       ),
                     ),

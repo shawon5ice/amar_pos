@@ -41,8 +41,8 @@ class Data {
 @JsonSerializable()
 class PurchaseReturnProduct {
   final int id;
-  final String category;
-  final String brand;
+  final String? category;
+  final String? brand;
   final String product;
   final int quantity;
   @JsonKey(name: 'total_price')

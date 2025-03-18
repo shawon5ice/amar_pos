@@ -172,6 +172,8 @@ class PurchaseService {
     required DateTime? startDate,
     required DateTime? endDate,
     required String? search,
+    required int? categoryId,
+    required int? brandId,
     bool? shouldPrint
   }) async {
     // logger.d("PDF: $isPdf");
@@ -180,6 +182,8 @@ class PurchaseService {
       "start_date": startDate,
       "end_date": endDate,
       "search": search,
+      'category_id': categoryId,
+      'brand_id': brandId,
     };
 
     String downloadUrl = "";

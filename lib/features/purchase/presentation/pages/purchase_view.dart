@@ -50,13 +50,9 @@ class _PurchaseViewState extends State<PurchaseView> {
       controller.createPurchaseOrderModel =
           CreatePurchaseOrderModel.defaultConstructor();
       controller.purchaseOrderProducts.clear();
-      controller.getAllProducts(
-        search: "",
-        page: 1,
-      );
     } else {
       for (var e in controller.createPurchaseOrderModel.products) {
-        if(purchaseControllers.isNotEmpty){
+        if(purchaseControllers.isNotEmpty && !controller.isEditing){
           purchaseControllers.insert(0,TextEditingController(
             text: e.unitPrice.toString(),
           ));

@@ -194,7 +194,7 @@ class PurchaseController extends GetxController{
 
 
 
-  void addPlaceOrderProduct(ProductInfo product, {List<String>? snNo, int? quantity, required num unitPrice}) {
+  void addPlaceOrderProduct(ProductInfo product, {List<String>? snNo, int? quantity, required num unitPrice,}) {
     logger.i(snNo);
     if (purchaseOrderProducts.any((e) => e.id == product.id)) {
       var x  = createPurchaseOrderModel.products
@@ -203,7 +203,7 @@ class PurchaseController extends GetxController{
       x.unitPrice = unitPrice.toDouble();
 
     } else {
-      if(purchaseOrderProducts.isNotEmpty){
+      if(purchaseOrderProducts.isNotEmpty && !isEditing){
         purchaseOrderProducts.insert(0, product);
 
         createPurchaseOrderModel.products.insert(0, PurchaseProductModel(
@@ -499,7 +499,6 @@ class PurchaseController extends GetxController{
           brandId: brand?.id,
       );
 
-      logger.i(response);
       if (response != null) {
         purchaseHistoryResponseModel =
             PurchaseHistoryResponseModel.fromJson(response);
@@ -595,14 +594,14 @@ class PurchaseController extends GetxController{
         id: purchaseOrderInfo.id,
       );
 
-      logger.i(response);
+
       if (response != null) {
         purchaseOrderProducts.clear();
         getAllProducts(search: '', page: 1);
 
         purchaseOrderDetailsResponseModel =
             PurchaseOrderDetailsResponseModel.fromJson(response);
-
+        logger.i(purchaseOrderDetailsResponseModel);
         if(purchasePaymentMethods == null){
           await getPaymentMethods();
         }
@@ -619,7 +618,7 @@ class PurchaseController extends GetxController{
         //selecting products
         for (var e in purchaseOrderDetailsResponseModel!.data.details) {
           ProductInfo productInfo = productsListResponseModel!.data.productList.singleWhere((f) => f.id == e.id);
-          addPlaceOrderProduct(productInfo, quantity:  e.quantity,snNo: e.snNo, unitPrice: e.unitPrice);
+          addPlaceOrderProduct(productInfo, quantity:  e.quantity,snNo: e.snNo, unitPrice: e.unitPrice,);
         }
         
 
@@ -741,7 +740,9 @@ class PurchaseController extends GetxController{
         startDate: selectedDateTimeRange.value?.start,
         endDate: selectedDateTimeRange.value?.end,
         fileName: fileName,
-        shouldPrint: shouldPrint
+        shouldPrint: shouldPrint,
+        categoryId: category?.id,
+        brandId: brand?.id
       );
     } catch (e) {
       logger.e(e);

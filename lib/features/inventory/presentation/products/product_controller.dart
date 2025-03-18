@@ -1,13 +1,13 @@
 import 'package:amar_pos/features/inventory/data/products/product_brand_category_warranty_unit_list_response_model.dart';
 import 'package:amar_pos/features/inventory/data/products/product_list_response_model.dart';
 import 'package:amar_pos/features/inventory/data/service/product_service.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 
 import '../../../../core/constants/logger/logger.dart';
 import '../../../../core/network/helpers/error_extractor.dart';
 import '../../../../core/widgets/methods/helper_methods.dart';
+import '../../../../core/widgets/reusable/filter_bottom_sheet/product_brand_category_warranty_unit_response_model.dart' show FilterItem;
 import '../../../auth/data/model/hive/login_data.dart';
 import '../../../auth/data/model/hive/login_data_helper.dart';
 
@@ -38,6 +38,9 @@ class ProductController extends GetxController {
 
   bool hasError = false;
 
+  FilterItem? brand;
+  FilterItem? category;
+
   Future<void> getAllProducts(
       {required bool activeStatus, int page = 1, String? search}) async {
     if (page == 1) {
@@ -56,6 +59,8 @@ class ProductController extends GetxController {
         activeStatus: activeStatus,
         page: page,
         search: search,
+        categoryId: category?.id,
+        brandId: brand?.id
       );
 
       if (response != null) {
@@ -420,6 +425,8 @@ class ProductController extends GetxController {
           fileName: fileName,
           shouldPrint: shouldPrint,
         activeStatus: activeStatus,
+        categoryId: category?.id,
+        brandId: brand?.id,
       );
     } catch (e) {
       logger.e(e);

@@ -174,7 +174,7 @@ class Details {
   late final int quantity;
   late final num unitPrice;
   late final num total;
-  late final List<dynamic> snNo;
+  late final List<String>? snNo;
 
   Details.fromJson(Map<String, dynamic> json){
     id = json['id'];
@@ -183,7 +183,7 @@ class Details {
     quantity = json['quantity'];
     unitPrice = json['unit_price'];
     total = json['total'];
-    snNo = List.castFrom<dynamic, dynamic>(json['sn_no']);
+    snNo = List.from(json['sn_no'].map((e)=> SerialNo.fromJson(e).serialNo));
   }
 
   Map<String, dynamic> toJson() {
@@ -253,6 +253,27 @@ class Bank {
     final _data = <String, dynamic>{};
     _data['id'] = id;
     _data['name'] = name;
+    return _data;
+  }
+}
+
+class SerialNo {
+  SerialNo({
+    required this.id,
+    required this.serialNo,
+  });
+  late final int id;
+  late final String serialNo;
+
+  SerialNo.fromJson(Map<String, dynamic> json){
+    id = json['id'];
+    serialNo = json['serial_no'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final _data = <String, dynamic>{};
+    _data['id'] = id;
+    _data['serial_no'] = serialNo;
     return _data;
   }
 }
