@@ -37,6 +37,7 @@ class StockReportController extends GetxController {
 
   FilterItem? brand;
   FilterItem? category;
+  OutletModel? outlet;
 
   // Clear Filters
   void clearFilters() {
@@ -88,6 +89,7 @@ class StockReportController extends GetxController {
         brandId: brand?.id,
         categoryId: category?.id,
         search: searchEditingController.text,
+        storeId: outlet?.id,
       );
 
       if (response != null) {
@@ -194,4 +196,31 @@ class StockReportController extends GetxController {
 
     }
   }
+
+  Future<void> downloadList({required bool isPdf, bool? shouldPrint, String? search}) async {
+    if(stockReportList.isEmpty){
+      ErrorExtractor.showSingleErrorDialog(Get.context!, "There is no associated data to perform your action!");
+      return;
+    }
+
+    String fileName = "Stock Report - ${search != null && search.isNotEmpty? "with keyword $search" : ''}${isPdf ? ".pdf" : ".xlsx"}";
+
+    try {
+      var response = await StockReportService.downloadList(
+        usrToken: loginData!.token,
+        isPdf: isPdf,
+        search: search,
+        fileName: fileName,
+        shouldPrint: shouldPrint,
+        categoryId: category?.id,
+        brandId: brand?.id,
+        outletId: outlet?.id,
+      );
+    } catch (e) {
+      logger.e(e);
+    } finally {
+
+    }
+  }
+
 }

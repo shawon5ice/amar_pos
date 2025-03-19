@@ -11,18 +11,22 @@ class OutletDropDownWidget extends StatefulWidget {
     required this.onOutletSelection,
     this.initialOutletModel,
     this.isMandatory,
+    this.hideTitle,
+    this.filled
   });
 
   final Function(OutletModel? outlet) onOutletSelection;
   final OutletModel? initialOutletModel;
   final bool? isMandatory;
+  final bool? hideTitle;
+  final bool? filled;
 
   @override
   State<OutletDropDownWidget> createState() => _OutletDropDownWidgetState();
 }
 
 class _OutletDropDownWidgetState extends State<OutletDropDownWidget> {
-  final OutletDDController controller = Get.find();
+  final OutletDDController controller = Get.put(OutletDDController());
 
   @override
   void didUpdateWidget(covariant OutletDropDownWidget oldWidget) {
@@ -42,9 +46,10 @@ class _OutletDropDownWidgetState extends State<OutletDropDownWidget> {
           items: controller.outlets,
           isMandatory: false,
           title: "Outlet",
-          noTitle: true,
+          noTitle: widget.hideTitle ?? true,
           itemLabel: (value) => value.name,
           value: controller.selectedOutlet,
+          filled: widget.filled,
           onChanged: (value) {
             controller.selectedOutlet = value;
             controller.update(['outlet_dd']); // Notify UI of the change

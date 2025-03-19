@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 import '../../../../core/core.dart';
+import '../../../../core/data/model/outlet_model.dart';
 import '../../../../core/responsive/pixel_perfect.dart';
 import '../../../../core/widgets/reusable/custom_svg_icon_widget.dart';
 import '../../../../core/widgets/reusable/filter_bottom_sheet/product_brand_category_warranty_unit_response_model.dart' show FilterItem;
@@ -40,7 +41,6 @@ class _ProductsScreenState extends State<ProductsScreen>
   void initState() {
     searchController = TextEditingController();
     _tabController = TabController(length: 2, vsync: this);
-    controller.getCategoriesBrandWarrantyUnits();
     controller.getAllProducts(activeStatus: true, page: 1);
     // if (!_tabController.indexIsChanging && _tabController.index != _tabController.previousIndex) {
     //   search = "";
@@ -89,7 +89,7 @@ class _ProductsScreenState extends State<ProductsScreen>
                   disableDateTime: true,
                   selectedCategory: controller.category,
                   selectedDateTimeRange: null,
-                  onSubmit: (FilterItem? brand,FilterItem? category,DateTimeRange? dateTimeRange){
+                  onSubmit: (FilterItem? brand,FilterItem? category,DateTimeRange? dateTimeRange, OutletModel? outlet){
                     controller.update(['action_icon']);
                     controller.brand = brand;
                     controller.category = category;

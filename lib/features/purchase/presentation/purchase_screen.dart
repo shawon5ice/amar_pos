@@ -13,6 +13,7 @@ import 'package:get/get.dart';
 import '../../../core/constants/app_assets.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/logger/logger.dart';
+import '../../../core/data/model/outlet_model.dart';
 import '../../../core/responsive/pixel_perfect.dart';
 import '../../drawer/drawer_menu_controller.dart';
 
@@ -143,9 +144,10 @@ class _PurchaseScreenState extends State<PurchaseScreen>
                   showModalBottomSheet(context: context, builder: (context) => SimpleFilterBottomSheetWidget(
                     selectedBrand: controller.brand,
                     disableDateTime: true,
+                    disableOutlet: true,
                     selectedCategory: controller.category,
                     selectedDateTimeRange: controller.selectedDateTimeRange.value,
-                    onSubmit: (FilterItem? brand,FilterItem? category,DateTimeRange? dateTimeRange){
+                    onSubmit: (FilterItem? brand,FilterItem? category,DateTimeRange? dateTimeRange, OutletModel? outlet){
                       controller.brand = brand;
                       controller.category = category;
                       controller.selectedDateTimeRange.value = dateTimeRange;

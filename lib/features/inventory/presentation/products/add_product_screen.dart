@@ -66,6 +66,9 @@ class _AddProductScreenState extends State<AddProductScreen> {
 
   @override
   void initState() {
+    if(controller.productBrandCategoryWarrantyUnitListResponseModel == null){
+      controller.getCategoriesBrandWarrantyUnits();
+    }
     directlyAddProduct = Get.arguments != null;
     productNameController = TextEditingController();
     productIdController = TextEditingController();
@@ -74,7 +77,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
     mrpPriceController = TextEditingController();
     vatController = TextEditingController();
     noStockAlertController = TextEditingController();
-    if (Get.arguments != null) {
+    if (Get.arguments != null && Get.arguments is ProductInfo) {
       initializeData();
     }
 

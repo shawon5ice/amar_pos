@@ -5,6 +5,7 @@ import '../../../../../core/constants/app_assets.dart';
 import '../../../../../core/core.dart';
 import '../../../../../core/responsive/pixel_perfect.dart';
 import '../../../../../core/widgets/pager_list_view.dart';
+import '../../../../../core/widgets/reusable/custom_svg_icon_widget.dart';
 import '../../../../../core/widgets/reusable/status/total_status_widget.dart';
 import '../../../../../core/widgets/search_widget.dart';
 import '../stock_report_controller.dart';
@@ -33,17 +34,50 @@ class _StockReportPageState extends State<StockReportPage> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        CustomTextField(
-          textCon: controller.searchEditingController,
-          hintText: "Search...",
-          prefixWidget: Icon(Icons.search),
-          brdrRadius: 40.r,
-          debounceDuration: Duration(milliseconds: 300),
-          brdrClr: Colors.transparent,
-          txtSize: 14,
-          onChanged: (value){
-            controller.getStockReportList(page: 1,);
-          },
+        Row(
+          children: [
+            Expanded(
+              child: CustomTextField(
+                textCon: controller.searchEditingController,
+                hintText: "Search...",
+                brdrClr: Colors.transparent,
+                txtSize: 12.sp,
+                debounceDuration: const Duration(
+                  milliseconds: 300,
+                ),
+                // noInputBorder: true,
+                brdrRadius: 40.r,
+                prefixWidget: Icon(Icons.search),
+                onChanged: (value){
+                  controller.getStockReportList(page: 1,);
+                },
+              ),
+            ),
+            addW(8),
+            CustomSvgIconButton(
+              bgColor: const Color(0xffEBFFDF),
+              onTap: () {
+                controller.downloadList(isPdf: false,search: controller.searchEditingController.text);
+              },
+              assetPath: AppAssets.excelIcon,
+            ),
+            addW(4),
+            CustomSvgIconButton(
+              bgColor: const Color(0xffE1F2FF),
+              onTap: () {
+                controller.downloadList(isPdf: true, search: controller.searchEditingController.text);
+              },
+              assetPath: AppAssets.downloadIcon,
+            ),
+            addW(4),
+            CustomSvgIconButton(
+              bgColor: const Color(0xffFFFCF8),
+              onTap: () {
+                controller.downloadList(isPdf: true, shouldPrint: true, search: controller.searchEditingController.text);
+              },
+              assetPath: AppAssets.printIcon,
+            )
+          ],
         ),
         addH(8),
         GetBuilder<StockReportController>(

@@ -6,6 +6,7 @@ import 'package:amar_pos/features/inventory/presentation/stock_report/stock_repo
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/constants/logger/logger.dart';
+import '../../../../core/data/model/outlet_model.dart';
 import '../../../../core/responsive/pixel_perfect.dart';
 import '../../../../core/widgets/reusable/filter_bottom_sheet/product_brand_category_warranty_unit_response_model.dart';
 import '../../../../core/widgets/reusable/filter_bottom_sheet/simple_filter_bottom_sheet_widget.dart';
@@ -40,6 +41,7 @@ class _StockReportScreenState extends State<StockReportScreen>
         if(_tabController.index == 1){
           controller.brand = null;
           controller.category = null;
+          controller.outlet = null;
           controller.selectedDateTimeRange.value = null;
         }
         controller.searchEditingController.clear();
@@ -71,9 +73,10 @@ class _StockReportScreenState extends State<StockReportScreen>
                   selectedCategory: controller.category,
                   selectedDateTimeRange: null,
                   disableDateTime: true,
-                  onSubmit: (FilterItem? brand,FilterItem? category,DateTimeRange? dateTimeRange){
+                  onSubmit: (FilterItem? brand,FilterItem? category,DateTimeRange? dateTimeRange, OutletModel? outlet){
                     controller.brand = brand;
                     controller.category = category;
+                    controller.outlet = outlet;
                     controller.selectedDateTimeRange.value = dateTimeRange;
                     logger.i(controller.brand);
                     logger.i(controller.category?.id);
@@ -84,7 +87,7 @@ class _StockReportScreenState extends State<StockReportScreen>
                   },
                 ));
               },
-              icon: Icon(Icons.filter_alt_outlined, color: (controller.brand != null || controller.category != null) ? AppColors.error : null,),
+              icon: Icon(Icons.filter_alt_outlined, color: (controller.brand != null || controller.category != null || controller.outlet != null) ? AppColors.error : null,),
             ): SizedBox.shrink();
           })
         ],

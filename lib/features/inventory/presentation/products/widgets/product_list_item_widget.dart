@@ -13,7 +13,7 @@ import '../../../../config/presentation/supplier/supplier_action_menu_widget.dar
 class ProductListItemWidget extends StatelessWidget {
   ProductListItemWidget({super.key, required this.productInfo});
 
-  final ProductController controller = Get.find();
+  final ProductController controller = Get.put(ProductController());
 
   final ProductInfo productInfo;
 
