@@ -99,23 +99,6 @@ class _BillingSummaryState extends State<BillingSummary> {
             child: Column(
               children: [
                 GetBuilder<SalesController>(
-                  id: "selling_party_selection",
-                  builder: (controller) => Row(
-                    children: [
-                      CustomRadioButton(
-                        title: "Retail Sale",
-                        value: true,
-                      ),
-                      addW(10),
-                      CustomRadioButton(
-                        title: "Wholesale",
-                        value: false,
-                      ),
-                    ],
-                  ),
-                ),
-                addH(12),
-                GetBuilder<SalesController>(
                   id: "billing_summary_form",
                   builder: (controller) => Container(
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),

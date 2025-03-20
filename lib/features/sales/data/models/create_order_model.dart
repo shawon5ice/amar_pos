@@ -87,7 +87,7 @@ class CreateSaleOrderModel {
 
 class SaleProductModel {
   int id;
-  double unitPrice;
+  num unitPrice;
   int quantity;
   num vat;
   num? discount;

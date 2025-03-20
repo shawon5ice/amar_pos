@@ -187,7 +187,7 @@ class _PurchaseViewState extends State<PurchaseView> {
         
                                           FocusScope.of(context).unfocus();
                                         }else{
-                                          Methods.showSnackbar(msg: "No product found with SKU:$scannedCode");
+                                          Methods.showSnackbar(msg: "No product found with keyword:$scannedCode");
                                         }
                                       }
                                     },

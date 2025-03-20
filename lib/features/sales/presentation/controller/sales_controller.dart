@@ -124,13 +124,18 @@ class SalesController extends GetxController {
     selectedDateTimeRange.value = range;
   }
 
+  bool justChanged = false;
+
   void changeSellingParties(bool value) {
     isRetailSale = value;
+    justChanged = true;
+    update(['sales_product_list']);
+
     paymentMethodTracker.clear();
     redefinePrice();
-    calculateAmount();
-    getPaymentMethods();
-    update(['selling_party_selection', 'billing_summary_form']);
+    paymentMethodTracker.clear();
+    justChanged = false;
+    update(['selling_party_selection', 'billing_summary_form','sales_product_list']);
   }
 
   void redefinePrice() {
@@ -191,11 +196,12 @@ class SalesController extends GetxController {
   }
 
 
-  void addPlaceOrderProduct(ProductInfo product, {List<String>? snNo, int? quantity}) {
+  void addPlaceOrderProduct(ProductInfo product, {List<String>? snNo, int? quantity,required num unitPrice}) {
     if (placeOrderProducts.any((e) => e.id == product.id)) {
-      createOrderModel.products
-          .firstWhere((e) => e.id == product.id)
-          .quantity++;
+      var x  = createOrderModel.products
+          .firstWhere((e) => e.id  == product.id);
+      x.quantity++;
+      x.unitPrice = unitPrice;
     } else {
       placeOrderProducts.add(product);
       createOrderModel.products.add(SaleProductModel(
@@ -277,10 +283,14 @@ class SalesController extends GetxController {
   }
 
   FutureOr<List<ProductInfo>> suggestionsCallback(String search) async {
+
     // Check if the search term is in the existing items
+    List<ProductInfo> exactlyFound = currentSearchList.where((item) => item.sku.toLowerCase() == search.toString().toLowerCase()).toList();
+
+
     var x = getAll(search);
-    if (x.isNotEmpty) {
-      return x;
+    if(exactlyFound.isNotEmpty){
+      return exactlyFound;
     } else {
       // If not found locally, fetch from API
       await getAllProducts(search: search, page: 1);
@@ -290,11 +300,8 @@ class SalesController extends GetxController {
 
   getAll(search) {
     var filteredItems = currentSearchList
-        .where((item) => item.sku.toLowerCase().contains(search.toLowerCase()))
+        .where((item) => item.sku.toLowerCase().contains(search.toLowerCase()) || item.name.toLowerCase().contains(search.toLowerCase()))
         .toList();
-    filteredItems.addAll(currentSearchList
-        .where((item) => item.name.toLowerCase().contains(search.toLowerCase()))
-        .toList());
     return filteredItems;
   }
 
@@ -644,7 +651,7 @@ class SalesController extends GetxController {
         //selecting products
         for (var e in saleHistoryDetailsResponseModel!.data.orderDetails) {
           ProductInfo productInfo = productsListResponseModel!.data.productList.singleWhere((f) => f.id == e.id);
-          addPlaceOrderProduct(productInfo, snNo: e.snNo.map((e) => e.serialNo).toList(), quantity: e.quantity);
+          addPlaceOrderProduct(productInfo, snNo: e.snNo.map((e) => e.serialNo).toList(), quantity: e.quantity, unitPrice: isRetailSale ? productInfo.wholesalePrice : productInfo.mrpPrice);
         }
 
         //Payment Methods
