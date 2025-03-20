@@ -14,6 +14,7 @@ class StockReportService {
     String? search,
     int? brandId,
     int? categoryId,
+    int? storeId,
   }) async {
     logger.d("Page: $page");
     var response = await BaseClient.getData(
@@ -25,6 +26,7 @@ class StockReportService {
           "search": search,
           "brand_id": brandId,
           "category_id": categoryId,
+          "store_id": storeId,
         });
     return response;
   }
@@ -62,5 +64,39 @@ class StockReportService {
     String downloadUrl =  "${NetWorkStrings.baseUrl}/inventory/${isPdf? "download-pdf-product-stock-ledger": "download-excel-product-stock-ledger"}?store_id=$storeId&product_id=$productId&start_date=${formatDate(startDate!)}&end_date=${formatDate(endDate!)}";
 
     FileDownloader().downloadFile(url: downloadUrl, fileName: fileName);
+  }
+
+  static Future<void> downloadList({required bool isPdf, required String fileName,
+    required String usrToken, bool? shouldPrint, String? search,
+    int? categoryId,
+    int? brandId,
+    int? outletId,
+  }) async {
+    // logger.d("PDF: $isPdf");
+
+    Map<String, dynamic> query = {
+      "search": search,
+      "category_id": categoryId,
+      "brand_id": brandId,
+      "outlet_id" : outletId
+    };
+
+    logger.i(query);
+
+    String downloadUrl = "";
+
+    if(isPdf){
+      downloadUrl = "${NetWorkStrings.baseUrl}/inventory/download-pdf-product-stock/";
+    }else{
+      downloadUrl = "${NetWorkStrings.baseUrl}/inventory/download-excel-product-stock/";
+    }
+
+
+    FileDownloader().downloadFile(
+      url: downloadUrl,
+      token: usrToken,
+      query: query,
+      shouldPrint: shouldPrint,
+      fileName: fileName,);
   }
 }

@@ -105,6 +105,7 @@ class PurchaseController extends GetxController{
 
   void clearEditing(){
     purchaseProducts.clear();
+    createPurchaseOrderModel =  CreatePurchaseOrderModel.defaultConstructor();
     isEditing = false;
     selectedSupplier = null;
     selectedDateTimeRange.value = null;

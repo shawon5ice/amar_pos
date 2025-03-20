@@ -11,6 +11,7 @@ import 'package:get/get.dart';
 import '../../../core/constants/app_assets.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/logger/logger.dart';
+import '../../../core/data/model/outlet_model.dart';
 import '../../../core/responsive/pixel_perfect.dart';
 import '../../../core/widgets/reusable/filter_bottom_sheet/product_brand_category_warranty_unit_response_model.dart';
 import '../../../core/widgets/reusable/filter_bottom_sheet/simple_filter_bottom_sheet_widget.dart';
@@ -142,9 +143,10 @@ class _PurchaseReturnScreenState extends State<PurchaseReturnScreen>
                   showModalBottomSheet(context: context, builder: (context) => SimpleFilterBottomSheetWidget(
                     selectedBrand: controller.brand,
                     disableDateTime: true,
+                    disableOutlet: true,
                     selectedCategory: controller.category,
                     selectedDateTimeRange: controller.selectedDateTimeRange.value,
-                    onSubmit: (FilterItem? brand,FilterItem? category,DateTimeRange? dateTimeRange){
+                    onSubmit: (FilterItem? brand,FilterItem? category,DateTimeRange? dateTimeRange,OutletModel? outlet){
                       controller.brand = brand;
                       controller.category = category;
                       controller.selectedDateTimeRange.value = dateTimeRange;

@@ -327,7 +327,7 @@ class ProductController extends GetxController {
 
   Future<void> getCategoriesBrandWarrantyUnits() async {
     hasError = false; // Reset error before loading
-    update(['filter_list']);
+    update(['category_dd','brand_dd','warranty_dd','unit_dd']);
 
     try {
       var response = await ProductService.getCategoriesBrandWarrantyUnits(
@@ -348,7 +348,7 @@ class ProductController extends GetxController {
       hasError = true; // Handle any exceptions
       logger.e(e);
     } finally {
-      update(['filter_list']);
+      update(['category_dd','brand_dd','warranty_dd','unit_dd']);
     }
   }
 

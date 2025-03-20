@@ -96,7 +96,9 @@ class PurchaseReturnController extends GetxController {
   }
 
   void clearEditing(){
+    purchaseReturnProducts.clear();
     purchaseOrderProducts.clear();
+    createPurchaseReturnOrderModel =  CreatePurchaseReturnOrderModel.defaultConstructor();
     isEditing = false;
     selectedSupplier = null;
     selectedDateTimeRange.value = null;

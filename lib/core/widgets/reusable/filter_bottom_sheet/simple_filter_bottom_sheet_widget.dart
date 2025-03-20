@@ -5,12 +5,14 @@ import 'package:amar_pos/core/widgets/custom_text_field.dart';
 import 'package:amar_pos/core/widgets/field_title.dart';
 import 'package:amar_pos/core/widgets/reusable/filter_bottom_sheet/filter_controller.dart';
 import 'package:amar_pos/core/widgets/reusable/filter_bottom_sheet/product_brand_category_warranty_unit_response_model.dart';
+import 'package:amar_pos/core/widgets/reusable/outlet_dd/outlet_dropdown_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
 import '../../../../features/inventory/presentation/products/widgets/custom_drop_down_widget.dart';
 import '../../../constants/app_colors.dart';
+import '../../../data/model/outlet_model.dart';
 
 class SimpleFilterBottomSheetWidget extends StatefulWidget {
   SimpleFilterBottomSheetWidget({
@@ -19,15 +21,19 @@ class SimpleFilterBottomSheetWidget extends StatefulWidget {
     required this.selectedCategory,
     required this.selectedDateTimeRange,
     required this.onSubmit,
-    this.disableDateTime
+    this.disableDateTime,
+    this.disableOutlet,
+    this.selectedOutlet,
   });
 
   FilterItem? selectedBrand;
   bool? disableDateTime;
+  bool? disableOutlet;
   FilterItem? selectedCategory;
+  OutletModel? selectedOutlet;
   DateTimeRange? selectedDateTimeRange;
   Function(FilterItem? selectedBrand, FilterItem? selectedCategory,
-      DateTimeRange? selectedDateTimeRange) onSubmit;
+      DateTimeRange? selectedDateTimeRange, OutletModel? selectedOutlet) onSubmit;
 
   @override
   State<SimpleFilterBottomSheetWidget> createState() =>
@@ -49,6 +55,7 @@ class _SimpleFilterBottomSheetWidgetState
 
     brand = widget.selectedBrand;
     category = widget.selectedCategory;
+    outlet = widget.selectedOutlet;
     _controller.selectedDateTimeRange.value = widget.selectedDateTimeRange;
     if(widget.selectedDateTimeRange != null){
       _dateTimeController.text = "${formatDate(widget.selectedDateTimeRange!.start)} - ${formatDate(widget.selectedDateTimeRange!.end)}";
@@ -58,6 +65,7 @@ class _SimpleFilterBottomSheetWidgetState
 
   FilterItem? brand;
   FilterItem? category;
+  OutletModel? outlet;
 
   @override
   Widget build(BuildContext context) {
@@ -134,6 +142,14 @@ class _SimpleFilterBottomSheetWidgetState
                             }),
                       ],
                     ),
+                    addH(8),
+                    if(widget.disableOutlet == null)OutletDropDownWidget(
+                        filled: true,
+                        hideTitle: false,
+                        onOutletSelection: (value){
+                          outlet = value;
+
+                    }),
                     addH(8),
                     GetBuilder<FilterController>(
                         id: 'brand_dd',
@@ -243,6 +259,7 @@ class _SimpleFilterBottomSheetWidgetState
                           brand,
                           category,
                           controller.selectedDateTimeRange.value,
+                          outlet,
                         );
                       },
                     ),

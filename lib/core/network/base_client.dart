@@ -88,8 +88,8 @@ class BaseClient {
     Get.offAllNamed(LoginScreen.routeName);
   }
 
-  static void showRequestLog({String? token, String? url, String? requestType}){
-    logger.i("$requestType request to :$url\nToken : $token");
+  static void showRequestLog({String? token, String? url, String? requestType, dynamic parameter}){
+    logger.i("$requestType request to :$url\nToken : $token\nParams: $parameter");
   }
 
   /// GET request
@@ -100,7 +100,7 @@ class BaseClient {
     bool? fullUrlGiven,
   }) async {
     String url = fullUrlGiven == true ? api : '${NetWorkStrings.baseUrl}/$api';
-    showRequestLog(url: url, token: token, requestType: "GET");
+    showRequestLog(url: url, token: token, requestType: "GET", parameter: parameter);
     try {
       final response = await _dio.get(
         url,
