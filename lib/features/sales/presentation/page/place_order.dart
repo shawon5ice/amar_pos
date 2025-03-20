@@ -1,3 +1,4 @@
+import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:amar_pos/features/inventory/presentation/products/add_product_screen.dart';
 import 'package:amar_pos/features/sales/presentation/page/billing_summary.dart';
 import 'package:auto_size_text/auto_size_text.dart';
@@ -71,6 +72,12 @@ class _PlaceOrderState extends State<PlaceOrder> {
     super.dispose();
   }
 
+  void updatePricesForSaleType(List<TextEditingController> controllers) {
+    for (int i = 0; i < controller.createOrderModel.products.length; i++) {
+      controllers[i].text = controller.createOrderModel.products[i].unitPrice.toString();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -82,19 +89,26 @@ class _PlaceOrderState extends State<PlaceOrder> {
           children: [
             GetBuilder<SalesController>(
               id: "selling_party_selection",
-              builder: (controller) => Row(
-                children: [
-                  CustomRadioButton(
-                    title: "Retail Sale",
-                    value: true,
-                  ),
-                  addW(10),
-                  CustomRadioButton(
-                    title: "Wholesale",
-                    value: false,
-                  ),
-                ],
-              ),
+              builder: (controller) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  updatePricesForSaleType(purchaseControllers);
+                  controller.justChanged = false;
+                  controller.update(['place_order_items']);
+                });
+                return Row(
+                  children: [
+                    CustomRadioButton(
+                      title: "Retail Sale",
+                      value: true,
+                    ),
+                    addW(10),
+                    CustomRadioButton(
+                      title: "Wholesale",
+                      value: false,
+                    ),
+                  ],
+                );
+              },
             ),
             addH(12),
             Row(
@@ -321,11 +335,6 @@ class _PlaceOrderState extends State<PlaceOrder> {
                       ),
                     );
                   } else {
-                    if(controller.justChanged){
-                      for(int i=0;i<controller.createOrderModel.products.length; i++){
-                        purchaseControllers[i].text = controller.createOrderModel.products[i].unitPrice.toString();
-                      }
-                    }
                     return Form(
                       key: formKey,
                       child: ListView.builder(
@@ -734,6 +743,62 @@ class _PlaceOrderState extends State<PlaceOrder> {
                   ],
                 )
               : const SizedBox.shrink(),
+        ),
+      ),
+    );
+  }
+}
+
+
+class CustomRadioButton extends StatelessWidget {
+  CustomRadioButton({
+    super.key,
+    required this.title,
+    required this.value,
+    this.result,
+  });
+
+  final bool value;
+
+  final String title;
+  final Function()? result;
+
+  final SalesController controller = Get.find();
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          if(controller.isRetailSale != value){
+            controller.changeSellingParties(value);
+          }
+        },
+        child: Container(
+          height: 40.sp,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(color: AppColors.lightGreen),
+              borderRadius: BorderRadius.circular(20)),
+          child: Row(
+            children: [
+              Text(
+                title,
+                style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold),
+              ),
+              const Spacer(),
+              Radio(
+                visualDensity: VisualDensity.compact,
+                value: value,
+                activeColor: const Color(0xff009D5D),
+                groupValue: controller.isRetailSale,
+                onChanged: (value) {
+                  controller.changeSellingParties(value!);
+                },
+              )
+            ],
+          ),
         ),
       ),
     );

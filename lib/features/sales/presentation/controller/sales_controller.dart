@@ -129,13 +129,10 @@ class SalesController extends GetxController {
   void changeSellingParties(bool value) {
     isRetailSale = value;
     justChanged = true;
-    update(['sales_product_list']);
-
+    update(['selling_party_selection']);
     paymentMethodTracker.clear();
     redefinePrice();
     paymentMethodTracker.clear();
-    justChanged = false;
-    update(['selling_party_selection', 'billing_summary_form','sales_product_list']);
   }
 
   void redefinePrice() {
