@@ -12,6 +12,7 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../widgets/billing_summary_payment_option_selection_widget.dart';
+import '../widgets/solde_history_details_view.dart';
 
 class BillingSummary extends StatefulWidget {
   const BillingSummary({super.key});
@@ -42,25 +43,20 @@ class _BillingSummaryState extends State<BillingSummary> {
     customerPayableAmountEditingController = TextEditingController();
     customerChangeAmountEditingController = TextEditingController();
 
-    if(!controller.isEditing){
-      controller.paymentMethodTracker.clear();
-      controller.totalDiscount = 0;
-      controller.additionalExpense = 0;
-      controller.paidAmount = 0;
-      controller.isRetailSale = true;
-      controller.redefinePrice();
-      controller.serviceStuffInfo = null;
-      controller.selectedClient = null;
-      controller.getAllServiceStuff();
-      controller.getAllClientList();
-      controller.getPaymentMethods();
-    }else{
+    if(controller.isEditing){
       customerNameEditingController.text = controller.createOrderModel.name;
       customerPhoneNumberEditingController.text = controller.createOrderModel.phone;
       customerAddressEditingController.text = controller.createOrderModel.address;
       customerTotalDiscountEditingController.text = controller.saleHistoryDetailsResponseModel!.data.discount.toString();
       customerAdditionalExpensesEditingController.text = controller.saleHistoryDetailsResponseModel!.data.expense.toString();
       customerChangeAmountEditingController.text = controller.totalDeu.toString();
+    }else{
+      if(controller.serviceStuffList.isEmpty){
+        controller.getAllServiceStuff();
+      }
+      if(controller.billingPaymentMethods == null){
+        controller.getPaymentMethods();
+      }
     }
 
 
@@ -503,9 +499,12 @@ class _BillingSummaryState extends State<BillingSummary> {
               if(controller.isEditing){
                 controller.updateSaleOrder(context);
               }else{
-                controller.createSaleOrder(context);
+                controller.createSaleOrder(context).then((value){
+                if(value){
+                    Get.to(const InvoiceWidget(),arguments: [controller.pOrderId, controller.pOrderNo]);
+                    }
+                });
               }
-
             }
           },
           text: controller.isEditing ? "Update Order" : "Place Order",

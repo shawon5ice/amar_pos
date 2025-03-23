@@ -72,6 +72,40 @@ class _SalesScreenState extends State<SalesScreen>
   void initState() {
     _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(() async {
+      if(_tabController.indexIsChanging){
+        // controller.brand = null;
+        // controller.category = null;
+        controller.selectedDateTimeRange.value = null;
+        controller.searchProductController.clear();
+        FocusScope.of(context).unfocus();
+        controller.update(['action_icon']);
+      }
+      if (_tabController.index != _tabController.previousIndex && _tabController.previousIndex ==0 ) {
+        controller.searchProductController.clear();
+        controller.selectedDateTimeRange.value = null;
+        FocusScope.of(context).unfocus();
+        // Check if the user is editing and is leaving the first tab
+        if (controller.placeOrderProducts.isNotEmpty) {
+          // Store the new index
+          int newIndex = _tabController.index;
+
+          // Revert the tab index temporarily
+          _tabController.index = _tabController.previousIndex;
+
+          // Show the discard dialog
+          bool discard = await showDiscardDialog(context);
+          logger.d(discard);
+
+          if (discard) {
+            controller.placeOrderProducts.clear();
+            _tabController.animateTo(newIndex);
+            controller.clearEditing();
+          }
+        }
+        controller.update(['action_icon']); // Update the specific UI element
+      }
+    });
+    _tabController.addListener(() async {
       if (_tabController.index != _tabController.previousIndex) {
         controller.searchProductController.clear();
 

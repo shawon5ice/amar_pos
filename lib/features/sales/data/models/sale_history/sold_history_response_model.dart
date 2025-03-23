@@ -7,7 +7,8 @@ class Customer {
   final int id;
   final String name;
   final String phone;
-  final String address;
+  @JsonKey(defaultValue: "N/A")
+  final String? address;
 
   Customer({
     required this.id,

@@ -6,7 +6,6 @@ import 'package:amar_pos/features/sales/data/models/client_list_response_model.d
 import 'package:amar_pos/features/sales/data/models/create_order_model.dart';
 import 'package:amar_pos/features/sales/data/models/payment_method_tracker.dart';
 import 'package:amar_pos/features/sales/data/models/sale_history/sold_history_response_model.dart';
-import 'package:amar_pos/features/sales/data/models/sale_history_details_response_model.dart';
 import 'package:amar_pos/features/sales/data/models/sold_product/sold_product_response_model.dart';
 import 'package:amar_pos/features/sales/data/service/sales_service.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +14,7 @@ import '../../../../core/constants/logger/logger.dart';
 import '../../../auth/data/model/hive/login_data.dart';
 import '../../../auth/data/model/hive/login_data_helper.dart';
 import '../../../inventory/data/products/product_list_response_model.dart';
+import '../../data/models/sale_history/sold_history_details_response_model.dart' show SoldHistoryDetailsResponseModel;
 
 class SalesController extends GetxController {
   bool isProductListLoading = false;
@@ -54,8 +54,13 @@ class SalesController extends GetxController {
     placeOrderProducts.clear();
     soldProductList.clear();
     saleHistoryList.clear();
+    paidAmount = 0;
+    totalDiscount = 0;
+    totalPaid = 0;
+    totalDeu = 0;
+    totalQTY = 0;
     createOrderModel = CreateSaleOrderModel.defaultConstructor();
-    update(['place_order_items', 'billing_summary_button']);
+    // update(['place_order_items', 'billing_summary_button']);
   }
 
   List<ProductInfo> placeOrderProducts = [];
@@ -200,15 +205,30 @@ class SalesController extends GetxController {
       x.quantity++;
       x.unitPrice = unitPrice;
     } else {
-      placeOrderProducts.add(product);
-      createOrderModel.products.add(SaleProductModel(
-          id: product.id,
-          unitPrice: isRetailSale ? product.mrpPrice.toDouble() : product
-              .wholesalePrice.toDouble(),
-          quantity:quantity?? 1,
-          vat: (product.vat/100 * (isRetailSale ? product.mrpPrice.toDouble() : product
-              .wholesalePrice.toDouble())).toDouble(),
-          serialNo: snNo ?? []));
+
+      if(placeOrderProducts.isNotEmpty && !isEditing){
+        placeOrderProducts.insert(0, product);
+
+        createOrderModel.products.insert(0, SaleProductModel(
+            id: product.id,
+            unitPrice: isRetailSale ? product.mrpPrice.toDouble() : product
+                .wholesalePrice.toDouble(),
+            quantity:quantity?? 1,
+            vat: (product.vat/100 * (isRetailSale ? product.mrpPrice.toDouble() : product
+                .wholesalePrice.toDouble())).toDouble(),
+            serialNo: snNo ?? []));
+      }else{
+        placeOrderProducts.add(product);
+
+        createOrderModel.products.add(SaleProductModel(
+            id: product.id,
+            unitPrice: isRetailSale ? product.mrpPrice.toDouble() : product
+                .wholesalePrice.toDouble(),
+            quantity:quantity?? 1,
+            vat: (product.vat/100 * (isRetailSale ? product.mrpPrice.toDouble() : product
+                .wholesalePrice.toDouble())).toDouble(),
+            serialNo: snNo ?? []));
+      }
     }
     update(['place_order_items', 'billing_summary_button']);
   }
@@ -248,7 +268,7 @@ class SalesController extends GetxController {
       totalDeu = paidAmount - totalPaid;
     }
 
-    update(['selling_party_selection', 'change-due-amount','billing_summary_form']);
+    update(['change-due-amount','billing_summary_form']);
   }
 
   void changeQuantityOfProduct(int index, bool increase) {
@@ -397,8 +417,12 @@ class SalesController extends GetxController {
     }
   }
 
+  int? pOrderId;
+  String? pOrderNo;
 
-  void createSaleOrder(BuildContext context) async {
+  Future<bool> createSaleOrder(BuildContext context) async {
+    pOrderId = null;
+    pOrderNo = null;
     createSaleOrderLoading = true;
     update(["sales_product_list"]);
     RandomLottieLoader.show();
@@ -410,10 +434,14 @@ class SalesController extends GetxController {
       logger.e(response);
       if (response != null) {
         if (response['success']) {
-          placeOrderProducts.clear();
+          pOrderId = response['data']['id'];
+          pOrderNo = response['data']['order_no'];
+          clearFilter();
+          clearEditing();
           RandomLottieLoader.hide();
           Get.back();
           Get.back();
+          return true;
         } else {
           RandomLottieLoader.hide();
         }
@@ -422,10 +450,12 @@ class SalesController extends GetxController {
       }
     } catch (e) {
       logger.e(e);
+      return false;
     } finally {
       createSaleOrderLoading = false;
       update(["sales_product_list"]);
     }
+    return false;
   }
 
   void updateSaleOrder(BuildContext context) async {
@@ -582,22 +612,22 @@ class SalesController extends GetxController {
   }
 
   bool detailsLoading =false;
-  SaleHistoryDetailsResponseModel? saleHistoryDetailsResponseModel;
+  SoldHistoryDetailsResponseModel? saleHistoryDetailsResponseModel;
 
-  Future<void> getSoldHistoryDetails(BuildContext context, SaleHistory saleHistory) async {
+  Future<void> getSoldHistoryDetails(int orderId) async {
     detailsLoading = true;
     saleHistoryDetailsResponseModel = null;
     update(['sold_history_details']);
     try {
       var response = await SalesService.getSoldHistoryDetails(
           usrToken: loginData!.token,
-          id: saleHistory.id,
+          id: orderId,
       );
 
       logger.i(response);
       if (response != null) {
         saleHistoryDetailsResponseModel =
-            SaleHistoryDetailsResponseModel.fromJson(response);
+            SoldHistoryDetailsResponseModel.fromJson(response);
       }
     } catch (e) {
     } finally {
@@ -632,7 +662,7 @@ class SalesController extends GetxController {
         getAllProducts(search: '', page: 1);
         
         saleHistoryDetailsResponseModel =
-            SaleHistoryDetailsResponseModel.fromJson(response);
+            SoldHistoryDetailsResponseModel.fromJson(response);
 
         isRetailSale = saleHistoryDetailsResponseModel!.data.saleType.toLowerCase().contains("retail");
         await getPaymentMethods();
@@ -646,9 +676,9 @@ class SalesController extends GetxController {
         }
 
         //selecting products
-        for (var e in saleHistoryDetailsResponseModel!.data.orderDetails) {
+        for (var e in saleHistoryDetailsResponseModel!.data.details) {
           ProductInfo productInfo = productsListResponseModel!.data.productList.singleWhere((f) => f.id == e.id);
-          addPlaceOrderProduct(productInfo, snNo: e.snNo.map((e) => e.serialNo).toList(), quantity: e.quantity, unitPrice: isRetailSale ? productInfo.wholesalePrice : productInfo.mrpPrice);
+          addPlaceOrderProduct(productInfo, snNo: e.snNo?.map((e) => e.serialNo).toList(), quantity: e.quantity, unitPrice: isRetailSale ? productInfo.wholesalePrice : productInfo.mrpPrice);
         }
 
         //Payment Methods

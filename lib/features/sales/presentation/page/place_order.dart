@@ -53,14 +53,7 @@ class _PlaceOrderState extends State<PlaceOrder> {
 
   late TextEditingController suggestionEditingController;
 
-
-  @override
-  void didUpdateWidget(covariant PlaceOrder oldWidget) {
-    if(widget != oldWidget){
-      FocusScope.of(context).unfocus();
-    }
-    super.didUpdateWidget(oldWidget);
-  }
+  
 
 
   @override

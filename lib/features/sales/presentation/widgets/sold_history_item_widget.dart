@@ -29,7 +29,7 @@ class SoldHistoryItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: (){
-        Get.to(()=> InvoiceWidget(saleHistory: saleHistory));
+        Get.to(()=> InvoiceWidget(),arguments: [saleHistory.id, saleHistory.orderNo]);
       },
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 5),
