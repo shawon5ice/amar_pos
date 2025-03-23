@@ -135,17 +135,19 @@ class SalesService {
 
   static downloadSaleHistory(
       {required String usrToken,
-      required BuildContext context,
-      required SaleHistory saleHistory}) async {
+      required String fileName,
+      required int orderId,bool? shouldPrint}) async {
     // logger.d("PDF: $isPdf");
 
     String downloadUrl =
-        "${NetWorkStrings.baseUrl}/order/download-order-invoice/${saleHistory.id}";
+        "${NetWorkStrings.baseUrl}/order/download-order-invoice/$orderId";
 
     FileDownloader().downloadFile(
         url: downloadUrl,
         token: usrToken,
-        fileName: "${saleHistory.orderNo}.pdf",);
+        fileName: fileName,
+      shouldPrint: shouldPrint,
+    );
   }
 
   static Future<dynamic> getSoldHistoryDetails({

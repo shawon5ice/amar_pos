@@ -74,7 +74,7 @@ class SoldProductListItem extends StatelessWidget {
                           Flexible(
                             flex: 8,
                             child: Text(
-                                productInfo.brand),
+                                productInfo.brand?? "N/A"),
                           ),
                         ],
                       ),
@@ -88,7 +88,7 @@ class SoldProductListItem extends StatelessWidget {
                           const Text(" : "),
                           Flexible(
                             flex: 8,
-                            child: Text(productInfo.category),
+                            child: Text(productInfo.category?? 'N/A'),
                           ),
                         ],
                       ),

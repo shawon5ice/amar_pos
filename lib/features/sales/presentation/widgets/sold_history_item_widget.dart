@@ -100,7 +100,7 @@ class SoldHistoryItemWidget extends StatelessWidget {
                   bgColor: const Color(0xffE1F2FF),
                   onTap: () {
                     controller.downloadSaleHistory(
-                        isPdf: true, context: context, saleHistory: saleHistory);
+                        isPdf: true,  orderId: saleHistory.id, orderNo: saleHistory.orderNo);
                   },
                   assetPath: AppAssets.downloadIcon,
                 ),
@@ -108,16 +108,22 @@ class SoldHistoryItemWidget extends StatelessWidget {
                 CustomSvgSmallIconButton(
                   borderColor: const Color(0xffFF9000),
                   bgColor: const Color(0xffFFFCF8),
-                  onTap: () {},
+                  onTap: () {
+                    controller.downloadSaleHistory(
+                      shouldPrint: true,
+                        isPdf: true,  orderId: saleHistory.id, orderNo: saleHistory.orderNo);
+                  },
                   assetPath: AppAssets.printIcon,
                 ),
                 addW(8),
                 SoldHistoryItemActionMenu(
-                  onSelected: (value) {
+                  onSelected: (value) async{
                     switch (value) {
                       case "edit":
-                        controller.processEdit(saleHistory: saleHistory,context: context);
-                        onChange(0);
+                        await controller.processEdit(saleHistory: saleHistory,context: context).then((value){
+                          onChange(0);
+                        });
+
                         break;
                       case "delete":
                         AwesomeDialog(

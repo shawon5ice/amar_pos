@@ -41,19 +41,60 @@ class _PlaceOrderState extends State<PlaceOrder> {
 
   @override
   void initState() {
-    suggestionEditingController = TextEditingController();
-    controller.createOrderModel = CreateSaleOrderModel.defaultConstructor();
-    controller.placeOrderProducts.clear();
-    controller.getAllProducts(
-      search: "",
-      page: 1,
-    );
+    if (!controller.isEditing) {
+      controller.createOrderModel =
+          CreateSaleOrderModel.defaultConstructor();
+      controller.placeOrderProducts.clear();
+    } else {
+      for (var e in controller.createOrderModel.products) {
+        if(purchaseControllers.isNotEmpty && !controller.isEditing){
+          purchaseControllers.insert(0,TextEditingController(
+            text: e.unitPrice.toString(),
+          ));
+          purchaseQTYControllers.insert(0,TextEditingController(
+            text: e.quantity.toString(),
+          ));
+        }else{
+          purchaseControllers.add(TextEditingController(
+            text: e.unitPrice.toString(),
+          ));
+          purchaseQTYControllers.add(TextEditingController(
+            text: e.quantity.toString(),
+          ));
+        }
+      }
+      logger.i(purchaseControllers.length);
+    }
     super.initState();
   }
 
   late TextEditingController suggestionEditingController;
 
-  
+
+  void initializeData() {
+    logger.i("initializeData called. Product count: ${controller.createOrderModel.products.length}");
+
+    if (controller.createOrderModel.products.isEmpty) {
+      logger.e("Products are empty! Initialization skipped.");
+      return;
+    }
+
+    setState(() {
+      purchaseControllers.clear();
+      purchaseQTYControllers.clear();
+
+      for (var e in controller.createOrderModel.products) {
+        purchaseControllers.add(TextEditingController(
+          text: e.unitPrice.toString(),
+        ));
+        purchaseQTYControllers.add(TextEditingController(
+          text: e.quantity.toString(),
+        ));
+      }
+      logger.i("Initialized ${purchaseControllers.length} controllers.");
+    });
+  }
+
 
 
   @override
@@ -331,7 +372,7 @@ class _PlaceOrderState extends State<PlaceOrder> {
                     return Form(
                       key: formKey,
                       child: ListView.builder(
-                        itemCount: controller.placeOrderProducts.length,
+                        itemCount: controller.createOrderModel.products.length,
                         itemBuilder: (_, index) {
                           return Slidable(
                             endActionPane: ActionPane(

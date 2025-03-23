@@ -27,7 +27,7 @@ class SoldHistoryDetailsData {
   @JsonKey(name: 'sold_by')
   final String soldBy;
   @JsonKey(name: 'service_by')
-  final ServiceBy serviceBy;
+  final ServiceBy? serviceBy;
   @JsonKey(name: 'sub_total')
   final double subTotal;
   final double expense;

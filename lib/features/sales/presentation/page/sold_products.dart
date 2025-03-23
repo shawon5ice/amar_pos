@@ -90,17 +90,17 @@ class _SoldHistoryState extends State<SoldProduct> {
                 children: [
                   TotalStatusWidget(
                     flex: 3,
-                    isLoading: controller.isSaleHistoryListLoading,
+                    isLoading: controller.isSoldProductListLoading,
                     title: 'Total QTY',
-                    value: null,
+                    value: Methods.getFormattedNumber(controller.totalCount.toDouble()),
                     asset: AppAssets.productBox,
                   ),
                   addW(12),
                   TotalStatusWidget(
                     flex: 4,
-                    isLoading: controller.isSaleHistoryListLoading,
-                    title: 'Sold Amount',
-                    value: null,
+                    isLoading: controller.isSoldProductListLoading,
+                    title: 'Purchase Amount',
+                    value: Methods.getFormatedPrice(controller.soldTotalProductAmount),
                     asset: AppAssets.amount,
                   ),
                 ],

@@ -10,14 +10,18 @@ SoldProductResponseModel _$SoldProductResponseModelFromJson(
         Map<String, dynamic> json) =>
     SoldProductResponseModel(
       success: json['success'] as bool,
-      data: Data.fromJson(json['data'] as Map<String, dynamic>),
+      data: const DataConverter().fromJson(json['data']),
+      countTotal: (json['count_total'] as num).toInt(),
+      amountTotal: json['amount_total'] as num,
     );
 
 Map<String, dynamic> _$SoldProductResponseModelToJson(
         SoldProductResponseModel instance) =>
     <String, dynamic>{
       'success': instance.success,
-      'data': instance.data,
+      'data': const DataConverter().toJson(instance.data),
+      'count_total': instance.countTotal,
+      'amount_total': instance.amountTotal,
     };
 
 Data _$DataFromJson(Map<String, dynamic> json) => Data(
@@ -35,8 +39,8 @@ Map<String, dynamic> _$DataToJson(Data instance) => <String, dynamic>{
 SoldProductModel _$SoldProductModelFromJson(Map<String, dynamic> json) =>
     SoldProductModel(
       id: (json['id'] as num).toInt(),
-      category: json['category'] as String,
-      brand: json['brand'] as String,
+      category: json['category'] as String?,
+      brand: json['brand'] as String?,
       product: json['product'] as String,
       quantity: (json['quantity'] as num).toInt(),
       soldPrice: json['sold_price'] as num,

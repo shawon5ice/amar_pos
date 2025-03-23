@@ -120,7 +120,7 @@ class SaleProductModel {
       'quantity': quantity,
       'vat': vat,
       'discount': discount,
-      'serial_no': serialNo,
+      'serial_no': serialNo.isEmpty ? null : serialNo,
     };
   }
 }

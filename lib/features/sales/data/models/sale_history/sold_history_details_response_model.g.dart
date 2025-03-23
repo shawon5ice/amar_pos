@@ -31,7 +31,9 @@ SoldHistoryDetailsData _$SoldHistoryDetailsDataFromJson(
       customer: Customer.fromJson(json['customer'] as Map<String, dynamic>),
       vat: (json['vat'] as num).toDouble(),
       store: Store.fromJson(json['store'] as Map<String, dynamic>),
-      serviceBy: ServiceBy.fromJson(json['service_by'] as Map<String, dynamic>),
+      serviceBy: json['service_by'] == null
+          ? null
+          : ServiceBy.fromJson(json['service_by'] as Map<String, dynamic>),
       soldBy: json['sold_by'] as String,
       subTotal: (json['sub_total'] as num).toDouble(),
       changeAmount: (json['change_amount'] as num).toDouble(),

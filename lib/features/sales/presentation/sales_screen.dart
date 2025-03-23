@@ -105,31 +105,6 @@ class _SalesScreenState extends State<SalesScreen>
         controller.update(['action_icon']); // Update the specific UI element
       }
     });
-    _tabController.addListener(() async {
-      if (_tabController.index != _tabController.previousIndex) {
-        controller.searchProductController.clear();
-
-        // Check if the user is editing and is leaving the first tab
-        if (controller.isEditing && _tabController.previousIndex == 0) {
-          // Store the new index
-          int newIndex = _tabController.index;
-
-          // Revert the tab index temporarily
-          _tabController.index = _tabController.previousIndex;
-
-          // Show the discard dialog
-          bool discard = await showDiscardDialog(context);
-          logger.d(discard);
-
-          if (discard) {
-            controller.clearEditing();
-            _tabController.animateTo(newIndex);
-          }
-        }
-
-        controller.update(['action_icon']); // Update the specific UI element
-      }
-    });
     super.initState();
   }
 

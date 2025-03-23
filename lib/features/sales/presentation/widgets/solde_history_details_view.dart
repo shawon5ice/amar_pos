@@ -131,7 +131,8 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
                                   const Expanded(
                                       flex: 3,
                                       child: Text(
-                                        'PURCHASE ORDER',
+                                        textAlign: TextAlign.center,
+                                        'INVOICE',
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 16),
@@ -349,11 +350,11 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
                                 ),
                               ),
                               const SizedBox(height: 40),
-                              // Align(
-                              //   alignment: Alignment.centerRight,
-                              //   child: Text("Created by: ${data.createdBy}",
-                              //       style: TextStyle(fontWeight: FontWeight.bold)),
-                              // ),
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: Text("Prepared by: ${data.serviceBy?.name}",
+                                    style: TextStyle(fontWeight: FontWeight.bold)),
+                              ),
                             ],
                           ),
                         );
@@ -371,7 +372,7 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
         bottomNavigationBar: GetBuilder<SalesController>(
             id: 'download_print_buttons',
             builder: (controller){
-              if(controller.soldProductResponseModel != null){
+              if(controller.saleHistoryDetailsResponseModel != null){
                 return Padding(
                   padding: const EdgeInsets.all(20),
                   child: Row(
@@ -382,8 +383,8 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
                           color: Color(0xff03346E),
                           radius: 8,
                           onTap: () {
-                            // controller.downloadPurchaseHistory(
-                            //     isPdf: true, orderId: orderId, orderNo: orderNo);
+                            controller.downloadSaleHistory(
+                                isPdf: true, orderId: orderId, orderNo: orderNo);
                           },
                         ),
                       ),
@@ -394,11 +395,11 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
                           radius: 8,
                           color: Color(0xffFF9000),
                           onTap: () {
-                            // controller.downloadPurchaseHistory(
-                            //     shouldPrint: true,
-                            //     orderNo: orderNo,
-                            //     isPdf: true,
-                            //     orderId: orderId);
+                            controller.downloadSaleHistory(
+                                shouldPrint: true,
+                                orderNo: orderNo,
+                                isPdf: true,
+                                orderId: orderId);
                           },
                         ),
                       ),
