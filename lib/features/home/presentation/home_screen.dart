@@ -3,10 +3,26 @@ import 'package:amar_pos/features/drawer/drawer_menu_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class HomeScreen extends StatelessWidget {
+import '../../../permission_manager.dart';
+
+class HomeScreen extends StatefulWidget {
   static const String routeName = "/home_screen";
   const HomeScreen({super.key,});
 
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    initializePermissions();
+    super.initState();
+  }
+
+  void initializePermissions() async {
+    await PermissionManager.loadPermissions();
+  }
   @override
   Widget build(BuildContext context) {
     final DrawerMenuController drawerMenuController = Get.find();

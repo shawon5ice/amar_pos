@@ -15,6 +15,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/logger/logger.dart';
 import '../../../core/data/model/outlet_model.dart';
 import '../../../core/responsive/pixel_perfect.dart';
+import '../../../permission_manager.dart';
 import '../../drawer/drawer_menu_controller.dart';
 
 class PurchaseScreen extends StatefulWidget {
@@ -137,9 +138,9 @@ class _PurchaseScreenState extends State<PurchaseScreen>
           actions: [
             GetBuilder<PurchaseController>(
               id: 'action_icon',
-              builder: (controller) => _tabController.index == 0? GestureDetector(
+              builder: (controller) => _tabController.index == 0 && controller.purchaseCreateAccess ? GestureDetector(
                 child: SvgPicture.asset(AppAssets.pauseBillingIcon),
-              ): _tabController.index == 2 ? IconButton(
+              ): _tabController.index == 2 && controller.productAccess ? IconButton(
                 onPressed: () async {
                   showModalBottomSheet(context: context, builder: (context) => SimpleFilterBottomSheetWidget(
                     selectedBrand: controller.brand,
@@ -164,7 +165,7 @@ class _PurchaseScreenState extends State<PurchaseScreen>
                   ));
                 },
                 icon: Icon(Icons.filter_alt_outlined, color: (controller.brand != null || controller.category != null || controller.selectedDateTimeRange.value != null) ? AppColors.error : null,),
-              ):  GestureDetector(
+              ):  _tabController.index == 1 && controller.historyAccess ? GestureDetector(
                 onTap: () async {
                   DateTimeRange? selectedDate =
                   await showDateRangePicker(
@@ -183,7 +184,7 @@ class _PurchaseScreenState extends State<PurchaseScreen>
                   }
                 },
                 child: SvgPicture.asset(AppAssets.calenderIcon),
-              )
+              ): SizedBox.shrink()
             ),
             addW(12),
           ],

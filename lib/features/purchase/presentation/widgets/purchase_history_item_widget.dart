@@ -121,10 +121,14 @@ class PurchaseHistoryItemWidget extends StatelessWidget {
                     }
                     switch (value) {
                       case "edit":
+                        bool hasPermission = await controller.checkPurchasePermissions("update");
+                        if(!hasPermission) return;
                         await controller.processEdit(purchaseOrderInfo: purchaseHistory, context: context);
                         onChange(0);
                         break;
                       case "delete":
+                        bool hasPermission = await controller.checkPurchasePermissions("destroy");
+                        if(!hasPermission) return;
                         AwesomeDialog(
                             context: context,
                             dialogType: DialogType.error,

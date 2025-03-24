@@ -61,6 +61,7 @@ class AppAssets {
   static const String printIcon = "assets/icon/print.svg";
   static const String pauseBillingIcon = "assets/icon/pause_billing.svg";
   static const String placeOrderBG = "assets/images/place_order.png";
+  static const String accessDeniedBG = "assets/images/access_denied.png";
   static const String deleteIc = "assets/icon/delete_icon.svg";
   static const String snAdd = "assets/icon/sn_add.svg";
   static const String funnelFilter = "assets/icon/funnel_filter.svg";

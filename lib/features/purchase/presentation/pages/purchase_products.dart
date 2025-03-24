@@ -1,7 +1,9 @@
 import 'package:amar_pos/core/core.dart';
+import 'package:amar_pos/core/widgets/reusable/forbidden_access_full_screen_widget.dart';
 import 'package:amar_pos/features/purchase/data/models/purchase_product_response_model.dart';
 import 'package:amar_pos/features/purchase/presentation/purchase_controller.dart';
 import 'package:amar_pos/features/purchase/presentation/widgets/purchase_product_item_widget.dart';
+import 'package:amar_pos/permission_manager.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -27,9 +29,12 @@ class _SoldHistoryState extends State<PurchaseProducts> {
 
   @override
   void initState() {
-    controller.getPurchaseProducts();
+    if(controller.productAccess){
+      controller.getPurchaseProducts();
+    }
     super.initState();
   }
+
 
   TextEditingController textEditingController = TextEditingController();
   @override
@@ -39,7 +44,7 @@ class _SoldHistoryState extends State<PurchaseProducts> {
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
-        body: Column(
+        body:  !controller.productAccess ? const ForbiddenAccessFullScreenWidget() : Column(
           children: [
             Row(
               children: [

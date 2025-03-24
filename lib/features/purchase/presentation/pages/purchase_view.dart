@@ -2,7 +2,7 @@ import 'package:amar_pos/core/constants/logger/logger.dart';
 import 'package:amar_pos/core/methods/number_input_formatter.dart';
 import 'package:amar_pos/core/widgets/custom_text_field.dart';
 import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:amar_pos/core/widgets/reusable/forbidden_access_full_screen_widget.dart';
 import 'package:amar_pos/features/inventory/presentation/products/add_product_screen.dart';
 import 'package:amar_pos/features/purchase/data/models/create_purchase_order_model.dart';
 import 'package:amar_pos/features/purchase/presentation/pages/purchase_summary.dart';
@@ -100,7 +100,7 @@ class _PurchaseViewState extends State<PurchaseView> {
       },
       child: SafeArea(
         child: Scaffold(
-          body: Column(
+          body: !controller.purchaseCreateAccess ? ForbiddenAccessFullScreenWidget() : Column(
             children: [
               Row(
                 children: [

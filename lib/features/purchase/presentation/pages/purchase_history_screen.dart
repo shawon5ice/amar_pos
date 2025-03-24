@@ -13,6 +13,8 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/methods/helper_methods.dart';
 import '../../../../core/responsive/pixel_perfect.dart';
 import '../../../../core/widgets/pager_list_view.dart';
+import '../../../../core/widgets/reusable/forbidden_access_full_screen_widget.dart';
+import '../../../../permission_manager.dart';
 import '../../../inventory/presentation/stock_report/widget/custom_svg_icon_widget.dart';
 import '../widgets/purchase_history_item_widget.dart';
 
@@ -29,9 +31,12 @@ class _PurchaseHistoryScreenState extends State<PurchaseHistoryScreen> {
 
   @override
   void initState() {
-    controller.getPurchaseHistory();
+    if(controller.historyAccess){
+      controller.getPurchaseHistory();
+    }
     super.initState();
   }
+
 
   TextEditingController textEditingController = TextEditingController();
   @override
@@ -41,7 +46,7 @@ class _PurchaseHistoryScreenState extends State<PurchaseHistoryScreen> {
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
-        body: Column(
+        body:  !controller.historyAccess ? const ForbiddenAccessFullScreenWidget()  :Column(
           children: [
             Row(
               children: [

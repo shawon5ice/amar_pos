@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:amar_pos/features/drawer/model/drawer_items.dart';
 import 'package:amar_pos/features/drawer/model/menu_selection.dart';
 
+import '../../permission_manager.dart';
 import '../sales/presentation/sales_screen.dart';
 
 class DrawerMenuController extends GetxController {
@@ -29,6 +30,11 @@ class DrawerMenuController extends GetxController {
 
   LoginData? loginData = LoginDataBoxManager().loginData;
 
+
+  //Menus to active
+  List<String> purchaseModule = [];
+  List<String> salesModule = [];
+
   @override
   void onInit() {
     super.onInit();
@@ -39,9 +45,20 @@ class DrawerMenuController extends GetxController {
   @override
   void onReady() {
     loginData = LoginDataBoxManager().loginData;
+    loadModules();
     super.onReady();
   }
 
+  void loadModules() async {
+    if(PermissionManager.hasParentPermission('PurchaseOrder')){
+      purchaseModule.add("Purchase");
+    }
+    if(PermissionManager.hasParentPermission('PurchaseReturn')){
+      purchaseModule.add("Purchase Return");
+    }
+    logger.d(purchaseModule);
+    update(['drawer_menu']);
+  }
 
   void openDrawer() {
     isDrawerOpened.value = true;

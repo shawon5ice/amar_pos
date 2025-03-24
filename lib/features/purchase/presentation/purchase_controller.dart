@@ -9,6 +9,7 @@ import 'package:amar_pos/features/purchase/data/models/purchase_order_details_re
 import 'package:amar_pos/features/purchase/data/models/purchase_product_response_model.dart';
 import 'package:amar_pos/features/purchase/data/purchase_service.dart';
 import 'package:amar_pos/features/sales/data/models/payment_method_tracker.dart';
+import 'package:amar_pos/permission_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/constants/logger/logger.dart';
@@ -19,6 +20,11 @@ import '../../auth/data/model/hive/login_data_helper.dart';
 import '../../inventory/data/products/product_list_response_model.dart';
 
 class PurchaseController extends GetxController{
+
+  //Access
+  bool historyAccess = true;
+  bool productAccess = true;
+  bool purchaseCreateAccess = true;
 
   bool isProductListLoading = false;
   bool isPaymentMethodListLoading = false;
@@ -98,12 +104,25 @@ class PurchaseController extends GetxController{
   bool isPurchaseProductListLoading = false;
   bool isPurchaseProductsLoadingMore = false;
 
+
+  //Purchase sub module
+  List<String> purchaseSubmodules = [];
+
   void setSelectedDateRange(DateTimeRange? range) {
     selectedDateTimeRange.value = range;
   }
 
 
+  @override
+  void onReady() {
+    historyAccess = PermissionManager.hasPermission("PurchaseOrder.getAllPurchaseList");
+    productAccess = PermissionManager.hasPermission("PurchaseOrder.getPurchaseProductList");
+    purchaseCreateAccess =  PermissionManager.hasPermission("PurchaseOrder.store");
+
+    super.onReady();
+  }
   void clearEditing(){
+    purchaseOrderProducts.clear();
     purchaseProducts.clear();
     createPurchaseOrderModel =  CreatePurchaseOrderModel.defaultConstructor();
     isEditing = false;
@@ -116,6 +135,12 @@ class PurchaseController extends GetxController{
     totalDeu = 0;
     totalDiscount = 0;
     totalQTY = 0;
+    selectedSupplier = null;
+    supplierList.clear();
+    paymentMethodTracker.clear();
+    createPurchaseOrderModel = CreatePurchaseOrderModel.defaultConstructor();
+    additionalExpense = 0;
+    totalDiscount = 0;
     paymentMethodTracker.clear();
   }
   Future<void> getAllProducts(
@@ -717,6 +742,15 @@ class PurchaseController extends GetxController{
   }
 
   Future<void> downloadList({required bool isPdf,required bool purchaseHistory, bool? shouldPrint}) async {
+    bool hasPermission = true;
+    if(purchaseHistory){
+      hasPermission = checkPurchasePermissions(isPdf ? "exportToPdfPurchaseList": "exportToExcelPurchaseList");
+    }else{
+      hasPermission = checkPurchasePermissions(isPdf ? "exportToPdfPurchaseProductList": "exportToExcelPurchaseProductList");
+    }
+
+    if(!hasPermission) return;
+
     if(purchaseHistory && purchaseHistoryList.isEmpty || !purchaseHistory && purchaseProducts.isEmpty){
       ErrorExtractor.showSingleErrorDialog(Get.context!, "There is no associated data to perform your action!");
       return;
@@ -769,5 +803,13 @@ class PurchaseController extends GetxController{
       detailsLoading = false;
       update(['purchase_history_details', 'download_print_buttons']);
     }
+  }
+
+  bool checkPurchasePermissions(String permission) {
+    if(!PermissionManager.hasPermission("PurchaseOrder.$permission")){
+      ErrorExtractor.showSingleErrorDialog(Get.context!, "Forbidden access. You don't have Permission");
+      return false;
+    }
+    return true;
   }
 }
