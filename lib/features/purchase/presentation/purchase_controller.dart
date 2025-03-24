@@ -211,8 +211,6 @@ class PurchaseController extends GetxController{
             id: product.id,
             unitPrice: unitPrice.toDouble(),
             quantity:quantity?? 1,
-            vat: (product.vat/100 *  product
-                .wholesalePrice.toDouble()),
             serialNo: snNo ?? []));
       }else{
         purchaseOrderProducts.add(product);
@@ -221,8 +219,6 @@ class PurchaseController extends GetxController{
             id: product.id,
             unitPrice: unitPrice.toDouble(),
             quantity:quantity?? 1,
-            vat: (product.vat/100 *  product
-                .wholesalePrice.toDouble()),
             serialNo: snNo ?? []));
       }
     }
@@ -470,7 +466,6 @@ class PurchaseController extends GetxController{
       logger.e(e);
     } finally {
       createPurchaseOrderLoading = false;
-      isEditing = false;
       update(["purchase_order_items"]);
     }
     return false;

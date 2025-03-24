@@ -488,6 +488,7 @@ class SalesController extends GetxController {
           RandomLottieLoader.hide();
           Get.back();
           Get.back();
+          isEditing = false;
           return true;
         } else {
           RandomLottieLoader.hide();
@@ -499,7 +500,6 @@ class SalesController extends GetxController {
       logger.e(e);
     } finally {
       createSaleOrderLoading = false;
-      isEditing = false;
       update(["sales_product_list"]);
     }
     return false;

@@ -122,7 +122,7 @@ class _PurchaseSummaryPaymentOptionSelectionWidgetState
                           }
                         },
                         buttonStyleData: ButtonStyleData(
-                          height: 56.h,
+                          height: 56,
                           padding: EdgeInsets.zero,
                           decoration: BoxDecoration(
                             border:
@@ -274,12 +274,18 @@ class _PurchaseSummaryPaymentOptionSelectionWidgetState
                             .toList(),
                         value: widget.paymentMethodTracker.paymentOption,
                         onChanged: (value) {
+                          for(int i=0;i<controller.paymentMethodTracker.length; i++){
+                            if(controller.paymentMethodTracker[i].paymentOption?.id == value?.id ){
+                              Methods.showSnackbar(msg: "Please select another bank");
+                              return;
+                            }
+                          }
                           widget.paymentMethodTracker.paymentOption = value;
                           controller
                               .update(['billing_payment_methods', 'billing_summary_form']);
                         },
                         buttonStyleData: ButtonStyleData(
-                          height: 48,
+                          height: 56,
                           padding: EdgeInsets.zero,
                           decoration: BoxDecoration(
                             border:

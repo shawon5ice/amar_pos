@@ -409,7 +409,7 @@ class _PurchaseSummaryState extends State<PurchaseSummary> {
           ),
         ),
         bottomNavigationBar: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20,),
+          padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 10),
           child: Row(
             children: [
               CircleAvatar(

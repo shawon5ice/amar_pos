@@ -64,7 +64,6 @@ class PurchaseProductModel {
   int id;
   double unitPrice;
   int quantity;
-  num vat;
   num? discount;
   List<String> serialNo;
 
@@ -72,7 +71,6 @@ class PurchaseProductModel {
     required this.id,
     required this.unitPrice,
     required this.quantity,
-    required this.vat,
     required this.serialNo,
     this.discount,
   });
@@ -82,7 +80,6 @@ class PurchaseProductModel {
       id: json['id'],
       unitPrice: json['unit_price'].toDouble(),
       quantity: json['quantity'],
-      vat: json['vat'] ?? 0,
         serialNo: json['serial_no'],
       discount: json['discount'] ?? 0,
     );
@@ -93,7 +90,6 @@ class PurchaseProductModel {
       'id': id,
       'unit_price': unitPrice,
       'quantity': quantity,
-      'vat': vat,
       'discount': discount,
       'serial_no': serialNo.isEmpty ? null : serialNo,
     };
