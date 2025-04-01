@@ -506,6 +506,7 @@ class _BillingSummaryState extends State<BillingSummary> {
                   controller.updateSaleOrder(context).then((value){
                     if(value){
                       Get.to(const InvoiceWidget(),arguments: [controller.pOrderId, controller.pOrderNo]);
+                      controller.clearEditing();
                     }
                   });
                 }else{

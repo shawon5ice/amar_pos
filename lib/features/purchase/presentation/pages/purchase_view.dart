@@ -718,6 +718,9 @@ class _PurchaseViewState extends State<PurchaseView> {
                       }
                     }
                     if (formKey.currentState!.validate()) {
+                      if(controller.paymentMethodTracker.isEmpty && !controller.isEditing){
+                        controller.addPaymentMethod();
+                      }
                       await Get.to(() => PurchaseSummary(
                       //   onSuccess: (value){
                       //   if(value){

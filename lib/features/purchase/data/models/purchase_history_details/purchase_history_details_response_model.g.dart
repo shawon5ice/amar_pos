@@ -103,6 +103,7 @@ OrderDetail _$OrderDetailFromJson(Map<String, dynamic> json) => OrderDetail(
       name: json['name'] as String,
       quantity: (json['quantity'] as num).toInt(),
       unitPrice: (json['unit_price'] as num).toDouble(),
+      warranty: json['warranty'] as String? ?? 'N/A',
       total: (json['total'] as num).toDouble(),
       snNo: (json['sn_no'] as List<dynamic>?)
           ?.map((e) => SnNo.fromJson(e as Map<String, dynamic>))
@@ -114,6 +115,7 @@ Map<String, dynamic> _$OrderDetailToJson(OrderDetail instance) =>
       'id': instance.id,
       'line_id': instance.lineId,
       'name': instance.name,
+      'warranty': instance.warranty,
       'quantity': instance.quantity,
       'unit_price': instance.unitPrice,
       'total': instance.total,

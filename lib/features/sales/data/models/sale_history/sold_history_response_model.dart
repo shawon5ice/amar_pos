@@ -73,6 +73,12 @@ class Meta {
     required this.total,
   });
 
+  Meta.empty()
+      : currentPage = 0,
+        lastPage = 0,
+        from = 0,
+        total = 0;
+
   factory Meta.fromJson(Map<String, dynamic> json) => _$MetaFromJson(json);
   Map<String, dynamic> toJson() => _$MetaToJson(this);
 }
@@ -95,6 +101,7 @@ class Data {
 @JsonSerializable()
 class SaleHistoryResponseModel {
   final bool success;
+  @DataConverter()
   final Data data;
   @JsonKey(name: 'count_total')
   int countTotal;
@@ -110,4 +117,23 @@ class SaleHistoryResponseModel {
 
   factory SaleHistoryResponseModel.fromJson(Map<String, dynamic> json) => _$SaleHistoryResponseModelFromJson(json);
   Map<String, dynamic> toJson() => _$SaleHistoryResponseModelToJson(this);
+}
+
+
+class DataConverter implements JsonConverter<Data, dynamic> {
+  const DataConverter();
+
+  @override
+  Data fromJson(dynamic json) {
+    if (json is List) {
+      return Data(saleHistoryList: [],meta: Meta.empty());
+    } else if (json is Map<String, dynamic>) {
+      return Data.fromJson(json);
+    } else {
+      throw Exception('Unexpected type for data: ${json.runtimeType}');
+    }
+  }
+
+  @override
+  dynamic toJson(Data object) => object.toJson();
 }

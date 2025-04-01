@@ -231,6 +231,8 @@ class _PurchaseHistoryDetailsViewState
                                             children: [
                                               AutoSizeText(product.name),
                                               addH(4),
+                                              AutoSizeText("Warranty: ${product.warranty}"),
+                                              addH(4),
                                               if (product.snNo != null)
                                                 Wrap(
                                                   spacing: 4,

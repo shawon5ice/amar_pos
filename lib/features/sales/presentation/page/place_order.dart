@@ -188,7 +188,7 @@ class _PlaceOrderState extends State<PlaceOrder> {
                                       if (items.length == 1) {
                                         suggestionEditingController.clear();
                                         controller
-                                            .addPlaceOrderProduct(items.first, unitPrice: controller.isRetailSale ?  items.first.wholesalePrice : items.first.mrpPrice );
+                                            .addPlaceOrderProduct(items.first, unitPrice: controller.isRetailSale ?  items.first.mrpPrice : items.first.wholesalePrice );
 
                                         int value = controller
                                             .createOrderModel.products
@@ -315,7 +315,7 @@ class _PlaceOrderState extends State<PlaceOrder> {
                                   .add(TextEditingController(text: "1"));
                             }
                           }
-                          controller.addPlaceOrderProduct(product, unitPrice: controller.isRetailSale ? product.wholesalePrice : product.mrpPrice);
+                          controller.addPlaceOrderProduct(product, unitPrice: controller.isRetailSale ? product.mrpPrice : product.wholesalePrice);
                           suggestionEditingController.clear();
                           FocusScope.of(context).unfocus();
                         },

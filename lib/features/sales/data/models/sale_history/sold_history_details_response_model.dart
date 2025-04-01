@@ -146,6 +146,7 @@ class OrderDetail {
   @JsonKey(name: 'details_id')
   final int detailsId;
   final String name;
+  @JsonKey(defaultValue: 'N/A')
   final String warranty;
   final int quantity;
   @JsonKey(name: 'unit_price')

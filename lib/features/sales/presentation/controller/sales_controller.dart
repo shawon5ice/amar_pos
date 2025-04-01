@@ -905,8 +905,7 @@ class SalesController extends GetxController {
       // Parse the response
       if (response != null && response['success']) {
         // Remove the item from the list
-        saleHistoryList.remove(saleHistory);
-        saleHistoryResponseModel?.amountTotal -= saleHistory.amount;
+        getSoldHistory();
         saleHistoryResponseModel?.countTotal -= 1;
         Methods.showSnackbar(msg: response['message'], isSuccess: true);
       } else {

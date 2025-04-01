@@ -148,7 +148,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                             onParentTap: () => onParentTap(DrawerItems.inventory),
                             onChildTap: (child) => onChildTap(DrawerItems.inventory, child),
                           ),
-                          buildDrawerItems(context, DrawerItems.sales),
+                          if(controller.salesModule)buildDrawerItems(context, DrawerItems.sales),
                           // ExpandableDrawerWidget(
                           //   item: DrawerItems.sales,
                           //   children: const ["Retail Sale", "Whole Sale",],

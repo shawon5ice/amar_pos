@@ -194,6 +194,7 @@ class _PurchaseScreenState extends State<PurchaseScreen>
           child: Column(
             children: [
               Container(
+                clipBehavior: Clip.antiAlias,
                 height: 40.h,
                 padding: const EdgeInsets.all(4),
                 decoration: const BoxDecoration(

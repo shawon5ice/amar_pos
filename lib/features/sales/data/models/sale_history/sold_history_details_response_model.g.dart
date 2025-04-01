@@ -143,7 +143,7 @@ OrderDetail _$OrderDetailFromJson(Map<String, dynamic> json) => OrderDetail(
       totalPrice: (json['total_price'] as num).toDouble(),
       vat: (json['vat'] as num).toDouble(),
       vatPercent: (json['vat_percent'] as num).toDouble(),
-      warranty: json['warranty'] as String,
+      warranty: json['warranty'] as String? ?? 'N/A',
       name: json['name'] as String,
       quantity: (json['quantity'] as num).toInt(),
       unitPrice: (json['unit_price'] as num).toDouble(),

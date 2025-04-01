@@ -757,7 +757,7 @@ class PurchaseController extends GetxController{
     }
     hasError.value = false;
 
-    String fileName = "${purchaseHistory? "Purchase Order history": "Purchase Return Product History"}-${
+    String fileName = "${purchaseHistory? "Purchase Order history": "Purchase Product History"}-${
         selectedDateTimeRange.value != null ? "${selectedDateTimeRange.value!.start.toIso8601String().split("T")[0]}-${selectedDateTimeRange.value!.end.toIso8601String().split("T")[0]}": DateTime.now().toIso8601String().split("T")[0]
             .toString()
     }${isPdf ? ".pdf" : ".xlsx"}";

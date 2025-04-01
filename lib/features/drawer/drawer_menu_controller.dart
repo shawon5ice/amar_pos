@@ -3,6 +3,7 @@ import 'package:amar_pos/features/accounting/presentation/accounting_screen.dart
 import 'package:amar_pos/features/auth/data/model/hive/login_data.dart';
 import 'package:amar_pos/features/auth/data/model/hive/login_data_helper.dart';
 import 'package:amar_pos/features/exchange/exchange_screen.dart';
+import 'package:amar_pos/features/home/presentation/home_screen_controller.dart';
 import 'package:amar_pos/features/inventory/presentation/products/products_screen.dart';
 import 'package:amar_pos/features/inventory/presentation/stock_report/stock_report.dart';
 import 'package:amar_pos/features/purchase/presentation/purchase_screen.dart';
@@ -29,11 +30,9 @@ class DrawerMenuController extends GetxController {
   Rx<MenuSelection?> selectedMenuItem = Rx<MenuSelection?>(null);
 
   LoginData? loginData = LoginDataBoxManager().loginData;
-
-
   //Menus to active
   List<String> purchaseModule = [];
-  List<String> salesModule = [];
+  bool salesModule = false;
 
   @override
   void onInit() {
@@ -42,21 +41,19 @@ class DrawerMenuController extends GetxController {
     update();
   }
 
-  @override
-  void onReady() {
-    loginData = LoginDataBoxManager().loginData;
-    loadModules();
-    super.onReady();
-  }
-
-  void loadModules() async {
+  Future<void> loadModules() async {
+    purchaseModule.clear();
+    print("--->");
     if(PermissionManager.hasParentPermission('PurchaseOrder')){
       purchaseModule.add("Purchase");
     }
     if(PermissionManager.hasParentPermission('PurchaseReturn')){
       purchaseModule.add("Purchase Return");
     }
-    logger.d(purchaseModule);
+    if(PermissionManager.hasParentPermission('Order')){
+      salesModule = true;
+    }
+    logger.d(salesModule);
     update(['drawer_menu']);
   }
 

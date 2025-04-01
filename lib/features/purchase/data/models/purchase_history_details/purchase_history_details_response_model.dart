@@ -103,6 +103,8 @@ class OrderDetail {
   @JsonKey(name: 'line_id')
   final int lineId;
   final String name;
+  @JsonKey(defaultValue: "N/A")
+  final String warranty;
   final int quantity;
   @JsonKey(name: 'unit_price')
   final double unitPrice;
@@ -116,6 +118,7 @@ class OrderDetail {
     required this.name,
     required this.quantity,
     required this.unitPrice,
+    required this.warranty,
     required this.total,
     this.snNo,
   });

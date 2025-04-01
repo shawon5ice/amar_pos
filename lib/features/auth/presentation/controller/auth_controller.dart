@@ -54,14 +54,18 @@ class AuthController extends GetxController{
 
     emailFocus = FocusNode();
     passwordFocus = FocusNode();
+    initializeRememberMe();
+    super.onInit();
+  }
 
+  initializeRememberMe() async{
     if (Preference.getRememberMeFlag()) {
       emailController.text = Preference.getLoginEmail();
       passwordController.text = Preference.getLoginPass();
+      logger.i(Preference.getLoginEmail());
       rememberMeFlag = true;
       update(['remember_me']);
     }
-    super.onInit();
   }
 
   @override
@@ -77,6 +81,7 @@ class AuthController extends GetxController{
   }
   void handleRememberMe({bool? remember}){
     rememberMeFlag = remember ?? !rememberMeFlag;
+    Preference.setRememberMeFlag(rememberMeFlag);
     update(['remember_me']);
   }
 
@@ -277,46 +282,3 @@ class AuthController extends GetxController{
 
 }
 
-
-// late StreamSubscription _subscription;
-// bool _isOffline = false;
-
-// @override
-// void initState() {
-//   _emailFocus = FocusNode();
-//   _passwordFocus = FocusNode();
-//   if (Preference.getRememberMeFlag()) {
-//     _emailController.text = Preference.getLoginEmail();
-//     _passwordController.text = Preference.getLoginPass();
-//     _rememberMeFlag = true;
-//   }
-//
-//   _authCon.loading.listen((value) {
-//     if (!value && _authCon.isLoggedIn.value) {
-//       _authCon.isLoggedIn(false);
-//       // UserInfo userInfo = Preference.getUserInfo();
-//       // logger.i("ID:${userInfo.departmentId}");
-//       // if(userInfo.departmentId == 8){
-//       //   Future.delayed(
-//       //     const Duration(milliseconds: 100),
-//       //         () => Get.offAllNamed(HomeScreen.routeName),
-//       //   );
-//       // }else{
-//       //   Future.delayed(
-//       //     const Duration(milliseconds: 100),
-//       //         () => Get.offAllNamed(HRMScreen.routeName),
-//       //   );
-//       // }
-//     }
-//   });
-//
-//
-//   // _subscription = InternetConnectionChecker().onStatusChange.listen((status) {
-//   //   final hasInternet = status == InternetConnectionStatus.connected;
-//   //   setState(() {
-//   //     isOffline = !hasInternet;
-//   //   });
-//   // });
-//
-//   super.initState();
-// }

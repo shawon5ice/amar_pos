@@ -35,143 +35,146 @@ class LoginScreen extends GetView<AuthController> {
             splashColor: Colors.transparent,
             highlightColor: Colors.transparent,
             focusColor: Colors.transparent,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Obx(() => AuthHeader(title: "Sign In", error: controller.message.value,),),
-                Form(
-                  key: formKey,
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 30.w),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // email title
-                        const FieldTitle("Email or phone number",),
-                        addH(8.h),
-                        // email field
-                        CustomGlassMorfTextField(
-                          textCon: controller.emailController,
-                          hintText: 'Enter email or phone number',
-                          txtSize: 14.sp,
-                          inputType: TextInputType.emailAddress,
-                          focusNode: controller.emailFocus,
-                          errorText: "⚠️ Please insert your email/phone number!",
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              controller.emailFocus.requestFocus();
-                              return '⚠️ Please insert your email/phone number!';
-                            }
-                            return null;
-                          },
-                        ),
-                        addH(24.h),
-                        // password title
-                        buildFieldTitle('Password'),
-                        addH(8.h),
-                        // password field
-                        CustomGlassMorfTextField(
-                          textCon: controller.passwordController,
-                          hintText: 'Enter password',
-                          isPassField: true,
-                          txtSize: 14.sp,
-                          focusNode: controller.passwordFocus,
-                          validator: (value) {
-                            if ((value == null || value.isEmpty) &&
-                                controller.emailController.text.isNotEmpty) {
-                              controller.passwordFocus.requestFocus();
-                              return '⚠️ Please insert your password';
-                            }
-                            return null;
-                          },
-                        ),
-                        addH(10.h),
-                        // remember me & forgot password btn
-                        GetBuilder<AuthController>(
-                          id: 'remember_me',
-                          builder: (_)=> Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: GetBuilder<AuthController>(
+                id: 'remember_me',
+              builder: (controller) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Obx(() => AuthHeader(title: "Sign In", error: controller.message.value,),),
+                    Form(
+                      key: formKey,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 30.w),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // remember me
-                            GestureDetector(
-                              onTap: (){
-                                FocusManager.instance.primaryFocus?.unfocus();
-                                controller.handleRememberMe();
+                            // email title
+                            const FieldTitle("Email or phone number",),
+                            addH(8.h),
+                            // email field
+                            CustomGlassMorfTextField(
+                              textCon: controller.emailController,
+                              hintText: 'Enter email or phone number',
+                              txtSize: 14.sp,
+                              inputType: TextInputType.emailAddress,
+                              focusNode: controller.emailFocus,
+                              errorText: "⚠️ Please insert your email/phone number!",
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  controller.emailFocus.requestFocus();
+                                  return '⚠️ Please insert your email/phone number!';
+                                }
+                                return null;
                               },
-                              child: Row(
-                                children: [
-                                  Checkbox(
-                                    value: controller.rememberMeFlag,
-                                    onChanged: (value) {
-                                      FocusManager.instance.primaryFocus
-                                          ?.unfocus();
-                                      controller.handleRememberMe(remember: value);
-                                    },
-                                    activeColor: AppColors.primary,
-                                    splashRadius: 0,
-                                    materialTapTargetSize:
-                                    MaterialTapTargetSize.shrinkWrap,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(5.0),
-                                      side: BorderSide(
-                                        color: Colors.grey.shade300,
-                                        width: 1,
-                                      ),
-                                    ),
-                                  ),
-                                  Text(
-                                    'Remember Me',
-                                    style: context.textTheme.titleSmall,
-                                  ),
-                                ],
-                              ),
                             ),
-                            CustomTxtBtn(
-                              onTapFn: () => AwesomeDialog(
-                                context: context,
-                                dialogType: DialogType.question,
-                                headerAnimationLoop: false,
-                                title: "Forgot Password",
-                                desc: "how you want to reset your password?",
-                                btnCancelColor: Colors.green,
-                                btnOkColor: Colors.green,
-                                btnOkText: "via Phone",
-                                btnOkOnPress: () {
-                                  FocusManager.instance.primaryFocus?.unfocus();
-                                  Get.toNamed(ForgotPasswordScreen.routeName);
-                                },
-                                btnCancelText: null,
-                                btnCancelOnPress: null,
-                                // btnCancelOnPress: () => Get.toNamed(
-                                //   ForgetPasswordScreen.routeName,
-                                //   arguments: true, // true means email
-                                // ),
-                              ).show(),
-                              text: 'Forgot Password?',
-                              txtSize: 12,
-                              txtClr: Colors.red,
+                            addH(24.h),
+                            // password title
+                            buildFieldTitle('Password'),
+                            addH(8.h),
+                            // password field
+                            CustomGlassMorfTextField(
+                              textCon: controller.passwordController,
+                              hintText: 'Enter password',
+                              isPassField: true,
+                              txtSize: 14.sp,
+                              focusNode: controller.passwordFocus,
+                              validator: (value) {
+                                if ((value == null || value.isEmpty) &&
+                                    controller.emailController.text.isNotEmpty) {
+                                  controller.passwordFocus.requestFocus();
+                                  return '⚠️ Please insert your password';
+                                }
+                                return null;
+                              },
+                            ),
+                            addH(10.h),
+                            // remember me & forgot password btn
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                // remember me
+                                GestureDetector(
+                                  onTap: (){
+                                    FocusManager.instance.primaryFocus?.unfocus();
+                                    controller.handleRememberMe();
+                                  },
+                                  child: Row(
+                                    children: [
+                                      Checkbox(
+                                        value: controller.rememberMeFlag,
+                                        onChanged: (value) {
+                                          FocusManager.instance.primaryFocus
+                                              ?.unfocus();
+                                          controller.handleRememberMe(remember: value);
+                                        },
+                                        activeColor: AppColors.primary,
+                                        splashRadius: 0,
+                                        materialTapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(5.0),
+                                          side: BorderSide(
+                                            color: Colors.grey.shade300,
+                                            width: 1,
+                                          ),
+                                        ),
+                                      ),
+                                      Text(
+                                        'Remember Me',
+                                        style: context.textTheme.titleSmall,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                CustomTxtBtn(
+                                  onTapFn: () => AwesomeDialog(
+                                    context: context,
+                                    dialogType: DialogType.question,
+                                    headerAnimationLoop: false,
+                                    title: "Forgot Password",
+                                    desc: "how you want to reset your password?",
+                                    btnCancelColor: Colors.green,
+                                    btnOkColor: Colors.green,
+                                    btnOkText: "via Phone",
+                                    btnOkOnPress: () {
+                                      FocusManager.instance.primaryFocus?.unfocus();
+                                      Get.toNamed(ForgotPasswordScreen.routeName);
+                                    },
+                                    btnCancelText: null,
+                                    btnCancelOnPress: null,
+                                    // btnCancelOnPress: () => Get.toNamed(
+                                    //   ForgetPasswordScreen.routeName,
+                                    //   arguments: true, // true means email
+                                    // ),
+                                  ).show(),
+                                  text: 'Forgot Password?',
+                                  txtSize: 12,
+                                  txtClr: Colors.red,
+                                ),
+                              ],
+                            ),
+                            addH(24),
+                            CustomBtn(
+                              btnColor: AppColors.accent,
+                              onPressedFn: () {
+                                if(!formKey.currentState!.validate()){
+                                  return;
+                                }else{
+                                  controller.signIn();
+                                }
+                              },
+                              btnTxt: 'Sign In',
+                              txtSize: 18,
                             ),
                           ],
-                        ),),
-                        addH(24),
-                        CustomBtn(
-                          btnColor: AppColors.accent,
-                          onPressedFn: () {
-                            if(!formKey.currentState!.validate()){
-                              return;
-                            }else{
-                              controller.signIn();
-                            }
-                          },
-                          btnTxt: 'Sign In',
-                          txtSize: 18,
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-                addH(50.h),
-              ],
+                    addH(50.h),
+                  ],
+                );
+              }
             ),
           ),
         ),
