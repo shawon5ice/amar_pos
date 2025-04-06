@@ -47,10 +47,11 @@ class _PurchaseReturnViewState extends State<PurchaseReturnView> {
   @override
   void initState() {
     suggestionEditingController = TextEditingController();
-    if(!controller.isEditing){
-      controller.createPurchaseReturnOrderModel = CreatePurchaseReturnOrderModel.defaultConstructor();
+    if (!controller.isEditing) {
+      controller.createPurchaseReturnOrderModel =
+          CreatePurchaseReturnOrderModel.defaultConstructor();
       controller.purchaseOrderProducts.clear();
-    }else{
+    } else {
       for (var e in controller.createPurchaseReturnOrderModel.products) {
         if(purchaseControllers.isNotEmpty && !controller.isEditing){
           purchaseControllers.insert(0,TextEditingController(
@@ -101,7 +102,7 @@ class _PurchaseReturnViewState extends State<PurchaseReturnView> {
                   Expanded(
                     flex: 8,
                     child: GetBuilder<PurchaseReturnController>(
-                      id: "purchase_product_list",
+                      id: "purchase_return_product_list",
                       builder: (controller) {
                         return TypeAheadField<ProductInfo>(
                           hideOnUnfocus: true,
@@ -181,7 +182,7 @@ class _PurchaseReturnViewState extends State<PurchaseReturnView> {
 
                                           FocusScope.of(context).unfocus();
                                         }else{
-                                          Methods.showSnackbar(msg: "No product found with SKU:$scannedCode");
+                                          Methods.showSnackbar(msg: "No product found with keyword:$scannedCode");
                                         }
                                       }
                                     },
@@ -327,9 +328,13 @@ class _PurchaseReturnViewState extends State<PurchaseReturnView> {
                                   children: [
                                     addW(10),
                                     CustomSlidableAction(
-                                        onPressed: (context) => controller
-                                            .removePlaceOrderProduct(controller
-                                                .purchaseOrderProducts[index]),
+                                        onPressed: (context) {
+                                          purchaseControllers.removeAt(index);
+                                          purchaseReturnQTYControllers.removeAt(index);
+                                          controller.removePlaceOrderProduct(
+                                              controller
+                                                  .purchaseOrderProducts[index]);
+                                        },
                                         backgroundColor: const Color(0xffEF4B4B),
                                         borderRadius: const BorderRadius.all(
                                             Radius.circular(20)),
@@ -452,54 +457,59 @@ class _PurchaseReturnViewState extends State<PurchaseReturnView> {
                                                             },
                                                           );
                                                         },
-                                                        child: Container(
-                                                          height: 30.h,
-                                                          padding: const EdgeInsets.symmetric(
-                                                              horizontal: 12),
-                                                          decoration: BoxDecoration(
-                                                              color:controller
-                                                                  .createPurchaseReturnOrderModel
-                                                                  .products[index]
-                                                                  .serialNo
-                                                                  .length>controller
-                                                                  .createPurchaseReturnOrderModel
-                                                                  .products[index]
-                                                                  .quantity? AppColors.error : controller
-                                                                  .createPurchaseReturnOrderModel
-                                                                  .products[index]
-                                                                  .serialNo
-                                                                  .length ==
-                                                                  controller
+                                                        child: GetBuilder<PurchaseReturnController>(
+                                                            id: 'sn_status',
+                                                            builder: (controller){
+                                                            return Container(
+                                                              height: 30.h,
+                                                              padding: const EdgeInsets.symmetric(
+                                                                  horizontal: 12),
+                                                              decoration: BoxDecoration(
+                                                                  color:controller
                                                                       .createPurchaseReturnOrderModel
                                                                       .products[index]
-                                                                      .quantity
-                                                                  ? Color(0xff94DB8C)
-                                                                  : const Color(0xffF6FFF6),
-                                                              borderRadius: BorderRadius.all(
-                                                                  Radius.circular(20.r)),
-                                                              border: Border.all(
-                                                                  color:
-                                                                  const Color(0xff94DB8C)
-                                                                      .withOpacity(.3))),
-                                                          child: Row(
-                                                            children: [
-                                                              Text(
-                                                                "SN",
-                                                                style: context
-                                                                    .textTheme.titleSmall
-                                                                    ?.copyWith(
-                                                                  color: Colors.black,
-                                                                  fontSize: 14.sp,
-                                                                  fontWeight: FontWeight.w600,
-                                                                ),
+                                                                      .serialNo
+                                                                      .length>controller
+                                                                      .createPurchaseReturnOrderModel
+                                                                      .products[index]
+                                                                      .quantity? AppColors.error : controller
+                                                                      .createPurchaseReturnOrderModel
+                                                                      .products[index]
+                                                                      .serialNo
+                                                                      .length ==
+                                                                      controller
+                                                                          .createPurchaseReturnOrderModel
+                                                                          .products[index]
+                                                                          .quantity
+                                                                      ? Color(0xff94DB8C)
+                                                                      : const Color(0xffF6FFF6),
+                                                                  borderRadius: BorderRadius.all(
+                                                                      Radius.circular(20.r)),
+                                                                  border: Border.all(
+                                                                      color:
+                                                                      const Color(0xff94DB8C)
+                                                                          .withOpacity(.3))),
+                                                              child: Row(
+                                                                children: [
+                                                                  Text(
+                                                                    "SN",
+                                                                    style: context
+                                                                        .textTheme.titleSmall
+                                                                        ?.copyWith(
+                                                                      color: Colors.black,
+                                                                      fontSize: 14.sp,
+                                                                      fontWeight: FontWeight.w600,
+                                                                    ),
+                                                                  ),
+                                                                  const Spacer(),
+                                                                  SvgPicture.asset(
+                                                                    AppAssets.snAdd,
+                                                                    height: 14,
+                                                                  )
+                                                                ],
                                                               ),
-                                                              const Spacer(),
-                                                              SvgPicture.asset(
-                                                                AppAssets.snAdd,
-                                                                height: 14,
-                                                              )
-                                                            ],
-                                                          ),
+                                                            );
+                                                          }
                                                         ),
                                                       ),
                                                     ),
@@ -511,7 +521,7 @@ class _PurchaseReturnViewState extends State<PurchaseReturnView> {
                                         ),
                                       ],
                                     ),
-                                    addH(12.h),
+                                    addH(8.h),
                                     Row(
                                       mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -563,7 +573,7 @@ class _PurchaseReturnViewState extends State<PurchaseReturnView> {
                                                             .createPurchaseReturnOrderModel
                                                             .products[index].unitPrice = double.parse(value.replaceAll(',', ''));
                                                         controller.update(
-                                                            ['sub_total',]);
+                                                            ['sub_total', 'vat']);
                                                       } else {
                                                         controller
                                                             .createPurchaseReturnOrderModel
@@ -624,7 +634,7 @@ class _PurchaseReturnViewState extends State<PurchaseReturnView> {
                                                             .quantity =
                                                             int.parse(value.replaceAll(',', ''));
                                                         controller.update(
-                                                            ['sub_total',]);
+                                                            ['sub_total', 'vat','sn_status']);
                                                       } else {
                                                         controller
                                                             .createPurchaseReturnOrderModel

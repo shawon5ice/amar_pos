@@ -1,6 +1,6 @@
 import 'package:amar_pos/core/core.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
-import 'package:amar_pos/features/accounting/data/models/daily_statement/daily_statement_report_response_model.dart';
+import 'package:amar_pos/features/accounting/data/models/daily_statement/daily_statement_report_response_model.dart' as dataModel;
 import 'package:amar_pos/features/purchase/presentation/purchase_controller.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +11,7 @@ class DailyStatementItem extends StatelessWidget {
   const DailyStatementItem({super.key, required this.transactionData,});
 
 
-  final TransactionData transactionData;
+  final dataModel.DailyStatementItem transactionData;
 
   @override
   Widget build(BuildContext context) {
@@ -66,20 +66,20 @@ class DailyStatementItem extends StatelessWidget {
               children: [
                 StatementItemTitleValueWidget(
                   title: "Invoice Number",
-                  value: transactionData.slNo,
+                  value: transactionData.order_no,
                 ),
                 StatementItemTitleValueWidget(
                   title: "Purpose",
-                  value: transactionData.purpose ?? '--',
+                  value: transactionData.transaction ?? '--',
                 ),
                 StatementItemTitleValueWidget(
                   title: "Amount",
-                  value: Methods.getFormatedPrice(transactionData.amount),
+                  value: Methods.getFormatedPrice(transactionData.total.toDouble()),
                 ),
-                StatementItemTitleValueWidget(
-                  title: "Payment Method",
-                  value: transactionData.paymentMethod ?? '--',
-                ),
+                // StatementItemTitleValueWidget(
+                //   title: "Payment Method",
+                //   value: transactionData. ?? '--',
+                // ),
               ],
             ),
           )

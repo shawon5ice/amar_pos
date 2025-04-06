@@ -1,3 +1,4 @@
+import 'package:amar_pos/features/accounting/data/models/expense_voucher/expense_categories_response_model.dart';
 import 'package:amar_pos/features/purchase/data/models/create_purchase_order_model.dart';
 import 'package:amar_pos/features/purchase/data/models/purchase_history_response_model.dart';
 import 'package:amar_pos/features/sales/data/models/sale_history/sold_history_response_model.dart';
@@ -177,5 +178,35 @@ class ExpenseVoucherService {
     return response;
   }
 
+  static Future<dynamic> updateExpenseCategories({
+    required String categoryName,
+    required ExpenseCategory category,
+    required String token,
+  }) async {
+    var response = await BaseClient.postData(
+      token: token,
+      api: "chart_of_accounts/update/${category.id}",
+      body: {
+        "name": categoryName,
+        "code":category.code,
+        "root": category.root,
+        "remarks": category.remarks,
+        "type": 2,
+      },
+    );
+    return response;
+  }
+
+
+  static Future<dynamic> deleteExpenseCategories({
+    required int id,
+    required String token,
+  }) async {
+    var response = await BaseClient.deleteData(
+      token: token,
+      api: "chart_of_accounts/delete/$id",
+    );
+    return response;
+  }
 
 }

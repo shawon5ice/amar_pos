@@ -2,95 +2,95 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'daily_statement_report_response_model.g.dart';
 
+
 @JsonSerializable()
 class DailyStatementReportResponseModel {
   final bool success;
-  final List<DailyStatementData> data;
+  @DataConverter()
+  final DailyStatementData data;
 
   DailyStatementReportResponseModel({
     required this.success,
     required this.data,
   });
 
-  factory DailyStatementReportResponseModel.fromJson(Map<String, dynamic> json) => _$DailyStatementReportResponseModelFromJson(json);
+  factory DailyStatementReportResponseModel.fromJson(Map<String, dynamic> json) =>
+      _$DailyStatementReportResponseModelFromJson(json);
+
   Map<String, dynamic> toJson() => _$DailyStatementReportResponseModelToJson(this);
 }
 
 @JsonSerializable()
 class DailyStatementData {
-  @DataConverter()
-  final StatementData data;
-  final double debit;
-  final double credit;
-  final double balance;
+  final List<DailyStatementItem> data;
+  final Meta meta;
 
   DailyStatementData({
     required this.data,
-    required this.debit,
-    required this.credit,
-    required this.balance,
+    required this.meta,
   });
 
-  factory DailyStatementData.fromJson(Map<String, dynamic> json) => _$DailyStatementDataFromJson(json);
+  factory DailyStatementData.fromJson(Map<String, dynamic> json) =>
+      _$DailyStatementDataFromJson(json);
+
   Map<String, dynamic> toJson() => _$DailyStatementDataToJson(this);
 }
 
 @JsonSerializable()
-class StatementData {
-  final List<TransactionData> data;
-  @JsonKey(name: 'last_page')
-  final int lastPage;
-  final int total;
+class DailyStatementItem {
+  final String date;
+  final String order_no;
+  final String transaction;
+  final num total;
 
-  StatementData({
-    required this.data,
-    this.lastPage = 0,
-    this.total = 0,
+  DailyStatementItem({
+    required this.date,
+    required this.order_no,
+    required this.transaction,
+    required this.total,
   });
 
-  factory StatementData.fromJson(Map<String, dynamic> json) => _$StatementDataFromJson(json);
-  Map<String, dynamic> toJson() => _$StatementDataToJson(this);
+  factory DailyStatementItem.fromJson(Map<String, dynamic> json) =>
+      _$DailyStatementItemFromJson(json);
+
+  Map<String, dynamic> toJson() => _$DailyStatementItemToJson(this);
 }
 
 @JsonSerializable()
-class TransactionData {
-  @JsonKey(name: 'account_type')
-  final int accountType;
-  @JsonKey(name: 'sl_no')
-  final String slNo;
-  final double amount;
-  final String date;
-  @JsonKey(name: 'payment_method')
-  final String? paymentMethod;
-  final String? purpose;
+class Meta {
+  final int last_page;
+  final int total;
 
-  TransactionData({
-    required this.accountType,
-    required this.slNo,
-    required this.amount,
-    required this.date,
-    required this.paymentMethod,
-    required this.purpose,
+  Meta({
+    required this.last_page,
+    required this.total,
   });
 
-  factory TransactionData.fromJson(Map<String, dynamic> json) => _$TransactionDataFromJson(json);
-  Map<String, dynamic> toJson() => _$TransactionDataToJson(this);
+  factory Meta.fromJson(Map<String, dynamic> json) => _$MetaFromJson(json);
+
+  Map<String, dynamic> toJson() => _$MetaToJson(this);
+
+  Meta.empty():
+        last_page = 0,
+        total = 0;
 }
 
-class DataConverter implements JsonConverter<StatementData, dynamic> {
+
+
+class DataConverter implements JsonConverter<DailyStatementData, dynamic> {
   const DataConverter();
 
   @override
-  StatementData fromJson(dynamic json) {
+  DailyStatementData fromJson(dynamic json) {
     if (json is List) {
-      return StatementData(data: []);
+      return DailyStatementData(data: [],meta: Meta.empty());
     } else if (json is Map<String, dynamic>) {
-      return StatementData.fromJson(json);
+      return DailyStatementData.fromJson(json);
     } else {
       throw Exception('Unexpected type for data: ${json.runtimeType}');
     }
   }
 
   @override
-  dynamic toJson(StatementData object) => object.toJson();
+  dynamic toJson(DailyStatementData object) => object.toJson();
 }

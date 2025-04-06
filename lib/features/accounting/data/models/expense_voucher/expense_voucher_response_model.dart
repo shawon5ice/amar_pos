@@ -65,9 +65,6 @@ class Category {
   final String name;
   final String? code;
   final String? remarks;
-  final int root;
-  final int type;
-  final int status;
   @JsonKey(name: 'created_by')
   final int? createdBy;
   @JsonKey(name: 'updated_by')
@@ -84,9 +81,6 @@ class Category {
     required this.name,
     this.code,
     this.remarks,
-    required this.root,
-    required this.type,
-    required this.status,
     this.createdBy,
     this.updatedAt,
     this.updatedBy,

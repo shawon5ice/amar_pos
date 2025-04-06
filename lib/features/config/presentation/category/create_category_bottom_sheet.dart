@@ -8,8 +8,9 @@ import '../../../../core/core.dart';
 import 'category_controller.dart';
 
 class CreateCategoryBottomSheet extends StatefulWidget {
-  const CreateCategoryBottomSheet({super.key, this.category});
+  const CreateCategoryBottomSheet({super.key, this.category, this.onTap});
   final Category? category;
+  final Function(String)? onTap;
 
   @override
   State<CreateCategoryBottomSheet> createState() => _CreateCategoryBottomSheetState();
@@ -55,9 +56,9 @@ class _CreateCategoryBottomSheetState extends State<CreateCategoryBottomSheet> {
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
-                const Text(
-                  "Create New Category",
-                  style: TextStyle(
+                Text(
+                  widget.category != null ? "Update Category": "Create New Category",
+                  style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
                   ),
@@ -87,7 +88,12 @@ class _CreateCategoryBottomSheetState extends State<CreateCategoryBottomSheet> {
                 const SizedBox(height: 20),
                 CustomButton(
                   text: widget.category != null ? "Update" :"Add Now",
-                  onTap: widget.category != null ? (){
+                  onTap: widget.onTap != null ? () {
+                    if(formKey.currentState!.validate()){
+                      Get.back();
+                      widget.onTap!(_textEditingController.text);
+                    }
+                  } : widget.category != null ? (){
                     if(formKey.currentState!.validate()){
                       Get.back();
                       _categoryController.editCategory(category: widget.category! ,categoryName: _textEditingController.text,);

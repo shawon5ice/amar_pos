@@ -16,6 +16,8 @@ import 'package:amar_pos/features/drawer/drawer_menu_controller.dart';
 import 'package:amar_pos/features/inventory/presentation/products/product_controller.dart';
 import 'package:get/get.dart';
 
+import '../../features/config/presentation/category/category_controller.dart';
+
 class MainBinding extends Bindings{
   @override
   void dependencies() {
@@ -58,6 +60,7 @@ class ExpenseVoucherBindings extends Bindings{
   @override
   void dependencies() {
     Get.lazyPut(()=> ExpenseVoucherController());
+    Get.lazyPut(()=> CategoryController());
   }
 }
 

@@ -1,14 +1,17 @@
+import 'package:amar_pos/core/constants/logger/logger.dart';
 import 'package:amar_pos/core/widgets/custom_button.dart';
 import 'package:amar_pos/features/accounting/data/models/expense_voucher/expense_categories_response_model.dart';
 import 'package:amar_pos/features/accounting/presentation/views/expense_voucher/expense_voucher_controller.dart';
-import 'package:amar_pos/features/accounting/presentation/views/widgets/create_expense_category_bottom_sheet.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 
 import '../../../../../../core/constants/app_assets.dart';
+import '../../../../../../core/data/model/category_response_model.dart';
 import '../../../../../../core/widgets/pager_list_view.dart';
-import '../../../../data/models/expense_voucher/expense_voucher_response_model.dart';
+import '../../../../../config/presentation/category/create_category_bottom_sheet.dart';
+import '../../widgets/create_expense_category_bottom_sheet.dart';
 import '../../widgets/expense_voucher_item.dart';
 
 class ExpenseCategoryPage extends StatefulWidget {
@@ -48,7 +51,7 @@ class _ExpenseCategoryPageState extends State<ExpenseCategoryPage> {
                 return Center(
                   child: Text("Something went wrong", style: context.textTheme.titleLarge,),
                 );
-              }else if(controller.expenseCategoriesList.isEmpty){
+              }else if(controller.expenseCategoriesResponseModel!.data.data!.isEmpty){
                 return Center(
                   child: Text("No data found", style: context.textTheme.titleLarge,),
                 );
@@ -75,25 +78,34 @@ class _ExpenseCategoryPageState extends State<ExpenseCategoryPage> {
                                 fontSize: 16,
                                 height: (22 / 16)),
                           ),
-                          trailing: Row(
+                          subtitle: item.remarks != null ? Text("Remarks: ${item.remarks}"): null,
+                          trailing: !item.isActionable ? SizedBox.shrink(): Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               InkWell(
                                 onTap: () {
-                                  // showModalBottomSheet(
-                                  //   context: context,
-                                  //   isScrollControlled: true,
-                                  //   shape: const RoundedRectangleBorder(
-                                  //     borderRadius: BorderRadius.vertical(
-                                  //         top: Radius.circular(20)),
-                                  //   ),
-                                  //   builder: (context) {
-                                  //     return CreateCategoryBottomSheet(
-                                  //       category:
-                                  //       _categoryController.categoryList[index],
-                                  //     );
-                                  //   },
-                                  // );
+                                  showModalBottomSheet(
+                                    context: context,
+                                    isScrollControlled: true,
+                                    shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.vertical(
+                                          top: Radius.circular(20)),
+                                    ),
+                                    builder: (context) {
+                                      return CreateCategoryBottomSheet(
+                                        category: Category(
+                                          id: item.id,
+                                          name: item.name,
+                                        ),
+                                        onTap: (value){
+                                          controller.editCategory(
+                                            categoryName: value,
+                                            category: item,
+                                          );
+                                        },
+                                      );
+                                    },
+                                  );
                                 },
                                 child: SvgPicture.asset(AppAssets.editIcon),
                               ),
@@ -102,6 +114,19 @@ class _ExpenseCategoryPageState extends State<ExpenseCategoryPage> {
                               ),
                               InkWell(
                                 onTap: () {
+                                  // bool hasPermission = await controller.checkPurchasePermissions("destroy");
+                                  // if(!hasPermission) return;
+                                  AwesomeDialog(
+                                      context: context,
+                                      dialogType: DialogType.error,
+                                      title: "Are you sure?",
+                                      desc:
+                                      'You are going to delete "${item.name}" expense category',
+                                      btnOkOnPress: () {
+                                        controller.deleteCategory(id: item.id);
+                                      },
+                                      btnCancelOnPress: () {})
+                                      .show();
                                   // _categoryController.deleteCategory(
                                   //     category:
                                   //     _categoryController.categoryList[index]);

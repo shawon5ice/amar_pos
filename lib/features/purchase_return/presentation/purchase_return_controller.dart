@@ -118,7 +118,7 @@ class PurchaseReturnController extends GetxController {
     isLoadingMore = page > 1;
 
     hasError.value = false;
-    update(['purchase_product_list']);
+    update(['purchase_return_product_list']);
 
     try {
       var response = await PurchaseReturnService.getAllProductList(
@@ -150,23 +150,20 @@ class PurchaseReturnController extends GetxController {
     } finally {
       isProductListLoading = false;
       isLoadingMore = false;
-      update(['purchase_product_list']);
+      update(['purchase_return_product_list']);
     }
   }
 
   String previousSearch = '';
   FutureOr<List<ProductInfo>> suggestionsCallback(String search) async {
+    // Check if the search term is in the existing items
     List<ProductInfo> exactlyFound = currentSearchList.where((item) => item.sku.toLowerCase() == search.toString().toLowerCase()).toList();
 
     if(exactlyFound.isNotEmpty){
       return exactlyFound;
     }else {
       // If not found locally, fetch from API
-      if(previousSearch != search){
-        previousSearch = search;
-        await getAllProducts(search: search, page: 1);
-      }
-
+      await getAllProducts(search: search, page: 1);
       return getAll(search);
     }
   }
@@ -180,8 +177,7 @@ class PurchaseReturnController extends GetxController {
     return filteredItems;
   }
 
-  void addPlaceOrderProduct(ProductInfo product,
-      {List<String>? snNo, int? quantity,required num unitPrice}) {
+  void addPlaceOrderProduct(ProductInfo product, {List<String>? snNo, int? quantity, required num unitPrice,}) {
     logger.i(snNo);
     if (purchaseOrderProducts.any((e) => e.id == product.id)) {
       var x  = createPurchaseReturnOrderModel.products
@@ -197,18 +193,16 @@ class PurchaseReturnController extends GetxController {
             id: product.id,
             unitPrice: unitPrice.toDouble(),
             quantity:quantity?? 1,
-            vat: (product.vat/100 *  product
-                .wholesalePrice.toDouble()),
+            vat: (product.vat/100 *  unitPrice.toDouble()),
             serialNo: snNo ?? []));
       }else{
         purchaseOrderProducts.add(product);
 
         createPurchaseReturnOrderModel.products.add(PurchaseReturnProductModel(
             id: product.id,
+            vat: (product.vat/100 *  unitPrice.toDouble()),
             unitPrice: unitPrice.toDouble(),
             quantity:quantity?? 1,
-            vat: (product.vat/100 *  product
-                .wholesalePrice.toDouble()),
             serialNo: snNo ?? []));
       }
     }
@@ -311,10 +305,8 @@ class PurchaseReturnController extends GetxController {
       logger.e(e);
     } finally {
       isPaymentMethodListLoading = false;
+
       update(['billing_payment_methods']);
-      if (!isEditing) {
-        addPaymentMethod();
-      }
     }
   }
 
@@ -368,7 +360,9 @@ class PurchaseReturnController extends GetxController {
     totalAmount = totalA;
     totalQTY = totalQ;
     paidAmount = totalAmount + additionalExpense - totalDiscount;
-    if (firstTime == null) {
+    if (firstTime != null) {
+      addPaymentMethod();
+    }else{
       totalDeu = totalPaid - paidAmount;
     }
 
@@ -400,7 +394,13 @@ class PurchaseReturnController extends GetxController {
         if (response['success']) {
           pOrderId = response['data']['id'];
           pOrderNo = response['data']['order_no'];
-          clearEditing();
+          selectedSupplier = null;
+          supplierList.clear();
+          paymentMethodTracker.clear();
+          purchaseOrderProducts.clear();
+          createPurchaseReturnOrderModel = CreatePurchaseReturnOrderModel.defaultConstructor();
+          additionalExpense = 0;
+          totalDiscount = 0;
           RandomLottieLoader.hide();
           Get.back();
           Get.back();

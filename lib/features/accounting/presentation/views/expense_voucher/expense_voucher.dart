@@ -30,6 +30,7 @@ class _ExpenseVoucherState extends State<ExpenseVoucher> with SingleTickerProvid
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener((){
       if(_tabController.indexIsChanging){
+        controller.selectedDateTimeRange.value = null;
         controller.update(['action_button']);
       }
     });

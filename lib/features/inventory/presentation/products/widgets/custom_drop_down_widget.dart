@@ -31,7 +31,7 @@ class CustomDropdownWithSearchWidget<T> extends StatefulWidget {
     required this.onChanged,
     required this.hintText,
     required this.searchHintText,
-    this.buttonHeight = 48,
+    this.buttonHeight = 56,
     this.validator,
     this.value,
     this.noTitle = false,

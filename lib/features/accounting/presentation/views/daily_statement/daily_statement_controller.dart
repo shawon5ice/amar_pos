@@ -17,8 +17,8 @@ class DailyStatementController extends GetxController{
   int? selectedOutletId;
   Rx<DateTimeRange?> selectedDateTimeRange = Rx<DateTimeRange?>(null);
 
-  List<TransactionData> dailyStatementList = [];
-  List<TransactionData> currentSearchList = [];
+  List<DailyStatementItem> dailyStatementList = [];
+  List<DailyStatementItem> currentSearchList = [];
   DailyStatementReportResponseModel? dailyStatementReportResponseModel;
 
 
@@ -65,7 +65,7 @@ class DailyStatementController extends GetxController{
             DailyStatementReportResponseModel.fromJson(response);
 
         if (dailyStatementReportResponseModel != null) {
-          dailyStatementList.addAll(dailyStatementReportResponseModel!.data.first.data.data);
+          dailyStatementList.addAll(dailyStatementReportResponseModel!.data.data);
           logger.i(dailyStatementList.length);
           // if (currentSearchList.isNotEmpty) {
           //   lastFoundList.value = currentSearchList; // Update last found list
@@ -73,13 +73,12 @@ class DailyStatementController extends GetxController{
         } else {
           currentSearchList.clear(); // No results
         }
-      } else {
-        hasError.value = true; // Error in response
-        currentSearchList.clear();
       }
     } catch (e) {
-      hasError.value = true; // Handle exceptions
-      currentSearchList.clear();
+      if(page>1){
+        hasError.value = true; // Handle exceptions
+        currentSearchList.clear();
+      }
       logger.e(e);
     } finally {
       isStatementListLoading = false;

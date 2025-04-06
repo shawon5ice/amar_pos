@@ -32,7 +32,7 @@ class ExpenseCategory {
   // final List<dynamic> business;
   // final List<dynamic> store;
   final String? code;
-  final String name;
+  String name;
   final Root root;
   final String type;
   final String? remarks;

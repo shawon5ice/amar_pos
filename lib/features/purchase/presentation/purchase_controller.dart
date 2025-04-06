@@ -137,7 +137,6 @@ class PurchaseController extends GetxController{
     totalQTY = 0;
     selectedSupplier = null;
     supplierList.clear();
-    paymentMethodTracker.clear();
     createPurchaseOrderModel = CreatePurchaseOrderModel.defaultConstructor();
     additionalExpense = 0;
     totalDiscount = 0;
@@ -347,9 +346,6 @@ class PurchaseController extends GetxController{
     } finally {
       isPaymentMethodListLoading = false;
       update(['billing_payment_methods']);
-      if(!isEditing){
-        addPaymentMethod();
-      }
     }
   }
 
@@ -404,8 +400,10 @@ class PurchaseController extends GetxController{
     totalAmount = totalA;
     totalQTY = totalQ;
     paidAmount = totalAmount + additionalExpense - totalDiscount;
-    if(firstTime == null){
-      totalDeu =   totalPaid - paidAmount ;
+    if (firstTime != null) {
+      addPaymentMethod();
+    }else{
+      totalDeu = totalPaid - paidAmount;
     }
 
     update(['selling_party_selection','change-due-amount', 'billing_summary_form']);

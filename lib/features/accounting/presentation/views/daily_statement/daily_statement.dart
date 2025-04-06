@@ -14,8 +14,7 @@ import '../../../../../core/methods/helper_methods.dart';
 import '../../../../../core/widgets/pager_list_view.dart';
 import '../../../../../core/widgets/reusable/outlet_dd/outlet_dropdown_widget.dart';
 import '../../../../inventory/presentation/stock_report/widget/custom_svg_icon_widget.dart';
-import '../widgets/daily_statement_item.dart';
-import 'status_widget.dart';
+import '../widgets/daily_statement_item.dart' as statementWidget;
 
 class DailyStatement extends StatefulWidget {
   static const routeName = '/accounting/daily-statement';
@@ -114,50 +113,50 @@ class _DailyStatementState extends State<DailyStatement> {
               ),
             ),
             addH(8),
-            GetBuilder<DailyStatementController>(
-              id: 'total_statement_history',
-              builder: (controller) {
-                return Row(
-                  children: [
-                    StatusWidget(
-                      title: 'In',
-                      asset: AppAssets.cashIn,
-                      value: Methods.getFormatedPrice(controller
-                              .dailyStatementReportResponseModel
-                              ?.data
-                              .first
-                              .credit ??
-                          0),
-                      loading: controller.isStatementListLoading,
-                    ),
-                    addW(8),
-                    StatusWidget(
-                      title: 'Out',
-                      asset: AppAssets.cashOut,
-                      value: Methods.getFormatedPrice(controller
-                              .dailyStatementReportResponseModel
-                              ?.data
-                              .first
-                              .debit ??
-                          0),
-                      loading: controller.isStatementListLoading,
-                    ),
-                    addW(8),
-                    StatusWidget(
-                      title: 'Balance',
-                      asset: AppAssets.cash,
-                      value: Methods.getFormatedPrice(controller
-                              .dailyStatementReportResponseModel
-                              ?.data
-                              .first
-                              .balance ??
-                          0),
-                      loading: controller.isStatementListLoading,
-                    )
-                  ],
-                );
-              },
-            ),
+            // GetBuilder<DailyStatementController>(
+            //   id: 'total_statement_history',
+            //   builder: (controller) {
+            //     return Row(
+            //       children: [
+            //         StatusWidget(
+            //           title: 'In',
+            //           asset: AppAssets.cashIn,
+            //           value: Methods.getFormatedPrice(controller
+            //                   .dailyStatementReportResponseModel
+            //                   ?.data.data
+            //                   .first
+            //                   .credit ??
+            //               0),
+            //           loading: controller.isStatementListLoading,
+            //         ),
+            //         addW(8),
+            //         StatusWidget(
+            //           title: 'Out',
+            //           asset: AppAssets.cashOut,
+            //           value: Methods.getFormatedPrice(controller
+            //                   .dailyStatementReportResponseModel
+            //                   ?.data
+            //                   .first
+            //                   .debit ??
+            //               0),
+            //           loading: controller.isStatementListLoading,
+            //         ),
+            //         addW(8),
+            //         StatusWidget(
+            //           title: 'Balance',
+            //           asset: AppAssets.cash,
+            //           value: Methods.getFormatedPrice(controller
+            //                   .dailyStatementReportResponseModel
+            //                   ?.data
+            //                   .first
+            //                   .balance ??
+            //               0),
+            //           loading: controller.isStatementListLoading,
+            //         )
+            //       ],
+            //     );
+            //   },
+            // ),
             addH(8),
             Expanded(
               child: GetBuilder<DailyStatementController>(
@@ -167,24 +166,24 @@ class _DailyStatementState extends State<DailyStatement> {
                     return const Center(
                       child: CircularProgressIndicator(),
                     );
+                  }else if(controller.dailyStatementList.isEmpty){
+                    return Center(
+                      child: Text("No data found", style: context.textTheme.titleLarge,),
+                    );
                   }else if(controller.dailyStatementReportResponseModel == null){
                     return Center(
                       child: Text("Something went wrong", style: context.textTheme.titleLarge,),
-                    );
-                  }else if(controller.dailyStatementReportResponseModel!.data.first.data.data.isEmpty){
-                    return Center(
-                      child: Text("No data found", style: context.textTheme.titleLarge,),
                     );
                   }
                   return RefreshIndicator(
                     onRefresh: () async {
                       controller.getDailyStatement(page: 1);
                     },
-                    child: PagerListView<TransactionData>(
+                    child: PagerListView<DailyStatementItem>(
                       // scrollController: _scrollController,
                       items: controller.dailyStatementList,
                       itemBuilder: (_, item) {
-                        return DailyStatementItem(transactionData: item,);
+                        return statementWidget.DailyStatementItem(transactionData: item,);
                       },
                       isLoading: controller.isLoadingMore,
                       hasError: controller.hasError.value,
@@ -192,11 +191,11 @@ class _DailyStatementState extends State<DailyStatement> {
                         await controller.getDailyStatement(page: nextPage);
                       },
                       totalPage: controller
-                          .dailyStatementReportResponseModel?.data.first.data.lastPage ??
+                          .dailyStatementReportResponseModel?.data.meta.last_page ??
                           0,
                       totalSize:
                       controller
-                          .dailyStatementReportResponseModel?.data.first.data.total ??
+                          .dailyStatementReportResponseModel?.data.meta.total ??
                           0,
                       itemPerPage: 20,
                     ),
