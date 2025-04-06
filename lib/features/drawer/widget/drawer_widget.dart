@@ -137,7 +137,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                           buildDrawerItems(context, DrawerItems.overview),
                           ExpandableDrawerWidget(
                             item: DrawerItems.inventory,
-                            children: const ["Product List", "Stock Report",],
+                            children: const ["Product List", "Stock Report","Stock Transfer"],
                             expanded: (bool isExpanded) {
                               setState(() {
                                 if (isExpanded) selectedParentItem = DrawerItems.inventory;

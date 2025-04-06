@@ -17,6 +17,7 @@ import 'package:amar_pos/features/inventory/presentation/products/product_contro
 import 'package:get/get.dart';
 
 import '../../features/config/presentation/category/category_controller.dart';
+import '../../features/inventory/presentation/stock_transfer/stock_transfer_controller.dart';
 
 class MainBinding extends Bindings{
   @override
@@ -38,6 +39,13 @@ class ProductsBinding extends Bindings{
   @override
   void dependencies() {
     Get.lazyPut(()=> ProductController());
+  }
+}
+
+class StockTransferBinding extends Bindings{
+  @override
+  void dependencies() {
+    Get.lazyPut(()=> StockTransferController());
   }
 }
 

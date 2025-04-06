@@ -6,6 +6,7 @@ import 'package:amar_pos/features/exchange/exchange_screen.dart';
 import 'package:amar_pos/features/home/presentation/home_screen_controller.dart';
 import 'package:amar_pos/features/inventory/presentation/products/products_screen.dart';
 import 'package:amar_pos/features/inventory/presentation/stock_report/stock_report.dart';
+import 'package:amar_pos/features/inventory/presentation/stock_transfer/stock_tansfer.dart';
 import 'package:amar_pos/features/purchase/presentation/purchase_screen.dart';
 import 'package:amar_pos/features/purchase_return/presentation/purchase_return_screen.dart';
 import 'package:amar_pos/features/return/presentation/return_screen.dart';
@@ -102,6 +103,8 @@ class DrawerMenuController extends GetxController {
           return const ProductsScreen();
         }else if(selectedMenuItem.value?.child == "Stock Report"){
           return const StockReportScreen();
+        }else if(selectedMenuItem.value?.child == "Stock Transfer"){
+          return const StockTransferScreen();
         }else{
           return Container();
         }
