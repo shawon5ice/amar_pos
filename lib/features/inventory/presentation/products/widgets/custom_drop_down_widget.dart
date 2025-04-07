@@ -15,6 +15,7 @@ class CustomDropdownWithSearchWidget<T> extends StatefulWidget {
   final String searchHintText;
   final bool isMandatory;
   final int buttonHeight;
+  final double borderRadius;
   final bool noTitle;
   final bool? suffix;
   final bool? filled;
@@ -32,6 +33,7 @@ class CustomDropdownWithSearchWidget<T> extends StatefulWidget {
     required this.hintText,
     required this.searchHintText,
     this.buttonHeight = 56,
+    this.borderRadius = 8,
     this.validator,
     this.value,
     this.noTitle = false,
@@ -88,7 +90,7 @@ class _CustomDropdownWithSearchWidgetState<T>
                     isDense: true,
                     contentPadding: EdgeInsets.zero,
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                      borderRadius: BorderRadius.all(Radius.circular(widget.borderRadius)),
                       borderSide: BorderSide(
                         color: AppColors.inputBorderColor,
                       ),
@@ -96,19 +98,19 @@ class _CustomDropdownWithSearchWidgetState<T>
                     filled: widget.filled,
                     fillColor: Colors.white,
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                      borderRadius: BorderRadius.all(Radius.circular(widget.borderRadius)),
                       borderSide: BorderSide(
                         color: AppColors.inputBorderColor,
                       ),
                     ),
                     errorBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                      borderRadius: BorderRadius.all(Radius.circular(widget.borderRadius)),
                       borderSide: BorderSide(
                         color: Colors.red, // Red border for error state
                       ),
                     ),
                     focusedErrorBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                      borderRadius: BorderRadius.all(Radius.circular(widget.borderRadius)),
                       borderSide: BorderSide(
                         color: Colors.red,
                       ),
@@ -146,7 +148,7 @@ class _CustomDropdownWithSearchWidgetState<T>
                     padding: EdgeInsets.only(right: 8),
                     decoration: BoxDecoration(
                       border: Border.all(color: AppColors.inputBorderColor),
-                      borderRadius: const BorderRadius.all(Radius.circular(8)),
+                      borderRadius: BorderRadius.all(Radius.circular(widget.borderRadius)),
                     ),
                   ),
                   dropdownStyleData: DropdownStyleData(

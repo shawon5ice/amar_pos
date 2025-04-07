@@ -12,6 +12,7 @@ class OutletDropDownWidget extends StatefulWidget {
     this.initialOutletModel,
     this.isMandatory,
     this.hideTitle,
+    this.borderRadius,
     this.filled
   });
 
@@ -20,6 +21,7 @@ class OutletDropDownWidget extends StatefulWidget {
   final bool? isMandatory;
   final bool? hideTitle;
   final bool? filled;
+  final double? borderRadius;
 
   @override
   State<OutletDropDownWidget> createState() => _OutletDropDownWidgetState();
@@ -46,6 +48,7 @@ class _OutletDropDownWidgetState extends State<OutletDropDownWidget> {
           items: controller.outlets,
           isMandatory: false,
           title: "Outlet",
+          borderRadius: widget.borderRadius ?? 8,
           noTitle: widget.hideTitle ?? true,
           itemLabel: (value) => value.name,
           value: controller.selectedOutlet,

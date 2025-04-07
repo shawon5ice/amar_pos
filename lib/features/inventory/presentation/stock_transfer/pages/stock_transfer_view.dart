@@ -3,6 +3,7 @@ import 'package:amar_pos/core/methods/number_input_formatter.dart';
 import 'package:amar_pos/core/widgets/custom_text_field.dart';
 import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:amar_pos/core/widgets/reusable/forbidden_access_full_screen_widget.dart';
+import 'package:amar_pos/core/widgets/reusable/outlet_dd/outlet_dropdown_widget.dart';
 import 'package:amar_pos/features/inventory/presentation/products/add_product_screen.dart';
 import 'package:amar_pos/features/inventory/presentation/stock_transfer/pages/widgets/stock_transfer_product_sn_selection_dialog.dart';
 import 'package:amar_pos/features/inventory/presentation/stock_transfer/stock_transfer_controller.dart';
@@ -101,6 +102,13 @@ class _StockTransferViewState extends State<StockTransferView> {
         child: Scaffold(
           body: !controller.purchaseCreateAccess ? ForbiddenAccessFullScreenWidget() : Column(
             children: [
+              OutletDropDownWidget(
+                  filled: true,
+                  borderRadius: 40,
+                  onOutletSelection: (outlet){
+
+              }),
+              addH(8),
               GetBuilder<StockTransferController>(
                 id: "selling_party_selection",
                 builder: (controller) {
@@ -124,7 +132,7 @@ class _StockTransferViewState extends State<StockTransferView> {
                   );
                 },
               ),
-              addH(12),
+              addH(8),
               Row(
                 children: [
                   Expanded(
@@ -318,7 +326,7 @@ class _StockTransferViewState extends State<StockTransferView> {
                   )
                 ],
               ),
-              addH(12),
+              addH(8),
               Expanded(
                 child: GetBuilder<StockTransferController>(
                   id: "purchase_order_items",

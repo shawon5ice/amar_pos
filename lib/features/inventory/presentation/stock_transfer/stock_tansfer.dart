@@ -219,7 +219,7 @@ class _StockTransferScreenState extends State<StockTransferScreen>
                   ],
                 ),
               ),
-              addH(12),
+              addH(8),
               Expanded(
                 child: TabBarView(
                   physics: const NeverScrollableScrollPhysics(),
