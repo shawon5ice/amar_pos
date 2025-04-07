@@ -104,39 +104,42 @@ class _CustomTextFieldState extends State<CustomTextField> {
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      textInputAction: widget.textInputAction,
-      controller: widget.textCon,
-      readOnly: widget.readOnly,
-      enabled: widget.enabledFlag,
-      focusNode: widget.focusNode,
-      keyboardType: widget.inputType,
-      maxLength: widget.maxLength,
-      maxLines: widget.maxLine,
-      obscureText: obscureText,
-      cursorColor: AppColors.primary,
-      textAlign: widget.isCenterAlign ? TextAlign.center : TextAlign.start,
-      textAlignVertical: TextAlignVertical.center,
-      style: TextStyle(
-        fontSize: widget.txtSize,
-        fontWeight: widget.txtFontWeight,
-        color: widget.enabledFlag ? widget.txtClr : Colors.grey.shade800,
-      ),
-      validator: widget.validator,
-      inputFormatters: widget.inputFormatters,
-      onChanged: _onChangedDebounced,
-      onTap: widget.onTap ?? () {
-        if (widget.textCon.text == "0") {
-          widget.textCon.clear();
-        }
-      },
+    return Container(
+      width: widget.width,
+      child: TextFormField(
+        textInputAction: widget.textInputAction,
+        controller: widget.textCon,
+        readOnly: widget.readOnly,
+        enabled: widget.enabledFlag,
+        focusNode: widget.focusNode,
+        keyboardType: widget.inputType,
+        maxLength: widget.maxLength,
+        maxLines: widget.maxLine,
+        obscureText: obscureText,
+        cursorColor: AppColors.primary,
+        textAlign: widget.isCenterAlign ? TextAlign.center : TextAlign.start,
+        textAlignVertical: TextAlignVertical.center,
+        style: TextStyle(
+          fontSize: widget.txtSize,
+          fontWeight: widget.txtFontWeight,
+          color: widget.enabledFlag ? widget.txtClr : Colors.grey.shade800,
+        ),
+        validator: widget.validator,
+        inputFormatters: widget.inputFormatters,
+        onChanged: _onChangedDebounced,
+        onTap: widget.onTap ?? () {
+          if (widget.textCon.text == "0") {
+            widget.textCon.clear();
+          }
+        },
 
-      onFieldSubmitted: (value) {
-        if (widget.onSubmitted != null) {
-          widget.onSubmitted!(value); // Trigger feedback callback
-        }
-      },
-      decoration: _buildInputDecoration(),
+        onFieldSubmitted: (value) {
+          if (widget.onSubmitted != null) {
+            widget.onSubmitted!(value); // Trigger feedback callback
+          }
+        },
+        decoration: _buildInputDecoration(),
+      ),
     );
   }
 

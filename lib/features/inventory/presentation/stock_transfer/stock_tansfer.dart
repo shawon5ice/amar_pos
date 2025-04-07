@@ -1,6 +1,8 @@
 import 'package:amar_pos/core/widgets/reusable/filter_bottom_sheet/filter_controller.dart';
 import 'package:amar_pos/features/inventory/presentation/products/product_controller.dart';
+import 'package:amar_pos/features/inventory/presentation/stock_transfer/pages/stock_transfer_history_screen.dart';
 import 'package:amar_pos/features/inventory/presentation/stock_transfer/pages/stock_transfer_view.dart';
+import 'package:amar_pos/features/inventory/presentation/stock_transfer/stock_transfer_controller.dart';
 import 'package:amar_pos/features/purchase/presentation/pages/purchase_history_screen.dart';
 import 'package:amar_pos/features/purchase/presentation/pages/purchase_products.dart';
 import 'package:amar_pos/features/purchase/presentation/pages/purchase_view.dart';
@@ -68,7 +70,7 @@ class _StockTransferScreenState extends State<StockTransferScreen>
 
   @override
   void dispose() {
-    Get.delete<PurchaseController>();
+    Get.delete<StockTransferController>();
     Get.delete<ProductController>();
     Get.delete<FilterController>();
     super.dispose();
@@ -228,7 +230,7 @@ class _StockTransferScreenState extends State<StockTransferScreen>
                     StockTransferView(onSuccess:  (value){
                       _tabController.animateTo(value);
                     },),
-                    PurchaseHistoryScreen(onChange: (value){
+                    StockTransferHistoryScreen(onChange: (value){
                       _tabController.animateTo(value);
                     }),
                   ],
