@@ -1,3 +1,4 @@
+import 'package:amar_pos/features/inventory/presentation/stock_transfer/data/models/create_stock_transfer_request_model.dart';
 import 'package:amar_pos/features/purchase/data/models/create_purchase_order_model.dart';
 import 'package:amar_pos/features/purchase/data/models/purchase_history_response_model.dart';
 
@@ -59,15 +60,15 @@ class StockTransferService {
     return response;
   }
 
-  static Future<dynamic> createPurchaseOrder({
+  static Future<dynamic> createStockTransfer({
     required String usrToken,
-    required CreatePurchaseOrderModel purchaseOrderModel,
+    required CreateStockTransferRequestModel stockTransferRequestModel,
   }) async {
-    logger.i(purchaseOrderModel.toJson());
+    logger.i(stockTransferRequestModel.toJson());
     var response = await BaseClient.postData(
       token: usrToken,
-      api: "purchase/place-order",
-      body: purchaseOrderModel.toJson(),
+      api: "inventory/stock_transfer/create",
+      body: stockTransferRequestModel.toJson(),
     );
     return response;
   }
@@ -148,13 +149,13 @@ class StockTransferService {
       fileName: fileName,);
   }
 
-  static Future<dynamic> getPurchaseHistoryDetails({
+  static Future<dynamic> getStockTransferHistoryDetails({
     required String usrToken,
     required int id,
   }) async {
     var response = await BaseClient.getData(
       token: usrToken,
-      api: "purchase/get-purchase-details/$id",
+      api: "inventory/stock_transfer/get-details/$id",
     );
     return response;
   }
@@ -213,7 +214,7 @@ class StockTransferService {
       fileName: fileName,);
   }
 
-  static Future<dynamic> getPurchaseHistory({
+  static Future<dynamic> getStockTransferHistory({
     required String usrToken,
     required int page,
     String? search,
@@ -225,15 +226,13 @@ class StockTransferService {
     logger.d("Page: $page");
     var response = await BaseClient.getData(
         token: usrToken,
-        api: "purchase/get-all-purchase-list",
+        api: "inventory/stock_transfer/get-transfer-list",
         parameter: {
           "status": 1,
           "page": page,
           "search": search,
           "start_date": startDate,
           "end_date": endDate,
-          "category_id": categoryId,
-          "brand_id": brandId,
           "limit": 10,
         });
     return response;

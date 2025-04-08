@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/constants/logger/logger.dart';
 import '../../../../core/network/helpers/error_extractor.dart';
+import '../../../../core/widgets/loading/random_lottie_loader.dart';
+import '../../../../core/widgets/methods/helper_methods.dart';
 import '../../../../core/widgets/reusable/filter_bottom_sheet/product_brand_category_warranty_unit_response_model.dart';
 import '../../../../permission_manager.dart';
 import '../../../auth/data/model/hive/login_data.dart';
@@ -11,6 +13,8 @@ import '../../../auth/data/model/hive/login_data_helper.dart';
 import '../../../purchase/data/models/create_purchase_order_model.dart';
 import '../../data/products/product_list_response_model.dart';
 import 'data/models/create_stock_transfer_request_model.dart';
+import 'data/models/stock_transfer_history_details/stock_transfer_history_details_response_model.dart';
+import 'data/models/stock_transfer_history_response_model.dart';
 
 class StockTransferController extends GetxController{
 
@@ -31,8 +35,6 @@ class StockTransferController extends GetxController{
 
 
   bool isRetailSale = true;
-
-  num paidAmount = 0;
 
   FilterItem? brand;
   FilterItem? category;
@@ -55,7 +57,7 @@ class StockTransferController extends GetxController{
   bool creditSelected = false;
 
   CreateStockTransferRequestModel createStockTransferRequestModel = CreateStockTransferRequestModel.defaultConstructor();
-
+  int? selectedOutlet;
   TextEditingController searchProductController = TextEditingController();
   ProductsListResponseModel? productsListResponseModel;
 
@@ -222,47 +224,42 @@ class StockTransferController extends GetxController{
   int? pOrderId;
   String? pOrderNo;
 
-  // Future<bool> createPurchaseOrder() async {
-  //   pOrderId = null;
-  //   pOrderNo = null;
-  //   createPurchaseOrderLoading = true;
-  //   update(["purchase_order_items"]);
-  //   RandomLottieLoader.show();
-  //   try{
-  //     var response = await PurchaseService.createPurchaseOrder(
-  //       usrToken: loginData!.token,
-  //       purchaseOrderModel: createPurchaseOrderModel,
-  //     );
-  //     logger.e(response);
-  //     if (response != null) {
-  //       if(response['success']){
-  //         pOrderId = response['data']['id'];
-  //         pOrderNo = response['data']['order_no'];
-  //         selectedSupplier = null;
-  //         supplierList.clear();
-  //         paymentMethodTracker.clear();
-  //         purchaseOrderProducts.clear();
-  //         createPurchaseOrderModel = CreatePurchaseOrderModel.defaultConstructor();
-  //         additionalExpense = 0;
-  //         totalDiscount = 0;
-  //         RandomLottieLoader.hide();
-  //         Get.back();
-  //         Get.back();
-  //         return true;
-  //       }else{
-  //         RandomLottieLoader.hide();
-  //       }
-  //       Methods.showSnackbar(msg: response['message'], isSuccess: response['success']? true: null);
-  //     }
-  //   }catch(e){
-  //     logger.e(e);
-  //     return false;
-  //   }finally{
-  //     createPurchaseOrderLoading = false;
-  //     update(["purchase_order_items"]);
-  //   }
-  //   return false;
-  // }
+  Future<bool> createStockTransfer() async {
+    pOrderId = null;
+    pOrderNo = null;
+    createPurchaseOrderLoading = true;
+    update(["purchase_order_items"]);
+    RandomLottieLoader.show();
+    try{
+      var response = await StockTransferService.createStockTransfer(
+        usrToken: loginData!.token,
+        stockTransferRequestModel: createStockTransferRequestModel,
+      );
+      logger.e(response);
+      if (response != null) {
+        if(response['success']){
+          // pOrderId = response['data']['id'];
+          // pOrderNo = response['data']['order_no'];
+          purchaseOrderProducts.clear();
+          isRequisition = true;
+          createStockTransferRequestModel = CreateStockTransferRequestModel.defaultConstructor();
+          RandomLottieLoader.hide();
+          Get.back();
+          return true;
+        }else{
+          RandomLottieLoader.hide();
+        }
+        Methods.showSnackbar(msg: response['message'], isSuccess: response['success']? true: null);
+      }
+    }catch(e){
+      logger.e(e);
+      return false;
+    }finally{
+      createPurchaseOrderLoading = false;
+      update(["purchase_order_items"]);
+    }
+    return false;
+  }
 
 
   // Future<bool> updatePurchaseOrder() async {
@@ -302,52 +299,58 @@ class StockTransferController extends GetxController{
   //   return false;
   // }
 
-  // Future<void> getPurchaseHistory({int page = 1}) async {
-  //   isPurchaseHistoryListLoading = page == 1;
-  //   isPurchaseHistoryLoadingMore = page > 1;
-  //
-  //   if(page == 1){
-  //     purchaseHistoryResponseModel = null;
-  //     purchaseHistoryList.clear();
-  //   }
-  //
-  //   hasError.value = false;
-  //
-  //   update(['purchase_history_list','total_widget']);
-  //
-  //   try {
-  //     var response = await PurchaseService.getPurchaseHistory(
-  //       usrToken: loginData!.token,
-  //       page: page,
-  //       search: searchProductController.text,
-  //       startDate: selectedDateTimeRange.value?.start,
-  //       endDate: selectedDateTimeRange.value?.end,
-  //       categoryId: category?.id,
-  //       brandId: brand?.id,
-  //     );
-  //
-  //     if (response != null) {
-  //       purchaseHistoryResponseModel =
-  //           PurchaseHistoryResponseModel.fromJson(response);
-  //
-  //       if (purchaseHistoryResponseModel != null) {
-  //         purchaseHistoryList.addAll(purchaseHistoryResponseModel!.data.purchaseHistoryList);
-  //       }
-  //     } else {
-  //       if(page != 1){
-  //         hasError.value = true;
-  //       }
-  //     }
-  //   } catch (e) {
-  //     hasError.value = true;
-  //     purchaseHistoryList.clear();
-  //     logger.e(e);
-  //   } finally {
-  //     isPurchaseHistoryListLoading = false;
-  //     isPurchaseHistoryLoadingMore = false;
-  //     update(['purchase_history_list','total_widget']);
-  //   }
-  // }
+  bool isStockTransferHistoryListLoading = false;
+  bool isStockTransferHistoryListLoadingMore = false;
+
+  StockTransferResponse? stockTransferResponse;
+  List<StockTransfer> stockTransferHistory = [];
+
+  Future<void> getStockTransferHistory({int page = 1}) async {
+    isStockTransferHistoryListLoading = page == 1;
+    isStockTransferHistoryListLoadingMore = page > 1;
+
+    if(page == 1){
+      stockTransferResponse = null;
+      stockTransferHistory.clear();
+    }
+
+    hasError.value = false;
+
+    update(['purchase_history_list','total_widget']);
+
+    try {
+      var response = await StockTransferService.getStockTransferHistory(
+        usrToken: loginData!.token,
+        page: page,
+        search: searchProductController.text,
+        startDate: selectedDateTimeRange.value?.start,
+        endDate: selectedDateTimeRange.value?.end,
+        categoryId: category?.id,
+        brandId: brand?.id,
+      );
+
+      if (response != null) {
+        stockTransferResponse =
+            StockTransferResponse.fromJson(response);
+
+        if (stockTransferResponse != null) {
+          stockTransferHistory.addAll(stockTransferResponse!.data.data);
+        }
+      } else {
+        if(page != 1){
+          hasError.value = true;
+        }
+      }
+    } catch (e) {
+      hasError.value = true;
+      stockTransferHistory.clear();
+      logger.e(e);
+    } finally {
+      isStockTransferHistoryListLoading = false;
+      isStockTransferHistoryListLoadingMore = false;
+      update(['purchase_history_list','total_widget']);
+    }
+  }
 
   //
   //
@@ -536,29 +539,29 @@ class StockTransferController extends GetxController{
   //   }
   // }
   //
-  // PurchaseHistoryDetailsResponseModel? purchaseHistoryDetailsResponseModel;
+  StockTransferHistoryDetailsResponseModel? stockTransferHistoryDetailsResponseModel;
   //
-  // Future<void> getPurchaseHistoryDetails(BuildContext context, int orderId) async {
-  //   detailsLoading = true;
-  //   purchaseHistoryDetailsResponseModel = null;
-  //   update(['purchase_history_details', 'download_print_buttons']);
-  //   try {
-  //     var response = await PurchaseService.getPurchaseHistoryDetails(
-  //       usrToken: loginData!.token,
-  //       id: orderId,
-  //     );
-  //
-  //     logger.i(response);
-  //     if (response != null) {
-  //       purchaseHistoryDetailsResponseModel =
-  //           PurchaseHistoryDetailsResponseModel.fromJson(response);
-  //     }
-  //   } catch (e) {
-  //   } finally {
-  //     detailsLoading = false;
-  //     update(['purchase_history_details', 'download_print_buttons']);
-  //   }
-  // }
+  Future<void> getStockTransferHistoryDetails(BuildContext context, int orderId) async {
+    detailsLoading = true;
+    stockTransferHistoryDetailsResponseModel = null;
+    update(['stock_transfer_history_details', 'download_print_buttons']);
+    try {
+      var response = await StockTransferService.getStockTransferHistoryDetails(
+        usrToken: loginData!.token,
+        id: orderId,
+      );
+
+      if (response != null) {
+        stockTransferHistoryDetailsResponseModel =
+            StockTransferHistoryDetailsResponseModel.fromJson(response);
+        logger.d(stockTransferHistoryDetailsResponseModel);
+      }
+    } catch (e) {
+    } finally {
+      detailsLoading = false;
+      update(['stock_transfer_history_details', 'download_print_buttons']);
+    }
+  }
 
   bool checkPurchasePermissions(String permission) {
     if(!PermissionManager.hasPermission("PurchaseOrder.$permission")){

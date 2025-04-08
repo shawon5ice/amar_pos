@@ -2,23 +2,27 @@
 class CreateStockTransferRequestModel {
   int storeId;
   int type;
+  String remarks;
   List<StockTransferProduct> products;
 
   CreateStockTransferRequestModel({
     required this.storeId,
     required this.type,
     required this.products,
+    required this.remarks,
   });
 
   CreateStockTransferRequestModel.defaultConstructor()
       : storeId = -1,
         type = 1,
+        remarks = "",
         products = [];
 
   factory CreateStockTransferRequestModel.fromJson(Map<String, dynamic> json) {
     return CreateStockTransferRequestModel(
       storeId: json['store_id'],
       type: json['type'],
+      remarks: json['remarks'],
       products: (json['product'] as List)
           .map((productJson) => StockTransferProduct.fromJson(productJson))
           .toList(),
@@ -29,6 +33,7 @@ class CreateStockTransferRequestModel {
     return {
       'store_id': storeId,
       'type' : type,
+      'remarks' : remarks,
       'product': products.map((product) => product.toJson()).toList(),
     };
   }

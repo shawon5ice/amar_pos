@@ -23,7 +23,7 @@ class _StockTransferScreenState extends State<StockTransferScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
-  final StockTransferController controller = Get.put(StockTransferController());
+  final PurchaseController controller = Get.put(PurchaseController());
 
   @override
   void initState() {
@@ -219,7 +219,7 @@ class _StockTransferScreenState extends State<StockTransferScreen>
                   ],
                 ),
               ),
-              addH(12),
+              addH(8),
               Expanded(
                 child: TabBarView(
                   physics: const NeverScrollableScrollPhysics(),
@@ -228,7 +228,7 @@ class _StockTransferScreenState extends State<StockTransferScreen>
                     StockTransferView(onSuccess:  (value){
                       _tabController.animateTo(value);
                     },),
-                    PurchaseHistoryScreen(onChange: (value){
+                    StockTransferHistoryScreen(onChange: (value){
                       _tabController.animateTo(value);
                     }),
                   ],
