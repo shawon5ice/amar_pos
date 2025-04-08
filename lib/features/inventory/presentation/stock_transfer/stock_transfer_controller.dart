@@ -13,6 +13,7 @@ import '../../../auth/data/model/hive/login_data_helper.dart';
 import '../../../purchase/data/models/create_purchase_order_model.dart';
 import '../../data/products/product_list_response_model.dart';
 import 'data/models/create_stock_transfer_request_model.dart';
+import 'data/models/stock_transfer_history_details/stock_transfer_history_details_response_model.dart';
 import 'data/models/stock_transfer_history_response_model.dart';
 
 class StockTransferController extends GetxController{
@@ -546,29 +547,29 @@ class StockTransferController extends GetxController{
   //   }
   // }
   //
-  // PurchaseHistoryDetailsResponseModel? purchaseHistoryDetailsResponseModel;
+  StockTransferHistoryDetailsResponseModel? stockTransferHistoryDetailsResponseModel;
   //
-  // Future<void> getPurchaseHistoryDetails(BuildContext context, int orderId) async {
-  //   detailsLoading = true;
-  //   purchaseHistoryDetailsResponseModel = null;
-  //   update(['purchase_history_details', 'download_print_buttons']);
-  //   try {
-  //     var response = await PurchaseService.getPurchaseHistoryDetails(
-  //       usrToken: loginData!.token,
-  //       id: orderId,
-  //     );
-  //
-  //     logger.i(response);
-  //     if (response != null) {
-  //       purchaseHistoryDetailsResponseModel =
-  //           PurchaseHistoryDetailsResponseModel.fromJson(response);
-  //     }
-  //   } catch (e) {
-  //   } finally {
-  //     detailsLoading = false;
-  //     update(['purchase_history_details', 'download_print_buttons']);
-  //   }
-  // }
+  Future<void> getStockTransferHistoryDetails(BuildContext context, int orderId) async {
+    detailsLoading = true;
+    stockTransferHistoryDetailsResponseModel = null;
+    update(['stock_transfer_history_details', 'download_print_buttons']);
+    try {
+      var response = await StockTransferService.getStockTransferHistoryDetails(
+        usrToken: loginData!.token,
+        id: orderId,
+      );
+
+      if (response != null) {
+        stockTransferHistoryDetailsResponseModel =
+            StockTransferHistoryDetailsResponseModel.fromJson(response);
+        logger.d(stockTransferHistoryDetailsResponseModel);
+      }
+    } catch (e) {
+    } finally {
+      detailsLoading = false;
+      update(['stock_transfer_history_details', 'download_print_buttons']);
+    }
+  }
 
   bool checkPurchasePermissions(String permission) {
     if(!PermissionManager.hasPermission("PurchaseOrder.$permission")){

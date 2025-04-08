@@ -149,13 +149,13 @@ class StockTransferService {
       fileName: fileName,);
   }
 
-  static Future<dynamic> getPurchaseHistoryDetails({
+  static Future<dynamic> getStockTransferHistoryDetails({
     required String usrToken,
     required int id,
   }) async {
     var response = await BaseClient.getData(
       token: usrToken,
-      api: "purchase/get-purchase-details/$id",
+      api: "inventory/stock_transfer/get-details/$id",
     );
     return response;
   }

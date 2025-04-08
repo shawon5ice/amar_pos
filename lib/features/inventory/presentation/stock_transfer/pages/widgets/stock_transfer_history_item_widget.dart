@@ -14,6 +14,7 @@ import 'package:get/get.dart';
 
 import '../../../../../../core/constants/app_assets.dart';
 import '../../../../../../core/widgets/reusable/custom_svg_icon_widget.dart';
+import '../stock_transfer_details_view.dart';
 
 class StockTransferHistoryItemWidget extends StatelessWidget {
   StockTransferHistoryItemWidget({super.key, required this.stockTransfer, required this.onChange});
@@ -27,7 +28,7 @@ class StockTransferHistoryItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: (){
-        Get.to(const PurchaseHistoryDetailsView(),arguments: [stockTransfer.id,stockTransfer.orderNo]);
+        Get.to(const StockTransferDetailsView(),arguments: [stockTransfer.id,stockTransfer.orderNo]);
       },
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 5.h),

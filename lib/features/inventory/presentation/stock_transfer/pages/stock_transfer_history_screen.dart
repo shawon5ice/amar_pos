@@ -118,13 +118,13 @@ class _StockTransferHistoryScreenState extends State<StockTransferHistoryScreen>
                     return const Center(
                       child: CircularProgressIndicator(),
                     );
-                  }else if(controller.stockTransferResponse == null){
-                    return Center(
-                      child: Text("Something went wrong", style: context.textTheme.titleLarge,),
-                    );
                   }else if(controller.stockTransferHistory.isEmpty){
                     return Center(
                       child: Text("No data found", style: context.textTheme.titleLarge,),
+                    );
+                  }else if(controller.stockTransferResponse == null){
+                    return Center(
+                      child: Text("Something went wrong", style: context.textTheme.titleLarge,),
                     );
                   }
                   return RefreshIndicator(
