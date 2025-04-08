@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:amar_pos/core/constants/logger/logger.dart';
 import 'package:amar_pos/features/accounting/presentation/accounting_screen.dart';
 import 'package:amar_pos/features/auth/data/model/hive/login_data.dart';
@@ -32,7 +34,8 @@ class DrawerMenuController extends GetxController {
 
   LoginData? loginData = LoginDataBoxManager().loginData;
   //Menus to active
-  List<String> purchaseModule = [];
+  Set<String> purchaseModule = Set();
+  Set<String> inventoryModule = Set();
   bool salesModule = false;
 
   @override
@@ -43,19 +46,43 @@ class DrawerMenuController extends GetxController {
   }
 
   Future<void> loadModules() async {
-    purchaseModule.clear();
+    // purchaseModule.clear();
+    // inventoryModule.clear();
     print("--->");
+    loadPurchaseModule();
+    loadInventoryModule();
+    logger.d(salesModule);
+    update(['drawer_menu']);
+  }
+
+  void loadInventoryModule(){
+    if(PermissionManager.hasParentPermission('Inventory')){
+      inventoryModule.add("Product List");
+    }else{
+      inventoryModule.remove("Product List");
+    }
+    if(PermissionManager.hasPermission('Inventory.productStockReport')){
+      inventoryModule.add("Stock Report");
+    }else{
+      inventoryModule.remove("Stock Report");
+    }if(PermissionManager.hasParentPermission('StockTransferOrder')){
+      inventoryModule.add("Stock Transfer");
+    }else{
+      inventoryModule.remove("Stock Transfer");
+    }
+  }
+
+  void loadPurchaseModule(){
     if(PermissionManager.hasParentPermission('PurchaseOrder')){
       purchaseModule.add("Purchase");
+    }else{
+      purchaseModule.remove("Purchase");
     }
     if(PermissionManager.hasParentPermission('PurchaseReturn')){
       purchaseModule.add("Purchase Return");
+    }else{
+      purchaseModule.remove("Purchase Return");
     }
-    if(PermissionManager.hasParentPermission('Order')){
-      salesModule = true;
-    }
-    logger.d(salesModule);
-    update(['drawer_menu']);
   }
 
   void openDrawer() {

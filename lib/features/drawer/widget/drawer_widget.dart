@@ -135,9 +135,9 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                       child: Column(
                         children: [
                           buildDrawerItems(context, DrawerItems.overview),
-                          ExpandableDrawerWidget(
+                          if(controller.inventoryModule.isNotEmpty)ExpandableDrawerWidget(
                             item: DrawerItems.inventory,
-                            children: const ["Product List", "Stock Report","Stock Transfer"],
+                            children: controller.inventoryModule.toList(),
                             expanded: (bool isExpanded) {
                               setState(() {
                                 if (isExpanded) selectedParentItem = DrawerItems.inventory;
@@ -178,7 +178,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                           ),
                           if(controller.purchaseModule.isNotEmpty)ExpandableDrawerWidget(
                             item: DrawerItems.purchase,
-                            children: controller.purchaseModule,
+                            children: controller.purchaseModule.toList(),
                             expanded: (bool isExpanded) {
                               setState(() {
                                 if (isExpanded) selectedParentItem = DrawerItems.purchase;
