@@ -14,6 +14,7 @@ import 'data/models/create_stock_transfer_request_model.dart';
 
 class StockTransferController extends GetxController{
 
+  int totalQTY = 0;
   //Access
   bool historyAccess = true;
   bool productAccess = true;
@@ -85,27 +86,17 @@ class StockTransferController extends GetxController{
 
     super.onReady();
   }
-  // void clearEditing(){
-  //   purchaseOrderProducts.clear();
-  //   purchaseProducts.clear();
-  //   createPurchaseOrderModel =  CreatePurchaseOrderModel.defaultConstructor();
-  //   isEditing = false;
-  //   selectedSupplier = null;
-  //   selectedDateTimeRange.value = null;
-  //   paidAmount = 0;
-  //   searchProductController.clear();
-  //   totalDiscount = 0;
-  //   totalPaid = 0;
-  //   totalDeu = 0;
-  //   totalDiscount = 0;
-  //   totalQTY = 0;
-  //   selectedSupplier = null;
-  //   supplierList.clear();
-  //   createPurchaseOrderModel = CreatePurchaseOrderModel.defaultConstructor();
-  //   additionalExpense = 0;
-  //   totalDiscount = 0;
-  //   paymentMethodTracker.clear();
-  // }
+  void clearEditing(){
+    purchaseOrderProducts.clear();
+    createStockTransferRequestModel = CreateStockTransferRequestModel.defaultConstructor();
+    isEditing = false;
+    isRequisition = true;
+    totalQTY = 0;
+    selectedDateTimeRange.value = null;
+    paidAmount = 0;
+    searchProductController.clear();
+    totalQTY = 0;
+  }
 
   Future<void> getAllProducts(
       {required String search, required int page}) async {
@@ -173,6 +164,7 @@ class StockTransferController extends GetxController{
 
 
   void addPlaceOrderProduct(ProductInfo product, {List<String>? snNo, int? quantity, required num unitPrice,}) {
+    totalQTY+= quantity ?? 1;
     logger.i(snNo);
     if (purchaseOrderProducts.any((e) => e.id == product.id)) {
       var x  = createStockTransferRequestModel.products

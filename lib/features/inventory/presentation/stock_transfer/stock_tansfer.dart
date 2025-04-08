@@ -1,10 +1,9 @@
 import 'package:amar_pos/core/widgets/reusable/filter_bottom_sheet/filter_controller.dart';
 import 'package:amar_pos/features/inventory/presentation/products/product_controller.dart';
+import 'package:amar_pos/features/inventory/presentation/stock_transfer/data/models/create_stock_transfer_request_model.dart';
 import 'package:amar_pos/features/inventory/presentation/stock_transfer/pages/stock_transfer_view.dart';
+import 'package:amar_pos/features/inventory/presentation/stock_transfer/stock_transfer_controller.dart';
 import 'package:amar_pos/features/purchase/presentation/pages/purchase_history_screen.dart';
-import 'package:amar_pos/features/purchase/presentation/pages/purchase_products.dart';
-import 'package:amar_pos/features/purchase/presentation/pages/purchase_view.dart';
-import 'package:amar_pos/features/purchase/presentation/purchase_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/constants/app_colors.dart';
@@ -24,7 +23,7 @@ class _StockTransferScreenState extends State<StockTransferScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
-  final PurchaseController controller = Get.put(PurchaseController());
+  final StockTransferController controller = Get.put(StockTransferController());
 
   @override
   void initState() {
@@ -68,7 +67,7 @@ class _StockTransferScreenState extends State<StockTransferScreen>
 
   @override
   void dispose() {
-    Get.delete<PurchaseController>();
+    Get.delete<StockTransferController>();
     Get.delete<ProductController>();
     Get.delete<FilterController>();
     super.dispose();
@@ -117,10 +116,11 @@ class _StockTransferScreenState extends State<StockTransferScreen>
           centerTitle: true,
           leading: DrawerButton(
             onPressed: () async {
-              if (controller.isEditing) {
+              if (controller.createStockTransferRequestModel.products.isNotEmpty) {
                 bool discard = await showDiscardDialog(context);
                 logger.d(discard);
                 if(discard){
+                  controller.createStockTransferRequestModel = CreateStockTransferRequestModel.defaultConstructor();
                   controller.purchaseOrderProducts.clear();
                   controller.clearEditing();
                   drawerMenuController.openDrawer();

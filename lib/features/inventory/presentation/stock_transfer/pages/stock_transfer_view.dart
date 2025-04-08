@@ -1,5 +1,6 @@
 import 'package:amar_pos/core/constants/logger/logger.dart';
 import 'package:amar_pos/core/methods/number_input_formatter.dart';
+import 'dart:math';
 import 'package:amar_pos/core/widgets/custom_text_field.dart';
 import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:amar_pos/core/widgets/reusable/forbidden_access_full_screen_widget.dart';
@@ -99,7 +100,7 @@ class _StockTransferViewState extends State<StockTransferView> {
       },
       child: SafeArea(
         child: Scaffold(
-          body: !controller.purchaseCreateAccess ? ForbiddenAccessFullScreenWidget() : Column(
+          body: !controller.purchaseCreateAccess ? const ForbiddenAccessFullScreenWidget() : Column(
             children: [
               GetBuilder<StockTransferController>(
                 id: "selling_party_selection",
@@ -335,7 +336,7 @@ class _StockTransferViewState extends State<StockTransferView> {
                       return Form(
                         key: formKey,
                         child: ListView.builder(
-                          itemCount: controller.purchaseOrderProducts.length,
+                          itemCount: controller.createStockTransferRequestModel.products.length,
                           itemBuilder: (_, index) {
                             return Slidable(
                               endActionPane: ActionPane(
@@ -344,6 +345,8 @@ class _StockTransferViewState extends State<StockTransferView> {
                                     addW(10),
                                     CustomSlidableAction(
                                         onPressed: (context) {
+                                          controller.totalQTY -= int.parse(purchaseQTYControllers[index].text);
+                                          controller.update(['billing_summary_button']);
                                           purchaseQTYControllers.removeAt(index);
                                           controller.removePlaceOrderProduct(
                                               controller
@@ -580,12 +583,14 @@ class _StockTransferViewState extends State<StockTransferView> {
                                             textCon:
                                             purchaseQTYControllers[index],
                                             onChanged: (value) {
+                                              int tempValue = controller.createStockTransferRequestModel.products[index].quantity;
                                               if (value.isNotEmpty) {
                                                 controller
                                                     .createStockTransferRequestModel
                                                     .products[index]
                                                     .quantity =
                                                     int.parse(value.replaceAll(',', ''));
+                                                controller.totalQTY += -tempValue + int.parse(value.replaceAll(',', ''));
                                                 controller.update(
                                                     ['sub_total', 'vat','sn_status']);
                                               } else {
@@ -593,6 +598,7 @@ class _StockTransferViewState extends State<StockTransferView> {
                                                     .createStockTransferRequestModel
                                                     .products[index]
                                                     .quantity = 0;
+                                                controller.totalQTY += -tempValue;
                                               }
                                             },
                                             hintText: 'quantity'),
@@ -611,34 +617,56 @@ class _StockTransferViewState extends State<StockTransferView> {
               ),
             ],
           ),
-          bottomNavigationBar: GetBuilder<PurchaseController>(
+          bottomNavigationBar: GetBuilder<StockTransferController>(
             id: "billing_summary_button",
             builder: (controller) => controller.purchaseOrderProducts.isNotEmpty
-                ? CustomButton(
-              onTap: () async {
-                FocusScope.of(context).unfocus();
-                for(int i = 0; i < controller.createPurchaseOrderModel.products.length; i++){
-                  if(controller.createPurchaseOrderModel.products[i].serialNo.isNotEmpty && controller.createPurchaseOrderModel.products[i].serialNo.length != controller.createPurchaseOrderModel.products[i].quantity){
-                    ErrorExtractor.showSingleErrorDialog(context, "Please fix SN quantity issue of ${controller.purchaseOrderProducts[i].name}");
-                    return;
-                  }
-                }
-                // if (formKey.currentState!.validate()) {
-                //   await Get.to(() => PurchaseSummary(
-                //     //   onSuccess: (value){
-                //     //   if(value){
-                //     //     controller.clearEditing();
-                //     //     widget.onSuccess(1);
-                //     //   }
-                //     // },
-                //   ))
-                //       ?.then((value) {
-                //     FocusScope.of(context).unfocus();
-                //   });
-                // }
-              },
-              text: "Billing Summary",
-            )
+                ? Column(
+              mainAxisSize: MainAxisSize.min,
+                    children: [
+                      RichText(
+                        text: TextSpan(
+                            text: "Total QTY : ",
+                            style: TextStyle(color: Colors.black, fontSize: 16),
+                            children: [
+                              TextSpan(
+                                  text: controller.totalQTY.toString(),
+                                  style: TextStyle(
+                                      color: Color(0xffB50000),
+                                      fontWeight: FontWeight.bold))
+                            ]),
+                      ),
+                      addH(8),
+                      CustomButton(
+                        height: 48,
+                        onTap: () async {
+                          FocusScope.of(context).unfocus();
+                          if (!controller.isRequisition) {
+                            for (int i = 0;
+                                i <
+                                    controller.createStockTransferRequestModel
+                                        .products.length;
+                                i++) {
+                              if (controller.createStockTransferRequestModel
+                                      .products[i].serialNo.isNotEmpty &&
+                                  controller.createStockTransferRequestModel
+                                          .products[i].serialNo.length !=
+                                      controller.createStockTransferRequestModel
+                                          .products[i].quantity) {
+                                ErrorExtractor.showSingleErrorDialog(context,
+                                    "Please fix SN quantity issue of ${controller.purchaseOrderProducts[i].name}");
+                                return;
+                              }
+                            }
+                          }
+                          if (formKey.currentState!.validate()) {
+                            logger.i(controller.createStockTransferRequestModel
+                                .toJson());
+                          }
+                        },
+                        text: "Create Now",
+                      ),
+                    ],
+                  )
                 : const SizedBox.shrink(),
           ),
         ),
