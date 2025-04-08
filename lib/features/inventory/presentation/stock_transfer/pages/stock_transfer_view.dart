@@ -1,11 +1,13 @@
 import 'package:amar_pos/core/constants/logger/logger.dart';
+import 'package:amar_pos/core/data/model/outlet_model.dart';
 import 'package:amar_pos/core/methods/number_input_formatter.dart';
 import 'package:amar_pos/core/widgets/custom_text_field.dart';
 import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:amar_pos/core/widgets/reusable/forbidden_access_full_screen_widget.dart';
+import 'package:amar_pos/core/widgets/reusable/outlet_dd/outlet_dd_controller.dart';
 import 'package:amar_pos/core/widgets/reusable/outlet_dd/outlet_dropdown_widget.dart';
 import 'package:amar_pos/features/inventory/presentation/products/add_product_screen.dart';
-import 'package:amar_pos/features/inventory/presentation/stock_transfer/pages/stock_transfer_details_view.dart';
+import 'package:amar_pos/features/inventory/presentation/stock_transfer/data/models/create_stock_transfer_request_model.dart';
 import 'package:amar_pos/features/inventory/presentation/stock_transfer/pages/widgets/stock_transfer_product_sn_selection_dialog.dart';
 import 'package:amar_pos/features/inventory/presentation/stock_transfer/stock_transfer_controller.dart';
 import 'package:auto_size_text/auto_size_text.dart';
@@ -21,10 +23,11 @@ import '../../../../../core/network/helpers/error_extractor.dart';
 import '../../../../../core/responsive/pixel_perfect.dart';
 import '../../../../../core/widgets/custom_button.dart';
 import '../../../../../core/widgets/dashed_line.dart';
+import '../../../../../core/widgets/methods/field_validator.dart';
 import '../../../../../core/widgets/methods/helper_methods.dart';
 import '../../../../../core/widgets/qr_code_scanner.dart';
-import '../../../../return/presentation/page/return_summary.dart';
 import '../../../data/products/product_list_response_model.dart';
+import '../../products/widgets/custom_drop_down_widget.dart';
 
 class StockTransferView extends StatefulWidget {
   StockTransferView({super.key, required this.onSuccess});
@@ -50,36 +53,30 @@ class _StockTransferViewState extends State<StockTransferView> {
   void initState() {
     suggestionEditingController = TextEditingController();
     _remarks = TextEditingController();
-    // if (!controller.isEditing) {
-    //   controller.createPurchaseOrderModel =
-    //       CreatePurchaseOrderModel.defaultConstructor();
-    //   controller.purchaseOrderProducts.clear();
-    // } else {
-    //   for (var e in controller.createPurchaseOrderModel.products) {
-    //     if(purchaseQTYControllers.isNotEmpty && !controller.isEditing){
-    //       purchaseQTYControllers.insert(0,TextEditingController(
-    //         text: e.quantity.toString(),
-    //       ));
-    //     }else{
-    //       purchaseQTYControllers.add(TextEditingController(
-    //         text: e.quantity.toString(),
-    //       ));
-    //     }
-    //   }
-    //   logger.i(purchaseQTYControllers.length);
-    // }
+    if (!controller.isEditing) {
+      controller.createStockTransferRequestModel =
+          CreateStockTransferRequestModel.defaultConstructor();
+      controller.purchaseOrderProducts.clear();
+    } else {
+      logger.i(controller.remarks);
+      _remarks.text = controller.remarks ?? '';
+      for (var e in controller.createStockTransferRequestModel.products) {
+        if(purchaseQTYControllers.isNotEmpty && !controller.isEditing){
+          purchaseQTYControllers.insert(0,TextEditingController(
+            text: e.quantity.toString(),
+          ));
+        }else{
+          purchaseQTYControllers.add(TextEditingController(
+            text: e.quantity.toString(),
+          ));
+        }
+      }
+      logger.i(controller.selectedOutlet?.id);
+    }
     super.initState();
   }
 
   late TextEditingController suggestionEditingController;
-
-  // @override
-  // void didUpdateWidget(covariant StockTransferView oldWidget) {
-  //   if (widget != oldWidget) {
-  //     FocusScope.of(context).unfocus();
-  //   }
-  //   super.didUpdateWidget(oldWidget);
-  // }
 
   @override
   void dispose() {
@@ -103,22 +100,42 @@ class _StockTransferViewState extends State<StockTransferView> {
       },
       child: SafeArea(
         child: Scaffold(
-          body: !controller.purchaseCreateAccess
+          body: (!controller.createAccess && !controller.isEditing)
               ? ForbiddenAccessFullScreenWidget()
               : Column(
                   children: [
-                    OutletDropDownWidget(
-                        isMandatory: true,
-                        filled: true,
-                        borderRadius: 40,
-                        onOutletSelection: (outlet) {
-                          if (outlet != null) {
-                            controller.createStockTransferRequestModel.storeId =
-                                outlet.id;
-                          }
-                        }),
-                    addH(8),
                     GetBuilder<StockTransferController>(
+                      id: 'outlet_dd',
+                        builder: (outletController){
+                      return CustomDropdownWithSearchWidget<OutletModel>(
+                        items: controller.outlets,
+                        isMandatory: false,
+                        title: "Outlet",
+                        borderRadius: 40,
+                        noTitle: true,
+                        itemLabel: (value) => value.name,
+                        value: controller.selectedOutlet,
+                        filled: true,
+                        onChanged: (value) {
+                          controller.selectedOutlet = value;
+                          if(value != null){
+                            controller.createStockTransferRequestModel.storeId = value.id;
+                          }
+                          controller.update(['outlet_dd']); // Notify UI of the change
+                        },
+                        hintText: controller.outletListLoading
+                            ? "Loading..."
+                            : controller.outlets.isEmpty
+                            ? "No outlets found..."
+                            : "Select Outlet",
+                        searchHintText: "Search an outlet",
+                        validator: (value) =>
+                            FieldValidator.nonNullableFieldValidator(
+                                value?.name, "Outlet"),
+                      );
+                    }),
+                    addH(8),
+                    if(!controller.isEditing)GetBuilder<StockTransferController>(
                       id: "selling_party_selection",
                       builder: (controller) {
                         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -187,10 +204,7 @@ class _StockTransferViewState extends State<StockTransferView> {
                                               if (items.length == 1) {
                                                 suggestionEditingController
                                                     .clear();
-                                                controller.addPlaceOrderProduct(
-                                                    items.first,
-                                                    unitPrice: items
-                                                        .first.wholesalePrice);
+                                                controller.addPlaceOrderProduct(items.first,);
                                                 int value = controller
                                                     .createStockTransferRequestModel
                                                     .products
@@ -326,8 +340,7 @@ class _StockTransferViewState extends State<StockTransferView> {
                                           TextEditingController(text: "1"));
                                     }
                                   }
-                                  controller.addPlaceOrderProduct(product,
-                                      unitPrice: product.wholesalePrice);
+                                  controller.addPlaceOrderProduct(product,);
                                   suggestionEditingController.clear();
                                   FocusScope.of(context).unfocus();
                                 },
@@ -715,6 +728,7 @@ class _StockTransferViewState extends State<StockTransferView> {
                             return;
                           }
                           if (!controller.isRequisition) {
+                            controller.createStockTransferRequestModel.type = 2;
                             for (int i = 0;
                                 i <
                                     controller.createStockTransferRequestModel
@@ -737,18 +751,31 @@ class _StockTransferViewState extends State<StockTransferView> {
 
                           controller.createStockTransferRequestModel.remarks = _remarks.text;
 
-                          controller.createStockTransfer().then((value) {
-                            if (value) {
-                              widget.onSuccess(1);
-                              // Get.to(const StockTransferDetailsView(),
-                              //     arguments: [
-                              //       controller.pOrderId,
-                              //       controller.pOrderNo
-                              //     ]);
-                            }
-                          });
+                          if(controller.isEditing){
+                            controller.updateStockTransferOrder().then((value) {
+                              if (value) {
+                                widget.onSuccess(1);
+                                // Get.to(const StockTransferDetailsView(),
+                                //     arguments: [
+                                //       controller.pOrderId,
+                                //       controller.pOrderNo
+                                //     ]);
+                              }
+                            });
+                          }else{
+                            controller.createStockTransfer().then((value) {
+                              if (value) {
+                                widget.onSuccess(1);
+                                // Get.to(const StockTransferDetailsView(),
+                                //     arguments: [
+                                //       controller.pOrderId,
+                                //       controller.pOrderNo
+                                //     ]);
+                              }
+                            });
+                          }
                         },
-                        text: "Create Now",
+                        text: controller.isEditing ? "Update Now" : "Create Now",
                       ),
                     ),
               ),

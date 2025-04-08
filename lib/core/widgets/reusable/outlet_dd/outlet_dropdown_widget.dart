@@ -40,6 +40,13 @@ class _OutletDropDownWidgetState extends State<OutletDropDownWidget> {
   }
 
   @override
+  void initState() {
+    controller.resetOutletSelection();
+    controller.selectedOutlet = widget.initialOutletModel;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return GetBuilder<OutletDDController>(
       id: 'outlet_dd',

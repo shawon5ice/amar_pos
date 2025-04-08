@@ -118,7 +118,7 @@ class PurchaseController extends GetxController{
     historyAccess = PermissionManager.hasPermission("PurchaseOrder.getAllPurchaseList");
     productAccess = PermissionManager.hasPermission("PurchaseOrder.getPurchaseProductList");
     purchaseCreateAccess =  PermissionManager.hasPermission("PurchaseOrder.store");
-
+    update(['permission_handler_builder']);
     super.onReady();
   }
   void clearEditing(){

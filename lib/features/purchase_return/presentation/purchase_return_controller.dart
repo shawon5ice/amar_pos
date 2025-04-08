@@ -8,6 +8,7 @@ import '../../../core/constants/logger/logger.dart';
 import '../../../core/core.dart';
 import '../../../core/network/helpers/error_extractor.dart';
 import '../../../core/widgets/loading/random_lottie_loader.dart';
+import '../../../permission_manager.dart';
 import '../../auth/data/model/hive/login_data.dart';
 import '../../auth/data/model/hive/login_data_helper.dart';
 import '../../inventory/data/products/product_list_response_model.dart';
@@ -27,6 +28,11 @@ class PurchaseReturnController extends GetxController {
   bool filterListLoading = false;
   String generatedBarcode = "";
   bool barcodeGenerationLoading = false;
+
+  //Permissions
+  bool historyAccess = true;
+  bool productAccess = true;
+  bool createAccess = true;
 
   //billing summary
   num totalAmount = 0;
@@ -95,6 +101,18 @@ class PurchaseReturnController extends GetxController {
     selectedDateTimeRange.value = range;
   }
 
+  @override
+  void onReady() {
+    checkPermissions();
+    super.onReady();
+  }
+
+  void checkPermissions(){
+    historyAccess = PermissionManager.hasPermission("PurchaseReturn.getAllPurchaseReturnList");
+    productAccess = PermissionManager.hasPermission("PurchaseReturn.getPurchaseReturnProductList");
+    createAccess =  PermissionManager.hasPermission("PurchaseReturn.store");
+    update(['permission_handler_builder']);
+  }
   void clearEditing(){
     purchaseReturnProducts.clear();
     purchaseOrderProducts.clear();
@@ -459,6 +477,7 @@ class PurchaseReturnController extends GetxController {
   }
 
   Future<void> getPurchaseReturnHistory({int page = 1}) async {
+    if(!historyAccess) return;
     isPurchaseReturnHistoryListLoading = page == 1;
     isPurchaseReturnHistoryLoadingMore = page > 1;
 
@@ -510,6 +529,7 @@ class PurchaseReturnController extends GetxController {
   }
 
   Future<void> getPurchaseReturnProducts({int page = 1}) async {
+    if(!productAccess) return;
     isPurchaseReturnProductListLoading = page == 1;
     isPurchaseReturnProductsLoadingMore = page > 1;
 
@@ -694,6 +714,7 @@ class PurchaseReturnController extends GetxController {
   Future<void> downloadPurchaseReturnHistory({required bool isPdf, required int orderId,required String orderNo, bool? shouldPrint})  async {
     hasError.value = false;
 
+
     String fileName =
         "$orderNo${isPdf ? ".pdf" : ".xlsx"}";
     try {
@@ -710,6 +731,14 @@ class PurchaseReturnController extends GetxController {
 
   Future<void> downloadList(
       {required bool isPdf, required bool purchaseHistory, bool? shouldPrint}) async {
+    bool hasPermission = false;
+    if(purchaseHistory){
+      hasPermission = checkPurchaseReturnPermissions(isPdf ? "exportToPdfPurchaseReturnList": "exportToExcelPurchaseReturnList");
+    }else{
+      hasPermission = checkPurchaseReturnPermissions(isPdf ? "exportToPdfPurchaseReturnProductList": "exportToExcelPurchaseReturnProductList");
+    }
+
+    if(!hasPermission) return;
     hasError.value = false;
     if(purchaseHistory && purchaseReturnHistoryList.isEmpty || !purchaseHistory && purchaseReturnProducts.isEmpty){
       ErrorExtractor.showSingleErrorDialog(Get.context!, "There is no associated data to perform your action!");
@@ -773,5 +802,13 @@ class PurchaseReturnController extends GetxController {
       detailsLoading = false;
       update(['purchase_return_history_details','download_print_buttons']);
     }
+  }
+
+  bool checkPurchaseReturnPermissions(String permission) {
+    if(!PermissionManager.hasPermission("PurchaseReturn.$permission")){
+      ErrorExtractor.showSingleErrorDialog(Get.context!, "Forbidden access. You don't have Permission");
+      return false;
+    }
+    return true;
   }
 }

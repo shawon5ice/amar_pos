@@ -8,7 +8,7 @@ class HomeScreenService {
   }) async {
     var response = await BaseClient.getData(
         token: usrToken,
-        api: "get-all-permissions",);
+        api: "get-user-permissions",);
     return response;
   }
 }

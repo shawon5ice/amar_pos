@@ -73,16 +73,16 @@ class StockTransferService {
     return response;
   }
 
-  static Future<dynamic> updatePurchaseOrder({
+  static Future<dynamic> updateStockTransferOrder({
     required String usrToken,
-    required CreatePurchaseOrderModel purchaseOrderModel,
+    required CreateStockTransferRequestModel model,
     required int orderId,
   }) async {
-    logger.i(purchaseOrderModel.toJson());
+    logger.i(model.toJson());
     var response = await BaseClient.postData(
       token: usrToken,
-      api: 'purchase/update-order/$orderId',
-      body: purchaseOrderModel.toJson(),
+      api: 'inventory/stock_transfer/update/$orderId',
+      body: model.toJson(),
     );
     return response;
   }
@@ -135,12 +135,12 @@ class StockTransferService {
     return response;
   }
 
-  static downloadPurchaseHistory(
+  static downloadStockTransferInvoice(
       {required String usrToken, required int orderId, required String fileName, bool? shouldPrint}) async {
     // logger.d("PDF: $isPdf");
 
     String downloadUrl =
-        "${NetWorkStrings.baseUrl}/purchase/download-purchase-invoice/$orderId";
+        "${NetWorkStrings.baseUrl}/inventory/stock_transfer/download-invoice/$orderId";
 
     FileDownloader().downloadFile(
       url: downloadUrl,
@@ -160,23 +160,22 @@ class StockTransferService {
     return response;
   }
 
-  static Future<dynamic> deletePurchaseHistory({
+  static Future<dynamic> deleteStockTransfer({
     required String usrToken,
-    required PurchaseOrderInfo purchaseOrderInfo}) async {
+    required int stockTransferId}) async {
     var response = await BaseClient.deleteData(
       token: usrToken,
-      api: 'purchase/delete-order/${purchaseOrderInfo.id}',);
+      api: 'inventory/stock_transfer/delete/$stockTransferId',);
     return response;
   }
 
 
-  static Future<void> downloadList({required bool isPdf,required bool saleHistory, required String fileName,
+  static Future<void> downloadList({required bool isPdf, required String fileName,
     required String usrToken,
     required DateTime? startDate,
     required DateTime? endDate,
     required String? search,
-    required int? categoryId,
-    required int? brandId,
+    required int? type,
     bool? shouldPrint
   }) async {
     // logger.d("PDF: $isPdf");
@@ -185,24 +184,15 @@ class StockTransferService {
       "start_date": startDate,
       "end_date": endDate,
       "search": search,
-      'category_id': categoryId,
-      'brand_id': brandId,
+      'type': type,
     };
 
     String downloadUrl = "";
 
-    if(saleHistory){
-      if(isPdf){
-        downloadUrl = "${NetWorkStrings.baseUrl}/purchase/download-pdf-purchase-list/";
-      }else{
-        downloadUrl = "${NetWorkStrings.baseUrl}/purchase/download-excel-purchase-list";
-      }
+    if(isPdf){
+      downloadUrl = "${NetWorkStrings.baseUrl}/inventory/stock_transfer/download-pdf-transfer-list";
     }else{
-      if(isPdf){
-        downloadUrl = "${NetWorkStrings.baseUrl}/purchase/download-pdf-purchase-product/";
-      }else{
-        downloadUrl = "${NetWorkStrings.baseUrl}/purchase/download-excel-purchase-product/";
-      }
+      downloadUrl = "${NetWorkStrings.baseUrl}/inventory/stock_transfer/download-pdf-transfer-list";
     }
 
 
@@ -220,15 +210,14 @@ class StockTransferService {
     String? search,
     DateTime? startDate,
     DateTime? endDate,
-    int? categoryId,
-    int? brandId,
+    int? status
   }) async {
     logger.d("Page: $page");
     var response = await BaseClient.getData(
         token: usrToken,
         api: "inventory/stock_transfer/get-transfer-list",
         parameter: {
-          "status": 1,
+          "type": status,
           "page": page,
           "search": search,
           "start_date": startDate,

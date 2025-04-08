@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../../core/constants/app_assets.dart';
+import '../../../../permission_manager.dart';
 import '../../../inventory/presentation/stock_report/widget/custom_svg_icon_widget.dart';
 
 class PurchaseHistoryItemWidget extends StatelessWidget {
@@ -121,13 +122,12 @@ class PurchaseHistoryItemWidget extends StatelessWidget {
                     }
                     switch (value) {
                       case "edit":
-                        bool hasPermission = await controller.checkPurchasePermissions("update");
-                        if(!hasPermission) return;
+                        bool hasPermission = controller.checkPurchasePermissions("update");
                         await controller.processEdit(purchaseOrderInfo: purchaseHistory, context: context);
                         onChange(0);
                         break;
                       case "delete":
-                        bool hasPermission = await controller.checkPurchasePermissions("destroy");
+                        bool hasPermission = controller.checkPurchasePermissions("destroy");
                         if(!hasPermission) return;
                         AwesomeDialog(
                             context: context,

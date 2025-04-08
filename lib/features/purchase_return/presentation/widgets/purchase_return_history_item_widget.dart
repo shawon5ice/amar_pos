@@ -1,7 +1,5 @@
 import 'package:amar_pos/core/core.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
-import 'package:amar_pos/features/purchase/data/models/purchase_history_response_model.dart';
-import 'package:amar_pos/features/purchase/presentation/purchase_controller.dart';
 import 'package:amar_pos/features/purchase_return/data/models/purchase_return_history_response_model.dart';
 import 'package:amar_pos/features/purchase_return/presentation/pages/purchase_return_history_details_view.dart';
 import 'package:amar_pos/features/sales/presentation/widgets/sold_history_item_action_menu.dart';
@@ -12,6 +10,7 @@ import 'package:get/get.dart';
 
 import '../../../../core/constants/app_assets.dart';
 import '../../../../core/network/helpers/error_extractor.dart';
+import '../../../../permission_manager.dart';
 import '../../../inventory/presentation/stock_report/widget/custom_svg_icon_widget.dart';
 import '../purchase_return_controller.dart';
 
@@ -27,7 +26,7 @@ class PurchaseReturnHistoryItemWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: (){
-        Get.to(PurchaseReturnHistoryDetailsView(), arguments: [purchaseReturnHistory.id, purchaseReturnHistory.orderNo]);
+        Get.to(()=> const PurchaseReturnHistoryDetailsView(), arguments: [purchaseReturnHistory.id, purchaseReturnHistory.orderNo]);
       },
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 5.h),
@@ -121,10 +120,18 @@ class PurchaseReturnHistoryItemWidget extends StatelessWidget {
                     }
                     switch (value) {
                       case "edit":
+                        bool hasPermission = controller.checkPurchaseReturnPermissions('update');
+                        if(!hasPermission){
+                          return;
+                        }
                         await controller.processEdit(purchaseOrderInfo: purchaseReturnHistory, context: context);
                         onChange(0);
                         break;
                       case "delete":
+                        bool hasPermission = controller.checkPurchaseReturnPermissions('destroy');
+                        if(!hasPermission){
+                          return;
+                        }
                         AwesomeDialog(
                             context: context,
                             dialogType: DialogType.error,

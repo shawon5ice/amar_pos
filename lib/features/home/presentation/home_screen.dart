@@ -32,6 +32,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     }
   }
 
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
   void initializePermissions() async {
     await controller.getPermissions();
     if(controller.permissionApiResponse?.success == true){

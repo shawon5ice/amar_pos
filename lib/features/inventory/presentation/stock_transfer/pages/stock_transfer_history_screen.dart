@@ -1,11 +1,7 @@
-import 'package:amar_pos/core/constants/logger/logger.dart';
-import 'package:amar_pos/core/core.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/features/inventory/presentation/stock_transfer/data/models/stock_transfer_history_response_model.dart';
 import 'package:amar_pos/features/inventory/presentation/stock_transfer/pages/widgets/stock_transfer_history_item_widget.dart';
 import 'package:amar_pos/features/inventory/presentation/stock_transfer/stock_transfer_controller.dart';
-import 'package:amar_pos/features/purchase/data/models/purchase_history_response_model.dart';
-import 'package:amar_pos/features/purchase/presentation/purchase_controller.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:amar_pos/core/widgets/custom_text_field.dart';
 import 'package:flutter/material.dart';
@@ -73,9 +69,7 @@ class _StockTransferHistoryScreenState extends State<StockTransferHistoryScreen>
                 CustomSvgIconButton(
                   bgColor: const Color(0xffEBFFDF),
                   onTap: () {
-                    // controller.downloadList(isPdf: false, purchaseHistory: true);
-                    // controller.downloadStockLedgerReport(
-                    //     isPdf: false, context: context);
+                    controller.downloadList(isPdf: false,);
                   },
                   assetPath: AppAssets.excelIcon,
                 ),
@@ -83,7 +77,7 @@ class _StockTransferHistoryScreenState extends State<StockTransferHistoryScreen>
                 CustomSvgIconButton(
                   bgColor: const Color(0xffE1F2FF),
                   onTap: () {
-                    // controller.downloadList(isPdf: true, purchaseHistory: true);
+                    controller.downloadList(isPdf: true,);
                   },
                   assetPath: AppAssets.downloadIcon,
                 ),
@@ -91,7 +85,7 @@ class _StockTransferHistoryScreenState extends State<StockTransferHistoryScreen>
                 CustomSvgIconButton(
                   bgColor: const Color(0xffFFFCF8),
                   onTap: () {
-                    // controller.downloadList(isPdf: true, purchaseHistory: true, shouldPrint: true);
+                    controller.downloadList(isPdf: true, shouldPrint: true);
                   },
                   assetPath: AppAssets.printIcon,
                 )

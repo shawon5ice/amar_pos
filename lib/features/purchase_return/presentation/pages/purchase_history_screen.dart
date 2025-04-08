@@ -10,6 +10,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/methods/helper_methods.dart';
 import '../../../../core/responsive/pixel_perfect.dart';
 import '../../../../core/widgets/pager_list_view.dart';
+import '../../../../core/widgets/reusable/forbidden_access_full_screen_widget.dart';
 import '../../../inventory/presentation/stock_report/widget/custom_svg_icon_widget.dart';
 import '../../data/models/purchase_return_history_response_model.dart';
 import '../purchase_return_controller.dart';
@@ -40,7 +41,7 @@ class _PurchaseReturnHistoryScreenState extends State<PurchaseReturnHistoryScree
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
-        body: Column(
+        body: !controller.historyAccess ? ForbiddenAccessFullScreenWidget() : Column(
           children: [
             Row(
               children: [

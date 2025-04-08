@@ -14,12 +14,9 @@ class PermissionManager{
   }
 
   static bool hasPermission(String permission) {
-    for (var module in _permissions.values) {
-      if (module.containsKey(permission)) {
-        return true;
-      }
-    }
-    return false;
+    String? parent = permission.split(".").first;
+    return _permissions[parent]
+        ?.containsKey(permission) ?? false;
   }
 
   static bool hasAnyPermission(List<String> requiredPermissions) {

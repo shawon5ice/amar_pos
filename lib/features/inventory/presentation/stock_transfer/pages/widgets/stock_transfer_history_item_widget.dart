@@ -98,8 +98,8 @@ class StockTransferHistoryItemWidget extends StatelessWidget {
                   borderColor: const Color(0xff03346E),
                   bgColor: const Color(0xffE1F2FF),
                   onTap: () {
-                    // controller.downloadPurchaseHistory(
-                    //     isPdf: true, orderId: purchaseHistory.id, orderNo: purchaseHistory.orderNo);
+                    controller.downloadStockTransferInvoice(
+                        isPdf: true, orderId: stockTransfer.id, orderNo: stockTransfer.orderNo);
                   },
                   assetPath: AppAssets.downloadIcon,
                 ),
@@ -108,29 +108,29 @@ class StockTransferHistoryItemWidget extends StatelessWidget {
                   borderColor: const Color(0xffFF9000),
                   bgColor: const Color(0xffFFFCF8),
                   onTap: () {
-                    // controller.downloadPurchaseHistory(
-                    //   shouldPrint: true,
-                    //     orderNo: purchaseHistory.orderNo,
-                    //     isPdf: true, orderId: purchaseHistory.id);
+                    controller.downloadStockTransferInvoice(
+                      shouldPrint: true,
+                        orderNo: stockTransfer.orderNo,
+                        isPdf: true, orderId: stockTransfer.id);
                   },
                   assetPath: AppAssets.printIcon,
                 ),
                 addW(8),
                 SoldHistoryItemActionMenu(
                   onSelected: (value) async{
-                    // if(stockTransfer.isActionable == false){
-                    //   ErrorExtractor.showSingleErrorDialog(context, "You can't perform any action on this invoice due to changed stock Value!");
-                    //   return;
-                    // }
+                    if(stockTransfer.isEditable == false){
+                      ErrorExtractor.showSingleErrorDialog(context, "You can't perform any action on this invoice due to changed stock Value!");
+                      return;
+                    }
                     switch (value) {
                       case "edit":
-                        bool hasPermission = await controller.checkPurchasePermissions("update");
+                        bool hasPermission =  controller.checkStockTransferPermissions("update");
                         if(!hasPermission) return;
-                        // await controller.processEdit(purchaseOrderInfo: purchaseHistory, context: context);
+                        await controller.processEdit(stockTransferId: stockTransfer.id, context: context);
                         onChange(0);
                         break;
                       case "delete":
-                        bool hasPermission = await controller.checkPurchasePermissions("destroy");
+                        bool hasPermission = controller.checkStockTransferPermissions("destroy");
                         if(!hasPermission) return;
                         AwesomeDialog(
                             context: context,
@@ -139,8 +139,8 @@ class StockTransferHistoryItemWidget extends StatelessWidget {
                             desc:
                             "You are going to delete order no: ${stockTransfer.orderNo}",
                             btnOkOnPress: () {
-                              // controller.deletePurchaseOrder(
-                              //     purchaseOrderInfo: purchaseHistory);
+                              controller.deleteStockTransfer(
+                                  stockTransferId: stockTransfer.id);
                             },
                             btnCancelOnPress: () {})
                             .show();

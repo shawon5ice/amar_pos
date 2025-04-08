@@ -8,6 +8,7 @@ import '../../../../core/constants/app_assets.dart';
 import '../../../../core/responsive/pixel_perfect.dart';
 import '../../../../core/widgets/custom_text_field.dart';
 import '../../../../core/widgets/pager_list_view.dart';
+import '../../../../core/widgets/reusable/forbidden_access_full_screen_widget.dart';
 import '../../../inventory/presentation/stock_report/widget/custom_svg_icon_widget.dart';
 import '../../data/models/purchase_return_products_response_model.dart';
 import '../widgets/purchase_return_product_item_widget.dart';
@@ -37,7 +38,7 @@ class _SoldHistoryState extends State<PurchaseReturnProducts> {
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
-        body: Column(
+        body: !controller.productAccess ? ForbiddenAccessFullScreenWidget() : Column(
           children: [
             Row(
               children: [

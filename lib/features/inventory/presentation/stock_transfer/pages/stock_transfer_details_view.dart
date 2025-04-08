@@ -363,10 +363,10 @@ class _StockTransferDetailsViewState
             ),
           ),
         ),
-        bottomNavigationBar: GetBuilder<PurchaseController>(
+        bottomNavigationBar: GetBuilder<StockTransferController>(
             id: 'download_print_buttons',
             builder: (controller){
-              if(controller.purchaseHistoryDetailsResponseModel != null){
+              if(controller.stockTransferHistoryDetailsResponseModel != null){
                 return Padding(
                   padding: const EdgeInsets.all(20),
                   child: Row(
@@ -377,7 +377,7 @@ class _StockTransferDetailsViewState
                           color: Color(0xff03346E),
                           radius: 8,
                           onTap: () {
-                            controller.downloadPurchaseHistory(
+                            controller.downloadStockTransferInvoice(
                                 isPdf: true, orderId: orderId, orderNo: orderNo);
                           },
                         ),
@@ -389,7 +389,7 @@ class _StockTransferDetailsViewState
                           radius: 8,
                           color: Color(0xffFF9000),
                           onTap: () {
-                            controller.downloadPurchaseHistory(
+                            controller.downloadStockTransferInvoice(
                                 shouldPrint: true,
                                 orderNo: orderNo,
                                 isPdf: true,
