@@ -26,6 +26,7 @@ class PurchaseController extends GetxController{
   bool productAccess = true;
   bool purchaseCreateAccess = true;
 
+  bool loadingShowing = false;
   bool isProductListLoading = false;
   bool isPaymentMethodListLoading = false;
   bool isLoadingMore = false;
@@ -146,6 +147,7 @@ class PurchaseController extends GetxController{
       {required String search, required int page}) async {
     isProductListLoading = page == 1; // Mark initial loading state
     isLoadingMore = page > 1;
+    loadingShowing = true;
 
     hasError.value = false;
     update(['purchase_product_list']);
@@ -180,6 +182,7 @@ class PurchaseController extends GetxController{
     } finally {
       isProductListLoading = false;
       isLoadingMore = false;
+      loadingShowing = false;
       update(['purchase_product_list']);
     }
   }
@@ -219,6 +222,7 @@ class PurchaseController extends GetxController{
 
 
 
+  bool isProcessing = false;
   void addPlaceOrderProduct(ProductInfo product, {List<String>? snNo, int? quantity, required num unitPrice,}) {
     logger.i(snNo);
     if (purchaseOrderProducts.any((e) => e.id == product.id)) {
@@ -228,7 +232,7 @@ class PurchaseController extends GetxController{
       x.unitPrice = unitPrice.toDouble();
 
     } else {
-      if(purchaseOrderProducts.isNotEmpty && !isEditing){
+      if(purchaseOrderProducts.isNotEmpty && !isProcessing){
         purchaseOrderProducts.insert(0, product);
 
         createPurchaseOrderModel.products.insert(0, PurchaseProductModel(
@@ -600,6 +604,7 @@ class PurchaseController extends GetxController{
   Future<void> processEdit({required PurchaseOrderInfo purchaseOrderInfo,required BuildContext context}) async{
     editPurchaseHistoryItemLoading = true;
     isEditing = true;
+    isProcessing = true;
     RandomLottieLoader.show();
     serviceStuffInfo = null;
     paymentMethodTracker.clear();
@@ -678,6 +683,7 @@ class PurchaseController extends GetxController{
     } finally {
 
       editPurchaseHistoryItemLoading = false;
+      isProcessing = false;
       update(['edit_purchase_history_item']);
       // Methods.hideLoading();
       RandomLottieLoader.hide();
@@ -701,7 +707,7 @@ class PurchaseController extends GetxController{
       // Parse the response
       if (response != null && response['success']) {
         // Remove the item from the list
-        purchaseHistoryList.remove(purchaseOrderInfo);
+        getPurchaseHistory();
         Methods.showSnackbar(msg: response['message'], isSuccess: true);
       } else {
         ErrorExtractor.showSingleErrorDialog(Get.context!, response['message']);

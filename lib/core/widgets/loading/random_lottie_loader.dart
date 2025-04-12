@@ -102,20 +102,20 @@ class RandomLottieLoader {
           children: [
             Center(
               child: Lottie.asset(
-                AppAssets.lottieFiles[randomIndex],
+                AppAssets.lottieFiles[3],
                 width: 150,
                 height: 150,
               ),
             ),
-            const Align(
-              alignment: Alignment.bottomCenter,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text("Loading..."),
-                ],
-              ),
-            ),
+            // const Align(
+            //   alignment: Alignment.bottomCenter,
+            //   child: Column(
+            //     crossAxisAlignment: CrossAxisAlignment.center,
+            //     children: [
+            //       Text("Loading..."),
+            //     ],
+            //   ),
+            // ),
           ],
         ),
       ),

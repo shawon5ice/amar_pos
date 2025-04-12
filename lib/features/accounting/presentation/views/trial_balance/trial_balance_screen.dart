@@ -168,7 +168,7 @@ class _TrialBalanceScreenState extends State<TrialBalanceScreen>
                       fixedLeftColumns: 1,
                       columnSpacing: 12,
                       horizontalMargin: 12,
-                      minWidth: 800,
+                      // minWidth: 800,
                       empty: const Center(
                         child: Text("No Data Found"),
                       ),
@@ -195,7 +195,6 @@ class _TrialBalanceScreenState extends State<TrialBalanceScreen>
                             'Account Title',
                             textAlign: TextAlign.center,
                           )),
-                          fixedWidth: 120,
                         ),
                         DataColumn2(
                             label: Center(

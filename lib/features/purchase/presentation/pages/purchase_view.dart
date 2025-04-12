@@ -238,14 +238,8 @@ class _PurchaseViewState extends State<PurchaseView> {
                           onSelected: (product) {
                             int i = 0;
                             int value = 0;
-                            for (;
-                                i <
-                                    controller
-                                        .createPurchaseOrderModel.products.length;
-                                i++) {
-                              if (product.id ==
-                                  controller
-                                      .createPurchaseOrderModel.products[i].id) {
+                            for (; i < controller.createPurchaseOrderModel.products.length; i++) {
+                              if (product.id == controller.createPurchaseOrderModel.products[i].id) {
                                 value = controller.createPurchaseOrderModel
                                     .products[i].quantity;
                                 break;
@@ -289,9 +283,11 @@ class _PurchaseViewState extends State<PurchaseView> {
                           emptyBuilder: (_) => const Center(
                             child: Text("No Items found!"),
                           ),
-                          loadingBuilder: (_) => Center(
-                            child:RandomLottieLoader.lottieLoader(),
-                          ),
+                          loadingBuilder: (_) {
+                            return Center(
+                              child: RandomLottieLoader.lottieLoader(),
+                          );
+                          },
                         );
                       },
                     ),

@@ -134,7 +134,7 @@ class _ProfitOrLossScreenState extends State<ProfitOrLossScreen>
                       // fixedLeftColumns: 1,
                       columnSpacing: 12,
                       horizontalMargin: 12,
-                      minWidth: 800,
+                      // minWidth: 800,
                       empty: const Center(
                         child: Text("No Data Found"),
                       ),
@@ -152,7 +152,6 @@ class _ProfitOrLossScreenState extends State<ProfitOrLossScreen>
                             'Account Title',
                             textAlign: TextAlign.center,
                           )),
-                          fixedWidth: context.width/2.5,
                         ),
                         DataColumn2(
                             label: Center(
@@ -161,7 +160,7 @@ class _ProfitOrLossScreenState extends State<ProfitOrLossScreen>
                               textAlign: TextAlign.center,
                             )),
                           numeric: true,
-                          fixedWidth: 100,
+                          fixedWidth: 120,
                         ),
                         DataColumn2(
                           label: Center(

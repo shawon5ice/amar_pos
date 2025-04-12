@@ -5,6 +5,7 @@ import 'package:amar_pos/features/config/data/model/outlet/outlet_list_model_res
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import '../../../../core/data/model/outlet_model.dart';
+import '../../../permission/permissions.dart';
 import '../../data/model/employee/employee_list_response_model.dart';
 import 'package:amar_pos/features/config/data/service/employee_service.dart';
 import 'package:amar_pos/features/config/data/service/supplier_service.dart';
@@ -29,7 +30,6 @@ class EmployeeController extends GetxController {
   EmployeeListModelResponse? employeeListModelResponse;
 
   String? fileName;
-
 
   Future<void> selectFile() async {
     final result = await FilePicker.platform.pickFiles();
@@ -60,6 +60,11 @@ class EmployeeController extends GetxController {
 
   }
 
+  @override
+  void onReady() {
+    getAllPermissions();
+    super.onReady();
+  }
 
   void getAllEmployee() async {
     logger.i("HELLO EMPLOYEE");
@@ -68,7 +73,7 @@ class EmployeeController extends GetxController {
     try{
       var response = await EmployeeService.getAll(usrToken: loginData!.token);
       if (response != null) {
-        logger.d(response);
+        // logger.d(response);
         employeeListModelResponse = EmployeeListModelResponse.fromJson(response);
         employeeList = employeeListModelResponse!.data.employeeList;
         allEmployeeCopy = employeeList;
@@ -78,6 +83,41 @@ class EmployeeController extends GetxController {
     }finally{
       employeeListLoading = false;
       update(['employee_list']);
+    }
+
+  }
+
+
+  bool permissionLoading = false;
+  PermissionApiResponse? permissionApiResponse;
+  Map<String, Map<String, bool>> permissionStatus = {};
+
+  Future<void> preparePermissions() async{
+    permissionStatus = {};
+    permissionApiResponse!.data.entries.forEach((outer) {
+      permissionStatus[outer.key] = {}; // initialize inner map
+
+      outer.value.entries.forEach((inner) {
+        permissionStatus[outer.key]![inner.key] = false; // assign value
+      });
+    });
+  }
+  void getAllPermissions() async {
+    logger.i("HELLO EMPLOYEE");
+    permissionLoading = true;
+    update(['employee_permissions']);
+    try{
+      var response = await EmployeeService.getPermissions(usrToken: LoginDataBoxManager().loginData!.token);
+
+      if (response != null) {
+        permissionApiResponse = PermissionApiResponse.fromJson(response,params: 'data');
+        logger.e(permissionStatus['Warranty']);
+      }
+    }catch(e){
+      logger.e(e);
+    }finally{
+      permissionLoading = false;
+      update(['employee_permissions']);
     }
 
   }

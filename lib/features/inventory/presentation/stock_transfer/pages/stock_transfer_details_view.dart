@@ -199,13 +199,13 @@ class _StockTransferDetailsViewState
                                 columnWidths: {
                                   0: FixedColumnWidth(40.w),
                                   1: FlexColumnWidth(),
-                                  2: FixedColumnWidth(60.w),
+                                  2: FixedColumnWidth(80.w),
                                 },
                                 children: [
                                   TableRow(
                                     decoration:
                                     BoxDecoration(color: Colors.grey[200]),
-                                    children: const [
+                                    children:  [
                                       Padding(
                                           padding: EdgeInsets.symmetric(
                                               horizontal: 4, vertical: 8),

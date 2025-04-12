@@ -66,35 +66,35 @@ class PurchaseProductListItem extends StatelessWidget {
                         ),
                         overflow: TextOverflow.visible,
                       ),
-                      addH(8.h),
-                      Row(
-                        children: [
-                          const Expanded(
-                            flex: 2,
-                            child: Text("Brand"),
-                          ),
-                          const Text(" : "),
-                          Flexible(
-                            flex: 8,
-                            child: Text(
-                                productInfo.brand),
-                          ),
-                        ],
-                      ),
-                      addH(4.h),
-                      Row(
-                        children: [
-                          const Expanded(
-                            flex: 2,
-                            child: Text("Category"),
-                          ),
-                          const Text(" : "),
-                          Flexible(
-                            flex: 8,
-                            child: Text(productInfo.category),
-                          ),
-                        ],
-                      ),
+                      // addH(8.h),
+                      // Row(
+                      //   children: [
+                      //     const Expanded(
+                      //       flex: 2,
+                      //       child: Text("Brand"),
+                      //     ),
+                      //     const Text(" : "),
+                      //     Flexible(
+                      //       flex: 8,
+                      //       child: Text(
+                      //           productInfo.brand),
+                      //     ),
+                      //   ],
+                      // ),
+                      // addH(4.h),
+                      // Row(
+                      //   children: [
+                      //     const Expanded(
+                      //       flex: 2,
+                      //       child: Text("Category"),
+                      //     ),
+                      //     const Text(" : "),
+                      //     Flexible(
+                      //       flex: 8,
+                      //       child: Text(productInfo.category),
+                      //     ),
+                      //   ],
+                      // ),
                     ],
                   ),
                 ),

@@ -83,6 +83,8 @@ class AppAssets {
     'assets/lottie/loading1.json',
     'assets/lottie/loading2.json',
     'assets/lottie/loading3.json',
+    'assets/lottie/loading_text.json',
+    'assets/lottie/loading_satellite.json'
   ];
 
 }

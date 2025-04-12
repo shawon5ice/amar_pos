@@ -35,7 +35,7 @@ class _PurchaseScreenState extends State<PurchaseScreen>
   void initState() {
     _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(() async {
-      if(_tabController.indexIsChanging){
+      if (_tabController.indexIsChanging) {
         controller.brand = null;
         controller.category = null;
         controller.selectedDateTimeRange.value = null;
@@ -43,33 +43,37 @@ class _PurchaseScreenState extends State<PurchaseScreen>
         FocusScope.of(context).unfocus();
         controller.update(['action_icon']);
       }
-      if (_tabController.index != _tabController.previousIndex && _tabController.previousIndex ==0 ) {
+
+      if (_tabController.index != _tabController.previousIndex && _tabController.previousIndex == 0) {
         controller.searchProductController.clear();
         controller.selectedDateTimeRange.value = null;
         FocusScope.of(context).unfocus();
-        // Check if the user is editing and is leaving the first tab
+
         if (controller.purchaseOrderProducts.isNotEmpty) {
-          // Store the new index
           int newIndex = _tabController.index;
 
-          // Revert the tab index temporarily
-          _tabController.index = _tabController.previousIndex;
+          // Instantly revert without animation to avoid glitch
+          _tabController.animateTo(_tabController.previousIndex, duration: Duration.zero);
 
-          // Show the discard dialog
           bool discard = await showDiscardDialog(context);
           logger.d(discard);
 
           if (discard) {
             controller.purchaseOrderProducts.clear();
-            _tabController.animateTo(newIndex);
             controller.clearEditing();
+
+            // Animate to new tab after discard confirmation
+            _tabController.animateTo(newIndex);
           }
         }
-        controller.update(['action_icon']); // Update the specific UI element
+
+        controller.update(['action_icon']);
       }
     });
+
     super.initState();
   }
+
 
   @override
   void dispose() {
@@ -147,7 +151,6 @@ class _PurchaseScreenState extends State<PurchaseScreen>
                     onPressed: () async {
                       showModalBottomSheet(context: context, builder: (context) => SimpleFilterBottomSheetWidget(
                         selectedBrand: controller.brand,
-                        disableDateTime: true,
                         disableOutlet: true,
                         selectedCategory: controller.category,
                         selectedDateTimeRange: controller.selectedDateTimeRange.value,

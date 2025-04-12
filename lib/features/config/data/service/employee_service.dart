@@ -30,6 +30,15 @@ class EmployeeService {
     return response;
   }
 
+  static Future<dynamic>getPermissions({
+    required String usrToken,
+  }) async {
+    var response = await BaseClient.getData(
+      token: usrToken,
+      api: "get-all-permissions",);
+    return response;
+  }
+
 
   static Future<dynamic> store({
     required String name,

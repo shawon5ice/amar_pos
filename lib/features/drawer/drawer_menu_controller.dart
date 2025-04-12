@@ -49,10 +49,20 @@ class DrawerMenuController extends GetxController {
     // purchaseModule.clear();
     // inventoryModule.clear();
     print("--->");
+    loadSaleModule();
     loadPurchaseModule();
     loadInventoryModule();
     logger.d(salesModule);
     update(['drawer_menu']);
+  }
+
+
+  void loadSaleModule(){
+    if(PermissionManager.hasParentPermission('Order')){
+      salesModule = true;
+    }else{
+      salesModule = false;
+    }
   }
 
   void loadInventoryModule(){

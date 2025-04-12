@@ -57,6 +57,7 @@ class Employee {
     this.designation,
     required this.photo,
     required this.status,
+    required this.permissions,
   });
   late final int id;
   late final Business? business;
@@ -73,6 +74,7 @@ class Employee {
   late final String? designation;
   late final String photo;
   late final int status;
+  late final Map<String, Map<String, String>>? permissions;
 
   Employee.fromJson(Map<String, dynamic> json){
     id = json['id'];
@@ -90,6 +92,8 @@ class Employee {
     designation = json['designation'];
     photo = json['photo'];
     status = json['status'];
+    permissions = json['permissions'] is Map<String, dynamic> ? (json['permissions'] as Map<String, dynamic>).map(
+            (k, e) => MapEntry(k, Map<String, String>.from(e as Map))) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -109,6 +113,7 @@ class Employee {
     _data['designation'] = designation;
     _data['photo'] = photo;
     _data['status'] = status;
+    _data['permissions'] = permissions;
     return _data;
   }
 }

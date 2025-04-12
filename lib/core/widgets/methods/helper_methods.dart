@@ -36,15 +36,15 @@ class Methods {
   }
 
   static String getFormatedPrice(double value) {
-    return '৳${NumberFormat('#,##,###').format(value)}';
+    return '৳${NumberFormat('#,##,###.##').format(value)}';
   }
 
   static String getFormattedPrice(double value) {
-    return '৳${NumberFormat('#,##,###').format(value)}';
+    return '৳${NumberFormat('#,##,###.##').format(value)}';
   }
 
   static String getFormattedNumber(double value) {
-    return NumberFormat('#,##,###').format(value);
+    return NumberFormat('#,##,###.##').format(value);
   }
 
   static String getFormattedNumberWithDecimal(double value) {

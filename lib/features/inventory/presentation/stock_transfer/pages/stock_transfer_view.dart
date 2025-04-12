@@ -231,7 +231,7 @@ class _StockTransferViewState extends State<StockTransferView> {
                                                               index]
                                                           .text);
                                                   controller.update(
-                                                      ['purchase_order_items']);
+                                                      ['purchase_order_items','billing_summary_button']);
                                                 } else {
                                                   if (purchaseQTYControllers
                                                       .isNotEmpty) {

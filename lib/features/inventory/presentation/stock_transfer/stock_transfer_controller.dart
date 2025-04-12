@@ -396,9 +396,13 @@ class StockTransferController extends GetxController{
         }
         selectedOutlet = null;
         if(outlets.isEmpty){
-          await getAllOutlet();
+          await getAllOutlet().then((value){
+            selectedOutlet = outlets.singleWhere((e) => e.id == stockTransferHistoryDetailsResponseModel!.data.toStore.id);
+          });
+        }else{
+          selectedOutlet = outlets.singleWhere((e) => e.id == stockTransferHistoryDetailsResponseModel!.data.toStore.id);
         }
-        selectedOutlet = outlets.singleWhere((e) => e.id == stockTransferHistoryDetailsResponseModel!.data.toStore.id);
+        createStockTransferRequestModel.storeId = selectedOutlet?.id ?? -1;
         logger.i(stockTransferHistoryDetailsResponseModel!.data.type);
         changeTransferType(stockTransferHistoryDetailsResponseModel!.data.type == 1);
       }
@@ -563,6 +567,10 @@ class StockTransferController extends GetxController{
     var response = await BaseClient.getData(
       token: loginData!.token,
       api: NetWorkStrings.getAllOutletsDD,
+      parameter: {
+        "is_self_store": 0,
+        "is_transitional": 0
+      }
     );
 
     if (response != null && response['success']) {

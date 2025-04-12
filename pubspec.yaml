@@ -65,6 +65,7 @@ dependencies:
   device_preview_plus:
   data_table_2: 2.5.15
   barcode: ^2.2.9
+  mobile_scanner: 
 
 
 dev_dependencies:
