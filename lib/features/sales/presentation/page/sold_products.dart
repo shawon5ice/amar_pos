@@ -7,10 +7,12 @@ import '../../../../core/responsive/pixel_perfect.dart';
 import '../../../../core/widgets/custom_text_field.dart';
 import '../../../../core/widgets/methods/helper_methods.dart';
 import '../../../../core/widgets/pager_list_view.dart';
+import '../../../../core/widgets/reusable/status/total_status_widget.dart';
 import '../../../inventory/presentation/stock_report/widget/custom_svg_icon_widget.dart';
 import '../../data/models/sold_product/sold_product_response_model.dart';
 import '../controller/sales_controller.dart';
 import '../widgets/sold_history_item_widget.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class SoldProduct extends StatefulWidget {
   const SoldProduct({super.key});
@@ -155,66 +157,5 @@ class _SoldHistoryState extends State<SoldProduct> {
         ),
       ),
     );
-  }
-}
-
-class TotalStatusWidget extends StatelessWidget {
-  const TotalStatusWidget({
-    super.key,
-    required this.title,
-    this.value,
-    required this.isLoading,
-    required this.asset,
-    this.flex = 1,
-  });
-
-  final String title;
-  final String? value;
-  final bool isLoading;
-  final String asset;
-  final int flex;
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-        flex: flex,
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      color: Color(0xffA2A2A2),
-                      fontSize: 14,
-                    ),
-                  ),
-                  const Spacer(),
-                  SvgPicture.asset(asset)
-                ],
-              ),
-              addH(12),
-              isLoading
-                  ? Container(
-                  height: 30, width: 30, child: CircularProgressIndicator())
-                  : Text(
-                value != null ? value! : '--',
-                style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 20,
-                    height: 1.5
-                ),
-              )
-            ],
-          ),
-        ));
   }
 }

@@ -1,19 +1,19 @@
 import 'dart:async';
 import 'package:amar_pos/core/core.dart';
-import 'package:amar_pos/core/data/data.dart';
+import 'package:amar_pos/core/network/helpers/error_extractor.dart';
 import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:amar_pos/features/return/data/models/create_return_order_model.dart';
 import 'package:amar_pos/features/return/data/models/return_history/return_history_response_model.dart';
 import 'package:amar_pos/features/return/data/models/return_history_details_response_model.dart';
 import 'package:amar_pos/features/return/data/models/return_payment_method_tracker.dart';
 import 'package:amar_pos/features/return/data/service/return_service.dart';
-import 'package:amar_pos/features/sales/data/service/sales_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/constants/logger/logger.dart';
 import '../../../auth/data/model/hive/login_data.dart';
 import '../../../auth/data/model/hive/login_data_helper.dart';
 import '../../../inventory/data/products/product_list_response_model.dart';
+import '../../../sales/data/models/payment_method_tracker.dart';
 import '../../data/models/client_list_response_model.dart';
 import '../../data/models/return_products/return_product_response_model.dart';
 
@@ -26,6 +26,8 @@ class ReturnController extends GetxController {
   bool filterListLoading = false;
   String generatedBarcode = "";
   bool barcodeGenerationLoading = false;
+
+  bool justChanged = false;
 
   bool createReturnOrderLoading = false;
   LoginData? loginData = LoginDataBoxManager().loginData;
@@ -123,6 +125,7 @@ class ReturnController extends GetxController {
 
   void changeSellingParties(bool value) {
     isRetailSale = value;
+    logger.i(isRetailSale);
     paymentMethodTracker.clear();
     redefinePrice();
     calculateAmount();
@@ -149,16 +152,36 @@ class ReturnController extends GetxController {
     }
     totalPaid = excludeAmount;
     if(totalPaid>=paidAmount){
-      Methods.showSnackbar(msg: "Full amount already distributed");
+      logger.i("$totalPaid ---> $paidAmount");
+      ErrorExtractor.showSingleErrorDialog(Get.context!,  "Full amount already distributed");
+      // Methods.showSnackbar(msg: "Full amount already distributed",duration: 5);
       return;
     }
     paymentMethodTracker.add(ReturnPaymentMethodTracker(
         id: paymentMethodTracker.length + 1,
-      paidAmount: paidAmount - excludeAmount
+        paidAmount: paidAmount - excludeAmount
     ));
     calculateAmount();
-    update(['return_summary_form']);
+    update(['billing_summary_form']);
   }
+
+  // void addPaymentMethod(){
+  //   num excludeAmount = 0;
+  //   for(var e in paymentMethodTracker){
+  //     excludeAmount += e.paidAmount ?? 0;
+  //   }
+  //   totalPaid = excludeAmount;
+  //   if(totalPaid>=paidAmount){
+  //     Methods.showSnackbar(msg: "Full amount already distributed");
+  //     return;
+  //   }
+  //   paymentMethodTracker.add(ReturnPaymentMethodTracker(
+  //       id: paymentMethodTracker.length + 1,
+  //     paidAmount: paidAmount - excludeAmount
+  //   ));
+  //   calculateAmount();
+  //   update(['return_summary_form']);
+  // }
 
 
   num getTotalPayable() {
@@ -195,20 +218,46 @@ class ReturnController extends GetxController {
     }
   }
 
-  void addPlaceOrderProduct(ProductInfo product, {List<String>? snNo, int? quantity}) {
+  bool isProcessing = false;
+
+  void addPlaceOrderProduct(ProductInfo product, {List<String>? snNo, int? quantity,required num unitPrice}) {
     if (returnOrderProducts.any((e) => e.id == product.id)) {
-      createOrderModel.products
-          .firstWhere((e) => e.id == product.id)
-          .quantity++;
+      var x  = createOrderModel.products
+          .firstWhere((e) => e.id  == product.id);
+      x.quantity++;
+      x.unitPrice = x.unitPrice;
     } else {
-      returnOrderProducts.add(product);
-      createOrderModel.products.add(ReturnProductModel(
-          id: product.id,
-          unitPrice: isRetailSale ? product.mrpPrice.toDouble() : product.wholesalePrice.toDouble(),
-          quantity: quantity?? 1,
-          vat: (product.vat/100 * (isRetailSale ? product.mrpPrice.toDouble() : product
-              .wholesalePrice.toDouble())).toDouble(),
-          serialNo: snNo ?? []));
+
+      if(returnOrderProducts.isNotEmpty && !isProcessing){
+        returnOrderProducts.insert(0, product);
+
+        createOrderModel.products.insert(0, ReturnProductModel(
+            id: product.id,
+            unitPrice: isRetailSale ? product.mrpPrice.toDouble() : product
+                .wholesalePrice.toDouble(),
+            quantity:quantity?? 1,
+            vat: (product.vat/100 * (isRetailSale ? product.mrpPrice.toDouble() : product
+                .wholesalePrice.toDouble())).toDouble(),
+            serialNo: snNo ?? []));
+      }else{
+        returnOrderProducts.add(product);
+
+        num? unitPriceFromCreateModel;
+
+        for(int i= 0;i<createOrderModel.products.length ;i++){
+          if(createOrderModel.products[i].id == product.id){
+            unitPriceFromCreateModel = createOrderModel.products[i].unitPrice;
+          }
+        }
+
+        createOrderModel.products.add(ReturnProductModel(
+            id: product.id,
+            unitPrice: unitPriceFromCreateModel ?? unitPrice,
+            quantity:quantity?? 1,
+            vat: (product.vat/100 * (isRetailSale ? product.mrpPrice.toDouble() : product
+                .wholesalePrice.toDouble())).toDouble(),
+            serialNo: snNo ?? []));
+      }
     }
     update(['place_order_items', 'billing_summary_button']);
   }
@@ -236,19 +285,17 @@ class ReturnController extends GetxController {
     cashSelected = cash;
     totalPaid = excludeAmount;
     for (var e in createOrderModel.products) {
+      var product = returnOrderProducts.singleWhere((f) => f.id == e.id);
       totalQ += e.quantity;
-      totalV += e.vat * e.quantity;
+      totalV += product.isVatApplicable == 1 ? e.vat * e.quantity : 0;
       totalA += e.unitPrice * e.quantity;
     }
     totalAmount = totalA;
     totalVat = totalV;
     totalQTY = totalQ;
-    paidAmount = totalAmount + totalVat + additionalExpense - totalDiscount;
-    if(firstTime == null){
-      totalDeu =  paidAmount - totalPaid;
-    }
+    paidAmount = totalAmount  + additionalExpense - totalDiscount;
 
-    update(['selling_party_selection','change-due-amount', 'return_summary_form']);
+    update(['change-due-amount', 'return_summary_form']);
   }
 
   void changeQuantityOfProduct(int index, bool increase) {
@@ -280,10 +327,14 @@ class ReturnController extends GetxController {
   }
 
   FutureOr<List<ProductInfo>> suggestionsCallback(String search) async {
+
     // Check if the search term is in the existing items
+    List<ProductInfo> exactlyFound = currentSearchList.where((item) => item.sku.toLowerCase() == search.toString().toLowerCase()).toList();
+
+
     var x = getAll(search);
-    if (x.isNotEmpty) {
-      return x;
+    if(exactlyFound.isNotEmpty){
+      return exactlyFound;
     } else {
       // If not found locally, fetch from API
       await getAllProducts(search: search, page: 1);
@@ -293,11 +344,8 @@ class ReturnController extends GetxController {
 
   getAll(search) {
     var filteredItems = currentSearchList
-        .where((item) => item.sku.toLowerCase().contains(search.toLowerCase()))
+        .where((item) => item.sku.toLowerCase().contains(search.toLowerCase()) || item.name.toLowerCase().contains(search.toLowerCase()))
         .toList();
-    filteredItems.addAll(currentSearchList
-        .where((item) => item.name.toLowerCase().contains(search.toLowerCase()))
-        .toList());
     return filteredItems;
   }
 
@@ -672,7 +720,7 @@ class ReturnController extends GetxController {
         //selecting products
         for (var e in saleHistoryDetailsResponseModel!.data.orderDetails) {
           ProductInfo productInfo = productsListResponseModel!.data.productList.singleWhere((f) => f.id == e.id);
-          addPlaceOrderProduct(productInfo, snNo: e.snNo.map((e) => e.serialNo).toList(), quantity:  e.quantity);
+          addPlaceOrderProduct(productInfo, snNo: e.snNo.map((e) => e.serialNo).toList(), quantity:  e.quantity, unitPrice: e.unitPrice);
         }
 
         //Payment Methods
@@ -728,7 +776,7 @@ class ReturnController extends GetxController {
         totalPaid = saleHistoryDetailsResponseModel!.data.payable;
         totalDiscount = saleHistoryDetailsResponseModel!.data.discount;
         additionalExpense = saleHistoryDetailsResponseModel!.data.expense;
-        totalDeu = saleHistoryDetailsResponseModel!.data.changeAmount * -1;
+        // totalDeu = saleHistoryDetailsResponseModel!.data.changeAmount * -1;
       }
     } catch (e) {
       hasError.value = true;

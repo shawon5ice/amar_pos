@@ -82,7 +82,7 @@ class CreateReturnOrderModel {
 
 class ReturnProductModel {
   int id;
-  double unitPrice;
+  num unitPrice;
   int quantity;
   num vat;
   num? discount;

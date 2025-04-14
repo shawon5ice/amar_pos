@@ -1,4 +1,5 @@
 import 'package:amar_pos/core/core.dart';
+import 'package:amar_pos/core/network/helpers/error_extractor.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/features/return/presentation/controller/return_controller.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
@@ -8,6 +9,7 @@ import 'package:get/get.dart';
 
 import '../../../../core/constants/app_assets.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/methods/number_input_formatter.dart';
 import '../../../../core/widgets/custom_text_field.dart';
 import '../../../../core/widgets/field_title.dart';
 import '../../data/models/return_payment_method_tracker.dart';
@@ -79,24 +81,25 @@ class _ReturnSummaryPaymentOptionSelectionWidgetState
                         ),
                         items: controller.returnPaymentMethods?.data
                             .map((PaymentMethod item) {
-                              return DropdownMenuItem<PaymentMethod>(
-                                  value: item,
-                                  child: Text(
-                                    item.name,
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                );
-                            })
+                          return DropdownMenuItem<PaymentMethod>(
+                            value: item,
+                            child: Text(
+                              item.name,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          );
+                        })
                             .toList(),
                         value: widget.paymentMethodTracker.paymentMethod,
                         onChanged: (value) {
                           if (value != null) {
                             if(value.name.toLowerCase().contains("cash") && controller.cashSelected || value.name.toLowerCase().contains("credit") && controller.creditSelected ){
-                              Methods.showSnackbar(msg: "Please select another payment method");
+                              ErrorExtractor.showSingleErrorDialog(context, "Please select another payment method");
+                              // Methods.showSnackbar(msg: "Please select another payment method");
                               return;
                             }
                             if(value.name.toLowerCase().contains("cash")){
@@ -112,13 +115,13 @@ class _ReturnSummaryPaymentOptionSelectionWidgetState
                           }
                         },
                         buttonStyleData: ButtonStyleData(
-                          height: 48.sp,
+                          height: 56,
                           padding: EdgeInsets.zero,
                           decoration: BoxDecoration(
                             border:
-                                Border.all(color: AppColors.inputBorderColor),
+                            Border.all(color: AppColors.inputBorderColor),
                             borderRadius:
-                                const BorderRadius.all(Radius.circular(8)),
+                            const BorderRadius.all(Radius.circular(8)),
                           ),
                         ),
                         dropdownStyleData: const DropdownStyleData(
@@ -149,13 +152,17 @@ class _ReturnSummaryPaymentOptionSelectionWidgetState
                       textCon: paidAmount,
                       hintText: "Type here",
                       inputType: TextInputType.number,
+                      inputFormatters: [
+                        NumberInputFormatter()
+                      ],
                       onChanged: (value) {
                         if(value.isNotEmpty){
                           try{
-                            widget.paymentMethodTracker.paidAmount = num.parse(value);
+                            widget.paymentMethodTracker.paidAmount = num.parse(value.replaceAll(',', ''));
                             controller.calculateAmount();
                           }catch(e){
-                            Methods.showSnackbar(msg: "Please type a valid amount");
+                            ErrorExtractor.showSingleErrorDialog(context, "Please type a valid amount");
+                            // Methods.showSnackbar(msg: "Please type a valid amount");
                           }
                         }else{
                           widget.paymentMethodTracker.paidAmount = 0;
@@ -187,6 +194,7 @@ class _ReturnSummaryPaymentOptionSelectionWidgetState
                   widget.paymentMethodTracker.paidAmount = 0;
                   widget.onDeleteTap();
                 }
+
                 // controller.deletePaymentMethod(widget.key!);
                 controller.update(['billing_summary_form']);
               }, child: Padding(
@@ -202,72 +210,79 @@ class _ReturnSummaryPaymentOptionSelectionWidgetState
             ],
           ),
           widget.paymentMethodTracker.paymentMethod != null &&
-                  widget.paymentMethodTracker.paymentMethod!.paymentOptions
-                      .isNotEmpty
+              widget.paymentMethodTracker.paymentMethod!.paymentOptions
+                  .isNotEmpty
               ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    addH(8),
-                    RichFieldTitle(
-                      text: "Payment Options",
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              addH(8),
+              RichFieldTitle(
+                text: "Payment Options",
+              ),
+              addH(4),
+              DropdownButtonHideUnderline(
+                child: DropdownButton2<PaymentOption>(
+                  isExpanded: true,
+                  hint: Text(
+                    "Select Payment Options",
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Theme.of(context).hintColor,
                     ),
-                    addH(4),
-                    DropdownButtonHideUnderline(
-                      child: DropdownButton2<PaymentOption>(
-                        isExpanded: true,
-                        hint: Text(
-                          "Select Payment Options",
+                  ),
+                  items: widget
+                      .paymentMethodTracker.paymentMethod?.paymentOptions
+                      .map((PaymentOption item) =>
+                      DropdownMenuItem<PaymentOption>(
+                        value: item,
+                        child: Text(
+                          item.name,
                           style: TextStyle(
                             fontSize: 12,
-                            color: Theme.of(context).hintColor,
+                            fontWeight: FontWeight.bold,
                           ),
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        items: widget
-                            .paymentMethodTracker.paymentMethod?.paymentOptions
-                            .map((PaymentOption item) =>
-                                DropdownMenuItem<PaymentOption>(
-                                  value: item,
-                                  child: Text(
-                                    item.name,
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ))
-                            .toList(),
-                        value: widget.paymentMethodTracker.paymentOption,
-                        onChanged: (value) {
-                          widget.paymentMethodTracker.paymentOption = value;
-                          controller
-                              .update(['billing_payment_methods', 'billing_summary_form']);
-                        },
-                        buttonStyleData: ButtonStyleData(
-                          height: 48,
-                          padding: EdgeInsets.zero,
-                          decoration: BoxDecoration(
-                            border:
-                                Border.all(color: AppColors.inputBorderColor),
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(8)),
-                          ),
-                        ),
-                        dropdownStyleData: const DropdownStyleData(
-                          maxHeight: 200,
-                          offset: Offset(0, 4),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.all(Radius.circular(8)),
-                          ),
-                        ),
-                        menuItemStyleData: const MenuItemStyleData(
-                          height: 40,
-                        ),
-                      ),
+                      ))
+                      .toList(),
+                  value: widget.paymentMethodTracker.paymentOption,
+                  onChanged: (value) {
+                    for(int i=0;i<controller.paymentMethodTracker.length; i++){
+                      if(controller.paymentMethodTracker[i].paymentOption?.id == value?.id ){
+                        ErrorExtractor.showSingleErrorDialog(context, "Please select another bank");
+                        // Methods.showSnackbar(msg: "Please select another bank");
+                        return;
+                      }
+                    }
+                    widget.paymentMethodTracker.paymentOption = value;
+                    controller
+                        .update(['billing_payment_methods', 'billing_summary_form']);
+                  },
+                  buttonStyleData: ButtonStyleData(
+                    height: 48,
+                    padding: EdgeInsets.zero,
+                    decoration: BoxDecoration(
+                      border:
+                      Border.all(color: AppColors.inputBorderColor),
+                      borderRadius:
+                      const BorderRadius.all(Radius.circular(8)),
                     ),
-                  ],
-                )
+                  ),
+                  dropdownStyleData: const DropdownStyleData(
+                    maxHeight: 200,
+                    offset: Offset(0, 4),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                    ),
+                  ),
+                  menuItemStyleData: const MenuItemStyleData(
+                    height: 40,
+                  ),
+                ),
+              ),
+            ],
+          )
               : SizedBox.shrink(),
         ],
       ),

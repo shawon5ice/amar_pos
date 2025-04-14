@@ -3,6 +3,7 @@ import 'package:amar_pos/core/widgets/custom_button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/network/helpers/error_extractor.dart';
 import '../../../../core/widgets/custom_text_field.dart';
 import '../../../../core/widgets/dashed_line.dart';
 import '../../../../core/widgets/field_title.dart';
@@ -45,12 +46,30 @@ class _PlaceOrderProductSnSelectionDialogState
     super.dispose();
   }
 
+  void addSN(){
+    String value = textEditingController.text;
+    if(value.isEmpty){
+      ErrorExtractor.showSingleErrorDialog(context, "Please insert a valid sn code");
+      return;
+    }
+
+    for(int i = 0;i<widget.product.serialNo.length; i++){
+      if(value == widget.product.serialNo[i]){
+        ErrorExtractor.showSingleErrorDialog(context, "You've already added \"$value\" SN code");
+        return;
+      }
+    }
+    widget.product.serialNo.add(value);
+    textEditingController.text = '';
+    widget.controller.update(['purchase_order_product_sn_list','sn_input_field']);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(
         bottom:
-            MediaQuery.of(context).viewInsets.bottom, // Adjusts for keyboard
+        MediaQuery.of(context).viewInsets.bottom, // Adjusts for keyboard
       ),
       child: SingleChildScrollView(
         child: Padding(
@@ -98,86 +117,96 @@ class _PlaceOrderProductSnSelectionDialogState
                     const SizedBox(height: 8),
                     GetBuilder<SalesController>(
                       id: 'sn_input_field',
-                      builder: (controller) => CustomTextField(
-                        enabledFlag: widget.product.quantity <=
-                                widget.product.serialNo.length
-                            ? false
-                            : true,
-                        onSubmitted: (value) {
-                          widget.product.serialNo.add(value);
-                          textEditingController.clear();
-                          widget.controller
-                              .update(['create_order_product_sn_list']);
-                        },
-                        textCon: textEditingController,
-                        hintText: "Enter Serial Number",
-                        suffixWidget: InkWell(
-                            onTap: () async {
-                              final String? scannedCode =
-                              await Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                  const QRCodeScannerScreen(),
-                                ),
-                              );
-                              if (scannedCode != null &&
-                                  scannedCode.isNotEmpty) {
-                                textEditingController.text = scannedCode;
-                                widget.product.serialNo.add(scannedCode);
-                                textEditingController.clear();
-                                controller.update([
-                                  'create_order_product_sn_list',
-                                  'sn_input_field'
-                                ]);
-                              }
-                            },
-                            child: const Icon(
-                              Icons.qr_code_scanner_sharp,
-                              color: AppColors.accent,
-                            )),
+                      builder: (controller) => Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Expanded(
+                            flex: 8,
+                            child: CustomTextField(
+                              enabledFlag: widget.product.quantity <=
+                                  widget.product.serialNo.length
+                                  ? false
+                                  : true,
+                              onSubmitted: (value) {
+                                addSN();
+                              },
+                              textCon: textEditingController,
+                              hintText: "Enter Serial Number",
+                              suffixWidget: InkWell(
+                                  onTap: () async {
+                                    final String? scannedCode =
+                                    await Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                        const QRCodeScannerScreen(),
+                                      ),
+                                    );
+                                    if (scannedCode != null &&
+                                        scannedCode.isNotEmpty) {
+                                      textEditingController.text = scannedCode;
+                                      addSN();
+                                    }
+                                  },
+                                  child: const Icon(
+                                    Icons.qr_code_scanner_sharp,
+                                    color: AppColors.accent,
+                                  )),
+                            ),
+                          ),
+                          addW(8),
+                          Expanded(
+                            flex: 2,
+                            child: CustomButton(
+                              radius: 8,
+                              text: 'ADD',
+                              onTap: (){
+                                addSN();
+                              },
+                            ),
+                          )
+                        ],
                       ),
                     ),
                     const SizedBox(height: 8),
-                    if (widget.product.serialNo.isNotEmpty)
-                      Column(
+                    GetBuilder<SalesController>(
+                      id: 'purchase_order_product_sn_list',
+                      builder: (controller) => widget.product.serialNo.isNotEmpty ? Column(
                         children: [
                           const DashedLine(),
                           const SizedBox(height: 8),
-                          GetBuilder<SalesController>(
-                            id: 'create_order_product_sn_list',
-                            builder: (controller) => ConstrainedBox(
-                              constraints: BoxConstraints(maxHeight: 150),
-                              child: SingleChildScrollView(
-                                child: Wrap(
-                                  spacing: 4,
-                                  children: widget.product.serialNo
-                                      .map(
-                                        (e) => Chip(
-                                          elevation: 4,
-                                          label: Text(
-                                            e,
-                                            style: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 14.sp),
-                                          ),
-                                          onDeleted: () {
-                                            widget.product.serialNo.remove(e);
-                                            controller.update([
-                                              'create_order_product_sn_list',
-                                              'sn_input_field'
-                                            ]);
-                                          },
-                                        ),
-                                      )
-                                      .toList(),
-                                ),
+                          ConstrainedBox(
+                            constraints: BoxConstraints(maxHeight: 150),
+                            child: SingleChildScrollView(
+                              child: Wrap(
+                                spacing: 4,
+                                children: widget.product.serialNo.reversed
+                                    .map(
+                                      (e) => Chip(
+                                    elevation: 4,
+                                    label: Text(
+                                      e,
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 14.sp),
+                                    ),
+                                    onDeleted: () {
+                                      widget.product.serialNo.remove(e);
+                                      controller.update([
+                                        'purchase_order_product_sn_list',
+                                        'sn_input_field'
+                                      ]);
+                                    },
+                                  ),
+                                )
+                                    .toList(),
                               ),
                             ),
                           ),
                           addH(4),
                           DashedLine(),
                         ],
-                      ),
+                      ) : SizedBox.shrink(),
+                    ),
                   ],
                 ),
               ),

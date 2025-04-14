@@ -92,6 +92,7 @@ class SalesController extends GetxController {
   int totalQTY = 0;
   num totalPaid = 0;
   num totalDeu = 0;
+  num totalChangeAmount = 0;
 
   num paidAmount = 0;
 
@@ -158,13 +159,9 @@ class SalesController extends GetxController {
       excludeAmount += e.paidAmount ?? 0;
     }
     totalPaid = excludeAmount;
-    if (totalPaid >= paidAmount) {
-      Methods.showSnackbar(msg: "Full amount already distributed");
-      return;
-    }
     paymentMethodTracker.add(PaymentMethodTracker(
       id: paymentMethodTracker.length + 1,
-        paidAmount: paidAmount - excludeAmount
+        paidAmount: totalPaid >= paidAmount ?  0 : paidAmount - excludeAmount
     ));
     calculateAmount();
     update(['billing_summary_form']);
@@ -192,9 +189,6 @@ class SalesController extends GetxController {
     } finally {
       isPaymentMethodListLoading = false;
       update(['billing_payment_methods']);
-      if(!isEditing){
-        addPaymentMethod();
-      }
     }
   }
 
@@ -207,7 +201,7 @@ class SalesController extends GetxController {
       x.unitPrice = x.unitPrice;
     } else {
 
-      if(placeOrderProducts.isNotEmpty && !isEditing){
+      if(placeOrderProducts.isNotEmpty && !isProcessing){
         placeOrderProducts.insert(0, product);
 
         createOrderModel.products.insert(0, SaleProductModel(
@@ -274,6 +268,13 @@ class SalesController extends GetxController {
     totalVat = totalV;
     totalQTY = totalQ;
     paidAmount = totalAmount + totalVat + additionalExpense - totalDiscount;
+    if(paidAmount <= totalAmount){
+      totalChangeAmount = 0;
+      totalDeu = paidAmount - totalPaid;
+    }else{
+      totalDeu = 0;
+      totalChangeAmount = totalPaid - paidAmount;
+    }
     if (firstTime == null) {
       totalDeu = paidAmount - totalPaid;
     }
@@ -773,9 +774,11 @@ class SalesController extends GetxController {
   //   }
   // }
 
+  bool isProcessing = false;
   Future<void> processEdit({required SaleHistory saleHistory,required BuildContext context}) async{
     editSoldHistoryItemLoading = true;
     isEditing = true;
+    isProcessing = true;
     RandomLottieLoader.show();
     serviceStuffInfo = null;
     paymentMethodTracker.clear();
@@ -881,6 +884,7 @@ class SalesController extends GetxController {
     } finally {
 
       editSoldHistoryItemLoading = false;
+      isProcessing = false;
       update(['edit_purchase_history_item']);
       // Methods.hideLoading();
       RandomLottieLoader.hide();

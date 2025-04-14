@@ -1,11 +1,11 @@
-import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 import '../../../responsive/pixel_perfect.dart';
 
 class TotalStatusWidget extends StatelessWidget {
-  const TotalStatusWidget({
+  TotalStatusWidget({
     super.key,
     required this.title,
     this.value,
@@ -17,7 +17,7 @@ class TotalStatusWidget extends StatelessWidget {
   final String title;
   final String? value;
   final bool isLoading;
-  final String? asset;
+  String? asset;
   final int flex;
 
   @override
@@ -25,10 +25,10 @@ class TotalStatusWidget extends StatelessWidget {
     return Expanded(
         flex: flex,
         child: Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(20.r),
+            borderRadius: BorderRadius.circular(12.r),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -42,14 +42,14 @@ class TotalStatusWidget extends StatelessWidget {
                       fontSize: 12.sp,
                     ),
                   ),
-                  const Spacer(),
-                  asset != null ? SvgPicture.asset(asset!) : SizedBox.shrink()
+                  if(asset != null)const Spacer(),
+                  if(asset != null)SvgPicture.asset(asset!)
                 ],
               ),
-              asset != null ? addH(8.h) : addH(4.h),
+              addH(8.h),
               isLoading
                   ? Container(
-                  height: 30.sp, width: 30.sp, child: SpinKitFadingGrid(color: Colors.black,size: 20,) )
+                  height: 24.sp, width: 24.sp, child: CupertinoActivityIndicator() )
                   : Text(
                 value != null ? value! : '--',
                 style: TextStyle(

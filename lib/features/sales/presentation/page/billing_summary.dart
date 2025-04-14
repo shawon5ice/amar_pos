@@ -1,5 +1,6 @@
 import 'package:amar_pos/core/constants/app_colors.dart';
 import 'package:amar_pos/core/core.dart';
+import 'package:amar_pos/core/methods/number_input_formatter.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/core/widgets/custom_button.dart';
 import 'package:amar_pos/core/widgets/custom_text_field.dart';
@@ -11,6 +12,7 @@ import 'package:amar_pos/features/sales/presentation/controller/sales_controller
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import '../widgets/billing_summary_payment_option_selection_widget.dart';
 import '../widgets/solde_history_details_view.dart';
 
@@ -43,10 +45,11 @@ class _BillingSummaryState extends State<BillingSummary> {
     customerPayableAmountEditingController = TextEditingController();
     customerChangeAmountEditingController = TextEditingController();
 
+    customerNameEditingController.text = controller.createOrderModel.name;
+    customerPhoneNumberEditingController.text = controller.createOrderModel.phone;
+    customerAddressEditingController.text = controller.createOrderModel.address;
+
     if(controller.isEditing){
-      customerNameEditingController.text = controller.createOrderModel.name;
-      customerPhoneNumberEditingController.text = controller.createOrderModel.phone;
-      customerAddressEditingController.text = controller.createOrderModel.address;
       customerTotalDiscountEditingController.text = controller.saleHistoryDetailsResponseModel!.data.discount.toString();
       customerAdditionalExpensesEditingController.text = controller.saleHistoryDetailsResponseModel!.data.expense.toString();
       customerChangeAmountEditingController.text = controller.totalDeu.toString();
@@ -57,9 +60,15 @@ class _BillingSummaryState extends State<BillingSummary> {
       if(controller.billingPaymentMethods == null){
         controller.getPaymentMethods();
       }
+      if(controller.isRetailSale == false && controller.clientList.isEmpty){
+        controller.getAllClientList();
+      }
     }
 
 
+    if(!controller.isEditing && controller.paymentMethodTracker.isEmpty){
+      controller.addPaymentMethod();
+    }
 
     controller.calculateAmount(firstTime: true);
 
@@ -154,6 +163,9 @@ class _BillingSummaryState extends State<BillingSummary> {
                                               .text = value.phone;
                                           customerAddressEditingController.text =
                                               value.address;
+                                          controller.createOrderModel.phone = value.phone;
+                                          controller.createOrderModel.address = value.address;
+                                          controller.createOrderModel.customerId = value.id;
                                           controller.update(['client_list']);
                                         }
                                       },
@@ -189,6 +201,7 @@ class _BillingSummaryState extends State<BillingSummary> {
                             enabledFlag: controller.isRetailSale,
                             textCon: customerPhoneNumberEditingController,
                             hintText: "Type phone number",
+                            inputType: TextInputType.phone,
                             validator: (value) =>
                                 FieldValidator.nonNullableFieldValidator(
                                     value, "Phone number"),
@@ -200,9 +213,9 @@ class _BillingSummaryState extends State<BillingSummary> {
                             enabledFlag: controller.isRetailSale,
                             textCon: customerAddressEditingController,
                             hintText: "Type customer address",
-                            validator: (value) =>
-                                FieldValidator.nonNullableFieldValidator(
-                                    value, "Address"),
+                            // validator: (value) =>
+                            //     FieldValidator.nonNullableFieldValidator(
+                            //         value, "Address"),
                           ),
                           addH(8),
                           Row(
@@ -260,11 +273,14 @@ class _BillingSummaryState extends State<BillingSummary> {
                                           value = "0";
                                         }
                                         controller.additionalExpense =
-                                            num.parse(value);
+                                            num.parse(value.replaceAll(',', ''));
                                         controller.calculateAmount();
                                         controller
                                             .update(['billing_summary_form']);
                                       },
+                                      inputFormatters: [
+                                        NumberInputFormatter(),
+                                      ],
                                       validator: (value) {
                                         try {
                                           if (value != null && value.isNotEmpty) {
@@ -311,12 +327,15 @@ class _BillingSummaryState extends State<BillingSummary> {
                                           customerTotalDiscountEditingController,
                                       hintText: "Type here",
                                       inputType: TextInputType.number,
+                                      inputFormatters: [
+                                        NumberInputFormatter(),
+                                      ],
                                       onChanged: (value) {
                                         if (value.isEmpty) {
                                           value = "0";
                                         }
                                         controller.totalDiscount =
-                                            num.parse(value);
+                                            num.parse(value.replaceAll(',', ''));
                                         controller.calculateAmount();
                                         controller
                                             .update(['billing_summary_form']);
@@ -390,12 +409,12 @@ class _BillingSummaryState extends State<BillingSummary> {
                                           children: [
                                             // addH(16.h),
                                             FieldTitle(
-                                                "${controller.totalDeu < 0 ? "Change" : "Due"} Amount"),
+                                                "${controller.totalDeu >= 0 ? "Due" : "Change"} Amount"),
                                             addH(4),
                                             CustomTextField(
                                               enabledFlag: false,
                                               textCon: TextEditingController(
-                                                  text: (controller.totalDeu)
+                                                  text: (controller.totalDeu >= 0  ? controller.totalDeu : controller.totalChangeAmount)
                                                       .toString()),
                                               hintText: "Type here",
                                               inputType: TextInputType.number,
@@ -498,7 +517,7 @@ class _BillingSummaryState extends State<BillingSummary> {
                         bankId: e.paymentOption?.id));
                   }
                 }
-                if(controller.totalDeu<0){
+                if(controller.totalDeu>0){
                   Methods.showSnackbar(msg: "Payment amount must be grater then or equal to ${controller.paidAmount}. Please Adjust");
                   return;
                 }

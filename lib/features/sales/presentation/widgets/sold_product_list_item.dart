@@ -2,6 +2,7 @@ import 'package:amar_pos/core/core.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/features/inventory/presentation/products/widgets/product_quick_edit.dart';
 import 'package:amar_pos/features/sales/data/models/sold_product/sold_product_response_model.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -134,8 +135,10 @@ class SoldProductListItem extends StatelessWidget {
                       border: Border.all(
                           color: const Color(0xff94DB8C).withOpacity(.3))),
                   child: Center(
-                      child: Text(
-                        "Sold Price : ${Methods.getFormatedPrice(productInfo.soldPrice.toDouble())}",
+                      child: AutoSizeText(
+                        maxFontSize: 14,
+                        minFontSize: 6,
+                        "Price : ${Methods.getFormatedPrice(productInfo.soldPrice.toDouble())}",
                         style: context.textTheme.titleSmall?.copyWith(
                             color: Color(0xff009D5D),
                             fontSize: 14,

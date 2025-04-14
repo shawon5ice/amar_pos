@@ -8,6 +8,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import '../../../../core/constants/app_assets.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/methods/number_input_formatter.dart';
 import '../../../../core/widgets/custom_text_field.dart';
 import '../../../../core/widgets/field_title.dart';
 
@@ -148,10 +149,13 @@ class _BillingSummaryPaymentOptionSelectionWidgetState
                       textCon: paidAmount,
                       hintText: "Type here",
                       inputType: TextInputType.number,
+                      inputFormatters: [
+                        NumberInputFormatter()
+                      ],
                       onChanged: (value) {
                         if(value.isNotEmpty){
                           try{
-                            widget.paymentMethodTracker.paidAmount = num.parse(value);
+                            widget.paymentMethodTracker.paidAmount = num.parse(value.replaceAll(',', ''));
                             controller.calculateAmount();
                           }catch(e){
                             Methods.showSnackbar(msg: "Please type a valid amount");

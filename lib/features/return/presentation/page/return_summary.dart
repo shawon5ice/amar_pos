@@ -12,6 +12,7 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../sales/presentation/widgets/billing_summary_payment_option_selection_widget.dart';
 import '../../data/models/client_list_response_model.dart';
 import '../../data/models/create_return_order_model.dart';
 
@@ -43,25 +44,38 @@ class _ReturnSummaryState extends State<ReturnSummary> {
     customerPayableAmountEditingController = TextEditingController();
     customerChangeAmountEditingController = TextEditingController();
 
-    if(!controller.isEditing){
-      controller.paymentMethodTracker.clear();
-      controller.totalDiscount = 0;
-      controller.additionalExpense = 0;
-      controller.paidAmount = 0;
-      controller.isRetailSale = true;
-      controller.redefinePrice();
-      controller.serviceStuffInfo = null;
-      controller.selectedClient = null;
+    if(controller.serviceStuffList.isEmpty){
       controller.getAllServiceStuff();
+    }
+    if(controller.isRetailSale == false && controller.clientList.isEmpty){
       controller.getAllClientList();
+    }
+    if(controller.returnPaymentMethods == null){
       controller.getPaymentMethods();
-    }else{
-      customerNameEditingController.text = controller.createOrderModel.name;
-      customerPhoneNumberEditingController.text = controller.createOrderModel.phone;
-      customerAddressEditingController.text = controller.createOrderModel.address;
-      customerTotalDiscountEditingController.text = controller.saleHistoryDetailsResponseModel!.data.discount.toString();
-      customerAdditionalExpensesEditingController.text = controller.saleHistoryDetailsResponseModel!.data.expense.toString();
-      customerChangeAmountEditingController.text = controller.totalDeu.toString();
+    }
+    // if(!controller.isEditing){
+    //   controller.paymentMethodTracker.clear();
+    //   controller.totalDiscount = 0;
+    //   controller.additionalExpense = 0;
+    //   controller.paidAmount = 0;
+    //   controller.isRetailSale = true;
+    //   controller.redefinePrice();
+    //   controller.serviceStuffInfo = null;
+    //   controller.selectedClient = null;
+    // }else{
+    //
+    // }
+
+    customerNameEditingController.text = controller.createOrderModel.name;
+    customerPhoneNumberEditingController.text = controller.createOrderModel.phone;
+    customerAddressEditingController.text = controller.createOrderModel.address;
+    customerTotalDiscountEditingController.text = controller.totalDiscount.toString();
+    customerAdditionalExpensesEditingController.text = controller.additionalExpense.toString();
+    customerChangeAmountEditingController.text = controller.totalDeu.toString();
+
+
+    if(!controller.isEditing && controller.paymentMethodTracker.isEmpty){
+      controller.addPaymentMethod();
     }
 
     controller.calculateAmount(firstTime: true);
@@ -97,23 +111,6 @@ class _ReturnSummaryState extends State<ReturnSummary> {
             key: formKey,
             child: Column(
               children: [
-                GetBuilder<ReturnController>(
-                  id: "selling_party_selection",
-                  builder: (controller) => Row(
-                    children: [
-                      CustomRadioButton(
-                        title: "Retail Return",
-                        value: true,
-                      ),
-                      addW(10),
-                      CustomRadioButton(
-                        title: "Wholesale Return",
-                        value: false,
-                      ),
-                    ],
-                  ),
-                ),
-                addH(12),
                 GetBuilder<ReturnController>(
                   id: "return_summary_form",
                   builder: (controller) => Container(
@@ -173,6 +170,10 @@ class _ReturnSummaryState extends State<ReturnSummary> {
                                             .text = value.phone;
                                         customerAddressEditingController.text =
                                             value.address;
+
+                                        controller.createOrderModel.phone = value.phone;
+                                        controller.createOrderModel.address = value.address;
+                                        controller.createOrderModel.customerId = value.id;
                                         controller.update(['client_list']);
                                       }
                                     },
@@ -353,30 +354,30 @@ class _ReturnSummaryState extends State<ReturnSummary> {
                         addH(8),
                         Row(
                           children: [
-                            Expanded(
-                              child: GetBuilder<ReturnController>(
-                                  id: "change-due-amount",
-                                  builder: (controller) => Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          addH(16.h),
-                                          FieldTitle(
-                                              "${controller.totalDeu < 0 ? "Change" : "Deo"} Amount"),
-                                          addH(4),
-                                          CustomTextField(
-                                            enabledFlag: false,
-                                            textCon: TextEditingController(
-                                                text: (controller.totalDeu)
-                                                    .toString()),
-                                            hintText: "Type here",
-                                            inputType: TextInputType.number,
-                                            onChanged: (value) {},
-                                          ),
-                                        ],
-                                      )),
-                            ),
-                            addW(8),
+                            // Expanded(
+                            //   child: GetBuilder<ReturnController>(
+                            //       id: "change-due-amount",
+                            //       builder: (controller) => Column(
+                            //             crossAxisAlignment:
+                            //                 CrossAxisAlignment.start,
+                            //             children: [
+                            //               addH(16.h),
+                            //               FieldTitle(
+                            //                   "${controller.totalDeu < 0 ? "Change" : "Deo"} Amount"),
+                            //               addH(4),
+                            //               CustomTextField(
+                            //                 enabledFlag: false,
+                            //                 textCon: TextEditingController(
+                            //                     text: (controller.totalDeu)
+                            //                         .toString()),
+                            //                 hintText: "Type here",
+                            //                 inputType: TextInputType.number,
+                            //                 onChanged: (value) {},
+                            //               ),
+                            //             ],
+                            //           )),
+                            // ),
+                            // addW(8),
                             Expanded(
                               child: GetBuilder<ReturnController>(
                                 id: 'service_stuff_list',
@@ -476,62 +477,6 @@ class _ReturnSummaryState extends State<ReturnSummary> {
             }
           },
           text:  controller.isEditing ? "Update Order" : "Place Order",
-        ),
-      ),
-    );
-  }
-}
-
-class CustomRadioButton extends StatelessWidget {
-  CustomRadioButton({
-    super.key,
-    required this.title,
-    required this.value,
-    this.result,
-  });
-
-  final bool value;
-
-  final String title;
-  final Function()? result;
-
-  final ReturnController controller = Get.find();
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: () {
-          controller.changeSellingParties(value);
-        },
-        child: Container(
-          height: 40.sp,
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: AppColors.lightGreen),
-              borderRadius: BorderRadius.circular(20)),
-          child: Row(
-            children: [
-              AutoSizeText(
-                title,
-                minFontSize: 8,
-                maxFontSize: 14,
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const Spacer(),
-              Radio(
-                visualDensity: VisualDensity.compact,
-                value: value,
-                activeColor: const Color(0xff009D5D),
-                groupValue: controller.isRetailSale,
-                onChanged: (value) {
-                  controller.changeSellingParties(value!);
-                },
-              )
-            ],
-          ),
         ),
       ),
     );

@@ -11,6 +11,7 @@ import '../../../../core/constants/app_assets.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/logger/logger.dart';
 import '../../../../core/methods/number_input_formatter.dart';
+import '../../../../core/network/helpers/error_extractor.dart';
 import '../../../../core/responsive/pixel_perfect.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_text_field.dart';
@@ -403,7 +404,7 @@ class _PlaceOrderState extends State<PlaceOrder> {
                                 .toString()),
                             child: Container(
                               margin: const EdgeInsets.only(top: 4, bottom: 4),
-                              padding: const EdgeInsets.all(20),
+                              padding: EdgeInsets.only(top: 20,left: 20, right: 20, bottom: controller.placeOrderProducts[index].isVatApplicable == 1 ? 4 : 20),
                               decoration: const BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.all(
@@ -574,6 +575,7 @@ class _PlaceOrderState extends State<PlaceOrder> {
                                   ),
                                   addH(8),
                                   Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                     children: [
@@ -712,23 +714,40 @@ class _PlaceOrderState extends State<PlaceOrder> {
                                               GetBuilder<SalesController>(
                                                   id: 'sub_total',
                                                   builder: (controller) {
-                                                    return CustomTextField(
-                                                        contentPadding: 12,
-                                                        txtSize: 14,
-                                                        enabledFlag: false,
-                                                        textCon: TextEditingController(
-                                                            text: Methods.getFormattedNumber(
-                                                                controller
-                                                                    .createOrderModel
-                                                                    .products[index]
-                                                                    .unitPrice
-                                                                    .toDouble() *
+                                                    return Column(
+                                                      children: [
+                                                        CustomTextField(
+                                                            contentPadding: 12,
+                                                            txtSize: 14,
+                                                            enabledFlag: false,
+                                                            textCon: TextEditingController(
+                                                                text: Methods.getFormattedNumber(
                                                                     controller
                                                                         .createOrderModel
                                                                         .products[index]
-                                                                        .quantity
-                                                                        .toDouble())),
-                                                        hintText: 'Subtotal');
+                                                                        .unitPrice
+                                                                        .toDouble() *
+                                                                        controller
+                                                                            .createOrderModel
+                                                                            .products[index]
+                                                                            .quantity
+                                                                            .toDouble())),
+                                                            hintText: 'Subtotal'),
+                                                        if(controller.placeOrderProducts[index].isVatApplicable == 1)
+                                                          Column(
+                                                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                                                            mainAxisSize: MainAxisSize.min,
+                                                            children: [
+                                                              addH(2),
+                                                              Text(
+                                                                "VAT: ${Methods.getFormattedNumber((controller.createOrderModel.products[index].vat * controller.createOrderModel.products[index].quantity).toDouble())}",
+                                                                style: TextStyle(
+                                                                    color: AppColors.error, fontWeight: FontWeight.normal),
+                                                              ),
+                                                            ],
+                                                          )
+                                                      ],
+                                                    );
                                                   }),
                                             ],
                                           )),
@@ -767,9 +786,17 @@ class _PlaceOrderState extends State<PlaceOrder> {
                       child: CustomButton(
                         onTap: () async {
                           FocusScope.of(context).unfocus();
-                         await Get.to(() => BillingSummary())?.then((value) {
-                            FocusScope.of(context).unfocus();
-                          });
+                          for(int i = 0; i < controller.createOrderModel.products.length; i++){
+                            if(controller.createOrderModel.products[i].serialNo.isNotEmpty && controller.createOrderModel.products[i].serialNo.length != controller.createOrderModel.products[i].quantity){
+                              ErrorExtractor.showSingleErrorDialog(context, "Please fix SN quantity issue of ${controller.placeOrderProducts[i].name}");
+                              return;
+                            }
+                          }
+                          if (formKey.currentState!.validate()) {
+                            await Get.to(() => const BillingSummary())?.then((value) {
+                              FocusScope.of(context).unfocus();
+                            });
+                          }
                         },
                         text: "Billing Summary",
                       ),
