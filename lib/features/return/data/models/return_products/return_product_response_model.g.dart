@@ -11,6 +11,8 @@ ReturnProductResponseModel _$ReturnProductResponseModelFromJson(
     ReturnProductResponseModel(
       success: json['success'] as bool,
       data: Data.fromJson(json['data'] as Map<String, dynamic>),
+      countTotal: json['count_total'],
+      amountTotal: json['amount_total'],
     );
 
 Map<String, dynamic> _$ReturnProductResponseModelToJson(
@@ -36,7 +38,7 @@ ReturnProduct _$ReturnProductFromJson(Map<String, dynamic> json) =>
     ReturnProduct(
       id: (json['id'] as num).toInt(),
       category: json['category'] as String,
-      brand: json['brand'] as String,
+      brand: json['brand'] as String? ?? '--',
       product: json['product'] as String,
       quantity: (json['quantity'] as num).toInt(),
       soldPrice: json['sold_price'] as num,

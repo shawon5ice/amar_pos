@@ -7,13 +7,14 @@ class Customer {
   final int id;
   final String name;
   final String phone;
-  final String address;
+  @JsonKey(defaultValue: "--")
+  String? address;
 
   Customer({
     required this.id,
     required this.name,
     required this.phone,
-    required this.address,
+    this.address,
   });
 
   factory Customer.fromJson(Map<String, dynamic> json) => _$CustomerFromJson(json);
