@@ -95,28 +95,12 @@ class RandomLottieLoader {
     final randomIndex = Random().nextInt(AppAssets.lottieFiles.length);
 
     return  SizedBox(
-      height: Get.height * .5,
+      height: Get.height,
       child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Center(
-              child: Lottie.asset(
-                AppAssets.lottieFiles[3],
-                width: 150,
-                height: 150,
-              ),
-            ),
-            // const Align(
-            //   alignment: Alignment.bottomCenter,
-            //   child: Column(
-            //     crossAxisAlignment: CrossAxisAlignment.center,
-            //     children: [
-            //       Text("Loading..."),
-            //     ],
-            //   ),
-            // ),
-          ],
+        child: Lottie.asset(
+          AppAssets.lottieFiles[3],
+          width: 150,
+          height: 150,
         ),
       ),
     );

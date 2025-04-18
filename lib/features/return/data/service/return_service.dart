@@ -188,18 +188,7 @@ class ReturnServices{
       fileName: fileName,);
   }
 
-  static downloadReturnHistory(
-      {required String usrToken,
-        required ReturnHistory returnHistory}) async {
 
-    String downloadUrl =
-        "${NetWorkStrings.baseUrl}/return/download-return-invoice/${returnHistory.id}";
-
-    FileDownloader().downloadFile(
-      url: downloadUrl,
-      token: usrToken,
-      fileName: "${returnHistory.orderNo}.pdf",);
-  }
 
 
   static Future<dynamic> getReturnHistoryDetails({
@@ -211,5 +200,18 @@ class ReturnServices{
       api: "return/get-return-details/$id",
     );
     return response;
+  }
+
+  static downloadReturnHistory(
+      {required String usrToken, required int orderId, required String fileName, bool? shouldPrint}) async {
+    // logger.d("PDF: $isPdf");
+
+    String downloadUrl = "${NetWorkStrings.baseUrl}/return/download-return-invoice/$orderId";
+
+    FileDownloader().downloadFile(
+      url: downloadUrl,
+      token: usrToken,
+      shouldPrint: shouldPrint,
+      fileName: fileName,);
   }
 }

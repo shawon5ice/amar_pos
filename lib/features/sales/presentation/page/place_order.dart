@@ -335,8 +335,8 @@ class _PlaceOrderState extends State<PlaceOrder> {
                         emptyBuilder: (_) => const Center(
                           child: Text("No Items found!"),
                         ),
-                        loadingBuilder: (_) => const Center(
-                          child: CircularProgressIndicator(),
+                        loadingBuilder: (_) => Center(
+                          child: RandomLottieLoader.lottieLoader(),
                         ),
                       );
                     },

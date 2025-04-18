@@ -125,7 +125,7 @@ class _ProductListFilterBottomSheetState
                                 Row(
                                   children: [
                                     addW(16),
-                                    Text("Retail Sals", style: TextStyle(color: Color(0xff7C7C7C), fontSize: 14),),
+                                    Text("Retail Return", style: TextStyle(color: Color(0xff7C7C7C), fontSize: 14),),
                                     Spacer(),
                                     Checkbox(value: controller.retailSale, onChanged: (value){
                                       if(value != null){
@@ -143,7 +143,7 @@ class _ProductListFilterBottomSheetState
                                 Row(
                                   children: [
                                     addW(16),
-                                    Text("Wholesal",style: TextStyle(color: Color(0xff7C7C7C), fontSize: 14),),
+                                    Text("Wholesale Return",style: TextStyle(color: Color(0xff7C7C7C), fontSize: 14),),
                                     Spacer(),
                                     Checkbox(value: controller.wholeSale, onChanged: (value){
                                       if(value != null){

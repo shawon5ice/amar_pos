@@ -1,3 +1,4 @@
+import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:amar_pos/features/exchange/exchange_controller.dart';
 import 'package:amar_pos/features/exchange/presentation/widgets/exchange_product_sn_selection_widget.dart';
 import 'package:flutter/material.dart';
@@ -147,8 +148,8 @@ class _ReturnProductSelectionStepState extends State<ReturnProductSelectionStep>
                     emptyBuilder: (_) => const Center(
                       child: Text("No Items found!"),
                     ),
-                    loadingBuilder: (_) => const Center(
-                      child: CircularProgressIndicator(),
+                    loadingBuilder: (_) => Center(
+                      child: RandomLottieLoader.lottieLoader(),
                     ),
                   );
                 },

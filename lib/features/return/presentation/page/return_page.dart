@@ -1,3 +1,5 @@
+import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
+import 'package:amar_pos/features/return/data/models/create_return_order_model.dart';
 import 'package:amar_pos/features/return/presentation/controller/return_controller.dart';
 import 'package:amar_pos/features/return/presentation/page/return_summary.dart';
 import 'package:amar_pos/features/return/presentation/widgets/return_order_product_sn_selection_dialog.dart';
@@ -32,18 +34,81 @@ class ReturnPage extends StatefulWidget {
 }
 
 class _ReturnPageState extends State<ReturnPage> {
-  late TextEditingController suggestionEditingController;
-  final formKey = GlobalKey<FormState>();
+
   final ReturnController controller = Get.find();
+  List<TextEditingController> purchaseControllers = [];
+  List<TextEditingController> purchaseQTYControllers = [];
+
+  final formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
-    suggestionEditingController = TextEditingController();
+    logger.d(controller.createOrderModel.toJson());
+    if (!controller.isEditing) {
+      // controller.createOrderModel =
+      //     CreateReturnOrderModel.defaultConstructor();
+      // controller.returnOrderProducts.clear();
+    } else {
+      for (var e in controller.createOrderModel.products) {
+        logger.i("--->");
+        if(purchaseControllers.isNotEmpty && !controller.isEditing){
+          purchaseControllers.insert(0,TextEditingController(
+            text: e.unitPrice.toString(),
+          ));
+          purchaseQTYControllers.insert(0,TextEditingController(
+            text: e.quantity.toString(),
+          ));
+        }else{
+          purchaseControllers.add(TextEditingController(
+            text: e.unitPrice.toString(),
+          ));
+          purchaseQTYControllers.add(TextEditingController(
+            text: e.quantity.toString(),
+          ));
+        }
+      }
+      logger.i(purchaseControllers.length);
+    }
     super.initState();
   }
 
-  List<TextEditingController> purchaseControllers = [];
-  List<TextEditingController> purchaseQTYControllers = [];
+  late TextEditingController suggestionEditingController;
+
+
+  void initializeData() {
+    logger.i("initializeData called. Product count: ${controller.createOrderModel.products.length}");
+
+    if (controller.createOrderModel.products.isEmpty) {
+      logger.e("Products are empty! Initialization skipped.");
+      return;
+    }
+
+    setState(() {
+      purchaseControllers.clear();
+      purchaseQTYControllers.clear();
+
+      for (var e in controller.createOrderModel.products) {
+        purchaseControllers.add(TextEditingController(
+          text: e.unitPrice.toString(),
+        ));
+        purchaseQTYControllers.add(TextEditingController(
+          text: e.quantity.toString(),
+        ));
+      }
+      logger.i("Initialized ${purchaseControllers.length} controllers.");
+    });
+  }
+
+
+
+  @override
+  void dispose() {
+    for (int i = 0; i < purchaseControllers.length; i++) {
+      purchaseControllers[i].dispose();
+      purchaseQTYControllers[i].dispose();
+    }
+    super.dispose();
+  }
 
   void updatePricesForSaleType(List<TextEditingController> controllers) {
     for (int i = 0; i < controller.createOrderModel.products.length; i++) {
@@ -273,8 +338,8 @@ class _ReturnPageState extends State<ReturnPage> {
                         emptyBuilder: (_) => const Center(
                           child: Text("No Items found!"),
                         ),
-                        loadingBuilder: (_) => const Center(
-                          child: CircularProgressIndicator(),
+                        loadingBuilder: (_) => Center(
+                          child: RandomLottieLoader.lottieLoader(),
                         ),
                       );
                     },
@@ -286,7 +351,7 @@ class _ReturnPageState extends State<ReturnPage> {
                     backgroundColor: AppColors.accent,
                     child: IconButton(
                       onPressed: () {
-                        Get.toNamed(AddProductScreen.routeName);
+                        Get.toNamed(AddProductScreen.routeName,arguments: true);
                       },
                       icon: const Icon(Icons.add),
                     ),
@@ -295,7 +360,6 @@ class _ReturnPageState extends State<ReturnPage> {
               ],
             ),
             addH(12),
-
             Expanded(
               child: GetBuilder<ReturnController>(
                 id: "place_order_items",
@@ -458,8 +522,7 @@ class _ReturnPageState extends State<ReturnPage> {
                                                               color:controller
                                                                   .createOrderModel
                                                                   .products[index]
-                                                                  .serialNo
-                                                                  .length >
+                                                                  .serialNo.length >
                                                                   controller
                                                                       .createOrderModel
                                                                       .products[index]
@@ -699,263 +762,6 @@ class _ReturnPageState extends State<ReturnPage> {
                         },
                       ),
                     );
-                    return ListView.builder(
-                      itemCount: controller.returnOrderProducts.length,
-                      itemBuilder: (_, index) {
-                        return Slidable(
-                          endActionPane: ActionPane(
-                              motion: const ScrollMotion(),
-                              children: [
-                                addW(10),
-                                CustomSlidableAction(
-                                    onPressed: (context) => controller
-                                        .removePlaceOrderProduct(controller
-                                        .returnOrderProducts[index]),
-                                    backgroundColor: const Color(0xffEF4B4B),
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(20)),
-                                    child: Center(
-                                      child: SvgPicture.asset(
-                                        AppAssets.deleteIc,
-                                        // Path to your SVG file
-                                        height: 24,
-                                        width: 24,
-                                      ),
-                                    )),
-                              ]),
-                          key: Key(controller.returnOrderProducts[index].id
-                              .toString()),
-                          child: Container(
-                            margin: const EdgeInsets.only(top: 4, bottom: 4),
-                            padding: const EdgeInsets.all(20),
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(20),
-                              ),
-                            ),
-                            child: Column(
-                              children: [
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Container(
-                                      width: 70,
-                                      height: 70,
-                                      padding: EdgeInsets.all(1),
-                                      decoration: ShapeDecoration(
-                                        color: const Color(0x33BEBEBE)
-                                            .withOpacity(.3),
-                                        // image: DecorationImage(image: NetworkImage(controller.supplierList[index].photo!)),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                          BorderRadius.circular(10.r),
-                                        ),
-                                      ),
-                                      child: ClipRRect(
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(8.r)),
-                                          child: Image.network(
-                                            controller.returnOrderProducts[index]
-                                                .thumbnailImage
-                                                .toString(),
-                                            height: 70,
-                                            width: 70,
-                                            fit: BoxFit.cover,
-                                          )),
-                                    ),
-                                    addW(12),
-                                    Expanded(
-                                      flex: 8,
-                                      child: Column(
-                                        mainAxisAlignment:
-                                        MainAxisAlignment.start,
-                                        crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            controller
-                                                .returnOrderProducts[index]
-                                                .name,
-                                            style: context
-                                                .textTheme.titleSmall
-                                                ?.copyWith(
-                                              fontSize: 13,
-                                            ),
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                          addH(8),
-                                          Text(
-                                            "ID : ${controller.returnOrderProducts[index].sku}",
-                                            style: TextStyle(
-                                                color:
-                                                const Color(0xff40ACE3),
-                                                fontWeight: FontWeight.w400,
-                                                fontSize: 14),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                addH(12),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                        child: Text(
-                                          "Price : ${Methods.getFormatedPrice(controller.returnOrderProducts[index].mrpPrice.toDouble())}",
-                                          style: const TextStyle(
-                                              color: AppColors.primary),
-                                        )),
-                                    Expanded(
-                                        child: Text(
-                                          "Vat : ${Methods.getFormatedPrice((controller.returnOrderProducts[index].vat*(controller.returnOrderProducts[index].mrpPrice/100)).toDouble())}",
-                                          style: const TextStyle(
-                                              color: AppColors.primary),
-                                        )),
-                                    Expanded(
-                                        child: Text(
-                                          "Sub Total : ${Methods.getFormatedPrice(controller.returnOrderProducts[index].mrpPrice.toDouble() * controller.createOrderModel.products[index].quantity.toDouble())}",
-                                          style: const TextStyle(
-                                              color: AppColors.primary),
-                                        )),
-                                  ],
-                                ),
-                                addH(12),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Container(
-                                        // margin: EdgeInsets.only(right: 20),
-                                        height: 30,
-                                        decoration: BoxDecoration(
-                                            color: const Color(0xffFFFBED)
-                                                .withOpacity(.3),
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(20.r)),
-                                            border: Border.all(
-                                                color: const Color(0xffff9000)
-                                                    .withOpacity(.3),
-                                                width: .5)),
-                                        child: Center(
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Text(
-                                                  "Quantity : ${controller.createOrderModel.products[index].quantity}",
-                                                  style: context
-                                                      .textTheme.titleSmall
-                                                      ?.copyWith(
-                                                    color: const Color(0xffFF9000),
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.w600,
-                                                  ),
-                                                ),
-                                                addW(8),
-                                                Row(
-                                                  mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                                  children: [
-                                                    GestureDetector(
-                                                      onTap: () {
-                                                        controller
-                                                            .changeQuantityOfProduct(
-                                                            index, false);
-                                                      },
-                                                      child: const Icon(
-                                                          Icons.keyboard_arrow_down,
-                                                          size: 24,
-                                                          color: AppColors.error),
-                                                    ),
-                                                    GestureDetector(
-                                                      onTap: () {
-                                                        controller
-                                                            .changeQuantityOfProduct(
-                                                            index, true);
-                                                      },
-                                                      child: const Icon(
-                                                        Icons.keyboard_arrow_up,
-                                                        size: 24,
-                                                        color: AppColors.lightGreen,
-                                                      ),
-                                                    )
-                                                  ],
-                                                )
-                                              ],
-                                            )),
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      width: 8,
-                                    ),
-                                    Expanded(
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          showModalBottomSheet(
-                                            context: context,
-                                            isScrollControlled: true,
-                                            shape: const RoundedRectangleBorder(
-                                              borderRadius:
-                                              BorderRadius.vertical(
-                                                  top: Radius.circular(20)),
-                                            ),
-                                            builder: (context) {
-                                              return ReturnOrderProductSnSelectionDialog(
-                                                product: controller
-                                                    .createOrderModel
-                                                    .products[index],
-                                                productInfo: controller
-                                                    .returnOrderProducts[index],
-                                                controller: controller,
-                                              );
-                                            },
-                                          );
-                                        },
-                                        child: Container(
-                                          height: 30,
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 12),
-                                          decoration: BoxDecoration(
-                                              color: const Color(0xffF6FFF6),
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(20.r)),
-                                              border: Border.all(
-                                                  color: const Color(0xff94DB8C)
-                                                      .withOpacity(.3))),
-                                          child: Row(
-                                            children: [
-                                              Text(
-                                                "Serial No.",
-                                                style: context
-                                                    .textTheme.titleSmall
-                                                    ?.copyWith(
-                                                  color:
-                                                  const Color(0xff009D5D),
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w600,
-                                                ),
-                                              ),
-                                              const Spacer(),
-                                              SvgPicture.asset(
-                                                AppAssets.snAdd,
-                                                height: 14,
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                )
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    );
                   }
                 },
               ),
@@ -965,23 +771,40 @@ class _ReturnPageState extends State<ReturnPage> {
         bottomNavigationBar: GetBuilder<ReturnController>(
           id: "billing_summary_button",
           builder: (controller) => controller.returnOrderProducts.isNotEmpty
-              ? CustomButton(
-                onTap: () async {
-                  FocusScope.of(context).unfocus();
-                  for(int i = 0; i < controller.createOrderModel.products.length; i++){
-                    if(controller.createOrderModel.products[i].serialNo.isNotEmpty && controller.createOrderModel.products[i].serialNo.length != controller.createOrderModel.products[i].quantity){
-                      ErrorExtractor.showSingleErrorDialog(context, "Please fix SN quantity issue of ${controller.returnOrderProducts[i].name}");
-                      return;
+              ? Row(
+            children: [
+              CircleAvatar(
+                radius: 30,
+                backgroundColor: AppColors.accent,
+                child: GestureDetector(
+                  child: SvgPicture.asset(
+                    AppAssets.pauseBillingIcon,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              addW(12),
+              Expanded(
+                child: CustomButton(
+                  onTap: () async {
+                    FocusScope.of(context).unfocus();
+                    for(int i = 0; i < controller.createOrderModel.products.length; i++){
+                      if(controller.createOrderModel.products[i].serialNo.isNotEmpty && controller.createOrderModel.products[i].serialNo.length != controller.createOrderModel.products[i].quantity){
+                        ErrorExtractor.showSingleErrorDialog(context, "Please fix SN quantity issue of ${controller.returnOrderProducts[i].name}");
+                        return;
+                      }
                     }
-                  }
-                  if (formKey.currentState!.validate()) {
-                    await Get.to(() => const ReturnSummary())?.then((value) {
-                      FocusScope.of(context).unfocus();
-                    });
-                  }
-                },
-                text: "Return Summary",
+                    if (formKey.currentState!.validate()) {
+                      await Get.to(() => const ReturnSummary())?.then((value) {
+                        FocusScope.of(context).unfocus();
+                      });
+                    }
+                  },
+                  text: "Return Summary",
+                ),
               )
+            ],
+          )
               : const SizedBox.shrink(),
         ),
       ),

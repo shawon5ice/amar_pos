@@ -464,23 +464,22 @@ class ExchangeController extends GetxController{
 
   FutureOr<List<ProductInfo>> suggestionsCallback(String search) async {
     // Check if the search term is in the existing items
-    var x = getAll(search);
-    if (x.isNotEmpty) {
-      return x;
-    } else {
+    List<ProductInfo> exactlyFound = currentSearchList.where((item) => item.sku.toLowerCase() == search.toString().toLowerCase()).toList();
+
+    if(exactlyFound.isNotEmpty){
+      return exactlyFound;
+    }else {
       // If not found locally, fetch from API
       await getAllProducts(search: search, page: 1);
       return getAll(search);
     }
   }
 
+
   getAll(search) {
     var filteredItems = currentSearchList
-        .where((item) => item.sku.toLowerCase().contains(search.toLowerCase()))
+        .where((item) => item.sku.toLowerCase().contains(search.toLowerCase()) || item.name.toLowerCase().contains(search.toLowerCase()))
         .toList();
-    filteredItems.addAll(currentSearchList
-        .where((item) => item.name.toLowerCase().contains(search.toLowerCase()))
-        .toList());
     return filteredItems;
   }
 

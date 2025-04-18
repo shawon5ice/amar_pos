@@ -11,8 +11,8 @@ ReturnProductResponseModel _$ReturnProductResponseModelFromJson(
     ReturnProductResponseModel(
       success: json['success'] as bool,
       data: Data.fromJson(json['data'] as Map<String, dynamic>),
-      countTotal: json['count_total'],
-      amountTotal: json['amount_total'],
+      amountTotal: json['amount_total'] as num? ?? 0,
+      countTotal: (json['count_total'] as num?)?.toInt() ?? 0,
     );
 
 Map<String, dynamic> _$ReturnProductResponseModelToJson(
@@ -20,6 +20,8 @@ Map<String, dynamic> _$ReturnProductResponseModelToJson(
     <String, dynamic>{
       'success': instance.success,
       'data': instance.data,
+      'count_total': instance.countTotal,
+      'amount_total': instance.amountTotal,
     };
 
 Data _$DataFromJson(Map<String, dynamic> json) => Data(

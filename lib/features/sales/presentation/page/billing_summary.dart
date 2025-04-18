@@ -5,6 +5,7 @@ import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/core/widgets/custom_button.dart';
 import 'package:amar_pos/core/widgets/custom_text_field.dart';
 import 'package:amar_pos/core/widgets/field_title.dart';
+import 'package:amar_pos/features/inventory/presentation/products/widgets/custom_drop_down_widget.dart';
 import 'package:amar_pos/features/inventory/presentation/products/widgets/custom_dropdown_widget.dart';
 import 'package:amar_pos/features/sales/data/models/client_list_response_model.dart';
 import 'package:amar_pos/features/sales/data/models/create_order_model.dart';
@@ -63,11 +64,6 @@ class _BillingSummaryState extends State<BillingSummary> {
       if(controller.isRetailSale == false && controller.clientList.isEmpty){
         controller.getAllClientList();
       }
-    }
-
-
-    if(!controller.isEditing && controller.paymentMethodTracker.isEmpty){
-      controller.addPaymentMethod();
     }
 
     controller.calculateAmount(firstTime: true);
@@ -409,12 +405,12 @@ class _BillingSummaryState extends State<BillingSummary> {
                                           children: [
                                             // addH(16.h),
                                             FieldTitle(
-                                                "${controller.totalDeu >= 0 ? "Due" : "Change"} Amount"),
+                                                "${controller.paidAmount > controller.totalPaid ? "Due" : "Change"} Amount"),
                                             addH(4),
                                             CustomTextField(
                                               enabledFlag: false,
                                               textCon: TextEditingController(
-                                                  text: (controller.totalDeu >= 0  ? controller.totalDeu : controller.totalChangeAmount)
+                                                  text: (controller.paidAmount > controller.totalPaid ? (controller.paidAmount-controller.totalPaid) : (controller.totalPaid-controller.paidAmount))
                                                       .toString()),
                                               hintText: "Type here",
                                               inputType: TextInputType.number,
@@ -428,7 +424,8 @@ class _BillingSummaryState extends State<BillingSummary> {
                                 child: GetBuilder<SalesController>(
                                   id: 'service_stuff_list',
                                   builder: (controller) =>
-                                      CustomDropdown<ServiceStuffInfo>(
+                                      CustomDropdownWithSearchWidget<ServiceStuffInfo>(
+                                        searchHintText: "Service Stuff",
                                     validator: (value) => value == null
                                         ? "Please select a service stuff"
                                         : null,
@@ -516,10 +513,6 @@ class _BillingSummaryState extends State<BillingSummary> {
                         paid: e.paidAmount!.toDouble(),
                         bankId: e.paymentOption?.id));
                   }
-                }
-                if(controller.totalDeu>0){
-                  Methods.showSnackbar(msg: "Payment amount must be grater then or equal to ${controller.paidAmount}. Please Adjust");
-                  return;
                 }
                 if(controller.isEditing){
                   controller.updateSaleOrder(context).then((value){

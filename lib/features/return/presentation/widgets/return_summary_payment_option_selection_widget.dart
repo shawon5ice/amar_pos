@@ -98,8 +98,7 @@ class _ReturnSummaryPaymentOptionSelectionWidgetState
                         onChanged: (value) {
                           if (value != null) {
                             if(value.name.toLowerCase().contains("cash") && controller.cashSelected || value.name.toLowerCase().contains("credit") && controller.creditSelected ){
-                              ErrorExtractor.showSingleErrorDialog(context, "Please select another payment method");
-                              // Methods.showSnackbar(msg: "Please select another payment method");
+                              Methods.showSnackbar(msg: "Please select another payment method");
                               return;
                             }
                             if(value.name.toLowerCase().contains("cash")){
@@ -161,24 +160,23 @@ class _ReturnSummaryPaymentOptionSelectionWidgetState
                             widget.paymentMethodTracker.paidAmount = num.parse(value.replaceAll(',', ''));
                             controller.calculateAmount();
                           }catch(e){
-                            ErrorExtractor.showSingleErrorDialog(context, "Please type a valid amount");
-                            // Methods.showSnackbar(msg: "Please type a valid amount");
+                            Methods.showSnackbar(msg: "Please type a valid amount");
                           }
                         }else{
                           widget.paymentMethodTracker.paidAmount = 0;
                           controller.calculateAmount();
                         }
                       },
-                      validator: (value) {
-                        try{
-                          if(value != null && value.isNotEmpty){
-                            var x = num.parse(value);
-                          }
-                        }catch(e){
-                          return '⚠️ Please type a valid amount';
-                        }
-                        return null;
-                      },
+                      // validator: (value) {
+                      //   try{
+                      //     if(value != null && value.isNotEmpty){
+                      //       var x = num.parse(value);
+                      //     }
+                      //   }catch(e){
+                      //     return '⚠️ Please type a valid amount';
+                      //   }
+                      //   return null;
+                      // },
                     ),
                   ],
                 ),
@@ -249,8 +247,7 @@ class _ReturnSummaryPaymentOptionSelectionWidgetState
                   onChanged: (value) {
                     for(int i=0;i<controller.paymentMethodTracker.length; i++){
                       if(controller.paymentMethodTracker[i].paymentOption?.id == value?.id ){
-                        ErrorExtractor.showSingleErrorDialog(context, "Please select another bank");
-                        // Methods.showSnackbar(msg: "Please select another bank");
+                        Methods.showSnackbar(msg: "Please select another bank");
                         return;
                       }
                     }

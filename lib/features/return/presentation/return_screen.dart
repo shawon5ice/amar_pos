@@ -6,18 +6,12 @@ import 'package:amar_pos/features/return/presentation/page/return_history.dart';
 import 'package:amar_pos/features/return/presentation/page/return_page.dart';
 import 'package:amar_pos/features/return/presentation/page/return_products.dart';
 import 'package:amar_pos/features/return/presentation/widgets/return_history_filter_widget.dart';
-import 'package:amar_pos/features/sales/presentation/page/place_order.dart';
-import 'package:amar_pos/features/sales/presentation/page/sold_history.dart';
-import 'package:amar_pos/features/sales/presentation/controller/sales_controller.dart';
-import 'package:amar_pos/features/sales/presentation/page/sold_products.dart';
-import 'package:amar_pos/features/sales/presentation/widgets/sold_history_filter_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/logger/logger.dart';
 import '../../drawer/drawer_menu_controller.dart';
-import '../data/models/create_return_order_model.dart';
 
 class ReturnScreen extends StatefulWidget {
   static String routeName = '/sales_screen';
@@ -68,7 +62,7 @@ class _SalesScreenState extends State<ReturnScreen>
   void initState() {
     _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(() async {
-      if (controller.isEditing && _tabController.previousIndex == 0) {
+      if (controller.returnOrderProducts.isNotEmpty && _tabController.previousIndex == 0) {
         // Store the new index
         int newIndex = _tabController.index;
 
@@ -83,8 +77,9 @@ class _SalesScreenState extends State<ReturnScreen>
           controller.clearEditing();
           _tabController.animateTo(newIndex);
         }
-        controller.update(['action_icon']);
       }
+      controller.clearFilter();
+      controller.update(['action_icon']);
     });
     super.initState();
   }
@@ -172,8 +167,8 @@ class _SalesScreenState extends State<ReturnScreen>
                       Tab(
                         text: 'Return',
                       ),
-                      Tab(text: 'Return History'),
-                      Tab(text: 'Return Products'),
+                      Tab(text: 'History'),
+                      Tab(text: 'Products'),
                     ],
                   ),
                 ),

@@ -149,9 +149,12 @@ class _SalesScreenState extends State<SalesScreen>
           actions: [
             GetBuilder<SalesController>(
               id: 'action_icon',
-              builder: (controller) => _tabController.index == 0? GestureDetector(
-                child: SvgPicture.asset(AppAssets.pauseBillingIcon),
-              ): GestureDetector(
+              builder: (controller) => _tabController.index == 0? SizedBox()
+              // GestureDetector(
+              //   child: SvgPicture.asset(AppAssets.pauseBillingIcon),
+              // )
+                  :
+              GestureDetector(
                 onTap: (){
                   showModalBottomSheet(context: context, builder:(context) => SoldHistoryFilterBottomSheet(
                     saleHistory: _tabController.index == 1,

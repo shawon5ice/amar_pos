@@ -3,8 +3,8 @@ import 'package:amar_pos/core/core.dart';
 import 'package:amar_pos/core/network/helpers/error_extractor.dart';
 import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:amar_pos/features/return/data/models/create_return_order_model.dart';
+import 'package:amar_pos/features/return/data/models/return_history/return_history_details_response_model.dart';
 import 'package:amar_pos/features/return/data/models/return_history/return_history_response_model.dart';
-import 'package:amar_pos/features/return/data/models/return_history_details_response_model.dart';
 import 'package:amar_pos/features/return/data/models/return_payment_method_tracker.dart';
 import 'package:amar_pos/features/return/data/service/return_service.dart';
 import 'package:flutter/material.dart';
@@ -115,8 +115,13 @@ class ReturnController extends GetxController {
     returnOrderProducts.clear();
     soldProductList.clear();
     returnHistoryList.clear();
+    paidAmount = 0;
+    totalDiscount = 0;
+    totalPaid = 0;
+    totalDeu = 0;
+    totalQTY = 0;
     createOrderModel = CreateReturnOrderModel.defaultConstructor();
-    update(['place_order_items', 'billing_summary_button']);
+    // update(['place_order_items', 'billing_summary_button']);
   }
 
   void setSelectedDateRange(DateTimeRange? range) {
@@ -151,12 +156,6 @@ class ReturnController extends GetxController {
       excludeAmount += e.paidAmount ?? 0;
     }
     totalPaid = excludeAmount;
-    if(totalPaid>=paidAmount){
-      logger.i("$totalPaid ---> $paidAmount");
-      ErrorExtractor.showSingleErrorDialog(Get.context!,  "Full amount already distributed");
-      // Methods.showSnackbar(msg: "Full amount already distributed",duration: 5);
-      return;
-    }
     paymentMethodTracker.add(ReturnPaymentMethodTracker(
         id: paymentMethodTracker.length + 1,
         paidAmount: paidAmount - excludeAmount
@@ -212,9 +211,6 @@ class ReturnController extends GetxController {
     } finally {
       isPaymentMethodListLoading = false;
       update(['billing_payment_methods']);
-      if(!isEditing){
-        addPaymentMethod();
-      }
     }
   }
 
@@ -249,7 +245,6 @@ class ReturnController extends GetxController {
             unitPriceFromCreateModel = createOrderModel.products[i].unitPrice;
           }
         }
-
         createOrderModel.products.add(ReturnProductModel(
             id: product.id,
             unitPrice: unitPriceFromCreateModel ?? unitPrice,
@@ -257,6 +252,7 @@ class ReturnController extends GetxController {
             vat: (product.vat/100 * (isRetailSale ? product.mrpPrice.toDouble() : product
                 .wholesalePrice.toDouble())).toDouble(),
             serialNo: snNo ?? []));
+        logger.i(createOrderModel.products.length);
       }
     }
     update(['place_order_items', 'billing_summary_button']);
@@ -441,7 +437,13 @@ class ReturnController extends GetxController {
   }
 
 
-  void createReturnOrder(BuildContext context) async {
+  int? pOrderId;
+  String? pOrderNo;
+
+
+  Future<bool> createReturnOrder(BuildContext context) async {
+    pOrderId = null;
+    pOrderNo = null;
 
     createReturnOrderLoading = true;
     update(["return_product_list"]);
@@ -453,15 +455,20 @@ class ReturnController extends GetxController {
       );
       logger.e(response);
       if (response != null) {
-        if(response['success']){
-          returnOrderProducts.clear();
+        if (response['success']) {
+          pOrderId = response['data']['id'];
+          pOrderNo = response['data']['order_no'];
+          clearFilter();
+          clearEditing();
           RandomLottieLoader.hide();
           Get.back();
           Get.back();
-        }else{
+          return true;
+        } else {
           RandomLottieLoader.hide();
         }
-        Methods.showSnackbar(msg: response['message'], isSuccess: response['success']? true: null);
+        Methods.showSnackbar(msg: response['message'],
+            isSuccess: response['success'] ? true : null);
       }
     }catch(e){
       logger.e(e);
@@ -469,10 +476,13 @@ class ReturnController extends GetxController {
       createReturnOrderLoading = false;
       update(["return_product_list"]);
     }
+    return false;
   }
 
 
-  void updateReturnOrder(BuildContext context) async {
+  Future<bool> updateReturnOrder(BuildContext context) async {
+    pOrderId = null;
+    pOrderNo = null;
     createReturnOrderLoading = true;
     update(["return_product_list"]);
     RandomLottieLoader.show();
@@ -485,10 +495,14 @@ class ReturnController extends GetxController {
       logger.e(response);
       if (response != null) {
         if (response['success']) {
+          pOrderId = response['data']['id'];
+          pOrderNo = response['data']['order_no'];
           returnOrderProducts.clear();
           RandomLottieLoader.hide();
           Get.back();
           Get.back();
+          isEditing = false;
+          return true;
         } else {
           RandomLottieLoader.hide();
         }
@@ -502,6 +516,7 @@ class ReturnController extends GetxController {
       isEditing = false;
       update(["return_product_list"]);
     }
+    return false;
   }
 
   Future<void> getReturnHistory({int page = 1}) async {
@@ -630,17 +645,19 @@ class ReturnController extends GetxController {
 
 
   Future<void> downloadReturnHistory(
-      {required bool isPdf, required ReturnHistory returnHistory,}) async {
+      {required bool isPdf, required int id, required String orderNo,  bool? shouldPrint}) async {
     hasError.value = false;
 
-    String fileName = "${returnHistory.orderNo}-${DateTime
+    String fileName = "$orderNo-${DateTime
         .now()
         .microsecondsSinceEpoch
         .toString()}${isPdf ? ".pdf" : ".xlsx"}";
     try {
       var response = await ReturnServices.downloadReturnHistory(
-        returnHistory: returnHistory,
+        orderId: id,
+        fileName: fileName,
         usrToken: loginData!.token,
+        shouldPrint: shouldPrint,
       );
     } catch (e) {
       logger.e(e);
@@ -683,60 +700,68 @@ class ReturnController extends GetxController {
   ReturnHistoryDetailsResponseModel? saleHistoryDetailsResponseModel;
 
   Future<void> processEdit({required ReturnHistory returnHistory,required BuildContext context}) async{
-    editReturnHistoryItemLoading = true;
     isEditing = true;
+    isProcessing = true;
     RandomLottieLoader.show();
-    selectedClient = null;
     serviceStuffInfo = null;
     paymentMethodTracker.clear();
     createOrderModel = CreateReturnOrderModel.defaultConstructor();
 
     // Methods.showLoading();
-    update(['edit_sold_history_item']);
+    update(['edit_purchase_history_item']);
     try {
       var response = await ReturnServices.getReturnHistoryDetails(
         usrToken: loginData!.token,
         id: returnHistory.id,
       );
 
-      logger.i(response);
-      if (response != null) {
-        getAllProducts(search: '', page: 1);
 
+
+      if (response != null) {
+        returnOrderProducts.clear();
         saleHistoryDetailsResponseModel =
             ReturnHistoryDetailsResponseModel.fromJson(response);
+        logger.i("-->>");
+        isRetailSale = saleHistoryDetailsResponseModel!.data.saleType.toLowerCase().contains("customer");
+        getAllProducts(search: '', page: 1);
 
-        isRetailSale = saleHistoryDetailsResponseModel!.data.saleType.toLowerCase().contains("retail");
-        await getPaymentMethods();
+
+        logger.i(saleHistoryDetailsResponseModel);
+        if(returnProductResponseModel == null){
+          await getPaymentMethods();
+        }
 
         if(clientList.isEmpty){
           await getAllClientList();
         }
+
 
         if(serviceStuffList.isEmpty){
           await getAllServiceStuff();
         }
 
         //selecting products
-        for (var e in saleHistoryDetailsResponseModel!.data.orderDetails) {
+        for (var e in saleHistoryDetailsResponseModel!.data.details) {
           ProductInfo productInfo = productsListResponseModel!.data.productList.singleWhere((f) => f.id == e.id);
-          addPlaceOrderProduct(productInfo, snNo: e.snNo.map((e) => e.serialNo).toList(), quantity:  e.quantity, unitPrice: e.unitPrice);
+          logger.i("-->> ${e.unitPrice}");
+          addPlaceOrderProduct(productInfo, quantity:  e.quantity,snNo: e.snNo?.map((g) => g.serialNo).toList(), unitPrice: e.unitPrice,);
         }
+
+
 
         //Payment Methods
         for (var e in saleHistoryDetailsResponseModel!.data.paymentDetails) {
           PaymentMethod paymentMethod = returnPaymentMethods!.data.singleWhere((f) => f.id == e.id);
           PaymentOption? paymentOption;
 
+          if(e.bank != null){
+            paymentOption = paymentMethod.paymentOptions.singleWhere((f) => f.id == e.bank!.id);
+          }
           if(paymentMethod.name.toLowerCase().contains("cash")){
             cashSelected = true;
           }
           if(paymentMethod.name.toLowerCase().contains("credit")){
             creditSelected = true;
-          }
-
-          if(e.bank != null){
-            paymentOption = paymentMethod.paymentOptions.singleWhere((f) => f.id == e.bank!.id);
           }
 
           paymentMethodTracker.add(ReturnPaymentMethodTracker(
@@ -748,46 +773,69 @@ class ReturnController extends GetxController {
           logger.i(paymentMethodTracker);
         }
 
-        //Selecting client
         selectedClient = clientList.firstWhereOrNull((e) => e.id == saleHistoryDetailsResponseModel!.data.customer.id);
         createOrderModel.address = selectedClient?.address ?? saleHistoryDetailsResponseModel!.data.customer.address;
         createOrderModel.name = selectedClient?.address ?? saleHistoryDetailsResponseModel!.data.customer.name;
         createOrderModel.phone = selectedClient?.address ?? saleHistoryDetailsResponseModel!.data.customer.phone;
-        // if(!isRetailSale){
-        //   for(var e in clientList){
-        //     if(e.id == saleHistoryDetailsResponseModel!.data.serviceBy.id){
-        //       serviceStuffInfo = e;
-        //       break;
-        //     }
-        //   }
-        //   selectedClient = clientList.firstWhereOrNull((e) => e.id == saleHistoryDetailsResponseModel!.data.customer.id);
-        //
-        //
-        // }else{
-        //   createOrderModel.address = saleHistoryDetailsResponseModel!.data.customer.address;
-        //   createOrderModel.name = saleHistoryDetailsResponseModel!.data.customer.name;
-        //   createOrderModel.phone = saleHistoryDetailsResponseModel!.data.customer.phone;
-        // }
+        if(!isRetailSale){
+          for(var e in clientList){
+            if(e.id == saleHistoryDetailsResponseModel!.data.serviceBy?.id){
+              serviceStuffInfo = ServiceStuffInfo(id: e.id, name: e.name, photoUrl: '');
+              break;
+            }
+          }
+          selectedClient = clientList.firstWhereOrNull((e) => e.id == saleHistoryDetailsResponseModel!.data.customer.id);
+
+
+        }else{
+          createOrderModel.address = saleHistoryDetailsResponseModel!.data.customer.address;
+          createOrderModel.name = saleHistoryDetailsResponseModel!.data.customer.name;
+          createOrderModel.phone = saleHistoryDetailsResponseModel!.data.customer.phone;
+        }
 
         //service stuff
-        serviceStuffInfo = serviceStuffList.firstWhereOrNull((e) => e.id == saleHistoryDetailsResponseModel!.data.serviceBy.id);
+        serviceStuffInfo = serviceStuffList.firstWhereOrNull((e) => e.id == saleHistoryDetailsResponseModel!.data.serviceBy?.id);
 
 
         totalPaid = saleHistoryDetailsResponseModel!.data.payable;
         totalDiscount = saleHistoryDetailsResponseModel!.data.discount;
         additionalExpense = saleHistoryDetailsResponseModel!.data.expense;
-        // totalDeu = saleHistoryDetailsResponseModel!.data.changeAmount * -1;
+        totalDeu =  saleHistoryDetailsResponseModel!.data.changeAmount;
       }
     } catch (e) {
       hasError.value = true;
     } finally {
-
-      editReturnHistoryItemLoading = false;
-      update(['edit_sold_history_item']);
+      isProcessing = false;
+      update(['edit_purchase_history_item']);
       // Methods.hideLoading();
       RandomLottieLoader.hide();
     }
   }
 
+
+  // bool detailsLoading =false;
+  // ReturnHistoryDetailsResponseModel? saleHistoryDetailsResponseModel;
+
+  Future<void> getSoldHistoryDetails(int orderId) async {
+    detailsLoading = true;
+    saleHistoryDetailsResponseModel = null;
+    update(['sold_history_details','download_print_buttons']);
+    try {
+      var response = await ReturnServices.getReturnHistoryDetails(
+        usrToken: loginData!.token,
+        id: orderId,
+      );
+
+      logger.i(response);
+      if (response != null) {
+        saleHistoryDetailsResponseModel =
+            ReturnHistoryDetailsResponseModel.fromJson(response);
+      }
+    } catch (e) {
+    } finally {
+      detailsLoading = false;
+      update(['sold_history_details','download_print_buttons']);
+    }
+  }
 
 }

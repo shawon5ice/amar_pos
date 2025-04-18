@@ -33,8 +33,11 @@ class _BillingSummaryPaymentOptionSelectionWidgetState
 
   final SalesController controller = Get.find();
 
+  late TextEditingController _textEditingController;
+
   @override
   void initState() {
+    _textEditingController = TextEditingController();
     paidAmount = TextEditingController();
     paidAmount.text = widget.paymentMethodTracker.paidAmount.toString();
     super.initState();
@@ -50,11 +53,18 @@ class _BillingSummaryPaymentOptionSelectionWidgetState
   }
 
   @override
+  void dispose() {
+    _textEditingController.dispose();
+    paidAmount.dispose();
+    super.dispose();
+  }
+  @override
   Widget build(BuildContext context) {
     return GetBuilder<SalesController>(
       key: Key(controller.paymentMethodTracker.indexOf(widget.paymentMethodTracker).toString()),
       id: "billing_payment_methods",
       builder: (controller) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           addH(8),
           Row(
@@ -73,24 +83,24 @@ class _BillingSummaryPaymentOptionSelectionWidgetState
                         hint: Text(
                           "Select Payment",
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 12.sp,
                             color: Theme.of(context).hintColor,
                           ),
                         ),
                         items: controller.billingPaymentMethods?.data
                             .map((PaymentMethod item) {
-                              return DropdownMenuItem<PaymentMethod>(
-                                  value: item,
-                                  child: Text(
-                                    item.name,
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                );
-                            })
+                          return DropdownMenuItem<PaymentMethod>(
+                            value: item,
+                            child: Text(
+                              item.name,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          );
+                        })
                             .toList(),
                         value: widget.paymentMethodTracker.paymentMethod,
                         onChanged: (value) {
@@ -116,9 +126,9 @@ class _BillingSummaryPaymentOptionSelectionWidgetState
                           padding: EdgeInsets.zero,
                           decoration: BoxDecoration(
                             border:
-                                Border.all(color: AppColors.inputBorderColor),
+                            Border.all(color: AppColors.inputBorderColor),
                             borderRadius:
-                                const BorderRadius.all(Radius.circular(8)),
+                            const BorderRadius.all(Radius.circular(8)),
                           ),
                         ),
                         dropdownStyleData: const DropdownStyleData(
@@ -149,13 +159,10 @@ class _BillingSummaryPaymentOptionSelectionWidgetState
                       textCon: paidAmount,
                       hintText: "Type here",
                       inputType: TextInputType.number,
-                      inputFormatters: [
-                        NumberInputFormatter()
-                      ],
                       onChanged: (value) {
                         if(value.isNotEmpty){
                           try{
-                            widget.paymentMethodTracker.paidAmount = num.parse(value.replaceAll(',', ''));
+                            widget.paymentMethodTracker.paidAmount = num.parse(value);
                             controller.calculateAmount();
                           }catch(e){
                             Methods.showSnackbar(msg: "Please type a valid amount");
@@ -206,78 +213,102 @@ class _BillingSummaryPaymentOptionSelectionWidgetState
             ],
           ),
           widget.paymentMethodTracker.paymentMethod != null &&
-                  widget.paymentMethodTracker.paymentMethod!.paymentOptions
-                      .isNotEmpty
+              widget.paymentMethodTracker.paymentMethod!.paymentOptions
+                  .isNotEmpty
               ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    addH(8),
-                    RichFieldTitle(
-                      text: "Payment Options",
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              addH(8),
+              const RichFieldTitle(
+                text: "Payment Options",
+              ),
+              addH(4),
+              DropdownButtonHideUnderline(
+                child: DropdownButton2<PaymentOption>(
+                  isExpanded: true,
+                  hint: Text(
+                    "Select Payment Options",
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Theme.of(context).hintColor,
                     ),
-                    addH(4),
-                    DropdownButtonHideUnderline(
-                      child: DropdownButton2<PaymentOption>(
-                        isExpanded: true,
-                        hint: Text(
-                          "Select Payment Options",
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Theme.of(context).hintColor,
+                  ),
+                  dropdownSearchData: DropdownSearchData(
+                    searchController: _textEditingController,
+                    searchInnerWidgetHeight: 48,
+                    searchInnerWidget: Padding(
+                      padding:
+                      const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+                      child: TextFormField(
+                        controller: _textEditingController,
+                        decoration: InputDecoration(
+                          isDense: true,
+                          hintText: "Search Supplier",
+                          hintStyle: const TextStyle(fontSize: 12),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
                           ),
-                        ),
-                        items: widget
-                            .paymentMethodTracker.paymentMethod?.paymentOptions
-                            .map((PaymentOption item) =>
-                                DropdownMenuItem<PaymentOption>(
-                                  value: item,
-                                  child: Text(
-                                    item.name,
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ))
-                            .toList(),
-                        value: widget.paymentMethodTracker.paymentOption,
-                        onChanged: (value) {
-                          for(int i=0;i<controller.paymentMethodTracker.length; i++){
-                            if(controller.paymentMethodTracker[i].paymentOption?.id == value?.id ){
-                              Methods.showSnackbar(msg: "Please select another bank");
-                              return;
-                            }
-                          }
-                          widget.paymentMethodTracker.paymentOption = value;
-                          controller
-                              .update(['billing_payment_methods', 'billing_summary_form']);
-                        },
-                        buttonStyleData: ButtonStyleData(
-                          height: 48,
-                          padding: EdgeInsets.zero,
-                          decoration: BoxDecoration(
-                            border:
-                                Border.all(color: AppColors.inputBorderColor),
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(8)),
-                          ),
-                        ),
-                        dropdownStyleData: const DropdownStyleData(
-                          maxHeight: 200,
-                          offset: Offset(0, 4),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.all(Radius.circular(8)),
-                          ),
-                        ),
-                        menuItemStyleData: const MenuItemStyleData(
-                          height: 40,
                         ),
                       ),
                     ),
-                  ],
-                )
+                    searchMatchFn: (item, searchValue) {
+                      return item.value!.name
+                          .toLowerCase()
+                          .contains(searchValue.toLowerCase());
+                    },
+                  ),
+                  items: widget
+                      .paymentMethodTracker.paymentMethod?.paymentOptions
+                      .map((PaymentOption item) =>
+                      DropdownMenuItem<PaymentOption>(
+                        value: item,
+                        child: Text(
+                          item.name,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ))
+                      .toList(),
+                  value: widget.paymentMethodTracker.paymentOption,
+                  onChanged: (value) {
+                    for(int i=0;i<controller.paymentMethodTracker.length; i++){
+                      if(controller.paymentMethodTracker[i].paymentOption?.id == value?.id ){
+                        Methods.showSnackbar(msg: "Please select another bank");
+                        return;
+                      }
+                    }
+                    widget.paymentMethodTracker.paymentOption = value;
+                    controller
+                        .update(['billing_payment_methods', 'billing_summary_form']);
+                  },
+                  buttonStyleData: ButtonStyleData(
+                    height: 56,
+                    padding: EdgeInsets.zero,
+                    decoration: BoxDecoration(
+                      border:
+                      Border.all(color: AppColors.inputBorderColor),
+                      borderRadius:
+                      const BorderRadius.all(Radius.circular(8)),
+                    ),
+                  ),
+                  dropdownStyleData: const DropdownStyleData(
+                    maxHeight: 200,
+                    offset: Offset(0, 4),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                    ),
+                  ),
+                  menuItemStyleData: const MenuItemStyleData(
+                    height: 40,
+                  ),
+                ),
+              ),
+            ],
+          )
               : SizedBox.shrink(),
         ],
       ),

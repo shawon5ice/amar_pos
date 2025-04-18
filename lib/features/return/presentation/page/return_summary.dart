@@ -6,12 +6,14 @@ import 'package:amar_pos/core/widgets/custom_text_field.dart';
 import 'package:amar_pos/core/widgets/field_title.dart';
 import 'package:amar_pos/features/inventory/presentation/products/widgets/custom_dropdown_widget.dart';
 import 'package:amar_pos/features/return/presentation/controller/return_controller.dart';
+import 'package:amar_pos/features/return/presentation/widgets/return_history_details_view.dart';
 import 'package:amar_pos/features/return/presentation/widgets/return_summary_payment_option_selection_widget.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../../core/methods/number_input_formatter.dart';
 import '../../../sales/presentation/widgets/billing_summary_payment_option_selection_widget.dart';
 import '../../data/models/client_list_response_model.dart';
 import '../../data/models/create_return_order_model.dart';
@@ -36,6 +38,7 @@ class _ReturnSummaryState extends State<ReturnSummary> {
 
   @override
   void initState() {
+
     customerNameEditingController = TextEditingController();
     customerPhoneNumberEditingController = TextEditingController();
     customerAddressEditingController = TextEditingController();
@@ -44,34 +47,26 @@ class _ReturnSummaryState extends State<ReturnSummary> {
     customerPayableAmountEditingController = TextEditingController();
     customerChangeAmountEditingController = TextEditingController();
 
-    if(controller.serviceStuffList.isEmpty){
-      controller.getAllServiceStuff();
-    }
-    if(controller.isRetailSale == false && controller.clientList.isEmpty){
-      controller.getAllClientList();
-    }
-    if(controller.returnPaymentMethods == null){
-      controller.getPaymentMethods();
-    }
-    // if(!controller.isEditing){
-    //   controller.paymentMethodTracker.clear();
-    //   controller.totalDiscount = 0;
-    //   controller.additionalExpense = 0;
-    //   controller.paidAmount = 0;
-    //   controller.isRetailSale = true;
-    //   controller.redefinePrice();
-    //   controller.serviceStuffInfo = null;
-    //   controller.selectedClient = null;
-    // }else{
-    //
-    // }
-
     customerNameEditingController.text = controller.createOrderModel.name;
     customerPhoneNumberEditingController.text = controller.createOrderModel.phone;
     customerAddressEditingController.text = controller.createOrderModel.address;
-    customerTotalDiscountEditingController.text = controller.totalDiscount.toString();
-    customerAdditionalExpensesEditingController.text = controller.additionalExpense.toString();
-    customerChangeAmountEditingController.text = controller.totalDeu.toString();
+
+    customerTotalDiscountEditingController.text = Methods.getFormattedNumber(controller.totalDiscount.toDouble());
+    if(controller.isEditing){
+      customerTotalDiscountEditingController.text = controller.saleHistoryDetailsResponseModel!.data.discount.toString();
+      customerAdditionalExpensesEditingController.text = controller.saleHistoryDetailsResponseModel!.data.expense.toString();
+      customerChangeAmountEditingController.text = controller.totalDeu.toString();
+    }else{
+      if(controller.serviceStuffList.isEmpty){
+        controller.getAllServiceStuff();
+      }
+      if(controller.returnPaymentMethods == null){
+        controller.getPaymentMethods();
+      }
+      if(controller.isRetailSale == false && controller.clientList.isEmpty){
+        controller.getAllClientList();
+      }
+    }
 
 
     if(!controller.isEditing && controller.paymentMethodTracker.isEmpty){
@@ -99,44 +94,45 @@ class _ReturnSummaryState extends State<ReturnSummary> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: const Text("Return Summary"),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          child: Form(
-            key: formKey,
-            child: Column(
-              children: [
-                GetBuilder<ReturnController>(
-                  id: "return_summary_form",
-                  builder: (controller) => Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20)),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        FieldTitle(
-                            "${controller.isRetailSale ? "Customer" : "Client"} Name"),
-                        addH(4),
-                        controller.isRetailSale
-                            ? CustomTextField(
-                                enabledFlag: controller.isRetailSale,
-                                textCon: customerNameEditingController,
-                                hintText: "Type customer name",
-                                validator: (value) =>
-                                    FieldValidator.nonNullableFieldValidator(
-                                        value, "Customer name"),
-                              )
-                            : GetBuilder<ReturnController>(
-                                id: 'client_list',
-                                builder: (controller) =>
-                                    DropdownButtonHideUnderline(
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          title: const Text("Return Summary"),
+        ),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            child: Form(
+              key: formKey,
+              child: Column(
+                children: [
+                  GetBuilder<ReturnController>(
+                    id: "return_summary_form",
+                    builder: (controller) => Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20)),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          FieldTitle(
+                              "${controller.isRetailSale ? "Customer" : "Client"} Name"),
+                          addH(4),
+                          controller.isRetailSale
+                              ? CustomTextField(
+                            enabledFlag: controller.isRetailSale,
+                            textCon: customerNameEditingController,
+                            hintText: "Type customer name",
+                            validator: (value) =>
+                                FieldValidator.nonNullableFieldValidator(
+                                    value, "Customer name"),
+                          )
+                              : GetBuilder<ReturnController>(
+                            id: 'client_list',
+                            builder: (controller) =>
+                                DropdownButtonHideUnderline(
                                   child: DropdownButton2<ClientData>(
                                     isExpanded: true,
                                     hint: Text(
@@ -170,7 +166,6 @@ class _ReturnSummaryState extends State<ReturnSummary> {
                                             .text = value.phone;
                                         customerAddressEditingController.text =
                                             value.address;
-
                                         controller.createOrderModel.phone = value.phone;
                                         controller.createOrderModel.address = value.address;
                                         controller.createOrderModel.customerId = value.id;
@@ -178,7 +173,7 @@ class _ReturnSummaryState extends State<ReturnSummary> {
                                       }
                                     },
                                     buttonStyleData: ButtonStyleData(
-                                      height: 56.sp,
+                                      height: 56,
                                       padding: EdgeInsets.zero,
                                       decoration: BoxDecoration(
                                         border: Border.all(
@@ -201,282 +196,304 @@ class _ReturnSummaryState extends State<ReturnSummary> {
                                     ),
                                   ),
                                 ),
-                              ),
-                        addH(8),
-                        const FieldTitle("Phone Number"),
-                        addH(4),
-                        CustomTextField(
-                          enabledFlag: controller.isRetailSale,
-                          textCon: customerPhoneNumberEditingController,
-                          hintText: "Type phone number",
-                          validator: (value) =>
-                              FieldValidator.nonNullableFieldValidator(
-                                  value, "Phone number"),
-                        ),
-                        addH(8),
-                        const FieldTitle("Address"),
-                        addH(4),
-                        CustomTextField(
-                          enabledFlag: controller.isRetailSale,
-                          textCon: customerAddressEditingController,
-                          hintText: "Type customer address",
-                          validator: (value) =>
-                              FieldValidator.nonNullableFieldValidator(
-                                  value, "Address"),
-                        ),
-                        addH(8),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const FieldTitle("Total QTY"),
-                                  addH(4),
-                                  CustomTextField(
-                                    enabledFlag: false,
-                                    textCon: TextEditingController(
-                                        text: controller.totalQTY.toString()),
-                                    hintText: "Total quantity",
-                                  ),
-                                ],
-                              ),
-                            ),
-                            addW(8),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const FieldTitle("Total Amount"),
-                                  addH(4),
-                                  CustomTextField(
-                                    enabledFlag: false,
-                                    textCon: TextEditingController(
-                                        text:
-                                            controller.totalAmount.toString()),
-                                    hintText: "Type total amount",
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        addH(8),
-                        const FieldTitle("VAT"),
-                        addH(4),
-                        CustomTextField(
-                          enabledFlag: false,
-                          textCon: TextEditingController(
-                              text: controller.totalVat.toString()),
-                          hintText: "VAT",
-                        ),
-                        addH(8),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const FieldTitle("Deduction"),
-                                  addH(4),
-                                  CustomTextField(
-                                    textCon:
-                                        customerTotalDiscountEditingController,
-                                    hintText: "Type here",
-                                    inputType: TextInputType.number,
-                                    onChanged: (value) {
-                                      if (value.isEmpty) {
-                                        value = "0";
-                                      }
-                                      controller.totalDiscount =
-                                          num.parse(value);
-                                      controller.calculateAmount();
-                                      controller
-                                          .update(['return_summary_form']);
-                                    },
-                                    validator: (value) {
-                                      try {
-                                        if (value != null && value.isNotEmpty) {
-                                          var x = num.parse(value);
-                                        }
-                                      } catch (e) {
-                                        return '⚠️ Please type a valid amount';
-                                      }
-                                      return null;
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ),
-                            addW(8),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const FieldTitle("Returnable Amount"),
-                                  addH(4),
-                                  CustomTextField(
-                                    enabledFlag: false,
-                                    textCon: TextEditingController(
-                                        text: controller.paidAmount.toString()),
-                                    hintText: "Type here",
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        addH(8),
-                        ListView.builder(
-                          physics: const NeverScrollableScrollPhysics(),
-                          shrinkWrap: true,
-                          itemCount: controller.paymentMethodTracker.length,
-                          itemBuilder: (context, index) =>
-                              ReturnSummaryPaymentOptionSelectionWidget(
-                            key: ValueKey(controller.paymentMethodTracker[index]),
-                            paymentMethodTracker:
-                                controller.paymentMethodTracker[index],
-                            onDeleteTap: (){
-                              controller.paymentMethodTracker.removeAt(index);
-                              controller.calculateAmount();
-                            },
                           ),
-                        ),
-                        TextButton(
-                          style: const ButtonStyle(
-                              foregroundColor:
-                                  WidgetStatePropertyAll(AppColors.accent)),
-                          child: const Text("Add Multiple payment method"),
-                          onPressed: () {
-                            controller.addPaymentMethod();
-                          },
-                        ),
-                        addH(8),
-                        Row(
-                          children: [
-                            // Expanded(
-                            //   child: GetBuilder<ReturnController>(
-                            //       id: "change-due-amount",
-                            //       builder: (controller) => Column(
-                            //             crossAxisAlignment:
-                            //                 CrossAxisAlignment.start,
-                            //             children: [
-                            //               addH(16.h),
-                            //               FieldTitle(
-                            //                   "${controller.totalDeu < 0 ? "Change" : "Deo"} Amount"),
-                            //               addH(4),
-                            //               CustomTextField(
-                            //                 enabledFlag: false,
-                            //                 textCon: TextEditingController(
-                            //                     text: (controller.totalDeu)
-                            //                         .toString()),
-                            //                 hintText: "Type here",
-                            //                 inputType: TextInputType.number,
-                            //                 onChanged: (value) {},
-                            //               ),
-                            //             ],
-                            //           )),
-                            // ),
-                            // addW(8),
-                            Expanded(
-                              child: GetBuilder<ReturnController>(
-                                id: 'service_stuff_list',
-                                builder: (controller) =>
-                                    CustomDropdown<ServiceStuffInfo>(
-                                  validator: (value) => value == null
-                                      ? "Please select a service stuff"
-                                      : null,
-                                  value: controller.serviceStuffInfo,
-                                  items: controller.serviceStuffList,
-                                  isMandatory: true,
-                                  title: "Service Stuff",
-                                  itemLabel: (ServiceStuffInfo stuffInfo) =>
-                                      stuffInfo.name,
-                                  onChanged: (value) {
-                                    controller.serviceStuffInfo = value;
-                                  },
-                                  hintText:controller.serviceStuffListLoading? 'Loading...': controller.serviceStuffList.isNotEmpty
-                                          ? "Select Service Stuff"
-                                          : "No Stuff found!",
+                          addH(8),
+                          const FieldTitle("Phone Number"),
+                          addH(4),
+                          CustomTextField(
+                            enabledFlag: controller.isRetailSale,
+                            textCon: customerPhoneNumberEditingController,
+                            hintText: "Type phone number",
+                            inputType: TextInputType.phone,
+                            validator: (value) =>
+                                FieldValidator.nonNullableFieldValidator(
+                                    value, "Phone number"),
+                          ),
+                          addH(8),
+                          const FieldTitle("Address"),
+                          addH(4),
+                          CustomTextField(
+                            enabledFlag: controller.isRetailSale,
+                            textCon: customerAddressEditingController,
+                            hintText: "Type customer address",
+                            // validator: (value) =>
+                            //     FieldValidator.nonNullableFieldValidator(
+                            //         value, "Address"),
+                          ),
+                          addH(8),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const FieldTitle("Total QTY"),
+                                    addH(4),
+                                    CustomTextField(
+                                      enabledFlag: false,
+                                      textCon: TextEditingController(
+                                          text: controller.totalQTY.toString()),
+                                      hintText: "Total quantity",
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
+                              addW(8),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const FieldTitle("Total Amount"),
+                                    addH(4),
+                                    CustomTextField(
+                                      enabledFlag: false,
+                                      textCon: TextEditingController(
+                                          text:
+                                          controller.totalAmount.toString()),
+                                      hintText: "Type total amount",
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          addH(8),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const FieldTitle("VAT"),
+                                    addH(4),
+                                    CustomTextField(
+                                      enabledFlag: false,
+                                      textCon: TextEditingController(
+                                          text: controller.totalVat.toString()),
+                                      hintText: "VAT",
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          addH(8),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const FieldTitle("Deduction"),
+                                    addH(4),
+                                    CustomTextField(
+                                      textCon:
+                                      customerTotalDiscountEditingController,
+                                      hintText: "Type here",
+                                      inputType: TextInputType.number,
+                                      onChanged: (value) {
+                                        if (value.isEmpty) {
+                                          value = "0";
+                                        }
+                                        controller.totalDiscount =
+                                            num.parse(value);
+                                        controller.calculateAmount();
+                                        controller
+                                            .update(['return_summary_form']);
+                                      },
+                                      validator: (value) {
+                                        try {
+                                          if (value != null && value.isNotEmpty) {
+                                            var x = num.parse(value);
+                                          }
+                                        } catch (e) {
+                                          return '⚠️ Please type a valid amount';
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              addW(8),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const FieldTitle("Returnable Amount"),
+                                    addH(4),
+                                    CustomTextField(
+                                      enabledFlag: false,
+                                      textCon: TextEditingController(
+                                          text: controller.paidAmount.toString()),
+                                      hintText: "Type here",
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          addH(8),
+                          ListView.builder(
+                            physics: const NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            itemCount: controller.paymentMethodTracker.length,
+                            itemBuilder: (context, index) =>
+                                ReturnSummaryPaymentOptionSelectionWidget(
+                                  key: ValueKey(controller.paymentMethodTracker[index]),
+                                  paymentMethodTracker:
+                                  controller.paymentMethodTracker[index],
+                                  onDeleteTap: (){
+                                    controller.paymentMethodTracker.removeAt(index);
+                                    controller.calculateAmount();
+                                  },
+                                ),
+                          ),
+                          TextButton(
+                            style: const ButtonStyle(
+                                foregroundColor:
+                                WidgetStatePropertyAll(AppColors.accent)),
+                            child: const Text("Add Multiple payment method"),
+                            onPressed: () {
+                              controller.addPaymentMethod();
+                            },
+                          ),
+                          addH(8),
+                          Row(
+                            children: [
+                              // Expanded(
+                              //   child: GetBuilder<ReturnController>(
+                              //       id: "change-due-amount",
+                              //       builder: (controller) => Column(
+                              //         crossAxisAlignment:
+                              //         CrossAxisAlignment.start,
+                              //         children: [
+                              //           // addH(16.h),
+                              //           FieldTitle(
+                              //               "${controller.totalDeu >= 0 ? "Due" : "Change"} Amount"),
+                              //           addH(4),
+                              //           CustomTextField(
+                              //             enabledFlag: false,
+                              //             textCon: TextEditingController(
+                              //                 text: (controller.totalDeu >= 0  ? controller.totalDeu : controller.totalChangeAmount)
+                              //                     .toString()),
+                              //             hintText: "Type here",
+                              //             inputType: TextInputType.number,
+                              //             onChanged: (value) {},
+                              //           ),
+                              //         ],
+                              //       )),
+                              // ),
+                              // addW(8),
+                              Expanded(
+                                child: GetBuilder<ReturnController>(
+                                  id: 'service_stuff_list',
+                                  builder: (controller) =>
+                                      CustomDropdown<ServiceStuffInfo>(
+                                        validator: (value) => value == null
+                                            ? "Please select a service stuff"
+                                            : null,
+                                        value: controller.serviceStuffInfo,
+                                        items: controller.serviceStuffList,
+                                        isMandatory: true,
+                                        title: "Service Stuff",
+                                        itemLabel: (ServiceStuffInfo stuffInfo) =>
+                                        stuffInfo.name,
+                                        onChanged: (value) {
+                                          controller.serviceStuffInfo = value;
+                                        },
+                                        hintText:controller.serviceStuffListLoading? 'Loading...': controller.serviceStuffList.isNotEmpty
+                                            ? "Select Service Stuff"
+                                            : "No Stuff found!",
+                                      ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
-      ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        child: CustomButton(
-          onTap: () {
-            if (formKey.currentState!.validate()) {
-              controller.createOrderModel.saleType =
-                  controller.isRetailSale ? 3 : 4;
-              if (!controller.isRetailSale &&
-                  controller.selectedClient != null) {
-                controller.createOrderModel.customerId =
-                    controller.selectedClient!.id;
-              }
-              controller.createOrderModel.returnAmount =
-                  controller.totalAmount.toDouble();
-              controller.createOrderModel.deduction =
-                  controller.totalDiscount.toDouble();
-              controller.createOrderModel.amount =
-                  controller.paidAmount.toDouble();
-              controller.createOrderModel.vat =
-                  controller.totalVat.toDouble();
-              controller.createOrderModel.name = controller.isRetailSale
-                  ? customerNameEditingController.text
-                  : controller.selectedClient!.name;
-              controller.createOrderModel.phone = controller.isRetailSale
-                  ? customerPhoneNumberEditingController.text
-                  : controller.selectedClient!.phone;
-              controller.createOrderModel.address = controller.isRetailSale
-                  ? customerAddressEditingController.text
-                  : controller.selectedClient!.address;
-              if (controller.serviceStuffInfo == null) {
-                Methods.showSnackbar(msg: "Please select a service stuff");
-                return;
-              }
-              controller.createOrderModel.serviceBy =
-                  controller.serviceStuffInfo!.id;
-
-              controller.createOrderModel.payments.clear();
-              for (var e in controller.paymentMethodTracker) {
-                if (e.paymentMethod == null) {
-                  Methods.showSnackbar(
-                      msg:
-                          "Please insert valid amount or remove not selected payment methods");
-                  return;
-                } else if (e.paymentMethod != null &&
-                    e.paymentMethod!.paymentOptions.isNotEmpty &&
-                    e.paymentOption == null) {
-                  Methods.showSnackbar(
-                      msg: "Please select associate payment options");
-                  return;
-                } else {
-                  controller.createOrderModel.payments.add(Payment(
-                      methodId: e.paymentMethod!.id,
-                      paid: e.paidAmount!.toDouble(),
-                      bankId: e.paymentOption?.id));
+        bottomNavigationBar: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          child: CustomButton(
+            onTap: () {
+              if (formKey.currentState!.validate()) {
+                controller.createOrderModel.saleType =
+                controller.isRetailSale ? 3 : 4;
+                if (!controller.isRetailSale &&
+                    controller.selectedClient != null) {
+                  controller.createOrderModel.customerId =
+                      controller.selectedClient!.id;
                 }
-              }
-              if(controller.isEditing){
-                controller.updateReturnOrder(context);
-              }else{
-                controller.createReturnOrder(context);
-              }
+                controller.createOrderModel.returnAmount =
+                    controller.totalAmount.toDouble();
+                controller.createOrderModel.deduction =
+                    controller.totalDiscount.toDouble();
+                controller.createOrderModel.amount =
+                    controller.paidAmount.toDouble();
+                controller.createOrderModel.vat =
+                    controller.totalVat.toDouble();
+                controller.createOrderModel.name = controller.isRetailSale
+                    ? customerNameEditingController.text
+                    : controller.selectedClient!.name;
+                controller.createOrderModel.phone = controller.isRetailSale
+                    ? customerPhoneNumberEditingController.text
+                    : controller.selectedClient!.phone;
+                controller.createOrderModel.address = controller.isRetailSale
+                    ? customerAddressEditingController.text
+                    : controller.selectedClient!.address;
+                if (controller.serviceStuffInfo == null) {
+                  Methods.showSnackbar(msg: "Please select a service stuff");
+                  return;
+                }
+                controller.createOrderModel.serviceBy =
+                    controller.serviceStuffInfo!.id;
 
-            }
-          },
-          text:  controller.isEditing ? "Update Order" : "Place Order",
+                controller.createOrderModel.payments.clear();
+                for (var e in controller.paymentMethodTracker) {
+                  if (e.paymentMethod == null) {
+                    Methods.showSnackbar(
+                        msg:
+                        "Please insert valid amount or remove not selected payment methods");
+                    return;
+                  } else if (e.paymentMethod != null &&
+                      e.paymentMethod!.paymentOptions.isNotEmpty &&
+                      e.paymentOption == null) {
+                    Methods.showSnackbar(
+                        msg: "Please select associate payment options");
+                    return;
+                  } else {
+                    controller.createOrderModel.payments.add(Payment(
+                        methodId: e.paymentMethod!.id,
+                        paid: e.paidAmount!.toDouble(),
+                        bankId: e.paymentOption?.id));
+                  }
+                }
+                if(controller.isEditing){
+                  controller.updateReturnOrder(context).then((value){
+                    if(value){
+                      Get.to(const ReturnHistoryDetailsWidget(),arguments: [controller.pOrderId, controller.pOrderNo]);
+                      controller.clearEditing();
+                    }
+                  });
+                }else{
+                  controller.createReturnOrder(context).then((value){
+                    if(value){
+                      Get.to(const ReturnHistoryDetailsWidget(),arguments: [controller.pOrderId, controller.pOrderNo]);
+                    }
+                  });
+                }
+
+              }
+            },
+            text: controller.isEditing ? "Update Order" : "Place Order",
+          ),
         ),
       ),
     );

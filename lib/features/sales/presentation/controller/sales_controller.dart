@@ -240,9 +240,9 @@ class SalesController extends GetxController {
     num totalV = 0;
     int totalQ = 0;
     paidAmount = 0;
-    num excludeAmount = 0;
     bool cash = false;
     bool credit = false;
+    num excludeAmount = 0;
     for (var e in paymentMethodTracker) {
       excludeAmount += e.paidAmount ?? 0;
       if(e.paymentMethod != null){
@@ -268,18 +268,14 @@ class SalesController extends GetxController {
     totalVat = totalV;
     totalQTY = totalQ;
     paidAmount = totalAmount + totalVat + additionalExpense - totalDiscount;
-    if(paidAmount <= totalAmount){
-      totalChangeAmount = 0;
-      totalDeu = paidAmount - totalPaid;
-    }else{
-      totalDeu = 0;
-      totalChangeAmount = totalPaid - paidAmount;
+
+    if (firstTime != null && paymentMethodTracker.isEmpty) {
+      addPaymentMethod();
     }
-    if (firstTime == null) {
-      totalDeu = paidAmount - totalPaid;
-    }
+
     update(['change-due-amount','billing_summary_form']);
   }
+
 
   void changeQuantityOfProduct(int index, bool increase) {
     if (increase) {
