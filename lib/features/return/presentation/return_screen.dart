@@ -94,16 +94,6 @@ class _SalesScreenState extends State<ReturnScreen>
   Widget build(BuildContext context) {
     final DrawerMenuController drawerMenuController = Get.find();
     return PopScope(
-      onPopInvoked: (value) async {
-        if(controller.isEditing){
-          drawerMenuController.closeDrawer();
-          bool val = await showDiscardDialog(context);
-          if(val){
-            controller.clearEditing();
-            _tabController.animateTo(1);
-          }
-        }
-      },
       canPop: false,
       child: Scaffold(
         appBar: AppBar(

@@ -232,8 +232,7 @@ class ReturnController extends GetxController {
             unitPrice: isRetailSale ? product.mrpPrice.toDouble() : product
                 .wholesalePrice.toDouble(),
             quantity:quantity?? 1,
-            vat: (product.vat/100 * (isRetailSale ? product.mrpPrice.toDouble() : product
-                .wholesalePrice.toDouble())).toDouble(),
+            vat: product.isVatApplicable == 1 ? (product.vat/100 * unitPrice).toDouble() : 0,
             serialNo: snNo ?? []));
       }else{
         returnOrderProducts.add(product);
@@ -249,8 +248,7 @@ class ReturnController extends GetxController {
             id: product.id,
             unitPrice: unitPriceFromCreateModel ?? unitPrice,
             quantity:quantity?? 1,
-            vat: (product.vat/100 * (isRetailSale ? product.mrpPrice.toDouble() : product
-                .wholesalePrice.toDouble())).toDouble(),
+            vat: product.isVatApplicable == 1 ? (product.vat/100 * unitPrice).toDouble() : 0,
             serialNo: snNo ?? []));
         logger.i(createOrderModel.products.length);
       }
@@ -283,7 +281,7 @@ class ReturnController extends GetxController {
     for (var e in createOrderModel.products) {
       var product = returnOrderProducts.singleWhere((f) => f.id == e.id);
       totalQ += e.quantity;
-      totalV += product.isVatApplicable == 1 ? e.vat * e.quantity : 0;
+      totalV += product.isVatApplicable == 1 ? product.vat/100 * e.unitPrice * e.quantity : 0;
       totalA += e.unitPrice * e.quantity;
     }
     totalAmount = totalA;

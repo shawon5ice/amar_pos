@@ -264,6 +264,7 @@ class _ExchangeSummaryState extends State<ExchangeSummary> {
                     ),
                     addH(8),
                     Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
                           child: GetBuilder<ExchangeController>(
@@ -272,7 +273,6 @@ class _ExchangeSummaryState extends State<ExchangeSummary> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      addH(16.h),
                                       const FieldTitle("Change Amount"),
                                       addH(4),
                                       CustomTextField(

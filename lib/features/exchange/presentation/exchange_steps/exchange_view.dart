@@ -45,7 +45,6 @@ class _ExchangeViewState extends State<ExchangeView> {
               connectorThickness: 2,
               // stepIconMargin: EdgeInsets.only(bottom: 8),
               stepIconHeight: 32,
-
               elevation: 0,
               // connectorColor: WidgetStatePropertyAll(AppColors.primary),
               type: StepperType.horizontal,
@@ -57,6 +56,7 @@ class _ExchangeViewState extends State<ExchangeView> {
                   ? controller.onSubmit
                   : controller.onStepContinue,
               onStepCancel: controller.onStepCancel,
+
               steps: [
                 Step(
                     // title: SizedBox.shrink(),

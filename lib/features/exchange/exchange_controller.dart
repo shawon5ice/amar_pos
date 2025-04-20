@@ -79,9 +79,21 @@ class ExchangeController extends GetxController{
   int currentStep = 0;
 
   void onStepContinue() {
-    if(currentStep == 0 && returnOrderProducts.isEmpty){
-      Methods.showSnackbar(msg: "Please select products to return");
-      return;
+    if(currentStep == 0){
+      if(returnOrderProducts.isEmpty){
+        Methods.showSnackbar(msg: "Please select products to return");
+        return;
+      }else{
+        exchangeRequestModel.returnProducts.forEach((e) {
+          if(e.serialNo.isNotEmpty && e.quantity != e.serialNo.length){
+            var product = returnOrderProducts.singleWhere((f) => e.id == f.id);
+            logger.i(e.quantity);
+            ErrorExtractor.showSingleErrorDialog(Get.context!, "Please fix SN quantity issue of ${product.name}");
+            return;
+          }
+        });
+      }
+      currentStep++;
     }else if(currentStep == 1 && exchangeProducts.isEmpty){
       Methods.showSnackbar(msg: "Please select products to exchange");
       return;
@@ -321,7 +333,7 @@ class ExchangeController extends GetxController{
     }
   }
 
-  void addProduct(ProductInfo product, {List<String>? snNo, int? quantity,required bool isReturn}) {
+  void addProduct(ProductInfo product, {List<String>? snNo, int? quantity,required bool isReturn,required num unitPrice,}) {
     if(isReturn){
       if (returnOrderProducts.any((e) => e.id == product.id)) {
         var p = exchangeRequestModel.returnProducts
@@ -851,12 +863,12 @@ class ExchangeController extends GetxController{
         //selecting products
         for (var e in exchangeOrderDetailsResponseModel!.data.returnDetails) {
           ProductInfo productInfo = productsListResponseModel!.data.productList.singleWhere((f) => f.id == e.id);
-          addProduct(productInfo, snNo: e.snNo.map((e) => e.serialNo).toList(), quantity:  e.quantity, isReturn: true);
+          addProduct(productInfo, snNo: e.snNo.map((e) => e.serialNo).toList(), quantity:  e.quantity, isReturn: true, unitPrice: e.unitPrice);
         }
 
         for (var e in exchangeOrderDetailsResponseModel!.data.exchangeDetails) {
           ProductInfo productInfo = productsListResponseModel!.data.productList.singleWhere((f) => f.id == e.id);
-          addProduct(productInfo, snNo: e.snNo.map((e) => e.serialNo).toList(), quantity:  e.quantity, isReturn: false);
+          addProduct(productInfo, snNo: e.snNo.map((e) => e.serialNo).toList(), quantity:  e.quantity, isReturn: false, unitPrice: e.unitPrice);
         }
 
         //Payment Methods

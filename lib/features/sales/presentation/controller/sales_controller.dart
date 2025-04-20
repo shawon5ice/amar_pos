@@ -206,11 +206,9 @@ class SalesController extends GetxController {
 
         createOrderModel.products.insert(0, SaleProductModel(
             id: product.id,
-            unitPrice: isRetailSale ? product.mrpPrice.toDouble() : product
-                .wholesalePrice.toDouble(),
+            unitPrice: unitPrice,
             quantity:quantity?? 1,
-            vat: (product.vat/100 * (isRetailSale ? product.mrpPrice.toDouble() : product
-                .wholesalePrice.toDouble())).toDouble(),
+            vat: product.isVatApplicable == 1 ? (product.vat/100 * unitPrice * (quantity ?? 1)).toDouble(): 0,
             serialNo: snNo ?? []));
       }else{
         placeOrderProducts.add(product);
@@ -227,8 +225,7 @@ class SalesController extends GetxController {
             id: product.id,
             unitPrice: unitPriceFromCreateModel ?? unitPrice,
             quantity:quantity?? 1,
-            vat: (product.vat/100 * (isRetailSale ? product.mrpPrice.toDouble() : product
-                .wholesalePrice.toDouble())).toDouble(),
+            vat: product.isVatApplicable == 1 ? (product.vat/100 * (unitPriceFromCreateModel ?? unitPrice)).toDouble(): 0,
             serialNo: snNo ?? []));
       }
     }
@@ -261,7 +258,7 @@ class SalesController extends GetxController {
       var product = placeOrderProducts.singleWhere((f) => f.id == e.id);
 
       totalQ += e.quantity;
-      totalV += product.isVatApplicable == 1 ? e.vat * e.quantity : 0;
+      totalV += product.isVatApplicable == 1 ? product.vat/100 * e.unitPrice * e.quantity : 0;
       totalA += e.unitPrice * e.quantity;
     }
     totalAmount = totalA;

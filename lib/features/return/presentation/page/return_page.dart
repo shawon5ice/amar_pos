@@ -742,7 +742,7 @@ class _ReturnPageState extends State<ReturnPage> {
                                                             children: [
                                                               addH(2),
                                                               Text(
-                                                                "VAT: ${Methods.getFormattedNumber((controller.createOrderModel.products[index].vat * controller.createOrderModel.products[index].quantity).toDouble())}",
+                                                                "VAT: ${Methods.getFormattedNumber(((controller.returnOrderProducts[index].vat/100) * controller.createOrderModel.products[index].unitPrice * controller.createOrderModel.products[index].quantity).toDouble())}",
                                                                 style: TextStyle(
                                                                     color: AppColors.error, fontWeight: FontWeight.normal),
                                                               ),
