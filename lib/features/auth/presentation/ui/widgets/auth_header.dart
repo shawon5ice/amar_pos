@@ -7,10 +7,12 @@ import '../../../../../core/constants/app_colors.dart';
 class AuthHeader extends StatelessWidget {
   final String title;
   final String? error;
+  final double? height;
 
   const AuthHeader({
     super.key,
     required this.title,
+    this.height,
     this.error,
   });
 
@@ -18,7 +20,7 @@ class AuthHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: Get.width,
-      height: Get.height / 2,
+      height: height?? Get.height / 2,
       child: Stack(
 
         alignment: Alignment.center,

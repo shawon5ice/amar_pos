@@ -6,13 +6,14 @@ import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
+import 'package:get/get_connect/http/src/multipart/form_data.dart';
 import '../../features/auth/data/model/hive/login_data_helper.dart';
 import '../../features/auth/presentation/ui/login_screen.dart';
 import '../constants/app_strings.dart';
 import '../constants/logger/logger.dart';
 import '../widgets/methods/helper_methods.dart';
 import 'network_strings.dart';
-
+import 'package:dio/dio.dart' as dio;
 class BaseClient {
   static  final Dio _dio = Dio(
     BaseOptions(
@@ -132,8 +133,10 @@ class BaseClient {
   static Future<dynamic> postData({
     required String api,
     String? token,
+    bool? fileTypeContent,
     dynamic body,
     bool? fullUrlGiven,
+    bool? shouldExtractErros
   }) async {
     String url = fullUrlGiven == true ? api : '${NetWorkStrings.baseUrl}/$api';
     showRequestLog(url: url, token: token, requestType: "POST");
@@ -142,13 +145,16 @@ class BaseClient {
         url,
         data: body,
         options: token != null
-            ? Options(headers: {'Authorization': 'Bearer $token'})
+            ? Options(headers: {'Authorization': 'Bearer $token',},contentType: body is dio.FormData
+            ? 'multipart/form-data'
+            : 'application/json')
             : null,
       );
       logger.i('POST Response: ${response.statusCode}');
-      if(response.data['success'] || (!response.data['success'] && response.data['errors'] == null)){
+      logger.i('POST Response: ${response.data}');
+      if((response.data['success'] || (!response.data['success'] && response.data['errors'] == null )|| shouldExtractErros != null)){
         return response.data;
-      }else{
+      }else if(shouldExtractErros == null){
         ErrorExtractor.showErrorDialog(Get.context!, response.data);
       }
       return response.data;

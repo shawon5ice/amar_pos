@@ -1,12 +1,15 @@
 import 'dart:convert';
 
+import 'package:amar_pos/core/network/helpers/error_extractor.dart';
 import 'package:amar_pos/features/auth/data/model/sign_in_response.dart' as network;
 import 'package:amar_pos/features/drawer/main_page.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../../../core/constants/app_strings.dart';
 import '../../../../core/constants/logger/logger.dart';
 import '../../../../core/data/preference.dart';
 import '../../../../core/widgets/methods/helper_methods.dart';
@@ -14,10 +17,23 @@ import '../../data/model/hive/login_data.dart';
 import '../../data/model/hive/login_data_helper.dart';
 import '../../data/services/auth_remote_data_service.dart';
 
+enum AuthStep {
+  enterPhone,
+  sendingOtp,
+  otpSent,
+  otpSendingFailed,
+  verifyingOtp,
+  otpVerified,
+  otpVerifyingFailed,
+  signingUp,
+  signUpSuccess,
+  signingUpFailed,
+}
+
 class AuthController extends GetxController{
   RxBool isLoggedIn = false.obs;
   RxBool loading = false.obs;
-
+  final authStep = AuthStep.enterPhone.obs;
   network.SignInResponse? signInResponse;
   // UserInfo? userInfo;
   RxString message = ''.obs;
@@ -25,9 +41,16 @@ class AuthController extends GetxController{
 
   bool rememberMeFlag  = false;
 
+  bool showSignUpView = false;
   late final TextEditingController emailController;
   late final TextEditingController passwordController;
   late final TextEditingController phoneCon;
+
+
+  String? businessLogo;
+  String? ownerPhoto;
+
+  final FocusNode pinPutFocusNode = FocusNode();
 
   late FocusNode emailFocus;
   late FocusNode passwordFocus;
@@ -51,7 +74,6 @@ class AuthController extends GetxController{
     emailController = TextEditingController();
     passwordController = TextEditingController();
     phoneCon = TextEditingController();
-
     emailFocus = FocusNode();
     passwordFocus = FocusNode();
     initializeRememberMe();
@@ -72,8 +94,6 @@ class AuthController extends GetxController{
   void dispose() {
     emailController.dispose();
     passwordController.dispose();
-    phoneCon.dispose();
-
     emailFocus.dispose();
     passwordFocus.dispose();
 
@@ -94,6 +114,23 @@ class AuthController extends GetxController{
       Preference.setLoginPass("");
     }
   }
+
+  Future<void> selectFile({bool? ownerLogo}) async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+
+    );
+    if (result != null) {
+      if(ownerLogo != null){
+        ownerPhoto = result.files.single.path;
+      }else{
+        businessLogo = result.files.single.path;
+      }
+      update(['register_screen']);
+    }
+  }
+
+
 
   void signIn() async {
     isLoggedIn.value = false;
@@ -158,37 +195,103 @@ class AuthController extends GetxController{
   }
 
   //Send OTP
-  // Future sendOTP({
-  //   required bool isForVerification,
-  //   required String otp,
-  // }) async {
-  //   isLoggingIn(true);
-  //   Methods.showLoading();
-  //   try {
-  //     var response = await AuthRemoteDataService.sendOTP(
-  //       phoneNumber: phoneCon.text.trim(),
-  //       isForVerification: isForVerification,
-  //       otp: otp,
-  //     );
-  //
-  //     if(response['success'] && !isForVerification){
-  //       otpSend(true);
-  //     }else if(response['success'] && isForVerification){
-  //       verificationDone(true);
-  //     }
-  //     update(['forgot_password_view']);
-  //     if(response['success']){
-  //       Methods.showSnackbar(msg: response['message'],isSuccess: true);
-  //     }else{
-  //       Methods.showSnackbar(msg: response['message']);
-  //     }
-  //   } catch(e){
-  //     Methods.showSnackbar(msg: AppStrings.kWentWrong);
-  //   }finally {
-  //     Methods.hideLoading();
-  //     update(['forgot_password_view']);
-  //   }
-  // }
+  Future<bool> sendOTP(String phone) async {
+    authStep.value = AuthStep.sendingOtp;
+    Methods.showLoading();
+    try {
+      var response = await AuthRemoteDataService.sendOTP(
+        phoneNumber: phone,
+      );
+
+      update(['register_screen']);
+      if(response['success']){
+        authStep.value = AuthStep.otpSent;
+        Methods.showSnackbar(msg: response['message'],isSuccess: true);
+        return true;
+      }else{
+        authStep.value = AuthStep.otpSendingFailed;
+        Methods.showSnackbar(msg: response['message']);
+      }
+    } catch(e){
+      authStep.value = AuthStep.otpSendingFailed;
+      Methods.showSnackbar(msg: AppStrings.kWentWrong);
+    }finally {
+      Methods.hideLoading();
+      update(['register_screen']);
+    }
+    return false;
+  }
+
+  Future verifyOTP(String otp, String phone) async {
+    if(otp.isEmpty && otp.length != 6){
+      Methods.showSnackbar(msg: "Please enter valid OTP");
+      return;
+    }
+    authStep.value = AuthStep.verifyingOtp;
+    Methods.showLoading();
+    try {
+      var response = await AuthRemoteDataService.verifyOTP(
+        phoneNumber: phone,
+        otp: otp,
+      );
+
+      update(['register_screen']);
+      if(response['success']){
+        authStep.value = AuthStep.otpVerified;
+        showSignUpView = true;
+        Methods.showSnackbar(msg: response['message'],isSuccess: true);
+      }else{
+        authStep.value = AuthStep.otpVerifyingFailed;
+        Methods.showSnackbar(msg: response['message']);
+      }
+    } catch(e){
+      authStep.value = AuthStep.otpVerifyingFailed;
+      Methods.showSnackbar(msg: AppStrings.kWentWrong);
+    }finally {
+      Methods.hideLoading();
+      update(['register_screen']);
+    }
+  }
+
+
+
+
+
+  Future signUp(var formData) async {
+    authStep.value = AuthStep.signingUp;
+    // Methods.showLoading();
+    try {
+      var response = await AuthRemoteDataService.signUp(
+        formData
+      );
+
+      update(['register_screen']);
+      if(response['success']){
+        authStep.value = AuthStep.signUpSuccess;
+        Methods.showSnackbar(msg: response['message'],isSuccess: true);
+      }else{
+        authStep.value = AuthStep.signingUpFailed;
+        if(response['errors'] is Map<String, dynamic>){
+          List<String> errors = ErrorExtractor.extractErrorMessages(response);
+          logger.i(errors);
+          String message = "";
+          for (int i = 0; i<errors.length; i++) {
+            message += "${i+1}. ${errors[i]} ${i<errors.length?"\n":''}";
+          }
+          Methods.showSnackbar(msg: message);
+        }else{
+          Methods.showSnackbar(msg: response['message']);
+        }
+
+      }
+    } catch(e){
+      authStep.value = AuthStep.signingUpFailed;
+      Methods.showSnackbar(msg: AppStrings.kWentWrong);
+    }finally {
+      // Methods.hideLoading();
+      update(['register_screen']);
+    }
+  }
 
 
   //Send password

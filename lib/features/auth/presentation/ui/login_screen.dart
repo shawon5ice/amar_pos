@@ -1,5 +1,6 @@
 import 'package:amar_pos/core/widgets/custom_btn.dart';
 import 'package:amar_pos/core/widgets/field_title.dart';
+import 'package:amar_pos/features/auth/presentation/ui/registration_screen.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -172,6 +173,16 @@ class LoginScreen extends GetView<AuthController> {
                       ),
                     ),
                     addH(50.h),
+                    Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text("Don't have an account?"),
+                        TextButton(onPressed: (){
+                          Get.toNamed(RegistrationScreen.routeName,);
+                        }, child: Text('Sign up',style: TextStyle(color: AppColors.accent),))
+                      ],
+                    )
                   ],
                 );
               }
@@ -186,49 +197,6 @@ class LoginScreen extends GetView<AuthController> {
     return Text(
       title,
       style: Get.context?.textTheme.titleSmall,
-    );
-  }
-}
-
-class TabbarItem extends StatelessWidget {
-  final VoidCallback onTapFn;
-  final String title;
-  final bool isSelected;
-
-  const TabbarItem({
-    Key? key,
-    required this.onTapFn,
-    required this.title,
-    required this.isSelected,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: InkWell(
-        onTap: onTapFn,
-        splashColor: Colors.transparent,
-        highlightColor: Colors.transparent,
-        child: Container(
-          height: 40,
-          decoration: BoxDecoration(
-            border: Border(
-              bottom: BorderSide(
-                width: isSelected ? 4 : 1,
-                color: AppColors.primary,
-              ),
-            ),
-          ),
-          child: Text(
-            title,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

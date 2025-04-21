@@ -29,6 +29,9 @@ class LoginData extends HiveObject {
   @HiveField(6)
   String address;
 
+  @HiveField(8)
+  String? photo;
+
   @HiveField(7)
   List<String> permissions;
 
@@ -39,6 +42,7 @@ class LoginData extends HiveObject {
     required this.email,
     required this.phone,
     required this.business,
+    this.photo,
     // required this.subscription,
     required this.address,
     required this.permissions,
@@ -50,6 +54,7 @@ class LoginData extends HiveObject {
       token: json['token'],
       name: json['name'],
       status: json['status']??'--',
+      photo: json['photo']??'--',
       email: json['email']??'--',
       phone: json['phone']??'--',
       business: Business.fromJson(json['business']),

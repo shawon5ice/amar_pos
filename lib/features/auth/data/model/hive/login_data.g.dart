@@ -25,13 +25,14 @@ class LoginDataAdapter extends TypeAdapter<LoginData> {
       business: fields[5] as Business,
       address: fields[6] as String,
       permissions: (fields[7] as List).cast<String>(),
+      photo: fields[8] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, LoginData obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(9)
       ..writeByte(0)
       ..write(obj.token)
       ..writeByte(1)
@@ -47,7 +48,10 @@ class LoginDataAdapter extends TypeAdapter<LoginData> {
       ..writeByte(6)
       ..write(obj.address)
       ..writeByte(7)
-      ..write(obj.permissions);
+      ..write(obj.permissions)
+      ..writeByte(8)
+      ..write(obj.photo)
+    ;
   }
 
   @override

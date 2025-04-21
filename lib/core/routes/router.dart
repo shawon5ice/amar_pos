@@ -11,6 +11,7 @@ import 'package:amar_pos/features/accounting/presentation/views/supplier_payment
 import 'package:amar_pos/features/accounting/presentation/views/supplier_payment/supplier_payment.dart';
 import 'package:amar_pos/features/accounting/presentation/views/trial_balance/trial_balance_screen.dart';
 import 'package:amar_pos/features/auth/presentation/ui/login_screen.dart';
+import 'package:amar_pos/features/auth/presentation/ui/registration_screen.dart';
 import 'package:amar_pos/features/config/presentation/configuration_screen.dart';
 import 'package:amar_pos/features/drawer/main_page.dart';
 import 'package:amar_pos/features/home/presentation/home_screen.dart';
@@ -37,6 +38,14 @@ class AppRoutes {
       page: () => LoginScreen(),
       binding: AuthBinding(),
     ),
+
+    GetPage(
+      name: RegistrationScreen.routeName,
+      page: () => RegistrationScreen(),
+      binding: AuthBinding(),
+      transition: Transition.rightToLeft,
+    ),
+
 
     GetPage(
       name: ForgotPasswordScreen.routeName,

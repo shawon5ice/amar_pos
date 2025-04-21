@@ -90,11 +90,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                 children: [
                   Row(
                     children: [
-                      CircleAvatar(
-                        backgroundColor: Colors.white,
-                        radius: 25,
-                        child: (controller.loginData?.business.logo != null && controller.loginData!.business.logo!.contains('http')) ?Image.network(controller.loginData!.business.logo!): const Icon(Icons.broken_image),
-                      ),
+                      (controller.loginData?.photo != null && controller.loginData!.photo!.contains('http')) ?ClipOval(child: Image.network(controller.loginData!.photo!, fit: BoxFit.cover,width: 50,height: 50,)): const Icon(Icons.broken_image),
                       const SizedBox(
                         width: 12,
                       ),
