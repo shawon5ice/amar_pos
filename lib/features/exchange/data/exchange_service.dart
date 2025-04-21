@@ -111,6 +111,9 @@ class ExchangeService{
     String? search,
     DateTime? startDate,
     DateTime? endDate,
+    int? brandId,
+    int? categoryId,
+    int? productType
   }) async {
     logger.d("Page: $page");
     var response = await BaseClient.getData(
@@ -122,7 +125,9 @@ class ExchangeService{
           "search": search,
           "start_date": startDate,
           "end_date": endDate,
-          "product_type": 3,
+          "brand_id": brandId,
+          "category_id": categoryId,
+          "product_type": productType?? 3,
           "limit": 10,
         });
     return response;
@@ -179,15 +184,15 @@ class ExchangeService{
 
   static downloadExchangeInvoice(
       {required String usrToken,
-        required ExchangeOrderInfo exchangeOrderInfo}) async {
+        required int orderId, required String fileName}) async {
 
     String downloadUrl =
-        "${NetWorkStrings.baseUrl}/exchange/download-exchange-invoice/${exchangeOrderInfo.id}";
+        "${NetWorkStrings.baseUrl}/exchange/download-exchange-invoice/$orderId";
 
     FileDownloader().downloadFile(
       url: downloadUrl,
       token: usrToken,
-      fileName: "${exchangeOrderInfo.orderNo}.pdf",);
+      fileName: fileName);
   }
 
 

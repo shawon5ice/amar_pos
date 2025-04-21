@@ -10,6 +10,8 @@ import '../../../../core/constants/app_assets.dart';
 import '../../../../core/responsive/pixel_perfect.dart';
 import '../../../../core/widgets/custom_text_field.dart';
 import '../../../../core/widgets/pager_list_view.dart';
+import '../../../core/widgets/methods/helper_methods.dart';
+import '../../../core/widgets/reusable/status/total_status_widget.dart';
 import '../../inventory/presentation/stock_report/widget/custom_svg_icon_widget.dart';
 import '../exchange_controller.dart';
 
@@ -30,6 +32,10 @@ class _SoldHistoryState extends State<ExchangeProducts> {
     super.initState();
   }
 
+  Set<String> _selected  = {
+    'exchange'
+  };
+
   TextEditingController textEditingController = TextEditingController();
   @override
   Widget build(BuildContext context) {
@@ -42,6 +48,24 @@ class _SoldHistoryState extends State<ExchangeProducts> {
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             children: [
+              SegmentedButton(
+                segments: [
+                ButtonSegment(value: 'exchange', label: Text('Exchange Produccts')),
+                ButtonSegment(value: 'return', label: Text('Return Products'))
+              ], selected: _selected,
+                onSelectionChanged: (value){
+                 setState(() {
+                   controller.category = null;
+                   controller.brand = null;
+                   controller.selectedDateTimeRange.value = null;
+                   _selected = value;
+                   controller.getExchangeProducts(
+                     productType: _selected.first == 'exchange' ? 3 : 2,
+                   );
+                 });
+                },
+              ),
+              addH(8),
               Row(
                 children: [
                   Expanded(
@@ -85,7 +109,7 @@ class _SoldHistoryState extends State<ExchangeProducts> {
                   )
                 ],
               ),
-              addH(8.px),
+              addH(8),
               GetBuilder<ExchangeController>(
                 id: 'total_status_widget',
                 builder: (controller) => Row(
@@ -94,7 +118,11 @@ class _SoldHistoryState extends State<ExchangeProducts> {
                       flex: 3,
                       isLoading: controller.isExchangeProductListLoading,
                       title: 'Total QTY',
-                      value: null,
+                      value: controller.exchangeProductResponseModel != null
+                          ? Methods.getFormattedNumber(controller
+                          .exchangeProductResponseModel!.countTotal
+                          .toDouble())
+                          : null,
                       asset: AppAssets.productBox,
                     ),
                     addW(12),
@@ -102,7 +130,11 @@ class _SoldHistoryState extends State<ExchangeProducts> {
                       flex: 4,
                       isLoading: controller.isExchangeProductListLoading,
                       title: 'Sold Amount',
-                      value: null,
+                      value: controller.exchangeProductResponseModel != null
+                          ? Methods.getFormattedNumber(controller
+                          .exchangeProductResponseModel!.amountTotal
+                          .toDouble())
+                          : null,
                       asset: AppAssets.amount,
                     ),
                   ],
@@ -158,66 +190,5 @@ class _SoldHistoryState extends State<ExchangeProducts> {
         ),
       ),
     );
-  }
-}
-
-class TotalStatusWidget extends StatelessWidget {
-  const TotalStatusWidget({
-    super.key,
-    required this.title,
-    this.value,
-    required this.isLoading,
-    required this.asset,
-    this.flex = 1,
-  });
-
-  final String title;
-  final String? value;
-  final bool isLoading;
-  final String asset;
-  final int flex;
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-        flex: flex,
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      color: Color(0xffA2A2A2),
-                      fontSize: 14.sp,
-                    ),
-                  ),
-                  const Spacer(),
-                  SvgPicture.asset(asset)
-                ],
-              ),
-              addH(12),
-              isLoading
-                  ? Container(
-                  height: 30.sp, width: 30.sp, child: CircularProgressIndicator())
-                  : Text(
-                value != null ? value! : '--',
-                style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 20.sp,
-                    height: 1.5.sp
-                ),
-              )
-            ],
-          ),
-        ));
   }
 }

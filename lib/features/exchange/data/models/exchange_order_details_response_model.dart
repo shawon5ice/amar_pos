@@ -1,294 +1,230 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part 'exchange_order_details_response_model.g.dart';
+
+
+@JsonSerializable()
 class ExchangeOrderDetailsResponseModel {
-  ExchangeOrderDetailsResponseModel({
-    required this.success,
-    required this.data,
-  });
-  late final bool success;
-  late final Data data;
+  final bool success;
+  final ExchangeHistoryDetailsData data;
 
-  ExchangeOrderDetailsResponseModel.fromJson(Map<String, dynamic> json){
-    success = json['success'];
-    data = Data.fromJson(json['data']);
-  }
+  ExchangeOrderDetailsResponseModel({required this.success, required this.data});
 
-  Map<String, dynamic> toJson() {
-    final _data = <String, dynamic>{};
-    _data['success'] = success;
-    _data['data'] = data.toJson();
-    return _data;
-  }
+  factory ExchangeOrderDetailsResponseModel.fromJson(Map<String, dynamic> json) => _$ExchangeOrderDetailsResponseModelFromJson(json);
+  Map<String, dynamic> toJson() => _$ExchangeOrderDetailsResponseModelToJson(this);
 }
 
-class Data {
-  Data({
+@JsonSerializable()
+class ExchangeHistoryDetailsData {
+  final int id;
+  @JsonKey(name: 'date_time')
+  final String dateTime;
+  @JsonKey(name: 'order_no')
+  final String orderNo;
+  @JsonKey(name: 'sale_type')
+  final String saleType;
+  final Customer customer;
+  @JsonKey(name: 'sold_by')
+  final String soldBy;
+  @JsonKey(name: 'service_by')
+  final ServiceBy? serviceBy;
+  // @JsonKey(name: 'sub_total')
+  // final num subTotal;
+  // final num expense;
+  // final num vat;
+  final num payable;
+  final Business business;
+  @JsonKey(name: 'change_amount')
+  final double changeAmount;
+  final Store store;
+  @JsonKey(name: 'return_total')
+  final num returnTotal;
+  @JsonKey(name: 'return_details')
+  final List<OrderDetail> returnDetails;
+  @JsonKey(name: 'exchange_total')
+  final num exchangeTotal;
+  @JsonKey(name: 'exchange_details')
+  final List<OrderDetail> exchangeDetails;
+  @JsonKey(name: 'payment_details')
+  final List<PaymentDetails> paymentDetails;
+  final double discount;
+
+  ExchangeHistoryDetailsData({
     required this.id,
     required this.dateTime,
     required this.orderNo,
     required this.saleType,
     required this.customer,
-    required this.soldBy,
+    // required this.vat,
+    required this.returnTotal,
+    required this.exchangeTotal,
+    required this.store,
     required this.serviceBy,
-    required this.subTotal,
-    required this.discount,
-    required this.vat,
-    required this.expense,
+    required this.soldBy,
+    // required this.subTotal,
+    required this.changeAmount,
+    // required this.expense,
     required this.payable,
     required this.business,
-    required this.store,
     required this.returnDetails,
     required this.exchangeDetails,
     required this.paymentDetails,
-    required this.changeAmount,
+    required this.discount,
   });
-  late final int id;
-  late final String dateTime;
-  late final String orderNo;
-  late final String saleType;
-  late final Customer customer;
-  late final String soldBy;
-  late final ServiceBy serviceBy;
-  late final num subTotal;
-  late final num discount;
-  late final num vat;
-  late final num expense;
-  late final num payable;
-  late final Business business;
-  late final Store store;
 
-  late final List<OrderDetails> returnDetails;
-  late final List<OrderDetails> exchangeDetails;
-  late final List<PaymentDetails> paymentDetails;
-  late final num changeAmount;
-  late final num returnTotal;
-  late final num exchangeTotal;
-
-  Data.fromJson(Map<String, dynamic> json){
-    id = json['id'];
-    dateTime = json['date_time'];
-    orderNo = json['order_no'];
-    saleType = json['sale_type'];
-    customer = Customer.fromJson(json['customer']);
-    soldBy = json['sold_by'];
-    serviceBy = json['service_by'] is Map ? ServiceBy.fromJson(json['service_by']) : ServiceBy(id: -1, name: "--", email: "", phone: "", photoUrl: "");
-    subTotal = json['sub_total'] ?? 0;
-    discount = json['discount'] ?? 0;
-    vat = json['vat'] ?? 0;
-    expense = json['expense'] ?? 0;
-    payable = json['payable'] ?? 0;
-    business = Business.fromJson(json['business']);
-    store = Store.fromJson(json['store']);
-    returnDetails = List.from(json['return_details']).map((e)=>OrderDetails.fromJson(e)).toList();
-    exchangeDetails = List.from(json['exchange_details']).map((e)=>OrderDetails.fromJson(e)).toList();
-    paymentDetails = List.from(json['payment_details']).map((e)=>PaymentDetails.fromJson(e)).toList();
-    changeAmount = json['change_amount'] ?? 0;
-    returnTotal = json['return_total'] ?? 0;
-    exchangeTotal = json['exchange_total'] ?? 0;
-  }
-
-  Map<String, dynamic> toJson() {
-    final _data = <String, dynamic>{};
-    _data['id'] = id;
-    _data['date_time'] = dateTime;
-    _data['order_no'] = orderNo;
-    _data['sale_type'] = saleType;
-    _data['customer'] = customer.toJson();
-    _data['sold_by'] = soldBy;
-    _data['service_by'] = serviceBy.toJson();
-    _data['sub_total'] = subTotal;
-    _data['discount'] = discount;
-    _data['vat'] = vat;
-    _data['expense'] = expense;
-    _data['payable'] = payable;
-    _data['business'] = business.toJson();
-    _data['store'] = store.toJson();
-    _data['return_details'] = returnDetails.map((e)=>e.toJson()).toList();
-    _data['exchange_details'] = exchangeDetails.map((e)=>e.toJson()).toList();
-    _data['payment_details'] = paymentDetails.map((e)=>e.toJson()).toList();
-    _data['change_amount'] = changeAmount;
-    return _data;
-  }
+  factory ExchangeHistoryDetailsData.fromJson(Map<String, dynamic> json) => _$ExchangeHistoryDetailsDataFromJson(json);
+  Map<String, dynamic> toJson() => _$ExchangeHistoryDetailsDataToJson(this);
 }
 
-class Customer {
-  Customer({
-    required this.id,
-    required this.name,
-    required this.phone,
-    required this.address,
-  });
-  late final int id;
-  late final String name;
-  late final String phone;
-  late final String address;
 
-  Customer.fromJson(Map<String, dynamic> json){
-    id = json['id'];
-    name = json['name'];
-    phone = json['phone'];
-    address = json['address'];
-  }
+@JsonSerializable()
+class Store {
+  final int id;
+  final String name;
+  final String phone;
+  final String address;
 
-  Map<String, dynamic> toJson() {
-    final _data = <String, dynamic>{};
-    _data['id'] = id;
-    _data['name'] = name;
-    _data['phone'] = phone;
-    _data['address'] = address;
-    return _data;
-  }
+  Store({required this.id, required this.name, required this.phone, required this.address});
+
+  factory Store.fromJson(Map<String, dynamic> json) => _$StoreFromJson(json);
+  Map<String, dynamic> toJson() => _$StoreToJson(this);
 }
 
+@JsonSerializable()
 class ServiceBy {
+  final int id;
+  final String name;
+  final String phone;
+  final String email;
+  @JsonKey(name: 'photo_url')
+  final String photoUrl;
+
   ServiceBy({
     required this.id,
     required this.name,
     required this.email,
-    required this.phone,
     required this.photoUrl,
-  });
-  late final int id;
-  late final String name;
-  late final String email;
-  late final String phone;
-  late final String photoUrl;
+    required this.phone,});
 
-  ServiceBy.fromJson(Map<String, dynamic> json){
-    id = json['id'];
-    name = json['name'];
-    email = json['email'];
-    phone = json['phone'];
-    photoUrl = json['photo_url'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final _data = <String, dynamic>{};
-    _data['id'] = id;
-    _data['name'] = name;
-    _data['email'] = email;
-    _data['phone'] = phone;
-    _data['photo_url'] = photoUrl;
-    return _data;
-  }
+  factory ServiceBy.fromJson(Map<String, dynamic> json) => _$ServiceByFromJson(json);
+  Map<String, dynamic> toJson() => _$ServiceByToJson(this);
 }
 
+
+@JsonSerializable()
+class Customer {
+  final int id;
+  final String name;
+  final String phone;
+  final String address;
+
+  Customer({required this.id, required this.name, required this.phone, required this.address});
+
+  factory Customer.fromJson(Map<String, dynamic> json) => _$CustomerFromJson(json);
+  Map<String, dynamic> toJson() => _$CustomerToJson(this);
+}
+
+@JsonSerializable()
 class Business {
+  final int id;
+  final String name;
+  final String phone;
+  final String? email;
+  final String logo;
+  final String address;
+  @JsonKey(name: 'photo_url')
+  final String photoUrl;
+
   Business({
     required this.id,
     required this.name,
     required this.phone,
-    this.email,
+    required this.email,
     required this.logo,
     required this.address,
     required this.photoUrl,
   });
-  late final int id;
-  late final String name;
-  late final String phone;
-  late final Null email;
-  late final String logo;
-  late final String address;
-  late final String photoUrl;
 
-  Business.fromJson(Map<String, dynamic> json){
-    id = json['id'];
-    name = json['name'];
-    phone = json['phone'];
-    email = null;
-    logo = json['logo'];
-    address = json['address'];
-    photoUrl = json['photo_url'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final _data = <String, dynamic>{};
-    _data['id'] = id;
-    _data['name'] = name;
-    _data['phone'] = phone;
-    _data['email'] = email;
-    _data['logo'] = logo;
-    _data['address'] = address;
-    _data['photo_url'] = photoUrl;
-    return _data;
-  }
+  factory Business.fromJson(Map<String, dynamic> json) => _$BusinessFromJson(json);
+  Map<String, dynamic> toJson() => _$BusinessToJson(this);
 }
 
-class Store {
-  Store({
+@JsonSerializable()
+class OrderDetail {
+  final int id;
+  @JsonKey(name: 'details_id')
+  final int detailsId;
+  final String name;
+  @JsonKey(defaultValue: 'N/A')
+  final String warranty;
+  final int quantity;
+  @JsonKey(name: 'unit_price')
+  final double unitPrice;
+  @JsonKey(name: 'total_price')
+  final double totalPrice;
+  @JsonKey(name: 'wh_price')
+  final double wholeSalePrice;
+  @JsonKey(name: 'rp_price')
+  final double retailSalePrice;
+  final double vat;
+  @JsonKey(name: 'vat_percent')
+  final double vatPercent;
+  @JsonKey(name: 'sn_no', defaultValue: [])
+  final List<SnNo>? snNo;
+
+  OrderDetail({
     required this.id,
-    required this.name,
-    required this.phone,
-    required this.address,
-  });
-  late final int id;
-  late final String name;
-  late final String phone;
-  late final String address;
-
-  Store.fromJson(Map<String, dynamic> json){
-    id = json['id'];
-    name = json['name'];
-    phone = json['phone'];
-    address = json['address'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final _data = <String, dynamic>{};
-    _data['id'] = id;
-    _data['name'] = name;
-    _data['phone'] = phone;
-    _data['address'] = address;
-    return _data;
-  }
-}
-
-class OrderDetails {
-  OrderDetails({
     required this.detailsId,
-    required this.id,
-    required this.name,
-    required this.quantity,
-    required this.unitPrice,
+    required this.retailSalePrice,
+    required this.wholeSalePrice,
     required this.totalPrice,
     required this.vat,
     required this.vatPercent,
-    required this.snNo,
+    required this.warranty,
+    required this.name,
+    required this.quantity,
+    required this.unitPrice,
+    this.snNo,
   });
-  late final int detailsId;
-  late final int id;
-  late final String name;
-  late final int quantity;
-  late final int unitPrice;
-  late final int totalPrice;
-  late final int vat;
-  late final int vatPercent;
-  late final List<SnNo> snNo;
 
-  OrderDetails.fromJson(Map<String, dynamic> json){
-    detailsId = json['details_id'];
-    id = json['id'];
-    name = json['name'];
-    quantity = json['quantity'];
-    unitPrice = json['unit_price'];
-    totalPrice = json['total_price'];
-    vat = json['vat'];
-    vatPercent = json['vat_percent'];
-    snNo = List.from(json['sn_no']).map((e)=>SnNo.fromJson(e)).toList();
-  }
-
-  Map<String, dynamic> toJson() {
-    final _data = <String, dynamic>{};
-    _data['details_id'] = detailsId;
-    _data['id'] = id;
-    _data['name'] = name;
-    _data['quantity'] = quantity;
-    _data['unit_price'] = unitPrice;
-    _data['total_price'] = totalPrice;
-    _data['vat'] = vat;
-    _data['vat_percent'] = vatPercent;
-    _data['sn_no'] = snNo.map((e)=>e.toJson()).toList();
-    return _data;
-  }
+  factory OrderDetail.fromJson(Map<String, dynamic> json) => _$OrderDetailFromJson(json);
+  Map<String, dynamic> toJson() => _$OrderDetailToJson(this);
 }
+
+@JsonSerializable()
+class PaymentDetails {
+  final int id;
+  @JsonKey(name: 'order_payment_id')
+  final int orderPaymentId;
+  final String name;
+  final double amount;
+  final List<BankDetail> details;
+  final BankDetail? bank;
+
+  PaymentDetails({
+    required this.id,
+    required this.orderPaymentId,
+    required this.name,
+    required this.amount,
+    required this.details,
+    this.bank,
+  });
+
+  factory PaymentDetails.fromJson(Map<String, dynamic> json) => _$PaymentDetailsFromJson(json);
+  Map<String, dynamic> toJson() => _$PaymentDetailsToJson(this);
+}
+
+@JsonSerializable()
+class BankDetail {
+  final int id;
+  final String name;
+
+  BankDetail({required this.id, required this.name});
+
+  factory BankDetail.fromJson(Map<String, dynamic> json) => _$BankDetailFromJson(json);
+  Map<String, dynamic> toJson() => _$BankDetailToJson(this);
+}
+
 
 class SnNo {
   SnNo({
@@ -307,85 +243,6 @@ class SnNo {
     final _data = <String, dynamic>{};
     _data['id'] = id;
     _data['serial_no'] = serialNo;
-    return _data;
-  }
-}
-
-class PaymentDetails {
-  PaymentDetails({
-    required this.id,
-    required this.orderPaymentId,
-    required this.name,
-    required this.amount,
-    required this.details,
-    this.bank,
-  });
-  late final int id;
-  late final int orderPaymentId;
-  late final String name;
-  late final int amount;
-  late final List<Details> details;
-  late final Bank? bank;
-
-  PaymentDetails.fromJson(Map<String, dynamic> json){
-    id = json['id'];
-    orderPaymentId = json['order_payment_id'];
-    name = json['name'];
-    amount = json['amount'];
-    details = List.from(json['details']).map((e)=>Details.fromJson(e)).toList();
-    bank = json['bank'] is Map ? Bank.fromJson(json['bank']) : null;
-  }
-
-  Map<String, dynamic> toJson() {
-    final _data = <String, dynamic>{};
-    _data['id'] = id;
-    _data['order_payment_id'] = orderPaymentId;
-    _data['name'] = name;
-    _data['amount'] = amount;
-    _data['details'] = details.map((e)=>e.toJson()).toList();
-    _data['bank'] = bank?.toJson();
-    return _data;
-  }
-}
-
-class Details {
-  Details({
-    required this.id,
-    required this.name,
-  });
-  late final int id;
-  late final String name;
-
-  Details.fromJson(Map<String, dynamic> json){
-    id = json['id'];
-    name = json['name'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final _data = <String, dynamic>{};
-    _data['id'] = id;
-    _data['name'] = name;
-    return _data;
-  }
-}
-
-class Bank {
-  Bank({
-    required this.id,
-    required this.name,
-  });
-  late final int id;
-  late final String name;
-
-  Bank.fromJson(Map<String, dynamic> json){
-    id = json['id'];
-    name = json['name'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final _data = <String, dynamic>{};
-    _data['id'] = id;
-    _data['name'] = name;
     return _data;
   }
 }

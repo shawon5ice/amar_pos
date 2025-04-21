@@ -8,10 +8,16 @@ part 'exchange_product_response_model.g.dart'; // This is the generated file.
 class ExchangeProductResponseModel {
   final bool success;
   final Data data;
+  @JsonKey(name: 'amount_total',defaultValue: 0)
+  final num amountTotal;
+  @JsonKey(name: 'count_total',defaultValue: 0)
+  final num countTotal;
 
   ExchangeProductResponseModel({
     required this.success,
     required this.data,
+    required this.countTotal,
+    required this.amountTotal,
   });
 
   factory ExchangeProductResponseModel.fromJson(Map<String, dynamic> json) =>
@@ -40,6 +46,7 @@ class Data {
 class ExchangeProduct {
   final int id;
   final String category;
+  @JsonKey(defaultValue: 'N/A')
   final String brand;
   final String product;
   final int quantity;

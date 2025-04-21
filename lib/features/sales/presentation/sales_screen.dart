@@ -197,8 +197,8 @@ class _SalesScreenState extends State<SalesScreen>
                       Tab(
                         text: 'Place Order',
                       ),
-                      Tab(text: 'Sold History'),
-                      Tab(text: 'Sold Products'),
+                      Tab(text: 'History'),
+                      Tab(text: 'Products'),
                     ],
                   ),
                 ),

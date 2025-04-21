@@ -1,7 +1,13 @@
 import 'package:amar_pos/core/constants/app_colors.dart';
 import 'package:amar_pos/core/core.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
+import 'package:amar_pos/core/widgets/field_title.dart';
 import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
+import 'package:amar_pos/features/exchange/data/models/exchange_history_response_model.dart';
+import 'package:amar_pos/features/exchange/exchange_controller.dart';
+import 'package:amar_pos/features/return/data/models/return_history/return_history_details_response_model.dart';
+import 'package:amar_pos/features/return/data/models/return_history/return_history_response_model.dart';
+import 'package:amar_pos/features/return/presentation/controller/return_controller.dart';
 import 'package:amar_pos/features/sales/data/models/sale_history/sold_history_response_model.dart';
 import 'package:amar_pos/features/sales/data/models/sale_history_details_response_model.dart';
 import 'package:amar_pos/features/sales/presentation/controller/sales_controller.dart';
@@ -10,24 +16,23 @@ import 'package:barcode/barcode.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/methods/number_to_word.dart';
-import '../../data/models/sale_history/sold_history_details_response_model.dart';
+import '../data/models/exchange_order_details_response_model.dart';
 
-class InvoiceWidget extends StatefulWidget {
+class ExchangeHistoryDetailsWidget extends StatefulWidget {
 
-  const InvoiceWidget({
+  const ExchangeHistoryDetailsWidget({
     super.key,
   });
 
   @override
-  State<InvoiceWidget> createState() => _InvoiceWidgetState();
+  State<ExchangeHistoryDetailsWidget> createState() => _ReturnHistoryDetailsWidgetState();
 }
 
-class _InvoiceWidgetState extends State<InvoiceWidget> {
-  SalesController controller = Get.find();
+class _ReturnHistoryDetailsWidgetState extends State<ExchangeHistoryDetailsWidget> {
+  ExchangeController controller = Get.find();
 
   late int orderId;
   late String orderNo;
@@ -39,7 +44,7 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
     orderNo = Get.arguments[1];
 
     i = 1;
-    controller.getSoldHistoryDetails(orderId);
+    controller.getExchangeHistoryDetails(orderId);
     super.initState();
   }
 
@@ -59,17 +64,18 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Header Section
-                  GetBuilder<SalesController>(
+                  GetBuilder<ExchangeController>(
                     id: 'sold_history_details',
                     builder: (controller) {
                       if (controller.detailsLoading) {
                         return Center(child: RandomLottieLoader.lottieLoader());
-                      } else if (controller.saleHistoryDetailsResponseModel !=
+                      } else if (controller.exchangeOrderDetailsResponseModel !=
                           null) {
-                        SoldHistoryDetailsData data =
-                            controller.saleHistoryDetailsResponseModel!.data;
+                        ExchangeHistoryDetailsData data =
+                            controller.exchangeOrderDetailsResponseModel!.data;
                         return SingleChildScrollView(
                           child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               addH(12),
                               Column(
@@ -93,7 +99,7 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
                                                         FontWeight.bold),
                                                   ),
                                                   Text(
-                                                      "Phone: ${controller.saleHistoryDetailsResponseModel!.data.business.phone}"),
+                                                      "Phone: ${controller.exchangeOrderDetailsResponseModel!.data.business.phone}"),
                                                 ],
                                               ),
                                             ),
@@ -121,7 +127,7 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
                               addH(
                                 12,
                               ),
-                              Divider(
+                              const Divider(
                                 color: AppColors.inputBorderColor,
                               ),
                               Row(
@@ -132,7 +138,7 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
                                       flex: 3,
                                       child: Text(
                                         textAlign: TextAlign.center,
-                                        'INVOICE',
+                                        'EXCHANGE INVOICE',
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 16),
@@ -176,6 +182,10 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
                               ),
                               addH(20),
                               // Product Table
+                              const Text("Return Products",
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,),),
+                              addH(4),
                               Table(
                                 border: TableBorder.all(color: Colors.grey),
                                 columnWidths: {
@@ -216,7 +226,7 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
                                               textAlign: TextAlign.center)),
                                     ],
                                   ),
-                                  ...data.details.map((product) {
+                                  ...data.returnDetails.map((product) {
                                     return TableRow(
                                       children: [
                                         Padding(
@@ -263,7 +273,130 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
                                                       ),
                                                     ))
                                                         .toList(),
-                                                  )
+                                                  ),
+                                                AutoSizeText("Warranty: ${product.warranty}"),
+                                              ],
+                                            )),
+                                        Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 4, vertical: 8),
+                                            child: AutoSizeText(
+                                                Methods.getFormattedNumber(
+                                                    product.unitPrice.toDouble()),
+                                                textAlign: TextAlign.center)),
+                                        Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 4, vertical: 8),
+                                            child: AutoSizeText(
+                                                Methods.getFormattedNumber(
+                                                    product.quantity.toDouble()),
+                                                textAlign: TextAlign.center)),
+                                        Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 4, vertical: 8),
+                                            child: AutoSizeText(
+                                                Methods.getFormattedNumber(
+                                                    product.totalPrice.toDouble()),
+                                                textAlign: TextAlign.center)),
+                                      ],
+                                    );
+                                  }).toList(),
+                                ],
+                              ),
+                              addH(20),
+                              const Text("Exchange Products",
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold),),
+                              addH(4),
+                              Table(
+                                border: TableBorder.all(color: Colors.grey),
+                                columnWidths: {
+                                  0: FixedColumnWidth(40.w),
+                                  1: FlexColumnWidth(),
+                                  2: FixedColumnWidth(60.w),
+                                  3: FixedColumnWidth(40.w),
+                                  4: FixedColumnWidth(60.w),
+                                },
+                                children: [
+                                  TableRow(
+                                    decoration:
+                                    BoxDecoration(color: Colors.grey[200]),
+                                    children: const [
+                                      Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 4, vertical: 8),
+                                          child: AutoSizeText("SL.",
+                                              textAlign: TextAlign.center)),
+                                      Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 4, vertical: 8),
+                                          child: AutoSizeText("Product Name")),
+                                      Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 4, vertical: 8),
+                                          child: AutoSizeText("Price",
+                                              textAlign: TextAlign.center)),
+                                      Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 4, vertical: 8),
+                                          child: AutoSizeText("QTY",
+                                              textAlign: TextAlign.center)),
+                                      Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 4, vertical: 8),
+                                          child: AutoSizeText("Total",
+                                              textAlign: TextAlign.center)),
+                                    ],
+                                  ),
+                                  ...data.exchangeDetails.map((product) {
+                                    return TableRow(
+                                      children: [
+                                        Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 4, vertical: 8),
+                                            child: AutoSizeText("${i++}",
+                                                textAlign: TextAlign.center)),
+                                        Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 4, vertical: 8),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                              children: [
+                                                AutoSizeText(product.name),
+                                                addH(4),
+                                                if (product.snNo != null)
+                                                  Wrap(
+                                                    spacing: 4,
+                                                    runSpacing: 4,
+                                                    children: product.snNo!
+                                                        .map((e) => Container(
+                                                      padding:
+                                                      const EdgeInsets
+                                                          .symmetric(
+                                                          horizontal:
+                                                          12,
+                                                          vertical: 4),
+                                                      decoration:
+                                                      const BoxDecoration(
+                                                        borderRadius:
+                                                        BorderRadius
+                                                            .all(Radius
+                                                            .circular(
+                                                            8)),
+                                                        color: Colors.black,
+                                                      ),
+                                                      child: AutoSizeText(
+                                                        e.serialNo,
+                                                        style:
+                                                        const TextStyle(
+                                                            color: Colors
+                                                                .white),
+                                                      ),
+                                                    ))
+                                                        .toList(),
+                                                  ),
+                                                AutoSizeText("Warranty: ${product.warranty}"),
                                               ],
                                             )),
                                         Padding(
@@ -300,7 +433,7 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
                                       TextStyle(fontWeight: FontWeight.bold)),
                                   Expanded(
                                       child: Text(
-                                        _convertToWords(data.payable),
+                                        _convertToWords(data.payable.toDouble()),
                                         style: TextStyle(fontWeight: FontWeight.bold),
                                       )),
                                 ],
@@ -313,14 +446,16 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     TitleWithValue(
-                                      title: "Sub Total",
-                                      value: data.subTotal,
+                                      title: "Return Amount",
+                                      value: data.returnTotal,
                                       isTitleBold: true,
                                       isValueBold: true,
                                     ),
                                     TitleWithValue(
-                                      title: "Expense",
-                                      value: data.expense,
+                                      title: "Exchange Amount",
+                                      value: data.exchangeTotal,
+                                      isTitleBold: true,
+                                      isValueBold: true,
                                     ),
                                     TitleWithValue(
                                       title: "Discount",
@@ -369,10 +504,10 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
             ),
           ),
         ),
-        bottomNavigationBar: GetBuilder<SalesController>(
+        bottomNavigationBar: GetBuilder<ExchangeController>(
             id: 'download_print_buttons',
             builder: (controller){
-              if(controller.saleHistoryDetailsResponseModel != null){
+              if(controller.exchangeOrderDetailsResponseModel != null){
                 return Padding(
                   padding: const EdgeInsets.all(20),
                   child: Row(
@@ -383,7 +518,7 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
                           color: Color(0xff03346E),
                           radius: 8,
                           onTap: () {
-                            controller.downloadSaleHistory(
+                            controller.downloadExchangeHistory(
                                 isPdf: true, orderId: orderId, orderNo: orderNo);
                           },
                         ),
@@ -395,11 +530,8 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
                           radius: 8,
                           color: Color(0xffFF9000),
                           onTap: () {
-                            controller.downloadSaleHistory(
-                                shouldPrint: true,
-                                orderNo: orderNo,
-                                isPdf: true,
-                                orderId: orderId);
+                            controller.downloadExchangeHistory(
+                                isPdf: true, orderId: orderId, orderNo: orderNo, shouldPrint: true);
                           },
                         ),
                       ),

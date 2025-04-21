@@ -2,6 +2,7 @@ import 'package:amar_pos/core/core.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/features/exchange/data/models/exchange_history_response_model.dart';
 import 'package:amar_pos/features/exchange/exchange_controller.dart';
+import 'package:amar_pos/features/exchange/presentation/exhcange_history_details_view.dart';
 import 'package:amar_pos/features/return/data/models/return_history/return_history_response_model.dart';
 import 'package:amar_pos/features/return/presentation/controller/return_controller.dart';
 import 'package:amar_pos/features/sales/presentation/controller/sales_controller.dart';
@@ -24,147 +25,155 @@ class ExchangeHistoryItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 5.h),
-      padding: const EdgeInsets.all(10),
-      foregroundDecoration: !exchangeOrderInfo.isActionable
-          ? BoxDecoration(
-        color: const Color(0xff7c7c7c).withOpacity(.3),
-        borderRadius: BorderRadius.all(Radius.circular(20.r)),
-      )
-          : null,
-      decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.all(Radius.circular(20.r))),
-      child: Column(
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Flexible(
-                child: Row(
-                  children: [
-                    Container(
-                      padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                      decoration: BoxDecoration(
-                          color: const Color(0xffF6FFF6),
-                          border: Border.all(
-                            color: const Color(0xff94DB8C),
-                            width: .5,
-                          ),
-                          borderRadius: BorderRadius.circular(20)),
-                      child: AutoSizeText(
-                        exchangeOrderInfo.date,
-                        maxFontSize: 10,
-                        minFontSize: 8,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                    addW(8.w),
-                    Container(
-                      padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                      decoration: BoxDecoration(
-                          color: const Color(0xffF2E8FF),
-                          border: Border.all(
-                            color: const Color(0xff500DA0),
-                            width: .5,
-                          ),
-                          borderRadius: BorderRadius.circular(20)),
-                      child: AutoSizeText(
-                        exchangeOrderInfo.saleType,
-                        minFontSize: 8,
-                        maxFontSize: 10,
-                        style: const TextStyle(
-                          color: Color(0xff500DA0),
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              addW(8.w),
-              CustomSvgSmallIconButton(
-                borderColor: const Color(0xff03346E),
-                bgColor: const Color(0xffE1F2FF),
-                onTap: () {
-                  controller.downloadReturnHistory(
-                      isPdf: true, exchangeOrderInfo: exchangeOrderInfo);
-                },
-                assetPath: AppAssets.downloadIcon,
-              ),
-              addW(8),
-              CustomSvgSmallIconButton(
-                borderColor: const Color(0xffFF9000),
-                bgColor: const Color(0xffFFFCF8),
-                onTap: () {},
-                assetPath: AppAssets.printIcon,
-              ),
-              addW(8),
-              SoldHistoryItemActionMenu(
-                onSelected: (value) {
-                  switch (value) {
-                    case "edit":
-                      controller.processEdit(exchangeOrderInfo: exchangeOrderInfo, context: context).then((value){
-                        onChange(0);
-                      });
-                      break;
-                    case "delete":
-                      AwesomeDialog(
-                          context: context,
-                          dialogType: DialogType.error,
-                          title: "Are you sure?",
-                          desc:
-                          "You are going to delete order no: ${exchangeOrderInfo.orderNo}",
-                          btnOkOnPress: () {
-                            controller.deleteExchangeOrder(
-                                exchangeOrderInfo: exchangeOrderInfo);
-                          },
-                          btnCancelOnPress: () {})
-                          .show();
-                      break;
-                  }
-                },
-              ),
-            ],
-          ),
-          addH(12),
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: const BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(10)),
-              color: Color(0xffF8F7F2),
-            ),
-            child: Column(
+    return GestureDetector(
+      onTap: (){
+        Get.to(()=> ExchangeHistoryDetailsWidget(),arguments: [exchangeOrderInfo.id, exchangeOrderInfo.orderNo]);
+      },
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical: 5.h),
+        padding: const EdgeInsets.all(10),
+        foregroundDecoration: !exchangeOrderInfo.isActionable
+            ? BoxDecoration(
+          color: const Color(0xff7c7c7c).withOpacity(.3),
+          borderRadius: BorderRadius.all(Radius.circular(20.r)),
+        )
+            : null,
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.all(Radius.circular(20.r))),
+        child: Column(
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ExchangeHistoryItemTitleValueWidget(
-                  title: "Invoice Number",
-                  value: exchangeOrderInfo.orderNo,
+                Flexible(
+                  child: Row(
+                    children: [
+                      Container(
+                        padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                            color: const Color(0xffF6FFF6),
+                            border: Border.all(
+                              color: const Color(0xff94DB8C),
+                              width: .5,
+                            ),
+                            borderRadius: BorderRadius.circular(20)),
+                        child: AutoSizeText(
+                          exchangeOrderInfo.date,
+                          maxFontSize: 10,
+                          minFontSize: 8,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      addW(8.w),
+                      Container(
+                        padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                            color: const Color(0xffF2E8FF),
+                            border: Border.all(
+                              color: const Color(0xff500DA0),
+                              width: .5,
+                            ),
+                            borderRadius: BorderRadius.circular(20)),
+                        child: AutoSizeText(
+                          exchangeOrderInfo.saleType,
+                          minFontSize: 8,
+                          maxFontSize: 10,
+                          style: const TextStyle(
+                            color: Color(0xff500DA0),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                ExchangeHistoryItemTitleValueWidget(
-                  title: "Customer Name",
-                  value: exchangeOrderInfo.customer.name,
+                addW(8.w),
+                CustomSvgSmallIconButton(
+                  borderColor: const Color(0xff03346E),
+                  bgColor: const Color(0xffE1F2FF),
+                  onTap: () {
+                    controller.downloadExchangeHistory(
+                        isPdf: true, orderNo: exchangeOrderInfo.orderNo, orderId: exchangeOrderInfo.id,);
+                  },
+                  assetPath: AppAssets.downloadIcon,
                 ),
-                ExchangeHistoryItemTitleValueWidget(
-                  title: "Phone Number",
-                  value: exchangeOrderInfo.customer.phone,
+                addW(8),
+                CustomSvgSmallIconButton(
+                  borderColor: const Color(0xffFF9000),
+                  bgColor: const Color(0xffFFFCF8),
+                  onTap: () {
+                    controller.downloadExchangeHistory(
+                      isPdf: true, orderNo: exchangeOrderInfo.orderNo, orderId: exchangeOrderInfo.id,shouldPrint: true);
+                  },
+                  assetPath: AppAssets.printIcon,
                 ),
-                ExchangeHistoryItemTitleValueWidget(
-                  title: "Discount",
-                  value: Methods.getFormatedPrice(exchangeOrderInfo.discount.toDouble()),
-                ),
-                ExchangeHistoryItemTitleValueWidget(
-                  title: "Paid Amount",
-                  value: Methods.getFormatedPrice(exchangeOrderInfo.paidAmount.toDouble()),
+                addW(8),
+                SoldHistoryItemActionMenu(
+                  onSelected: (value) {
+                    switch (value) {
+                      case "edit":
+                        controller.processEdit(exchangeOrderInfo: exchangeOrderInfo, context: context).then((value){
+                          onChange(0);
+                        });
+                        break;
+                      case "delete":
+                        AwesomeDialog(
+                            context: context,
+                            dialogType: DialogType.error,
+                            title: "Are you sure?",
+                            desc:
+                            "You are going to delete order no: ${exchangeOrderInfo.orderNo}",
+                            btnOkOnPress: () {
+                              controller.deleteExchangeOrder(
+                                  exchangeOrderInfo: exchangeOrderInfo);
+                            },
+                            btnCancelOnPress: () {})
+                            .show();
+                        break;
+                    }
+                  },
                 ),
               ],
             ),
-          )
-        ],
+            addH(12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: const BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                color: Color(0xffF8F7F2),
+              ),
+              child: Column(
+                children: [
+                  ExchangeHistoryItemTitleValueWidget(
+                    title: "Invoice Number",
+                    value: exchangeOrderInfo.orderNo,
+                  ),
+                  ExchangeHistoryItemTitleValueWidget(
+                    title: "Customer Name",
+                    value: exchangeOrderInfo.customer.name,
+                  ),
+                  ExchangeHistoryItemTitleValueWidget(
+                    title: "Phone Number",
+                    value: exchangeOrderInfo.customer.phone,
+                  ),
+                  ExchangeHistoryItemTitleValueWidget(
+                    title: "Discount",
+                    value: Methods.getFormatedPrice(exchangeOrderInfo.discount.toDouble()),
+                  ),
+                  ExchangeHistoryItemTitleValueWidget(
+                    title: "Paid Amount",
+                    value: Methods.getFormatedPrice(exchangeOrderInfo.paidAmount.toDouble()),
+                  ),
+                ],
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

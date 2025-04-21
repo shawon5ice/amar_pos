@@ -182,7 +182,20 @@ class _BalanceSheetScreenState extends State<BalanceSheetScreen>
                                 : WidgetStatePropertyAll(
                                     Colors.yellow.withOpacity(.03)),
                             cells: [
-                              _buildDataCell(isNumber: false ,e.name??'N/A', maxLines: 2,),
+                              DataCell(
+                                AutoSizeText(
+                                  minFontSize: 2,
+                                  maxFontSize: 10,
+                                  maxLines:2,
+                                  e.name??'N/A',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color:  Colors.black,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                ),
+                              ),
+                              // _buildDataCell(isNumber: false ,e.name??'N/A', maxLines: 2,),
                               _buildDataCell(Methods.getFormattedNumber(
                               e.debit?.toDouble() ?? 0,
                               ), maxLines: 2, isNumber: true),

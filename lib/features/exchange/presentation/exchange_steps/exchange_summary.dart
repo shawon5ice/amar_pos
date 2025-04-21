@@ -40,17 +40,21 @@ class _ExchangeSummaryState extends State<ExchangeSummary> {
     customerPayableAmountEditingController = TextEditingController();
     customerChangeAmountEditingController = TextEditingController();
 
-    if(!controller.isEditing){
-      controller.clearPaymentAndOtherIssues();
-      controller.getPaymentMethods();
-      controller.addPaymentMethod(addForceFully: true);
-      controller.calculateAmount(firstTime: true);
-    }else{
-      customerNameEditingController.text = controller.exchangeRequestModel.name;
-      customerPhoneNumberEditingController.text = controller.exchangeRequestModel.phone;
-      customerAddressEditingController.text = controller.exchangeRequestModel.address;
-      customerTotalDiscountEditingController.text = controller.totalDiscount.toString();
-    }
+    // if(!controller.isEditing){
+    //   controller.clearPaymentAndOtherIssues();
+    //   controller.getPaymentMethods();
+    //   controller.addPaymentMethod(addForceFully: true);
+    //   controller.calculateAmount(firstTime: true);
+    // }else{
+    //
+    // }
+    customerNameEditingController.text = controller.exchangeRequestModel.name;
+    customerPhoneNumberEditingController.text = controller.exchangeRequestModel.phone;
+    customerAddressEditingController.text = controller.exchangeRequestModel.address;
+    customerTotalDiscountEditingController.text = controller.totalDiscount.toString();
+
+    controller.calculateAmount(firstTime: true);
+
     super.initState();
   }
 
@@ -100,7 +104,7 @@ class _ExchangeSummaryState extends State<ExchangeSummary> {
                               value, "Phone number"),
                     ),
                     addH(8),
-                    const RichFieldTitle(text: "Address",),
+                    const FieldTitle("Address",),
                     addH(4),
                     CustomTextField(
                       textCon: customerAddressEditingController,
@@ -108,9 +112,9 @@ class _ExchangeSummaryState extends State<ExchangeSummary> {
                       onChanged: (value){
                         controller.exchangeRequestModel.address = value;
                       },
-                      validator: (value) =>
-                          FieldValidator.nonNullableFieldValidator(
-                              value, "Address"),
+                      // validator: (value) =>
+                      //     FieldValidator.nonNullableFieldValidator(
+                      //         value, "Address"),
                     ),
                     addH(8),
                     Row(

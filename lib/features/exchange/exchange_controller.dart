@@ -5,20 +5,24 @@ import 'package:amar_pos/features/exchange/data/exchange_service.dart';
 import 'package:amar_pos/features/exchange/data/models/create_exchange_request_model.dart';
 import 'package:amar_pos/features/exchange/data/models/exchange_history_response_model.dart';
 import 'package:amar_pos/features/exchange/data/models/exchange_product_response_model.dart';
+import 'package:amar_pos/features/exchange/presentation/exhcange_history_details_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../core/constants/logger/logger.dart';
 import '../../core/widgets/loading/random_lottie_loader.dart';
 import '../../core/widgets/methods/helper_methods.dart';
+import '../../core/widgets/reusable/filter_bottom_sheet/product_brand_category_warranty_unit_response_model.dart';
 import '../auth/data/model/hive/login_data.dart';
 import '../auth/data/model/hive/login_data_helper.dart';
 import '../inventory/data/products/product_list_response_model.dart';
 import 'data/models/exchange_order_details_response_model.dart';
 import 'data/models/exchange_payment_method_tracker.dart';
 
-class ExchangeController extends GetxController{
+class ExchangeController extends GetxController {
   final summaryFormKey = GlobalKey<FormState>();
 
+  FilterItem? brand;
+  FilterItem? category;
 
   bool isProductListLoading = false;
   bool isPaymentMethodListLoading = false;
@@ -34,7 +38,8 @@ class ExchangeController extends GetxController{
 
   final isLoading = false.obs; // Tracks ongoing API calls
   var lastFoundList = <ProductInfo>[].obs; // Previously found products
-  var currentSearchList = <ProductInfo>[].obs; // Results from the ongoing search
+  var currentSearchList =
+      <ProductInfo>[].obs; // Results from the ongoing search
   var isSearching = false.obs; // Indicates whether a search is ongoing
   var hasError = false.obs; // Tracks if an error occurred
   TextEditingController searchProductController = TextEditingController();
@@ -43,17 +48,23 @@ class ExchangeController extends GetxController{
   List<ProductInfo> returnOrderProducts = [];
   List<ProductInfo> exchangeProducts = [];
 
-  CreateExchangeRequestModel exchangeRequestModel = CreateExchangeRequestModel.defaultConstructor();
+  CreateExchangeRequestModel exchangeRequestModel =
+      CreateExchangeRequestModel.defaultConstructor();
+
   //
   PaymentMethodsResponseModel? paymentMethodsResponseModel;
+
   //
   List<ExchangePaymentMethodTracker> paymentMethodTracker = [];
+
   //
   bool isRetailSale = true;
+
   //
   List<ServiceStuffInfo> serviceStuffList = [];
   bool serviceStuffLoading = false;
   ServiceStuffInfo? serviceStuffInfo;
+
   //
   List<CustomerInfo> customerList = [];
   CustomerInfo? selectedCustomer;
@@ -74,36 +85,48 @@ class ExchangeController extends GetxController{
   bool cashSelected = false;
   bool creditSelected = false;
 
-
   //controlling exchange views
   int currentStep = 0;
 
   void onStepContinue() {
-    if(currentStep == 0){
-      if(returnOrderProducts.isEmpty){
+    if (currentStep == 0) {
+      if (returnOrderProducts.isEmpty) {
         Methods.showSnackbar(msg: "Please select products to return");
         return;
-      }else{
-        exchangeRequestModel.returnProducts.forEach((e) {
-          if(e.serialNo.isNotEmpty && e.quantity != e.serialNo.length){
+      } else {
+        bool hasIssues = false;
+        for (var e in exchangeRequestModel.returnProducts) {
+          if (e.serialNo.isNotEmpty && e.quantity != e.serialNo.length) {
             var product = returnOrderProducts.singleWhere((f) => e.id == f.id);
             logger.i(e.quantity);
-            ErrorExtractor.showSingleErrorDialog(Get.context!, "Please fix SN quantity issue of ${product.name}");
+            ErrorExtractor.showSingleErrorDialog(Get.context!,
+                "Please fix SN quantity issue of ${product.name}");
+            hasIssues = true;
             return;
           }
-        });
+        }
       }
       currentStep++;
-    }else if(currentStep == 1 && exchangeProducts.isEmpty){
-      Methods.showSnackbar(msg: "Please select products to exchange");
-      return;
-    }else{
-      if (currentStep < 2) {
-        currentStep++;
+    } else if (currentStep == 1) {
+      if(exchangeProducts.isEmpty){
+        Methods.showSnackbar(msg: "Please select products to exchange");
+        return;
+      }else {
+        bool hasIssues = false;
+        for (var e in exchangeRequestModel.exchangeProducts) {
+          if (e.serialNo.isNotEmpty && e.quantity != e.serialNo.length) {
+            var product = exchangeProducts.singleWhere((f) => e.id == f.id);
+            logger.i(e.quantity);
+            ErrorExtractor.showSingleErrorDialog(Get.context!,
+                "Please fix SN quantity issue of ${product.name}");
+            return;
+          }
+        }
       }
+      currentStep++;
     }
     logger.i(currentStep);
-    update(['exchange_view_controller','exchange_view']);
+    update(['exchange_view_controller', 'exchange_view']);
   }
 
   void onStepCancel() {
@@ -111,11 +134,12 @@ class ExchangeController extends GetxController{
       currentStep--;
     }
     logger.e(currentStep);
-    update(['exchange_view_controller','exchange_view']);
+    update(['exchange_view_controller', 'exchange_view']);
   }
 
   bool validationDone = false;
-  void processData(){
+
+  void processData() {
     validationDone = false;
     if (summaryFormKey.currentState!.validate()) {
       exchangeRequestModel.saleType = 5;
@@ -135,13 +159,12 @@ class ExchangeController extends GetxController{
         if (e.paymentMethod == null) {
           Methods.showSnackbar(
               msg:
-              "Please insert valid amount or remove not selected payment methods");
+                  "Please insert valid amount or remove not selected payment methods");
           return;
         } else if (e.paymentMethod != null &&
             e.paymentMethod!.paymentOptions.isNotEmpty &&
             e.paymentOption == null) {
-          Methods.showSnackbar(
-              msg: "Please select associate payment options");
+          Methods.showSnackbar(msg: "Please select associate payment options");
           return;
         } else {
           exchangeRequestModel.payments.add(Payment(
@@ -149,27 +172,32 @@ class ExchangeController extends GetxController{
               paid: e.paidAmount!.toDouble(),
               bankId: e.paymentOption?.id));
         }
-
       }
       validationDone = true;
     }
   }
 
-  Future<void> onSubmit() async{
+  int? pOrderId;
+  String? pOrderNo;
+
+
+  Future<void> onSubmit() async {
+    pOrderId = null;
+    pOrderNo = null;
+
     processData();
-    if(validationDone){
+    if (validationDone) {
       createReturnOrderLoading = true;
       update(["exchange_product_list"]);
       RandomLottieLoader.show();
-      try{
+      try {
         var response;
-        if(isEditing){
+        if (isEditing) {
           response = await ExchangeService.updateExchangeHistory(
               usrToken: loginData!.token,
               exchangeRequest: exchangeRequestModel,
-              orderId: exchangeOrderDetailsResponseModel!.data.id
-          );
-        }else{
+              orderId: exchangeOrderDetailsResponseModel!.data.id);
+        } else {
           response = await ExchangeService.createExchange(
             usrToken: loginData!.token,
             request: exchangeRequestModel,
@@ -178,32 +206,37 @@ class ExchangeController extends GetxController{
 
         logger.e(response);
         if (response != null) {
-          if(response['success']){
+          RandomLottieLoader.hide();
+          if (response['success']) {
             returnOrderProducts.clear();
-            exchangeRequestModel = CreateExchangeRequestModel.defaultConstructor();
+            exchangeRequestModel =
+                CreateExchangeRequestModel.defaultConstructor();
             exchangeProducts.clear();
             RandomLottieLoader.hide();
+            pOrderId = response['data']['id'];
+            pOrderNo = response['data']['order_no'];
             Get.back();
+            Get.to(()=> ExchangeHistoryDetailsWidget(),arguments: [pOrderId, pOrderNo]);
             currentStep = 0;
-            update(['exchange_view_controller','exchange_view']);
+            update(['exchange_view_controller', 'exchange_view']);
             Methods.showSnackbar(msg: response['message'], isSuccess: true);
-          }else{
-            RandomLottieLoader.hide();
-            RandomLottieLoader.hide();
-            RandomLottieLoader.hide();
-            await Future.delayed(const Duration(milliseconds: 500), (){
+          } else {
+            // await Future.delayed(const Duration(milliseconds: 500), () {});
+            if(response['message'] != null){
+              ErrorExtractor.showSingleErrorDialog(Get.context!, response['message']);
+            }else{
+              ErrorExtractor.showErrorDialog(Get.context!, response);
+            }
 
-            });
-            ErrorExtractor.showErrorDialog(Get.context!, response);
           }
         }
-      }catch(e){
+      } catch (e) {
         RandomLottieLoader.hide();
         logger.e(e);
-      }finally{
+      } finally {
         RandomLottieLoader.hide();
         createReturnOrderLoading = false;
-        update(['exchange_view_controller','exchange_view']);
+        update(['exchange_view_controller', 'exchange_view']);
       }
       logger.e(exchangeRequestModel.toJson());
     }
@@ -214,8 +247,10 @@ class ExchangeController extends GetxController{
   List<ExchangeOrderInfo> exchangeHistoryList = [];
   bool isExchangeHistoryListLoading = false;
   bool isReturnHistoryLoadingMore = false;
+
   //
   Rx<DateTimeRange?> selectedDateTimeRange = Rx<DateTimeRange?>(null);
+
   // bool retailSale = false;
   // bool wholeSale = false;
   //
@@ -233,11 +268,12 @@ class ExchangeController extends GetxController{
 
   @override
   void onReady() {
-    getAllProducts(search: '',page: 1);
+    getAllProducts(search: '', page: 1);
     getAllServiceStuff();
     super.onReady();
   }
-  void clearFilter(){
+
+  void clearFilter() {
     searchProductController.clear();
     // wholeSale = false;
     // retailSale = false;
@@ -245,7 +281,7 @@ class ExchangeController extends GetxController{
     update(['filter_view']);
   }
 
-  void clearExchange(){
+  void clearExchange() {
     currentStep = 0;
     exchangeProducts.clear();
     returnOrderProducts.clear();
@@ -276,35 +312,46 @@ class ExchangeController extends GetxController{
     selectedDateTimeRange.value = range;
   }
 
-
-
-
-  void addPaymentMethod({bool? addForceFully}){
+  void addPaymentMethod() {
     num excludeAmount = 0;
-    for(var e in paymentMethodTracker){
+    for (var e in paymentMethodTracker) {
       excludeAmount += e.paidAmount ?? 0;
     }
     totalPaid = excludeAmount;
-    if(totalPaid>=paidAmount && addForceFully == null){
+    if (totalPaid >= paidAmount) {
       Methods.showSnackbar(msg: "Full amount already distributed");
       return;
     }
     paymentMethodTracker.add(ExchangePaymentMethodTracker(
         id: paymentMethodTracker.length + 1,
-        paidAmount: addForceFully != null ? 0 : paidAmount - excludeAmount
+        paidAmount: totalPaid >= paidAmount ?  0 : paidAmount - excludeAmount
     ));
     calculateAmount();
     update(['summary_form']);
   }
 
+  // void addPaymentMethod({bool? addForceFully}) {
+  //   num excludeAmount = 0;
+  //   for (var e in paymentMethodTracker) {
+  //     excludeAmount += e.paidAmount ?? 0;
+  //   }
+  //   totalPaid = excludeAmount;
+  //   if (totalPaid >= paidAmount && addForceFully == null) {
+  //     Methods.showSnackbar(msg: "Full amount already distributed");
+  //     return;
+  //   }
+  //   paymentMethodTracker.add(ExchangePaymentMethodTracker(
+  //       id: paymentMethodTracker.length + 1,
+  //       paidAmount: addForceFully != null ? 0 : paidAmount - excludeAmount));
+  //   calculateAmount();
+  //   update(['summary_form']);
+  // }
 
   num getTotalPayable() {
-    return (totalExchangeAmount +
-        - totalReturnAmount - totalDiscount);
+    return (totalExchangeAmount + -totalReturnAmount - totalDiscount);
   }
 
-
-  void clearPaymentAndOtherIssues(){
+  void clearPaymentAndOtherIssues() {
     paymentMethodTracker.clear();
     totalDiscount = 0;
     totalDeu = 0;
@@ -320,7 +367,8 @@ class ExchangeController extends GetxController{
           usrToken: loginData!.token);
 
       if (response != null && response['success']) {
-        paymentMethodsResponseModel = PaymentMethodsResponseModel.fromJson(response);
+        paymentMethodsResponseModel =
+            PaymentMethodsResponseModel.fromJson(response);
       } else {
         hasError.value = true;
       }
@@ -333,8 +381,14 @@ class ExchangeController extends GetxController{
     }
   }
 
-  void addProduct(ProductInfo product, {List<String>? snNo, int? quantity,required bool isReturn,required num unitPrice,}) {
-    if(isReturn){
+  void addProduct(
+    ProductInfo product, {
+    List<String>? snNo,
+    int? quantity,
+    required bool isReturn,
+    required num unitPrice,
+  }) {
+    if (isReturn) {
       if (returnOrderProducts.any((e) => e.id == product.id)) {
         var p = exchangeRequestModel.returnProducts
             .firstWhere((e) => e.id == product.id);
@@ -344,13 +398,12 @@ class ExchangeController extends GetxController{
         exchangeRequestModel.returnProducts.add(ProductModel(
             id: product.id,
             unitPrice: product.mrpPrice.toDouble(),
-            quantity: quantity?? 1,
-            vat: (product.vat/100 * product.mrpPrice.toDouble()).toDouble(),
+            quantity: quantity ?? 1,
+            vat: (product.vat / 100 * product.mrpPrice.toDouble()).toDouble(),
             serialNo: snNo ?? []));
       }
       totalReturnQTY++;
-
-    }else{
+    } else {
       if (exchangeProducts.any((e) => e.id == product.id)) {
         exchangeRequestModel.exchangeProducts
             .firstWhere((e) => e.id == product.id)
@@ -360,8 +413,8 @@ class ExchangeController extends GetxController{
         exchangeRequestModel.exchangeProducts.add(ProductModel(
             id: product.id,
             unitPrice: product.mrpPrice.toDouble(),
-            quantity: quantity?? 1,
-            vat: (product.vat/100 * product.mrpPrice.toDouble()).toDouble(),
+            quantity: quantity ?? 1,
+            vat: (product.vat / 100 * product.mrpPrice.toDouble()).toDouble(),
             serialNo: snNo ?? []));
       }
       totalExchangeQTY++;
@@ -380,12 +433,12 @@ class ExchangeController extends GetxController{
     num excludeAmount = 0;
     for (var e in paymentMethodTracker) {
       excludeAmount += e.paidAmount ?? 0;
-      if(e.paymentMethod != null){
-        if(e.paymentMethod!.name.toLowerCase().contains("cash")){
+      if (e.paymentMethod != null) {
+        if (e.paymentMethod!.name.toLowerCase().contains("cash")) {
           cashPaid = e.paidAmount ?? 0;
           cash = true;
         }
-        if(e.paymentMethod!.name.toLowerCase().contains("credit")){
+        if (e.paymentMethod!.name.toLowerCase().contains("credit")) {
           credit = true;
         }
       }
@@ -394,8 +447,9 @@ class ExchangeController extends GetxController{
     cashSelected = cash;
     totalPaid = excludeAmount;
     for (var e in exchangeRequestModel.returnProducts) {
+      ProductInfo productModel = returnOrderProducts.singleWhere((f)=> e.id == f.id);
       totalQ += e.quantity;
-      totalV += e.vat * e.quantity;
+      totalV += productModel.isVatApplicable == 1 ? e.vat * e.quantity:0;
       totalA += e.unitPrice * e.quantity;
     }
     logger.i(totalA);
@@ -406,8 +460,9 @@ class ExchangeController extends GetxController{
     totalV = 0;
     totalA = 0;
     for (var e in exchangeRequestModel.exchangeProducts) {
+      ProductInfo productModel = exchangeProducts.singleWhere((f)=> e.id == f.id);
       totalQ += e.quantity;
-      totalV += e.vat * e.quantity;
+      totalV += productModel.isVatApplicable == 1 ? e.vat * e.quantity:0;
       totalA += e.unitPrice * e.quantity;
     }
 
@@ -419,12 +474,21 @@ class ExchangeController extends GetxController{
     logger.i(paidAmount);
     logger.i(totalPaid);
     logger.e(cashPaid);
-    if(firstTime == null){
-      if(cashPaid>0){
-        totalDeu = cashPaid - paidAmount + (totalPaid-cashPaid);
-      }else{
-        totalDeu = 0;
-      }
+    totalDeu = paidAmount - totalPaid;
+    if (paidAmount - totalPaid<0) {
+          totalDeu = totalPaid - paidAmount;
+    } else {
+      totalDeu = 0;
+    }
+    // if (firstTime == null) {
+    //   if (cashPaid > 0) {
+    //     totalDeu = cashPaid - paidAmount + (totalPaid - cashPaid);
+    //   } else {
+    //     totalDeu = 0;
+    //   }
+    // }
+    if (firstTime != null && paymentMethodTracker.isEmpty) {
+      addPaymentMethod();
     }
 
     update(['change-due-amount', 'summary_form']);
@@ -432,10 +496,10 @@ class ExchangeController extends GetxController{
 
   void changeQuantityOfProduct(int index, bool increase, bool isReturn) {
     if (increase) {
-      if(isReturn){
+      if (isReturn) {
         exchangeRequestModel.returnProducts[index].quantity++;
         totalReturnQTY++;
-      }else{
+      } else {
         exchangeRequestModel.exchangeProducts[index].quantity++;
         totalExchangeQTY++;
       }
@@ -445,7 +509,7 @@ class ExchangeController extends GetxController{
           exchangeRequestModel.returnProducts[index].quantity--;
           totalReturnQTY--;
         }
-      }else{
+      } else {
         if (exchangeRequestModel.exchangeProducts[index].quantity > 0) {
           exchangeRequestModel.exchangeProducts[index].quantity--;
           totalExchangeQTY--;
@@ -456,16 +520,22 @@ class ExchangeController extends GetxController{
   }
 
   void removePlaceOrderProduct(ProductInfo product, bool isReturn) {
-    if(isReturn){
-      var p = exchangeRequestModel.returnProducts.singleWhere((e) => e.id == product.id);
+    if (isReturn) {
+      var p = exchangeRequestModel.returnProducts
+          .singleWhere((e) => e.id == product.id);
       totalReturnQTY -= p.quantity;
-      totalReturnAmount = totalReturnAmount - (p.unitPrice * p.quantity + (p.vat * p.quantity * p.unitPrice * 0.01));
+      totalReturnAmount = totalReturnAmount -
+          (p.unitPrice * p.quantity +
+              (p.vat * p.quantity * p.unitPrice * 0.01));
       exchangeRequestModel.returnProducts.remove(p);
       returnOrderProducts.remove(product);
-    }else{
-      var p = exchangeRequestModel.exchangeProducts.singleWhere((e) => e.id == product.id);
+    } else {
+      var p = exchangeRequestModel.exchangeProducts
+          .singleWhere((e) => e.id == product.id);
       totalExchangeQTY -= p.quantity;
-      totalExchangeAmount = totalReturnAmount - (p.unitPrice * p.quantity + (p.vat * p.quantity * p.unitPrice * 0.01));
+      totalExchangeAmount = totalReturnAmount -
+          (p.unitPrice * p.quantity +
+              (p.vat * p.quantity * p.unitPrice * 0.01));
       exchangeRequestModel.exchangeProducts.remove(p);
       exchangeProducts.remove(product);
     }
@@ -476,21 +546,25 @@ class ExchangeController extends GetxController{
 
   FutureOr<List<ProductInfo>> suggestionsCallback(String search) async {
     // Check if the search term is in the existing items
-    List<ProductInfo> exactlyFound = currentSearchList.where((item) => item.sku.toLowerCase() == search.toString().toLowerCase()).toList();
+    List<ProductInfo> exactlyFound = currentSearchList
+        .where(
+            (item) => item.sku.toLowerCase() == search.toString().toLowerCase())
+        .toList();
 
-    if(exactlyFound.isNotEmpty){
+    if (exactlyFound.isNotEmpty) {
       return exactlyFound;
-    }else {
+    } else {
       // If not found locally, fetch from API
       await getAllProducts(search: search, page: 1);
       return getAll(search);
     }
   }
 
-
   getAll(search) {
     var filteredItems = currentSearchList
-        .where((item) => item.sku.toLowerCase().contains(search.toLowerCase()) || item.name.toLowerCase().contains(search.toLowerCase()))
+        .where((item) =>
+            item.sku.toLowerCase().contains(search.toLowerCase()) ||
+            item.name.toLowerCase().contains(search.toLowerCase()))
         .toList();
     return filteredItems;
   }
@@ -574,7 +648,8 @@ class ExchangeController extends GetxController{
       );
 
       if (response != null && response['success']) {
-        customerList = CustomerListResponseModel.fromJson(response).customerListData;
+        customerList =
+            CustomerListResponseModel.fromJson(response).customerListData;
       } else {
         hasError.value = true;
       }
@@ -586,6 +661,7 @@ class ExchangeController extends GetxController{
       update(['client_list']);
     }
   }
+
   //
   //
   // void createReturnOrder(BuildContext context) async {
@@ -655,22 +731,22 @@ class ExchangeController extends GetxController{
     isExchangeHistoryListLoading = page == 1;
     isReturnHistoryLoadingMore = page > 1;
 
-    if(page == 1){
+    if (page == 1) {
       exchangeHistoryResponseModel = null;
       exchangeHistoryList.clear();
     }
 
     hasError.value = false;
 
-    update(['return_history_list','total_widget']);
+    update(['return_history_list', 'total_widget']);
 
     try {
       var response = await ExchangeService.getExchangeHistory(
-          usrToken: loginData!.token,
-          page: page,
-          search: searchProductController.text,
-          startDate: selectedDateTimeRange.value?.start,
-          endDate: selectedDateTimeRange.value?.end,
+        usrToken: loginData!.token,
+        page: page,
+        search: searchProductController.text,
+        startDate: selectedDateTimeRange.value?.start,
+        endDate: selectedDateTimeRange.value?.end,
       );
 
       logger.i(response);
@@ -679,10 +755,11 @@ class ExchangeController extends GetxController{
             ExchangeHistoryResponseModel.fromJson(response);
 
         if (exchangeHistoryResponseModel != null) {
-          exchangeHistoryList.addAll(exchangeHistoryResponseModel!.data.exchangeHistoryList);
+          exchangeHistoryList
+              .addAll(exchangeHistoryResponseModel!.data.exchangeHistoryList);
         }
       } else {
-        if(page != 1){
+        if (page != 1) {
           hasError.value = true;
         }
       }
@@ -693,30 +770,34 @@ class ExchangeController extends GetxController{
     } finally {
       isExchangeHistoryListLoading = false;
       isReturnHistoryLoadingMore = false;
-      update(['return_history_list','total_widget']);
+      update(['return_history_list', 'total_widget']);
     }
   }
+
   //
-  Future<void> getExchangeProducts({int page = 1}) async {
+  Future<void> getExchangeProducts({int page = 1, int? productType}) async {
     isExchangeProductListLoading = page == 1;
     isExchangeProductsLoadingMore = page > 1;
 
-    if(page == 1){
+    if (page == 1) {
       exchangeProductResponseModel = null;
       exchangeProductList.clear();
     }
 
     hasError.value = false;
 
-    update(['exchange_product_list','total_status_widget']);
+    update(['exchange_product_list', 'total_status_widget']);
 
     try {
       var response = await ExchangeService.getExchangeProducts(
-          usrToken: loginData!.token,
-          page: page,
-          search: searchProductController.text,
-          startDate: selectedDateTimeRange.value?.start,
-          endDate: selectedDateTimeRange.value?.end,
+        usrToken: loginData!.token,
+        page: page,
+        search: searchProductController.text,
+        startDate: selectedDateTimeRange.value?.start,
+        endDate: selectedDateTimeRange.value?.end,
+        productType: productType,
+        brandId: brand?.id,
+        categoryId: category?.id
       );
 
       logger.i(response);
@@ -725,10 +806,11 @@ class ExchangeController extends GetxController{
             ExchangeProductResponseModel.fromJson(response);
 
         if (exchangeProductResponseModel != null) {
-          exchangeProductList.addAll(exchangeProductResponseModel!.data.exchangeProducts);
+          exchangeProductList
+              .addAll(exchangeProductResponseModel!.data.exchangeProducts);
         }
       } else {
-        if(page != 1){
+        if (page != 1) {
           hasError.value = true;
         }
       }
@@ -739,14 +821,13 @@ class ExchangeController extends GetxController{
     } finally {
       isExchangeProductListLoading = false;
       isExchangeProductsLoadingMore = false;
-      update(['exchange_product_list','total_status_widget']);
+      update(['exchange_product_list', 'total_status_widget']);
     }
   }
 
   Future<void> deleteExchangeOrder({
     required ExchangeOrderInfo exchangeOrderInfo,
   }) async {
-
     hasError.value = false;
     update(['return_history_list']);
 
@@ -768,7 +849,8 @@ class ExchangeController extends GetxController{
     } catch (e) {
       hasError.value = true;
       logger.e(e);
-      Methods.showSnackbar(msg: 'Error: something went wrong while deleting the item');
+      Methods.showSnackbar(
+          msg: 'Error: something went wrong while deleting the item');
     } finally {
       update(['return_history_list']);
     }
@@ -776,33 +858,29 @@ class ExchangeController extends GetxController{
 
   //
   //
-  Future<void> downloadReturnHistory(
-      {required bool isPdf, required ExchangeOrderInfo exchangeOrderInfo,}) async {
+  Future<void> downloadExchangeHistory(
+      {required bool isPdf,
+      required int orderId,
+      required String orderNo,
+      bool? shouldPrint}) async {
     hasError.value = false;
 
-    String fileName = "${exchangeOrderInfo.orderNo}-${DateTime
-        .now()
-        .microsecondsSinceEpoch
-        .toString()}${isPdf ? ".pdf" : ".xlsx"}";
+    String fileName =
+        "$orderNo-${DateTime.now().microsecondsSinceEpoch.toString()}${isPdf ? ".pdf" : ".xlsx"}";
     try {
       var response = await ExchangeService.downloadExchangeInvoice(
-        exchangeOrderInfo: exchangeOrderInfo,
-        usrToken: loginData!.token,
-      );
+          orderId: orderId, usrToken: loginData!.token, fileName: fileName);
     } catch (e) {
       logger.e(e);
-    } finally {
-
-    }
+    } finally {}
   }
 
-  Future<void> downloadList({required bool isPdf,required bool returnHistory}) async {
+  Future<void> downloadList(
+      {required bool isPdf, required bool returnHistory}) async {
     hasError.value = false;
 
-    String fileName = "${returnHistory? "Exchange Order history": "Exchange Product History"}-${
-        selectedDateTimeRange.value != null ? "${selectedDateTimeRange.value!.start.toIso8601String().split("T")[0]}-${selectedDateTimeRange.value!.end.toIso8601String().split("T")[0]}": DateTime.now().toIso8601String().split("T")[0]
-            .toString()
-    }${isPdf ? ".pdf" : ".xlsx"}";
+    String fileName =
+        "${returnHistory ? "Exchange Order history" : "Exchange Product History"}-${selectedDateTimeRange.value != null ? "${selectedDateTimeRange.value!.start.toIso8601String().split("T")[0]}-${selectedDateTimeRange.value!.end.toIso8601String().split("T")[0]}" : DateTime.now().toIso8601String().split("T")[0].toString()}${isPdf ? ".pdf" : ".xlsx"}";
     try {
       var response = await ExchangeService.downloadList(
         returnHistory: returnHistory,
@@ -815,19 +893,20 @@ class ExchangeController extends GetxController{
       );
     } catch (e) {
       logger.e(e);
-    } finally {
-
-    }
+    } finally {}
   }
 
-
   bool isEditing = false;
-  bool detailsLoading =false;
+  bool detailsLoading = false;
   bool editReturnHistoryItemLoading = true;
+
   //
   ExchangeOrderDetailsResponseModel? exchangeOrderDetailsResponseModel;
+
   //
-  Future<void> processEdit({required ExchangeOrderInfo exchangeOrderInfo,required BuildContext context}) async{
+  Future<void> processEdit(
+      {required ExchangeOrderInfo exchangeOrderInfo,
+      required BuildContext context}) async {
     editReturnHistoryItemLoading = true;
     isEditing = true;
     RandomLottieLoader.show();
@@ -850,41 +929,51 @@ class ExchangeController extends GetxController{
         exchangeOrderDetailsResponseModel =
             ExchangeOrderDetailsResponseModel.fromJson(response);
 
-        if(paymentMethodsResponseModel == null){
+        if (paymentMethodsResponseModel == null) {
           await getPaymentMethods();
         }
 
-
-
-        if(serviceStuffList.isEmpty){
+        if (serviceStuffList.isEmpty) {
           await getAllServiceStuff();
         }
 
         //selecting products
         for (var e in exchangeOrderDetailsResponseModel!.data.returnDetails) {
-          ProductInfo productInfo = productsListResponseModel!.data.productList.singleWhere((f) => f.id == e.id);
-          addProduct(productInfo, snNo: e.snNo.map((e) => e.serialNo).toList(), quantity:  e.quantity, isReturn: true, unitPrice: e.unitPrice);
+          ProductInfo productInfo = productsListResponseModel!.data.productList
+              .singleWhere((f) => f.id == e.id);
+          addProduct(productInfo,
+              snNo: e.snNo?.map((e) => e.serialNo).toList(),
+              quantity: e.quantity,
+              isReturn: true,
+              unitPrice: e.unitPrice);
         }
 
         for (var e in exchangeOrderDetailsResponseModel!.data.exchangeDetails) {
-          ProductInfo productInfo = productsListResponseModel!.data.productList.singleWhere((f) => f.id == e.id);
-          addProduct(productInfo, snNo: e.snNo.map((e) => e.serialNo).toList(), quantity:  e.quantity, isReturn: false, unitPrice: e.unitPrice);
+          ProductInfo productInfo = productsListResponseModel!.data.productList
+              .singleWhere((f) => f.id == e.id);
+          addProduct(productInfo,
+              snNo: e.snNo?.map((e) => e.serialNo).toList(),
+              quantity: e.quantity,
+              isReturn: false,
+              unitPrice: e.unitPrice);
         }
 
         //Payment Methods
         for (var e in exchangeOrderDetailsResponseModel!.data.paymentDetails) {
-          PaymentMethod paymentMethod = paymentMethodsResponseModel!.data.singleWhere((f) => f.id == e.id);
+          PaymentMethod paymentMethod = paymentMethodsResponseModel!.data
+              .singleWhere((f) => f.id == e.id);
           PaymentOption? paymentOption;
 
-          if(paymentMethod.name.toLowerCase().contains("cash")){
+          if (paymentMethod.name.toLowerCase().contains("cash")) {
             cashSelected = true;
           }
-          if(paymentMethod.name.toLowerCase().contains("credit")){
+          if (paymentMethod.name.toLowerCase().contains("credit")) {
             creditSelected = true;
           }
 
-          if(e.bank != null){
-            paymentOption = paymentMethod.paymentOptions.singleWhere((f) => f.id == e.bank!.id);
+          if (e.bank != null) {
+            paymentOption = paymentMethod.paymentOptions
+                .singleWhere((f) => f.id == e.bank!.id);
           }
 
           paymentMethodTracker.add(ExchangePaymentMethodTracker(
@@ -896,12 +985,15 @@ class ExchangeController extends GetxController{
           logger.i(paymentMethodTracker);
         }
 
-        exchangeRequestModel.address = exchangeOrderDetailsResponseModel!.data.customer.address;
-        exchangeRequestModel.name = exchangeOrderDetailsResponseModel!.data.customer.name;
-        exchangeRequestModel.phone = exchangeOrderDetailsResponseModel!.data.customer.phone;
+        exchangeRequestModel.address =
+            exchangeOrderDetailsResponseModel!.data.customer.address;
+        exchangeRequestModel.name =
+            exchangeOrderDetailsResponseModel!.data.customer.name;
+        exchangeRequestModel.phone =
+            exchangeOrderDetailsResponseModel!.data.customer.phone;
         //service stuff
-        serviceStuffInfo = serviceStuffList.firstWhereOrNull((e) => e.id == exchangeOrderDetailsResponseModel!.data.serviceBy.id);
-
+        serviceStuffInfo = serviceStuffList.firstWhereOrNull((e) =>
+            e.id == exchangeOrderDetailsResponseModel!.data.serviceBy?.id);
 
         totalPaid = exchangeOrderDetailsResponseModel!.data.payable;
         totalDiscount = exchangeOrderDetailsResponseModel!.data.discount;
@@ -910,11 +1002,32 @@ class ExchangeController extends GetxController{
     } catch (e) {
       hasError.value = true;
     } finally {
-
       editReturnHistoryItemLoading = false;
       update(['edit_sold_history_item']);
       // Methods.hideLoading();
       RandomLottieLoader.hide();
+    }
+  }
+
+  Future<void> getExchangeHistoryDetails(int orderId) async {
+    detailsLoading = true;
+    exchangeOrderDetailsResponseModel = null;
+    update(['sold_history_details', 'download_print_buttons']);
+    try {
+      var response = await ExchangeService.getExchangeOrderDetails(
+        usrToken: loginData!.token,
+        id: orderId,
+      );
+
+      logger.i(response);
+      if (response != null) {
+        exchangeOrderDetailsResponseModel =
+            ExchangeOrderDetailsResponseModel.fromJson(response);
+      }
+    } catch (e) {
+    } finally {
+      detailsLoading = false;
+      update(['sold_history_details', 'download_print_buttons']);
     }
   }
 }

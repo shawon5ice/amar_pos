@@ -11,6 +11,8 @@ ExchangeProductResponseModel _$ExchangeProductResponseModelFromJson(
     ExchangeProductResponseModel(
       success: json['success'] as bool,
       data: Data.fromJson(json['data'] as Map<String, dynamic>),
+      countTotal: json['count_total'] as num? ?? 0,
+      amountTotal: json['amount_total'] as num? ?? 0,
     );
 
 Map<String, dynamic> _$ExchangeProductResponseModelToJson(
@@ -36,7 +38,7 @@ ExchangeProduct _$ExchangeProductFromJson(Map<String, dynamic> json) =>
     ExchangeProduct(
       id: (json['id'] as num).toInt(),
       category: json['category'] as String,
-      brand: json['brand'] as String,
+      brand: json['brand'] as String? ?? 'N/A',
       product: json['product'] as String,
       quantity: (json['quantity'] as num).toInt(),
       soldPrice: json['sold_price'] as num,
