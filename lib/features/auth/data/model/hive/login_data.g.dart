@@ -23,9 +23,9 @@ class LoginDataAdapter extends TypeAdapter<LoginData> {
       email: fields[3] as String,
       phone: fields[4] as String,
       business: fields[5] as Business,
+      photo: fields[8] as String?,
       address: fields[6] as String,
       permissions: (fields[7] as List).cast<String>(),
-      photo: fields[8] as String?,
     );
   }
 
@@ -47,11 +47,10 @@ class LoginDataAdapter extends TypeAdapter<LoginData> {
       ..write(obj.business)
       ..writeByte(6)
       ..write(obj.address)
-      ..writeByte(7)
-      ..write(obj.permissions)
       ..writeByte(8)
       ..write(obj.photo)
-    ;
+      ..writeByte(7)
+      ..write(obj.permissions);
   }
 
   @override

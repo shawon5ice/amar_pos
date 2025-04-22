@@ -4,6 +4,7 @@ import 'drawer_item.dart';
 import 'package:flutter/material.dart';
 
 class DrawerItems{
+  static const DrawerItem profile = DrawerItem(title: 'Profile', icon: AppAssets.overviewMenuIcon);
   static const DrawerItem overview = DrawerItem(title: 'Overview', icon: AppAssets.overviewMenuIcon);
   static const DrawerItem inventory = DrawerItem(title: 'Inventory', icon: AppAssets.inventoryMenuIcon);
   static const DrawerItem sales = DrawerItem(title: 'Sales', icon: AppAssets.salesMenuIcon);

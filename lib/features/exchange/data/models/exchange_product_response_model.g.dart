@@ -20,6 +20,8 @@ Map<String, dynamic> _$ExchangeProductResponseModelToJson(
     <String, dynamic>{
       'success': instance.success,
       'data': instance.data,
+      'amount_total': instance.amountTotal,
+      'count_total': instance.countTotal,
     };
 
 Data _$DataFromJson(Map<String, dynamic> json) => Data(

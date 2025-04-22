@@ -6,11 +6,13 @@ import 'package:amar_pos/features/auth/presentation/ui/login_screen.dart';
 import 'package:amar_pos/features/drawer/drawer_menu_controller.dart';
 import 'package:amar_pos/features/drawer/model/menu_selection.dart';
 import 'package:amar_pos/features/inventory/presentation/products/products_screen.dart';
+import 'package:amar_pos/features/profile/presentation/profile_screen.dart';
 import 'package:amar_pos/permission_manager.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:hive/hive.dart';
 import '../../../core/constants/app_colors.dart';
 import '../model/drawer_item.dart';
 import '../model/drawer_items.dart';
@@ -88,34 +90,47 @@ class _DrawerWidgetState extends State<DrawerWidget> {
               width: 232,
               child: Column(
                 children: [
-                  Row(
-                    children: [
-                      (controller.loginData?.photo != null && controller.loginData!.photo!.contains('http')) ?ClipOval(child: Image.network(controller.loginData!.photo!, fit: BoxFit.cover,width: 50,height: 50,)): const Icon(Icons.broken_image),
-                      const SizedBox(
-                        width: 12,
+                  GestureDetector(
+                    onTap: (){
+                      onParentTap(DrawerItems.profile);
+                      // Get.to(()=> ProfileScreen());
+                    },
+                    child: Container(
+                      padding: EdgeInsets.all(5),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(8)),
+                        color: selectedParentItem == DrawerItems.profile ? AppColors.lightGreen.withOpacity(.3) : null
                       ),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              controller.loginData?.name ?? '--',
-                              style: context.textTheme.titleSmall?.copyWith(
-                                  color: Colors.white, fontWeight: FontWeight.bold),
-                              maxLines: 1,
+                      child: Row(
+                        children: [
+                          (controller.loginData?.photo != null && controller.loginData!.photo!.contains('http')) ?ClipOval(child: Image.network(controller.loginData!.photo!, fit: BoxFit.cover,width: 50,height: 50,)): const Icon(Icons.broken_image),
+                          const SizedBox(
+                            width: 12,
+                          ),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  controller.loginData?.name ?? '--',
+                                  style: context.textTheme.titleSmall?.copyWith(
+                                      color: Colors.white, fontWeight: FontWeight.bold),
+                                  maxLines: 1,
+                                ),
+                                Text(
+                                  controller.loginData?.email ?? "--",
+                                  style: context.textTheme.bodyLarge?.copyWith(
+                                      color: AppColors.accent,
+                                      fontWeight: FontWeight.normal),
+                                  maxLines: 1,
+                                )
+                              ],
                             ),
-                            Text(
-                              controller.loginData?.email ?? "--",
-                              style: context.textTheme.bodyLarge?.copyWith(
-                                  color: AppColors.accent,
-                                  fontWeight: FontWeight.normal),
-                              maxLines: 1,
-                            )
-                          ],
-                        ),
-                      )
-                    ],
+                          )
+                        ],
+                      ),
+                    ),
                   ),
                   const SizedBox(
                     height: 18,
@@ -255,6 +270,30 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   }
 
   Widget buildDrawerItems(BuildContext context, DrawerItem item) {
+    bool isSelected = selectedParentItem == item;
+    return ListTile(
+      selected: isSelected,
+      selectedTileColor: AppColors.lightGreen.withOpacity(.3),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(12)),
+      ),
+      onTap: () => onParentTap(item),
+      leading: SvgPicture.asset(item.icon, width: 20, height: 20),
+      dense: true,
+      title: Text(
+        item.title,
+        style: TextStyle(
+          color: isSelected ? AppColors.accent : AppColors.textDarkPrimary,
+          fontSize: isSelected ? 14 : 12,
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+        ),
+      ),
+      horizontalTitleGap: 8,
+      visualDensity: VisualDensity.compact,
+    );
+  }
+
+  Widget buildProfileDrawerItems(BuildContext context, DrawerItem item) {
     bool isSelected = selectedParentItem == item;
     return ListTile(
       selected: isSelected,
