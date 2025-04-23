@@ -233,8 +233,12 @@ class AuthController extends GetxController{
         Methods.showSnackbar(msg: response['message'],isSuccess: true);
         return true;
       }else{
+        if(isForgotPassword != null){
+          forgotPasswordStep.value = ForgotPasswordStep.otpSendingFailed;
+        }else{
+          authStep.value = AuthStep.otpSendingFailed;
+        }
         Methods.showSnackbar(msg: response['message']);
-        throw(Exception());
       }
     } catch(e){
       if(isForgotPassword != null){
@@ -280,8 +284,12 @@ class AuthController extends GetxController{
         }
         Methods.showSnackbar(msg: response['message'],isSuccess: true);
       }else{
+        if(isForgotPassword != null){
+          forgotPasswordStep.value = ForgotPasswordStep.otpVerifyingFailed;
+        }else{
+          authStep.value = AuthStep.otpVerifyingFailed;
+        }
         Methods.showSnackbar(msg: response['message']);
-        throw(Exception());
       }
     } catch(e){
       if(isForgotPassword != null){

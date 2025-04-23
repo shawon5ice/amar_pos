@@ -22,7 +22,7 @@ class FieldTitle extends StatelessWidget {
       text,
       style: context.textTheme.titleSmall?.copyWith(
         color: color,
-        fontSize: fontSize ?? 12.sp,
+        fontSize: fontSize ?? 14.sp,
         fontWeight: fontWeight,
       ),
     );
@@ -51,7 +51,7 @@ class RichFieldTitle extends StatelessWidget {
         text: text,
         style: context.textTheme.titleSmall?.copyWith(
           color: Colors.black,
-          fontSize: fontSize ?? 12.sp,
+          fontSize: fontSize ?? 14.sp,
           fontWeight: fontWeight,
         ),
       ),
@@ -59,7 +59,7 @@ class RichFieldTitle extends StatelessWidget {
         text: "*",
         style: context.textTheme.titleSmall?.copyWith(
           color: Colors.red,
-          fontSize: fontSize ?? 12.sp,
+          fontSize: fontSize ?? 14.sp,
           fontWeight: fontWeight,
         ),
       )

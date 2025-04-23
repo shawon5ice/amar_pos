@@ -12,6 +12,7 @@ import 'package:amar_pos/features/sales/data/service/sales_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/constants/logger/logger.dart';
+import '../../../../core/network/helpers/error_extractor.dart';
 import '../../../auth/data/model/hive/login_data.dart';
 import '../../../auth/data/model/hive/login_data_helper.dart';
 import '../../../inventory/data/products/product_list_response_model.dart';
@@ -140,6 +141,7 @@ class SalesController extends GetxController {
     paymentMethodTracker.clear();
     redefinePrice();
     paymentMethodTracker.clear();
+    getPaymentMethods();
   }
 
   void redefinePrice() {
@@ -169,6 +171,7 @@ class SalesController extends GetxController {
 
   Future<void> getPaymentMethods() async {
     try {
+      paymentMethodTracker.clear();
       cashSelected = false;
       creditSelected = false;
       isPaymentMethodListLoading = true;
@@ -917,8 +920,13 @@ class SalesController extends GetxController {
     }
   }
 
-  Future<void> downloadList({required bool isPdf,required bool saleHistory}) async {
+  Future<void> downloadList({required bool isPdf,required bool saleHistory,bool? shouldPrint}) async {
     hasError.value = false;
+
+    if(saleHistory && saleHistoryList.isEmpty || !saleHistory && soldProductList.isEmpty){
+      ErrorExtractor.showSingleErrorDialog(Get.context!, "There is no associated data to perform your action!");
+      return;
+    }
 
     String fileName = "${saleHistory? "Sale Order history": "Sale Product History"}-${
     selectedDateTimeRange.value != null ? "${selectedDateTimeRange.value!.start.toIso8601String().split("T")[0]}-${selectedDateTimeRange.value!.end.toIso8601String().split("T")[0]}": DateTime.now().toIso8601String().split("T")[0]
@@ -926,6 +934,7 @@ class SalesController extends GetxController {
     }${isPdf ? ".pdf" : ".xlsx"}";
     try {
       var response = await SalesService.downloadList(
+        shouldPrint: shouldPrint,
         saleHistory: saleHistory,
         usrToken: loginData!.token,
         isPdf: isPdf,
@@ -942,6 +951,18 @@ class SalesController extends GetxController {
     } finally {
 
     }
+  }
+
+  FutureOr<List<ClientData>> clientSuggestionsCallback(String search) async {
+    // Check if the search term is in the existing items
+    return  getAllClient(search);
+  }
+
+  getAllClient(search) {
+    var filteredItems = clientList
+        .where((item) => item.phone.toLowerCase().contains(search.toLowerCase()) || (item.name.toLowerCase().contains(search.toLowerCase())))
+        .toList();
+    return filteredItems;
   }
 
 }

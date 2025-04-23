@@ -9,8 +9,8 @@ class SoldHistoryItemActionMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 24,
-      width: 24,
+      height: 28,
+      width: 28,
       child: PopupMenuButton<String>(
         padding: EdgeInsets.zero,
         icon: const Icon(Icons.more_vert, color: Colors.black54),

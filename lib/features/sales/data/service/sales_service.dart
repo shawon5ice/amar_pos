@@ -177,6 +177,7 @@ class SalesService {
     required DateTime? endDate,
     required String? search,
     required int? saleType,
+    required bool? shouldPrint,
 
   }) async {
     // logger.d("PDF: $isPdf");
@@ -209,6 +210,8 @@ class SalesService {
         url: downloadUrl,
         token: usrToken,
         query: query,
-        fileName: fileName,);
+        fileName: fileName,
+      shouldPrint: shouldPrint
+    );
   }
 }

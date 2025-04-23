@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:pinput/pinput.dart';
 
+import '../../../../../core/constants/app_assets.dart';
 import '../../../../../core/constants/app_colors.dart';
 import '../../../../../core/responsive/pixel_perfect.dart';
 import '../../../../../core/widgets/custom_btn.dart';
@@ -39,6 +40,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   int _time = 59;
 
   void startTimer() {
+
     _time = 59;
     const oneSec = Duration(seconds: 1);
     _timer = Timer.periodic(oneSec, (Timer timer) {
@@ -66,6 +68,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   @override
   void initState() {
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark.copyWith(
+      statusBarColor: Colors.transparent, // or any color you use
+      statusBarIconBrightness: Brightness.light,
+      statusBarBrightness: Brightness.light, // For iOS
+    ));
     passwordController = TextEditingController();
     confirmPassword = TextEditingController();
     phoneCon = TextEditingController();
@@ -147,340 +154,338 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         await clearFields();
         Get.back();
       },
-      child: AnnotatedRegion(
-        value: const SystemUiOverlayStyle(
-          statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.dark,
+      child: Scaffold(
+        appBar: AppBar(
+          elevation: 0,
+          backgroundColor: AppColors.scaffoldBackground,
         ),
-        child: Scaffold(
-          // appBar: AppBar(
-          //   elevation: 0,
-          //   backgroundColor: Colors.transparent,
-          // ),
-          // backgroundColor: Colors.blue.shade50,
-          body: SingleChildScrollView(
-            child: InkWell(
-              onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-              splashColor: Colors.transparent,
-              highlightColor: Colors.transparent,
-              focusColor: Colors.transparent,
-              child: GetBuilder<AuthController>(
-                  id: 'forgot_password',
-                  builder: (controller) {
-                    return Form(
-                      key: formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Stack(
-                            children: [
-                              Obx(
-                                    () => AuthHeader(
-                                  title: "Forgot Password",
-                                  error: controller.message.value,
-                                  height: Get.height / 2,
-                                ),
-                              ),
-                              Positioned(
-                                  top: 36,
-                                  left: 20,
-                                  child: IconButton(
-                                      onPressed: () {
-                                        Get.back();
-                                      },
-                                      icon: const Icon(
-                                        Icons.arrow_back,
-                                        color: AppColors.accent,
-                                      ))),
-                            ],
-                          ),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 20.w),
+        // backgroundColor: Colors.blue.shade50,
+        body: SafeArea(
+          child: GestureDetector(
+            onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+            child: LayoutBuilder(
+              builder: (context,constraints) {
+                return ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxHeight: constraints.maxHeight,
+                  ),
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context)
+                          .viewInsets
+                          .bottom, // ensures view adjusts for keyboard
+                    ),
+                    child: GetBuilder<AuthController>(
+                        id: 'forgot_password',
+                        builder: (controller) {
+                          return Form(
+                            key: formKey,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                if (!controller.showChangePasswordInputFields)
-                                  Column(
-                                    crossAxisAlignment:
-                                    CrossAxisAlignment.start,
-                                    children: [
-                                      const FieldTitle(
-                                        "Phone number",
-                                      ),
-                                      addH(4),
-                                      CustomGlassMorfTextField(
-                                        enabledFlag:
-                                        controller.forgotPasswordStep.value ==
-                                            ForgotPasswordStep.enterPhone || controller.forgotPasswordStep.value == ForgotPasswordStep.otpSendingFailed
-                                            ? null
-                                            : false,
-                                        textCon: phoneCon,
-                                        hintText: 'Enter phone number',
-                                        txtSize: 14.sp,
-                                        inputType: TextInputType.phone,
-                                        focusNode: phoneFocus,
-                                        errorText:
-                                        "⚠️ Please insert your phone number!",
-                                        validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            phoneFocus.requestFocus();
-                                            return '⚠️ Please insert your phone number!';
-                                          }
-                                          return null;
-                                        },
-                                      ),
-                                    ],
+                                Padding(
+                                  padding: EdgeInsets.only(top: constraints.maxHeight/6-50,bottom:  100),
+                                  child: Center(
+                                    child: Image.asset(
+                                      AppAssets.amarPosLogo,
+                                      height: 110,
+                                      width: 200,
+                                    ),
                                   ),
-                                if (controller.showChangePasswordInputFields)
-                                  Column(
-                                    crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                ),
+                                // Obx(() => AuthHeader(title: "Sign In", error: controller.message.value,),),
+                                Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 24.w),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      buildField(
-                                        title: 'Password',
-                                        con: passwordController,
-                                        focus: passwordFocus,
-                                        isPassField: true,
-                                        isMandatory: true,
-                                      ),
-                                      buildField(
-                                        title: 'Confirm Password',
-                                        con: confirmPassword,
-                                        focus: confirmPasswordFocusNode,
-                                        isPassField: true,
-                                        isMandatory: true,
-                                      ),
-                                    ],
-                                  ),
-                                Obx(() {
-                                  if (controller.forgotPasswordStep.value ==
-                                      ForgotPasswordStep.otpSent ||
-                                      controller.forgotPasswordStep.value ==
-                                          ForgotPasswordStep.verifyingOtp ||
-                                      controller.forgotPasswordStep.value ==
-                                          ForgotPasswordStep.otpVerifyingFailed) {
-                                    return Column(
-                                      children: [
-                                        addH(12),
-                                        Pinput(
-                                          length: 6,
-                                          // onSubmit: (String pin) => _showSnackBar(pin, context),
-                                          focusNode: pinPutFocusNode,
-                                          controller: pinPutController,
-                                          // submittedFieldDecoration:
-                                          //     _pinPutDecoration.copyWith(
-                                          //   borderRadius: BorderRadius.circular(20.0),
-                                          // ),
-                                          // selectedFieldDecoration: _pinPutDecoration,
-                                          // followingFieldDecoration:
-                                          //     _pinPutDecoration.copyWith(
-                                          //   borderRadius: BorderRadius.circular(5.0),
-                                          //   border: Border.all(
-                                          //     color:
-                                          //         Colors.deepPurpleAccent.withOpacity(.5),
-                                          //   ),
-                                          // ),
+                                      if (!controller.showChangePasswordInputFields)
+                                        Column(
+                                          crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                          children: [
+                                            const FieldTitle(
+                                              "Phone number",
+                                            ),
+                                            addH(4),
+                                            CustomGlassMorfTextField(
+                                              enabledFlag:
+                                              controller.forgotPasswordStep.value ==
+                                                  ForgotPasswordStep.enterPhone || controller.forgotPasswordStep.value == ForgotPasswordStep.otpSendingFailed
+                                                  ? null
+                                                  : false,
+                                              textCon: phoneCon,
+                                              hintText: 'Enter phone number',
+                                              txtSize: 14.sp,
+                                              inputType: TextInputType.phone,
+                                              focusNode: phoneFocus,
+                                              errorText:
+                                              "⚠️ Please insert your phone number!",
+                                              validator: (value) {
+                                                if (value == null || value.isEmpty) {
+                                                  phoneFocus.requestFocus();
+                                                  return '⚠️ Please insert your phone number!';
+                                                }
+                                                return null;
+                                              },
+                                            ),
+                                          ],
                                         ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                              right: 15, top: 8),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                            MainAxisAlignment.end,
+                                      if (controller.showChangePasswordInputFields)
+                                        Column(
+                                          crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                          children: [
+                                            buildField(
+                                              title: 'Password',
+                                              con: passwordController,
+                                              focus: passwordFocus,
+                                              isPassField: true,
+                                              isMandatory: true,
+                                            ),
+                                            buildField(
+                                              title: 'Confirm Password',
+                                              con: confirmPassword,
+                                              focus: confirmPasswordFocusNode,
+                                              isPassField: true,
+                                              isMandatory: true,
+                                            ),
+                                          ],
+                                        ),
+                                      Obx(() {
+                                        if (controller.forgotPasswordStep.value ==
+                                            ForgotPasswordStep.otpSent ||
+                                            controller.forgotPasswordStep.value ==
+                                                ForgotPasswordStep.verifyingOtp ||
+                                            controller.forgotPasswordStep.value ==
+                                                ForgotPasswordStep.otpVerifyingFailed) {
+                                          return Column(
                                             children: [
-                                              _time == 0
-                                                  ? TextButton(
-                                                onPressed: () async {
-                                                  pinPutController
-                                                      .clear();
-                                                  bool check =
-                                                  await validatePhoneNumber();
-                                                  if (check) {
-                                                    bool sent =
-                                                    await controller
-                                                        .sendOTP(phoneCon.text.trim(),checkPlace: 3, isForgotPassword: true);
-                                                    if (sent) {
-                                                      startTimer();
-                                                    }
-                                                  }
-                                                  // Re-send Button Function
-                                                  controller.update([
-                                                    'register_screen'
-                                                  ]);
-                                                },
-                                                style: ButtonStyle(
-                                                  elevation:
-                                                  WidgetStateProperty
-                                                      .all(0),
-                                                  backgroundColor:
-                                                  WidgetStateProperty
-                                                      .all(
-                                                    AppColors.primary,
-                                                  ),
-                                                ),
-                                                child: const Text(
-                                                  "Re-send",
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                              )
-                                                  : RichText(
-                                                text: TextSpan(
-                                                  text: 'Re-send in ',
-                                                  style: const TextStyle(
-                                                    color: Colors.red,
-                                                    fontFamily: 'Poppins',
-                                                    fontSize: 12,
-                                                  ),
+                                              addH(12),
+                                              Pinput(
+                                                length: 6,
+                                                // onSubmit: (String pin) => _showSnackBar(pin, context),
+                                                focusNode: pinPutFocusNode,
+                                                controller: pinPutController,
+                                                // submittedFieldDecoration:
+                                                //     _pinPutDecoration.copyWith(
+                                                //   borderRadius: BorderRadius.circular(20.0),
+                                                // ),
+                                                // selectedFieldDecoration: _pinPutDecoration,
+                                                // followingFieldDecoration:
+                                                //     _pinPutDecoration.copyWith(
+                                                //   borderRadius: BorderRadius.circular(5.0),
+                                                //   border: Border.all(
+                                                //     color:
+                                                //         Colors.deepPurpleAccent.withOpacity(.5),
+                                                //   ),
+                                                // ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    right: 15, top: 8),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                  MainAxisAlignment.end,
                                                   children: [
-                                                    TextSpan(
-                                                      text: '00:$_time',
-                                                      style: const TextStyle(
-                                                        color: Colors.red,
-                                                        fontFamily:
-                                                        'Poppins',
-                                                        fontWeight:
-                                                        FontWeight
-                                                            .bold,
-                                                        fontSize: 12,
+                                                    _time == 0
+                                                        ? TextButton(
+                                                      onPressed: () async {
+                                                        pinPutController
+                                                            .clear();
+                                                        bool check =
+                                                        await validatePhoneNumber();
+                                                        if (check) {
+                                                          bool sent =
+                                                          await controller
+                                                              .sendOTP(phoneCon.text.trim(),checkPlace: 3, isForgotPassword: true);
+                                                          if (sent) {
+                                                            startTimer();
+                                                          }
+                                                        }
+                                                        // Re-send Button Function
+                                                        controller.update([
+                                                          'register_screen'
+                                                        ]);
+                                                      },
+                                                      style: ButtonStyle(
+                                                        elevation:
+                                                        WidgetStateProperty
+                                                            .all(0),
+                                                        backgroundColor:
+                                                        WidgetStateProperty
+                                                            .all(
+                                                          AppColors.primary,
+                                                        ),
                                                       ),
-                                                    ),
-                                                    const TextSpan(
-                                                      text: ' sec',
-                                                      style: TextStyle(
-                                                        color: Colors.red,
-                                                        fontFamily:
-                                                        'Poppins',
-                                                        fontSize: 12,
+                                                      child: const Text(
+                                                        "Re-send",
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                        ),
+                                                      ),
+                                                    )
+                                                        : RichText(
+                                                      text: TextSpan(
+                                                        text: 'Re-send in ',
+                                                        style: const TextStyle(
+                                                          color: Colors.red,
+                                                          fontFamily: 'Poppins',
+                                                          fontSize: 12,
+                                                        ),
+                                                        children: [
+                                                          TextSpan(
+                                                            text: '00:$_time',
+                                                            style: const TextStyle(
+                                                              color: Colors.red,
+                                                              fontFamily:
+                                                              'Poppins',
+                                                              fontWeight:
+                                                              FontWeight
+                                                                  .bold,
+                                                              fontSize: 12,
+                                                            ),
+                                                          ),
+                                                          const TextSpan(
+                                                            text: ' sec',
+                                                            style: TextStyle(
+                                                              color: Colors.red,
+                                                              fontFamily:
+                                                              'Poppins',
+                                                              fontSize: 12,
+                                                            ),
+                                                          ),
+                                                        ],
                                                       ),
                                                     ),
                                                   ],
                                                 ),
                                               ),
                                             ],
-                                          ),
-                                        ),
-                                      ],
-                                    );
-                                  } else {
-                                    return const SizedBox.shrink();
-                                  }
-                                }),
-                                addH(24),
-                                Obx(() {
-                                  final step = controller.forgotPasswordStep.value;
-                                  // final formValid = formKey.currentState?.validate() ?? false;
-
-                                  if (step == ForgotPasswordStep.sendingOtp ||
-                                      step == ForgotPasswordStep.verifyingOtp ||
-                                      step == ForgotPasswordStep.forgettingPassword) {
-                                    return CustomBtn(
-                                      btnColor: Colors.grey,
-                                      onPressedFn: () {},
-                                      btnTxt: 'Processing...',
-                                      txtSize: 18,
-                                    );
-                                  }
-
-                                  if (step == ForgotPasswordStep.otpSent) {
-                                    return CustomBtn(
-                                      btnColor: AppColors.primary,
-                                      onPressedFn: () => controller
-                                          .verifyOTP(pinPutController.text,phoneCon.text.trim(),checkPlace: 3,isForgotPassword: true),
-                                      btnTxt: 'Verify OTP',
-                                      txtSize: 18,
-                                    );
-                                  }
-
-                                  if (step == ForgotPasswordStep.otpVerified) {
-                                    return CustomBtn(
-                                      btnTxt: "Sign Up",
-                                      btnColor: AppColors.primary,
-                                      onPressedFn: () async {
-                                        bool check = await validate();
-                                        if (check) {
-                                          var req = await prepareData();
-                                          controller.changePassword(
-                                              req
                                           );
                                         } else {
-                                          return;
+                                          return const SizedBox.shrink();
                                         }
-                                      },
-                                    );
-                                  }
+                                      }),
+                                      addH(24),
+                                      Obx(() {
+                                        final step = controller.forgotPasswordStep.value;
+                                        // final formValid = formKey.currentState?.validate() ?? false;
 
-                                  if (step == ForgotPasswordStep.forgetPasswordSuccess) {
-                                    Future.delayed(const Duration(seconds: 1), () {
-                                      Get.offAllNamed(LoginScreen.routeName);
-                                    });
-                                    return CustomBtn(
-                                      btnTxt: "Password Changed Successfully",
-                                      btnColor: Colors.blue,
-                                      onPressedFn: () {},
-                                    );
-                                  }
+                                        if (step == ForgotPasswordStep.sendingOtp ||
+                                            step == ForgotPasswordStep.verifyingOtp ||
+                                            step == ForgotPasswordStep.forgettingPassword) {
+                                          return CustomBtn(
+                                            btnColor: Colors.grey,
+                                            onPressedFn: () {},
+                                            btnTxt: 'Processing...',
+                                            txtSize: 18,
+                                          );
+                                        }
 
-                                  if (step == ForgotPasswordStep.otpSendingFailed ||
-                                      step == ForgotPasswordStep.otpVerifyingFailed ||
-                                      step == ForgotPasswordStep.forgetPasswordFailed) {
-                                    return CustomBtn(
-                                      btnTxt: "Try Again",
-                                      btnColor: AppColors.error,
-                                      onPressedFn: () async {
-                                        if (step == ForgotPasswordStep.otpSendingFailed) {
-                                          bool check =
-                                          await validatePhoneNumber();
-                                          if (check) {
-                                            bool sent =
-                                            await controller.sendOTP(phoneCon.text.trim(),checkPlace: 3);
-                                            if (sent) {
-                                              startTimer();
+                                        if (step == ForgotPasswordStep.otpSent) {
+                                          return CustomBtn(
+                                            btnColor: AppColors.primary,
+                                            onPressedFn: () => controller
+                                                .verifyOTP(pinPutController.text,phoneCon.text.trim(),checkPlace: 3,isForgotPassword: true),
+                                            btnTxt: 'Verify OTP',
+                                            txtSize: 18,
+                                          );
+                                        }
+
+                                        if (step == ForgotPasswordStep.otpVerified) {
+                                          return CustomBtn(
+                                            btnTxt: "Change Password",
+                                            btnColor: AppColors.primary,
+                                            onPressedFn: () async {
+                                              bool check = await validate();
+                                              if (check) {
+                                                var req = await prepareData();
+                                                controller.changePassword(
+                                                    req
+                                                );
+                                              } else {
+                                                return;
+                                              }
+                                            },
+                                          );
+                                        }
+
+                                        if (step == ForgotPasswordStep.forgetPasswordSuccess) {
+                                          _timer?.cancel();
+                                          Future.delayed(const Duration(seconds: 1), () {
+                                            Get.offAllNamed(LoginScreen.routeName);
+                                          });
+                                          return CustomBtn(
+                                            btnTxt: "Password Changed Successfully",
+                                            btnColor: Colors.blue,
+                                            onPressedFn: () {},
+                                          );
+                                        }
+
+                                        if (step == ForgotPasswordStep.otpSendingFailed ||
+                                            step == ForgotPasswordStep.otpVerifyingFailed ||
+                                            step == ForgotPasswordStep.forgetPasswordFailed) {
+                                          return CustomBtn(
+                                            btnTxt: "Try Again",
+                                            btnColor: AppColors.error,
+                                            onPressedFn: () async {
+                                              if (step == ForgotPasswordStep.otpSendingFailed) {
+                                                bool check =
+                                                await validatePhoneNumber();
+                                                if (check) {
+                                                  bool sent =
+                                                  await controller.sendOTP(phoneCon.text.trim(),checkPlace: 3,isForgotPassword: true);
+                                                  if (sent) {
+                                                    startTimer();
+                                                  }
+                                                }
+                                              } else if (step ==
+                                                  ForgotPasswordStep.otpVerifyingFailed) {
+                                                controller
+                                                    .verifyOTP(pinPutController.text,phoneCon.text.trim(),checkPlace: 3,isForgotPassword: true);
+                                              } else if (step ==
+                                                  ForgotPasswordStep.forgetPasswordFailed) {
+                                                bool check = await validate();
+                                                if (check) {
+                                                  var req = await prepareData();
+                                                  controller.changePassword(
+                                                      req
+                                                  );
+                                                } else {
+                                                  return;
+                                                }
+                                              }
+                                            },
+                                          );
+                                        }
+
+                                        return CustomBtn(
+                                          btnTxt: "Get OTP",
+                                          btnColor: AppColors.accent,
+                                          onPressedFn: () async {
+                                            bool check = await validatePhoneNumber();
+                                            if (check) {
+                                              bool sent = await controller.sendOTP(phoneCon.text.trim(),checkPlace: 3,isForgotPassword: true);
+                                              if (sent) {
+                                                startTimer();
+                                              }
                                             }
-                                          }
-                                        } else if (step ==
-                                            ForgotPasswordStep.otpVerifyingFailed) {
-                                          controller
-                                              .verifyOTP(pinPutController.text,phoneCon.text.trim(),checkPlace: 3);
-                                        } else if (step ==
-                                            ForgotPasswordStep.forgetPasswordFailed) {
-                                          bool check = await validate();
-                                          if (check) {
-                                            var req = await prepareData();
-                                            controller.changePassword(
-                                                req
-                                            );
-                                          } else {
-                                            return;
-                                          }
-                                        }
-                                      },
-                                    );
-                                  }
-
-                                  return CustomBtn(
-                                    btnTxt: "Get OTP",
-                                    btnColor: AppColors.accent,
-                                    onPressedFn: () async {
-                                      bool check = await validatePhoneNumber();
-                                      if (check) {
-                                        bool sent = await controller.sendOTP(phoneCon.text.trim(),checkPlace: 3);
-                                        if (sent) {
-                                          startTimer();
-                                        }
-                                      }
-                                    },
-                                  );
-                                })
+                                          },
+                                        );
+                                      })
+                                    ],
+                                  ),
+                                ),
+                                addH(0)
                               ],
                             ),
-                          ),
-                          addH(50.h),
-                        ],
-                      ),
-                    );
-                  }),
+                          );
+                        }),
+                  ),
+                );
+              }
             ),
           ),
         ),

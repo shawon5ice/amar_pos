@@ -1,5 +1,6 @@
 import 'package:amar_pos/core/constants/app_colors.dart';
 import 'package:amar_pos/core/core.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:amar_pos/core/methods/number_input_formatter.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/core/widgets/custom_button.dart';
@@ -14,6 +15,7 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import '../../../../core/widgets/dashed_line.dart';
 import '../widgets/billing_summary_payment_option_selection_widget.dart';
 import '../widgets/solde_history_details_view.dart';
 
@@ -37,7 +39,7 @@ class _BillingSummaryState extends State<BillingSummary> {
 
   @override
   void initState() {
-
+    suggestionEditingController = TextEditingController();
     customerNameEditingController = TextEditingController();
     customerPhoneNumberEditingController = TextEditingController();
     customerAddressEditingController = TextEditingController();
@@ -47,6 +49,7 @@ class _BillingSummaryState extends State<BillingSummary> {
     customerChangeAmountEditingController = TextEditingController();
 
     customerNameEditingController.text = controller.createOrderModel.name;
+    suggestionEditingController.text = controller.selectedClient?.name ?? '';
     customerPhoneNumberEditingController.text = controller.createOrderModel.phone;
     customerAddressEditingController.text = controller.createOrderModel.address;
 
@@ -58,9 +61,6 @@ class _BillingSummaryState extends State<BillingSummary> {
       if(controller.serviceStuffList.isEmpty){
         controller.getAllServiceStuff();
       }
-      if(controller.billingPaymentMethods == null){
-        controller.getPaymentMethods();
-      }
       if(controller.isRetailSale == false && controller.clientList.isEmpty){
         controller.getAllClientList();
       }
@@ -70,6 +70,8 @@ class _BillingSummaryState extends State<BillingSummary> {
 
     super.initState();
   }
+
+  late TextEditingController suggestionEditingController;
 
   @override
   void dispose() {
@@ -123,72 +125,175 @@ class _BillingSummaryState extends State<BillingSummary> {
                                           value, "Customer name"),
                                 )
                               : GetBuilder<SalesController>(
-                                  id: 'client_list',
-                                  builder: (controller) =>
-                                      DropdownButtonHideUnderline(
-                                    child: DropdownButton2<ClientData>(
-                                      isExpanded: true,
-                                      hint: Text(
-                                        controller.clientList.isNotEmpty
-                                            ? "Select Client"
-                                            : "Loading...",
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: Theme.of(context).hintColor,
-                                        ),
-                                      ),
-                                      items: controller.clientList
-                                          .map((ClientData item) {
-                                        return DropdownMenuItem<ClientData>(
-                                          value: item,
-                                          child: Text(
-                                            item.name,
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        );
-                                      }).toList(),
-                                      value: controller.selectedClient,
-                                      onChanged: (value) {
-                                        if (value != null) {
-                                          controller.selectedClient = value;
-                                          customerPhoneNumberEditingController
-                                              .text = value.phone;
-                                          customerAddressEditingController.text =
-                                              value.address;
-                                          controller.createOrderModel.phone = value.phone;
-                                          controller.createOrderModel.address = value.address;
-                                          controller.createOrderModel.customerId = value.id;
-                                          controller.update(['client_list']);
-                                        }
-                                      },
-                                      buttonStyleData: ButtonStyleData(
-                                        height: 56,
-                                        padding: EdgeInsets.zero,
-                                        decoration: BoxDecoration(
-                                          border: Border.all(
-                                              color: AppColors.inputBorderColor),
-                                          borderRadius: const BorderRadius.all(
-                                              Radius.circular(8)),
-                                        ),
-                                      ),
-                                      dropdownStyleData: const DropdownStyleData(
-                                        maxHeight: 200,
-                                        offset: Offset(0, 4),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(8)),
-                                        ),
-                                      ),
-                                      menuItemStyleData: const MenuItemStyleData(
-                                        height: 40,
-                                      ),
-                                    ),
+                            id: 'supplier_list',
+                            builder: (controller) => TypeAheadField<ClientData>(
+                              hideOnUnfocus: false,
+                              hideOnSelect: true,
+                              showOnFocus: true,
+                              controller: suggestionEditingController,
+                              builder: (context, textController, focusNode) {
+                                suggestionEditingController = textController;
+                                return TextFormField(
+                                  autofocus: false,
+                                  validator: (value) =>
+                                      FieldValidator.nonNullableFieldValidator(
+                                          value, "Supplier name"),
+                                  controller: suggestionEditingController,
+                                  focusNode: focusNode,
+                                  decoration: InputDecoration(
+                                    border: _getInputBorder(),
+                                    suffixIcon: Icon(Icons.arrow_drop_down_sharp),
+                                    hintText: "Select Supplier",
+                                    contentPadding:
+                                    const EdgeInsets.symmetric(horizontal: 20),
+                                    hintStyle:
+                                    TextStyle(color: Colors.grey, fontSize: 14),
                                   ),
+                                );
+                              },
+                              suggestionsCallback: controller.clientSuggestionsCallback,
+                              itemBuilder: (context, supplier) {
+                                return ListTile(
+                                  minVerticalPadding: 4,
+                                  isThreeLine: true,
+                                  dense: true,
+                                  visualDensity: VisualDensity.compact,
+                                  title: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        supplier.name,
+                                        style: const TextStyle(
+                                            color: Colors.deepPurple,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      Text(supplier.phone),
+                                    ],
+                                  ),
+                                  subtitle: Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 4),
+                                    child: DashedLine(),
+                                  ),
+                                );
+                              },
+                              onSelected: (value) {
+                                controller.selectedClient = value;
+                                suggestionEditingController.text = value.name;
+                                customerNameEditingController.text = value.name ?? '';
+                                customerPhoneNumberEditingController
+                                    .text = value.phone ?? '';
+                                customerAddressEditingController.text =
+                                    value.address ?? '';
+                                controller.update(['supplier_list']);
+                                FocusScope.of(context).unfocus();
+                              },
+
+                              decorationBuilder: (context, child) {
+                                return Material(
+                                  type: MaterialType.card,
+                                  elevation: 8,
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: child,
+                                );
+                              },
+                              offset: const Offset(0, 4),
+                              constraints: const BoxConstraints(
+                                maxHeight: 300,
+                              ),
+                              emptyBuilder: (_) => const Center(
+                                child: Text("No Items found!"),
+                              ),
+                              loadingBuilder: (_) => const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                            ),
+
+                          // GetBuilder<SalesController>(
+                          //         id: 'client_list',
+                          //         builder: (controller) =>
+                          //             CustomDropdownWithSearchWidget<ClientData>(
+                          //               searchHintText: "Service Stuff",
+                          //               validator: (value) => value == null
+                          //                   ? "Please select a service stuff"
+                          //                   : null,
+                          //               value: controller.selectedClient,
+                          //               items: controller.clientList,
+                          //               isMandatory: true,
+                          //               title: "Service Stuff",
+                          //               itemLabel: (ClientData client) =>
+                          //               client.name,
+                          //               onChanged: (value) {
+                          //                 controller.selectedClient = value;
+                          //               },
+                          //               hintText:controller.serviceStuffListLoading? 'Loading...': controller.serviceStuffList.isNotEmpty
+                          //                   ? "Select Service Stuff"
+                          //                   : "No Stuff found!",
+                          //             ),
+                          //
+                                  //     DropdownButtonHideUnderline(
+                                  //   child: DropdownButton2<ClientData>(
+                                  //     isExpanded: true,
+                                  //     hint: Text(
+                                  //       controller.clientList.isNotEmpty
+                                  //           ? "Select Client"
+                                  //           : "Loading...",
+                                  //       style: TextStyle(
+                                  //         fontSize: 12,
+                                  //         color: Theme.of(context).hintColor,
+                                  //       ),
+                                  //     ),
+                                  //     items: controller.clientList
+                                  //         .map((ClientData item) {
+                                  //       return DropdownMenuItem<ClientData>(
+                                  //         value: item,
+                                  //         child: Text(
+                                  //           item.name,
+                                  //           style: const TextStyle(
+                                  //             fontSize: 12,
+                                  //             fontWeight: FontWeight.bold,
+                                  //           ),
+                                  //           overflow: TextOverflow.ellipsis,
+                                  //         ),
+                                  //       );
+                                  //     }).toList(),
+                                  //     value: controller.selectedClient,
+                                  //     onChanged: (value) {
+                                  //       if (value != null) {
+                                  //         controller.selectedClient = value;
+                                  //         customerPhoneNumberEditingController
+                                  //             .text = value.phone;
+                                  //         customerAddressEditingController.text =
+                                  //             value.address;
+                                  //         controller.createOrderModel.phone = value.phone;
+                                  //         controller.createOrderModel.address = value.address;
+                                  //         controller.createOrderModel.customerId = value.id;
+                                  //         controller.update(['client_list']);
+                                  //       }
+                                  //     },
+                                  //     buttonStyleData: ButtonStyleData(
+                                  //       height: 56,
+                                  //       padding: EdgeInsets.zero,
+                                  //       decoration: BoxDecoration(
+                                  //         border: Border.all(
+                                  //             color: AppColors.inputBorderColor),
+                                  //         borderRadius: const BorderRadius.all(
+                                  //             Radius.circular(8)),
+                                  //       ),
+                                  //     ),
+                                  //     dropdownStyleData: const DropdownStyleData(
+                                  //       maxHeight: 200,
+                                  //       offset: Offset(0, 4),
+                                  //       decoration: BoxDecoration(
+                                  //         color: Colors.white,
+                                  //         borderRadius: BorderRadius.all(
+                                  //             Radius.circular(8)),
+                                  //       ),
+                                  //     ),
+                                  //     menuItemStyleData: const MenuItemStyleData(
+                                  //       height: 40,
+                                  //     ),
+                                  //   ),
+                                  // ),
                                 ),
                           addH(8),
                           const FieldTitle("Phone Number"),
@@ -425,22 +530,22 @@ class _BillingSummaryState extends State<BillingSummary> {
                                   id: 'service_stuff_list',
                                   builder: (controller) =>
                                       CustomDropdownWithSearchWidget<ServiceStuffInfo>(
-                                        searchHintText: "Service Stuff",
+                                        searchHintText: "Service Staff",
                                     validator: (value) => value == null
-                                        ? "Please select a service stuff"
+                                        ? "Please select a service staff"
                                         : null,
                                     value: controller.serviceStuffInfo,
                                     items: controller.serviceStuffList,
-                                    isMandatory: true,
-                                    title: "Service Stuff",
+                                    isMandatory: false,
+                                    title: "Service Staff",
                                     itemLabel: (ServiceStuffInfo stuffInfo) =>
                                         stuffInfo.name,
                                     onChanged: (value) {
                                       controller.serviceStuffInfo = value;
                                     },
                                     hintText:controller.serviceStuffListLoading? 'Loading...': controller.serviceStuffList.isNotEmpty
-                                            ? "Select Service Stuff"
-                                            : "No Stuff found!",
+                                            ? "Select service staff"
+                                            : "No staff found!",
                                   ),
                                 ),
                               ),
@@ -487,10 +592,6 @@ class _BillingSummaryState extends State<BillingSummary> {
                 controller.createOrderModel.address = controller.isRetailSale
                     ? customerAddressEditingController.text
                     : controller.selectedClient!.address;
-                if (controller.serviceStuffInfo == null) {
-                  Methods.showSnackbar(msg: "Please select a service stuff");
-                  return;
-                }
                 controller.createOrderModel.serviceBy =
                     controller.serviceStuffInfo!.id;
       
@@ -533,6 +634,15 @@ class _BillingSummaryState extends State<BillingSummary> {
             text: controller.isEditing ? "Update Order" : "Place Order",
           ),
         ),
+      ),
+    );
+  }
+  InputBorder _getInputBorder() {
+    return OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+      borderSide: BorderSide(
+        color: AppColors.inputBorderColor,
+        width:  1,
       ),
     );
   }

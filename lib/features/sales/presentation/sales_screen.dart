@@ -75,6 +75,7 @@ class _SalesScreenState extends State<SalesScreen>
       if(_tabController.indexIsChanging){
         // controller.brand = null;
         // controller.category = null;
+        controller.clearFilter();
         controller.selectedDateTimeRange.value = null;
         controller.searchProductController.clear();
         FocusScope.of(context).unfocus();

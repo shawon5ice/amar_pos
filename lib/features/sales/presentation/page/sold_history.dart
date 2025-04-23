@@ -1,6 +1,7 @@
 import 'package:amar_pos/core/constants/logger/logger.dart';
 import 'package:amar_pos/core/core.dart';
 import 'package:amar_pos/core/widgets/custom_text_field.dart';
+import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:amar_pos/features/sales/data/models/sale_history/sold_history_response_model.dart';
 import 'package:amar_pos/features/sales/presentation/controller/sales_controller.dart';
 import 'package:amar_pos/features/sales/presentation/widgets/sold_history_item_widget.dart';
@@ -50,13 +51,13 @@ class _SoldHistoryState extends State<SoldHistory> {
                     brdrClr: Colors.transparent,
                     txtSize: 12,
                     debounceDuration: const Duration(
-                      milliseconds: 300,
+                      milliseconds: 500,
                     ),
                     // noInputBorder: true,
                     brdrRadius: 40,
                     prefixWidget: Icon(Icons.search),
                     onChanged: (value){
-                      controller.getSoldHistory();
+                      controller.getSoldHistory(page: 1);
                     },
                   ),
                 ),
@@ -79,7 +80,9 @@ class _SoldHistoryState extends State<SoldHistory> {
                 addW(4),
                 CustomSvgIconButton(
                   bgColor: const Color(0xffFFFCF8),
-                  onTap: () {},
+                  onTap: () {
+                    controller.downloadList(isPdf: true, saleHistory: true,shouldPrint: true);
+                  },
                   assetPath: AppAssets.printIcon,
                 )
               ],
@@ -121,8 +124,8 @@ class _SoldHistoryState extends State<SoldHistory> {
                 id: 'sold_history_list',
                 builder: (controller) {
                   if (controller.isSaleHistoryListLoading) {
-                    return const Center(
-                      child: CircularProgressIndicator(),
+                    return Center(
+                      child: RandomLottieLoader.lottieLoader(),
                     );
                   }else if(controller.saleHistoryResponseModel == null){
                     return Center(

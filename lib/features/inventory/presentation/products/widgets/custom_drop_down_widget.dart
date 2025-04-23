@@ -70,7 +70,7 @@ class _CustomDropdownWithSearchWidgetState<T>
           Padding(
             padding: const EdgeInsets.only(bottom: 4.0),
             child: widget.isMandatory
-                ? RichFieldTitle(text: widget.title)
+                ? RichFieldTitle(text: widget.title,)
                 : FieldTitle(widget.title),
           ),
         Row(

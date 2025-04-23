@@ -51,6 +51,7 @@ class AppRoutes {
       name: ForgotPasswordScreen.routeName,
       page: () => ForgotPasswordScreen(),
       binding: AuthBinding(),
+      transition: Transition.rightToLeft,
     ),
 
 

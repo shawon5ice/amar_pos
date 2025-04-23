@@ -107,6 +107,7 @@ class Customer {
   final int id;
   final String name;
   final String phone;
+  @JsonKey(defaultValue: 'N/a')
   final String address;
 
   Customer({required this.id, required this.name, required this.phone, required this.address});

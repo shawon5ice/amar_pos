@@ -69,6 +69,9 @@ class AppAssets {
   static const String productBox = "assets/icon/product_box.svg";
   static const String amount = "assets/icon/amount.svg";
 
+  static const String amarPosLogo = "assets/images/amar_pos_logo.png";
+  static const String motionSoftLogo = "assets/images/motion_soft_logo.png";
+
 
   static const String cashIn = "assets/icon/cash_in.svg";
   static const String cashOut = "assets/icon/cash_out.svg";

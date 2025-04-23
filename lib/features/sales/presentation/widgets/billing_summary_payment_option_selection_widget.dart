@@ -75,6 +75,7 @@ class _BillingSummaryPaymentOptionSelectionWidgetState
                   children: [
                     RichFieldTitle(
                       text: "Payment Methods",
+                      fontSize: 14.sp,
                     ),
                     addH(4),
                     DropdownButtonHideUnderline(

@@ -9,6 +9,7 @@ import 'package:amar_pos/features/inventory/presentation/products/products_scree
 import 'package:amar_pos/features/profile/presentation/profile_screen.dart';
 import 'package:amar_pos/permission_manager.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -112,7 +113,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                               final loginData = box.get(LoginDataBoxManager.logInBoxName) as LoginData?;
                               return Row(
                                 children: [
-                                  (loginData?.photo != null && loginData!.photo!.contains('http')) ?ClipOval(child: Image.network(loginData!.photo!, fit: BoxFit.cover,width: 50,height: 50,)): const Icon(Icons.broken_image),
+                                  (loginData?.photo != null && loginData!.photo!.contains('http')) ?ClipOval(child: CachedNetworkImage(imageUrl:loginData.photo!, fit: BoxFit.cover,width: 50,height: 50,)): const Icon(Icons.broken_image),
                                   const SizedBox(
                                     width: 12,
                                   ),

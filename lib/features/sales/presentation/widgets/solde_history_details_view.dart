@@ -319,7 +319,7 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
                                       isValueBold: true,
                                     ),
                                     TitleWithValue(
-                                      title: "Expense",
+                                      title: "Additional Charge",
                                       value: data.expense,
                                     ),
                                     TitleWithValue(
@@ -352,7 +352,12 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
                               const SizedBox(height: 40),
                               Align(
                                 alignment: Alignment.centerRight,
-                                child: Text("Prepared by: ${data.serviceBy?.name}",
+                                child: Text("Prepared by: ${data.soldBy}",
+                                    style: TextStyle(fontWeight: FontWeight.bold)),
+                              ),
+                             if(data.serviceBy != null) Align(
+                                alignment: Alignment.centerRight,
+                                child: Text("Assist by: ${data.serviceBy?.name}",
                                     style: TextStyle(fontWeight: FontWeight.bold)),
                               ),
                             ],

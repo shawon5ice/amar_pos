@@ -1,3 +1,4 @@
+import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:amar_pos/features/sales/presentation/widgets/sold_product_list_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -49,7 +50,7 @@ class _SoldHistoryState extends State<SoldProduct> {
                     brdrClr: Colors.transparent,
                     txtSize: 12,
                     debounceDuration: const Duration(
-                      milliseconds: 300,
+                      milliseconds: 500,
                     ),
                     // noInputBorder: true,
                     brdrRadius: 40,
@@ -79,7 +80,7 @@ class _SoldHistoryState extends State<SoldProduct> {
                 CustomSvgIconButton(
                   bgColor: const Color(0xffFFFCF8),
                   onTap: () {
-
+                    controller.downloadList(isPdf: true, saleHistory: false, shouldPrint: true);
                   },
                   assetPath: AppAssets.printIcon,
                 )
@@ -101,7 +102,7 @@ class _SoldHistoryState extends State<SoldProduct> {
                   TotalStatusWidget(
                     flex: 4,
                     isLoading: controller.isSoldProductListLoading,
-                    title: 'Purchase Amount',
+                    title: 'Sold Amount',
                     value: Methods.getFormatedPrice(controller.soldTotalProductAmount),
                     asset: AppAssets.amount,
                   ),
@@ -114,8 +115,8 @@ class _SoldHistoryState extends State<SoldProduct> {
                 id: 'sold_product_list',
                 builder: (controller) {
                   if (controller.isSoldProductListLoading) {
-                    return const Center(
-                      child: CircularProgressIndicator(),
+                    return  Center(
+                      child: RandomLottieLoader.lottieLoader(),
                     );
                   }else if(controller.soldProductResponseModel == null){
                     return Center(
@@ -128,7 +129,7 @@ class _SoldHistoryState extends State<SoldProduct> {
                   }
                   return RefreshIndicator(
                     onRefresh: () async {
-                      controller.getSoldHistory();
+                      controller.getSoldProducts();
                     },
                     child: PagerListView<SoldProductModel>(
                       // scrollController: _scrollController,
