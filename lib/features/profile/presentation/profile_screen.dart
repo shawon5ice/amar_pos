@@ -1,24 +1,12 @@
-import 'package:amar_pos/core/widgets/reusable/filter_bottom_sheet/filter_controller.dart';
-import 'package:amar_pos/core/widgets/reusable/filter_bottom_sheet/product_brand_category_warranty_unit_response_model.dart';
-import 'package:amar_pos/core/widgets/reusable/filter_bottom_sheet/simple_filter_bottom_sheet_widget.dart';
-import 'package:amar_pos/features/inventory/presentation/products/product_controller.dart';
 import 'package:amar_pos/features/profile/presentation/profile_controller.dart';
 import 'package:amar_pos/features/profile/presentation/views/change_password.dart';
 import 'package:amar_pos/features/profile/presentation/views/profile_view.dart';
-import 'package:amar_pos/features/purchase/presentation/pages/purchase_history_screen.dart';
-import 'package:amar_pos/features/purchase/presentation/pages/purchase_products.dart';
-import 'package:amar_pos/features/purchase/presentation/pages/purchase_view.dart';
-import 'package:amar_pos/features/purchase/presentation/purchase_controller.dart';
-import 'package:amar_pos/features/purchase/presentation/widgets/purchase_filter_bottom_sheet.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import '../../../core/constants/app_assets.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/logger/logger.dart';
-import '../../../core/data/model/outlet_model.dart';
 import '../../../core/responsive/pixel_perfect.dart';
-import '../../../permission_manager.dart';
 import '../../drawer/drawer_menu_controller.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -37,47 +25,32 @@ class _ProfileScreenState extends State<ProfileScreen>
   @override
   void initState() {
     _tabController = TabController(length: 2, vsync: this);
+    _tabKeys = List.generate(2, (index) => GlobalKey());
+    _tabController.addListener((){
+      if(_tabController.indexIsChanging){
+        controller.changePasswordStep.value = ChangePasswordStep.sendOTP;
+        _clearTabState(_tabController.index);
+      }
+    });
     super.initState();
   }
 
 
   @override
   void dispose() {
+    _tabKeys.clear();
+    _tabController.dispose();
     Get.delete<ProfileController>();
     super.dispose();
   }
 
+  List<GlobalKey> _tabKeys = [];
 
-  // Future<bool> showDiscardDialog(BuildContext context) async {
-  //   bool value = false;
-  //   return await showDialog(
-  //     barrierDismissible: false,
-  //     context: context,
-  //     builder: (context) {
-  //       return AlertDialog(
-  //         title: Text("Warning"),
-  //         content: Text("Do you want to discard your current operation?"),
-  //         actions: [
-  //           TextButton(
-  //             onPressed: () {
-  //               value = false;
-  //               Navigator.of(context).pop(false);
-  //             }, // Return `false` for "No"
-  //             child: Text("No"),
-  //           ),
-  //           TextButton(
-  //             onPressed: () {
-  //               value = true;
-  //               controller.clearEditing();
-  //               Navigator.of(context).pop(true);
-  //             }, // Return `true` for "Yes"
-  //             child: Text("Yes"),
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   ) ?? value;
-  // }
+  void _clearTabState(int index) {
+    setState(() {
+      _tabKeys[index] = GlobalKey(); // Assign a new key to force rebuild
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -188,8 +161,12 @@ class _ProfileScreenState extends State<ProfileScreen>
                       physics: const NeverScrollableScrollPhysics(),
                       controller: _tabController,
                       children: [
-                        PersonalInfoView(),
-                        ChangePassword(),
+                        PersonalInfoView(
+                          key: _tabKeys[0],
+                        ),
+                        ChangePassword(
+                          key: _tabKeys[1],
+                        ),
                       ],
                     ),
                   )

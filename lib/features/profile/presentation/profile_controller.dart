@@ -4,7 +4,6 @@ import 'package:amar_pos/features/drawer/drawer_menu_controller.dart';
 import 'package:amar_pos/features/profile/data/models/profie_details_response_model.dart';
 import 'package:amar_pos/features/profile/data/profile_service.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/network/helpers/error_extractor.dart';
@@ -19,14 +18,17 @@ enum ChangePasswordStep {
   otpSent,
   otpSendingFailed,
   verifyingOtp,
-  otpVerifiedAndChangedPasswordSuccess,
+  changingPassword,
+  changingPasswordFailed,
+  passwordChanged,
+  otpVerified,
   otpVerifyingFailed,
 }
 
 
 class ProfileController extends GetxController {
   LoginData? loginData = LoginDataBoxManager().loginData;
-  final authStep = ChangePasswordStep.sendOTP.obs;
+  final changePasswordStep = ChangePasswordStep.sendOTP.obs;
   bool isProfileDetailsLoading = false;
   ProfileDetailsResponseModel? profileDetailsResponseModel;
 
@@ -174,7 +176,7 @@ class ProfileController extends GetxController {
   Future<bool> sendOTP(
       String oldPassword,
       String password,) async {
-    authStep.value = ChangePasswordStep.sendingOtp;
+    changePasswordStep.value = ChangePasswordStep.sendingOtp;
     Methods.showLoading();
     try {
       var response = await ProfileService.sendOTP(
@@ -186,15 +188,15 @@ class ProfileController extends GetxController {
 
       update(['register_screen']);
       if(response['success']){
-        authStep.value = ChangePasswordStep.otpSent;
+        changePasswordStep.value = ChangePasswordStep.otpSent;
         Methods.showSnackbar(msg: response['message'],isSuccess: true);
         return true;
       }else{
-        authStep.value = ChangePasswordStep.otpSendingFailed;
+        changePasswordStep.value = ChangePasswordStep.otpSendingFailed;
         Methods.showSnackbar(msg: response['message']);
       }
     } catch(e){
-      authStep.value = ChangePasswordStep.otpSendingFailed;
+      changePasswordStep.value = ChangePasswordStep.otpSendingFailed;
       Methods.showSnackbar(msg: AppStrings.kWentWrong);
     }finally {
       Methods.hideLoading();
@@ -203,12 +205,12 @@ class ProfileController extends GetxController {
     return false;
   }
 
-  Future verifyOTP(String otp,) async {
+  Future verifyOTP(String otp,String oldPassword, String newPassword) async {
     if(otp.isEmpty && otp.length != 6){
       Methods.showSnackbar(msg: "Please enter valid OTP");
       return;
     }
-    authStep.value = ChangePasswordStep.verifyingOtp;
+    changePasswordStep.value = ChangePasswordStep.verifyingOtp;
     Methods.showLoading();
     try {
       var response = await ProfileService.verifyOTP(
@@ -219,14 +221,44 @@ class ProfileController extends GetxController {
 
       update(['register_screen']);
       if(response['success']){
-        authStep.value = ChangePasswordStep.otpVerifiedAndChangedPasswordSuccess;
+        changePasswordStep.value = ChangePasswordStep.otpVerified;
         Methods.showSnackbar(msg: response['message'],isSuccess: true);
+        changePassword(oldPassword, newPassword);
       }else{
-        authStep.value = ChangePasswordStep.otpVerifyingFailed;
+        changePasswordStep.value = ChangePasswordStep.otpVerifyingFailed;
         Methods.showSnackbar(msg: response['message']);
       }
     } catch(e){
-      authStep.value = ChangePasswordStep.otpVerifyingFailed;
+      changePasswordStep.value = ChangePasswordStep.otpVerifyingFailed;
+      Methods.showSnackbar(msg: AppStrings.kWentWrong);
+    }finally {
+      Methods.hideLoading();
+      update(['register_screen']);
+    }
+  }
+
+  Future changePassword(String oldPassword,String newPassword) async {
+
+    changePasswordStep.value = ChangePasswordStep.changingPassword;
+    Methods.showLoading();
+    try {
+      var response = await ProfileService.changePassword(
+        usrToken: loginData!.token,
+        newPassword: newPassword,
+        oldPassword: oldPassword,
+      );
+
+      update(['register_screen']);
+      if(response['success']){
+        changePasswordStep.value = ChangePasswordStep.passwordChanged;
+
+        Methods.showSnackbar(msg: response['message'],isSuccess: true);
+      }else{
+        changePasswordStep.value = ChangePasswordStep.otpVerifyingFailed;
+        Methods.showSnackbar(msg: response['message']);
+      }
+    } catch(e){
+      changePasswordStep.value = ChangePasswordStep.otpVerifyingFailed;
       Methods.showSnackbar(msg: AppStrings.kWentWrong);
     }finally {
       Methods.hideLoading();

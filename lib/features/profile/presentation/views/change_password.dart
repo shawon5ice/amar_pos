@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/core/widgets/custom_btn.dart';
-import 'package:amar_pos/core/widgets/custom_button.dart';
 import 'package:amar_pos/core/widgets/field_title.dart';
 import 'package:amar_pos/features/profile/presentation/profile_controller.dart';
 import 'package:flutter/material.dart';
@@ -74,262 +73,253 @@ class _ChangePasswordState extends State<ChangePassword> {
       }
     });
   }
+
+  @override
+  void dispose() {
+    newPasswordController.clear();
+    oldPasswordController.clear();
+    cNewPasswordController.clear();
+    super.dispose();
+  }
   
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
-        child: Container(
-          padding: EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.all(Radius.circular(5))
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              RichFieldTitle(text: "Old Password"),
-              addH(4),
-              CustomGlassMorfTextField(
-                textCon: oldPasswordController,
-                hintText: 'Enter current password',
-                isPassField: true,
-                txtSize: 14,
-                validator: (value) {
-                  if ((value == null || value.isEmpty) &&
-                      oldPasswordController.text.isNotEmpty) {
-                    return '⚠️ Please insert your current password';
-                  }
-                  return null;
-                },
-              ),
-              addH(12),
-              RichFieldTitle(text: "New Password"),
-              addH(4),
-              CustomGlassMorfTextField(
-                textCon: newPasswordController,
-                hintText: 'Enter new password',
-                isPassField: true,
-                txtSize: 14,
-                validator: (value) {
-                  if ((value == null || value.isEmpty) &&
-                      newPasswordController.text.isNotEmpty) {
-                    return '⚠️ Please insert your new password';
-                  }
-                  return null;
-                },
-              ),
-              addH(12),
-              RichFieldTitle(text: "Re-ype New Password"),
-              addH(4),
-              CustomGlassMorfTextField(
-                textCon: cNewPasswordController,
-                hintText: 'Enter new password',
-                isPassField: true,
-                txtSize: 14,
-                validator: (value) {
-                  if ((value == null || value.isEmpty) &&
-                      cNewPasswordController.text.isNotEmpty) {
-                    return '⚠️ Please insert your new password';
-                  }
-                  return null;
-                },
-              ),
-              addH(24),
-              Obx(() {
-                if (controller.authStep.value ==
-                    ChangePasswordStep.otpSent ||
-                    controller.authStep.value ==
-                        ChangePasswordStep.verifyingOtp ||
-                    controller.authStep.value ==
-                        ChangePasswordStep.otpVerifyingFailed) {
-                  return Column(
-                    children: [
-                      addH(12),
-                      Pinput(
-                        length: 6,
-                        // onSubmit: (String pin) => _showSnackBar(pin, context),
-                        focusNode: pinPutFocusNode,
-                        controller: pinPutController,
-                        // submittedFieldDecoration:
-                        //     _pinPutDecoration.copyWith(
-                        //   borderRadius: BorderRadius.circular(20.0),
-                        // ),
-                        // selectedFieldDecoration: _pinPutDecoration,
-                        // followingFieldDecoration:
-                        //     _pinPutDecoration.copyWith(
-                        //   borderRadius: BorderRadius.circular(5.0),
-                        //   border: Border.all(
-                        //     color:
-                        //         Colors.deepPurpleAccent.withOpacity(.5),
-                        //   ),
-                        // ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(
-                            right: 15, top: 8),
-                        child: Row(
-                          mainAxisAlignment:
-                          MainAxisAlignment.end,
-                          children: [
-                            _time == 0
-                                ? TextButton(
-                              onPressed: () async {
-                                pinPutController
-                                    .clear();
-                                bool sent =
-                                await controller
-                                    .sendOTP(
-                                  oldPasswordController.text,
-                                  newPasswordController.text
-                                );
-                                if (sent) {
-                                  startTimer();
-                                }
-                                // Re-send Button Function
-                                controller.update([
-                                  'register_screen'
-                                ]);
-                              },
-                              style: ButtonStyle(
-                                elevation:
-                                MaterialStateProperty
-                                    .all(0),
-                                backgroundColor:
-                                MaterialStateProperty
-                                    .all(
-                                  AppColors.primary,
-                                ),
-                              ),
-                              child: const Text(
-                                "Re-send",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                ),
-                              ),
-                            )
-                                : RichText(
-                              text: TextSpan(
-                                text: 'Re-send in ',
-                                style: TextStyle(
-                                  color: Colors.red,
-                                  fontFamily: 'Poppins',
-                                  fontSize: 12,
-                                ),
-                                children: [
-                                  TextSpan(
-                                    text: '00:$_time',
-                                    style: TextStyle(
-                                      color: Colors.red,
-                                      fontFamily:
-                                      'Poppins',
-                                      fontWeight:
-                                      FontWeight
-                                          .bold,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text: ' sec',
-                                    style: TextStyle(
-                                      color: Colors.red,
-                                      fontFamily:
-                                      'Poppins',
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ],
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            addH(20),
+            const RichFieldTitle(text: "Old Password"),
+            addH(4),
+            CustomGlassMorfTextField(
+
+              textCon: oldPasswordController,
+              hintText: 'Enter current password',
+              isPassField: true,
+              txtSize: 14,
+              validator: (value) {
+                if ((value == null || value.isEmpty) &&
+                    oldPasswordController.text.isNotEmpty) {
+                  return '⚠️ Please insert your current password';
+                }
+                return null;
+              },
+            ),
+            addH(12),
+            const RichFieldTitle(text: "New Password"),
+            addH(4),
+            CustomGlassMorfTextField(
+              textCon: newPasswordController,
+              hintText: 'Enter new password',
+              isPassField: true,
+              txtSize: 14,
+              validator: (value) {
+                if ((value == null || value.isEmpty) &&
+                    newPasswordController.text.isNotEmpty) {
+                  return '⚠️ Please insert your new password';
+                }
+                return null;
+              },
+            ),
+            addH(12),
+            const RichFieldTitle(text: "Re-ype New Password"),
+            addH(4),
+            CustomGlassMorfTextField(
+              textCon: cNewPasswordController,
+              hintText: 'Enter new password',
+              isPassField: true,
+              txtSize: 14,
+              validator: (value) {
+                if ((value == null || value.isEmpty) &&
+                    cNewPasswordController.text.isNotEmpty) {
+                  return '⚠️ Please insert your new password';
+                }
+                return null;
+              },
+            ),
+            addH(24),
+            Obx(() {
+              if (controller.changePasswordStep.value ==
+                  ChangePasswordStep.otpSent ||
+                  controller.changePasswordStep.value ==
+                      ChangePasswordStep.verifyingOtp ||
+                  controller.changePasswordStep.value ==
+                      ChangePasswordStep.otpVerifyingFailed) {
+                return Column(
+                  children: [
+                    addH(12),
+                    Pinput(
+                      length: 6,
+                      focusNode: pinPutFocusNode,
+                      controller: pinPutController,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          right: 15, top: 8),
+                      child: Row(
+                        mainAxisAlignment:
+                        MainAxisAlignment.end,
+                        children: [
+                          _time == 0
+                              ? TextButton(
+                            onPressed: () async {
+                              pinPutController
+                                  .clear();
+                              bool sent =
+                              await controller
+                                  .sendOTP(
+                                oldPasswordController.text,
+                                newPasswordController.text
+                              );
+                              if (sent) {
+                                startTimer();
+                              }
+                              // Re-send Button Function
+                              controller.update([
+                                'register_screen'
+                              ]);
+                            },
+                            style: ButtonStyle(
+                              elevation:
+                              WidgetStateProperty
+                                  .all(0),
+                              backgroundColor:
+                              WidgetStateProperty
+                                  .all(
+                                AppColors.accent,
                               ),
                             ),
-                          ],
-                        ),
+                            child: const Text(
+                              "Re-send",
+                              style: TextStyle(
+                                color: Colors.white,
+                              ),
+                            ),
+                          )
+                              : RichText(
+                            text: TextSpan(
+                              text: 'Re-send in ',
+                              style: const TextStyle(
+                                color: Colors.red,
+                                fontFamily: 'Poppins',
+                                fontSize: 12,
+                              ),
+                              children: [
+                                TextSpan(
+                                  text: '00:$_time',
+                                  style: const TextStyle(
+                                    color: Colors.red,
+                                    fontFamily:
+                                    'Poppins',
+                                    fontWeight:
+                                    FontWeight
+                                        .bold,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                const TextSpan(
+                                  text: ' sec',
+                                  style: TextStyle(
+                                    color: Colors.red,
+                                    fontFamily:
+                                    'Poppins',
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  );
-                } else {
-                  return SizedBox.shrink();
-                }
-              }),
-              addH(24),
-              Obx(() {
-                final step = controller.authStep.value;
-                // final formValid = formKey.currentState?.validate() ?? false;
+                    ),
+                  ],
+                );
+              } else {
+                return const SizedBox.shrink();
+              }
+            }),
+            addH(12),
+            Obx(() {
+              final step = controller.changePasswordStep.value;
+              // final formValid = formKey.currentState?.validate() ?? false;
 
-                if (step == ChangePasswordStep.sendingOtp ||
-                    step == ChangePasswordStep.verifyingOtp) {
-                  return CustomBtn(
-                    btnColor: Colors.grey,
-                    onPressedFn: () {},
-                    btnTxt: 'Processing...',
-                    txtSize: 18,
-                  );
-                }
-
-                if (step == ChangePasswordStep.otpSent) {
-                  return CustomBtn(
-                    btnColor: AppColors.primary,
-                    onPressedFn: () => controller
-                        .verifyOTP(pinPutController.text,),
-                    btnTxt: 'Verify OTP',
-                    txtSize: 18,
-                  );
-                }
-
-                if (step == ChangePasswordStep.otpVerifiedAndChangedPasswordSuccess) {
-                  // Future.delayed(Duration(seconds: 1), () {
-                  //   Get.offAllNamed(LoginScreen.routeName);
-                  // });
-                  return CustomBtn(
-                    btnTxt: "Password Changed Success!",
-                    btnColor: Colors.blue,
-                    onPressedFn: () {},
-                  );
-                }
-
-                if (step == ChangePasswordStep.otpSendingFailed ||
-                    step == ChangePasswordStep.otpVerifyingFailed) {
-                  return CustomBtn(
-                    btnTxt: "Try Again",
-                    btnColor: AppColors.error,
-                    onPressedFn: () async {
-                      if (step == ChangePasswordStep.otpSendingFailed) {
-                        bool sent =
-                        await controller.sendOTP(
-                          oldPasswordController.text,
-                          newPasswordController.text,
-                        );
-                        if (sent) {
-                          startTimer();
-                        }
-                      } else if (step ==
-                          ChangePasswordStep.otpVerifyingFailed) {
-                        controller
-                            .verifyOTP(pinPutController.text,);
-                      }
-                    },
-                  );
-                }
-
+              if (
+              step == ChangePasswordStep.sendingOtp ||
+              step == ChangePasswordStep.changingPassword ||
+                  step == ChangePasswordStep.verifyingOtp) {
                 return CustomBtn(
-                  btnTxt: "Get OTP",
-                  btnColor: AppColors.accent,
+                  btnColor: Colors.grey,
+                  onPressedFn: () {},
+                  btnTxt: 'Processing...',
+                  txtSize: 18,
+                );
+              }
+
+              if (step == ChangePasswordStep.otpSent) {
+                return CustomBtn(
+                  btnColor: AppColors.primary,
+                  onPressedFn: () => controller
+                      .verifyOTP(pinPutController.text,oldPasswordController.text, newPasswordController.text),
+                  btnTxt: 'Verify OTP & Change Password',
+                  txtSize: 18,
+                );
+              }
+
+              if (step == ChangePasswordStep.passwordChanged) {
+                // Future.delayed(Duration(seconds: 1), () {
+                //   Get.offAllNamed(LoginScreen.routeName);
+                // });
+                return CustomBtn(
+                  btnTxt: "Password Changed Successfully",
+                  btnColor: AppColors.primary.withOpacity(.3),
+                  onPressedFn: () {},
+                );
+              }
+
+              if (step == ChangePasswordStep.otpSendingFailed ||
+                  step == ChangePasswordStep.otpVerifyingFailed) {
+                return CustomBtn(
+                  btnTxt: "Try Again",
+                  btnColor: AppColors.error,
                   onPressedFn: () async {
-                    bool check = await validate();
-                    if (check) {
-                      bool sent = await controller.sendOTP(
+                    if (step == ChangePasswordStep.otpSendingFailed) {
+                      bool sent =
+                      await controller.sendOTP(
                         oldPasswordController.text,
-                        newPasswordController.text
+                        newPasswordController.text,
                       );
                       if (sent) {
                         startTimer();
                       }
+                    } else if (step == ChangePasswordStep.otpVerifyingFailed) {
+                      controller.verifyOTP(pinPutController.text,oldPasswordController.text, newPasswordController.text);
+                    }else if(step == ChangePasswordStep.changingPasswordFailed){
+                      controller.changePassword(oldPasswordController.text, newPasswordController.text);
                     }
                   },
                 );
-              })
-            ],
-          ),
+              }
+
+              return CustomBtn(
+                btnTxt: "Get OTP",
+                btnColor: AppColors.accent,
+                onPressedFn: () async {
+                  bool check = await validate();
+                  if (check) {
+                    bool sent = await controller.sendOTP(
+                      oldPasswordController.text,
+                      newPasswordController.text
+                    );
+                    if (sent) {
+                      startTimer();
+                    }
+                  }
+                },
+              );
+            })
+          ],
         ),
       ),
     );

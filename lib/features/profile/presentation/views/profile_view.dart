@@ -128,6 +128,7 @@ class _PersonalInfoViewState extends State<PersonalInfoView> {
                                     .profileDetailsResponseModel!.data.photo!,
                                 height: 200,
                                 width: 200,
+                                fit: BoxFit.cover,
                               );
                             }
                           },

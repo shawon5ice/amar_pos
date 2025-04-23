@@ -5,6 +5,7 @@ import '../../../../core/network/base_client.dart';
 import '../../../../core/network/download/file_downloader.dart';
 import '../../../../core/network/network_strings.dart';
 import 'package:dio/dio.dart' as dio;
+
 class ProfileService {
   static Future<dynamic> getProfileDetails({
     required String usrToken,
@@ -20,12 +21,8 @@ class ProfileService {
     required String usrToken,
     required dio.FormData formData,
   }) async {
-
     var response = await BaseClient.postData(
-      token: usrToken,
-      api: 'business_user/update-profile',
-      body: formData
-    );
+        token: usrToken, api: 'business_user/update-profile', body: formData);
     return response;
   }
 
@@ -33,12 +30,10 @@ class ProfileService {
     required String usrToken,
     required dio.FormData formData,
   }) async {
-
     var response = await BaseClient.postData(
-      token: usrToken,
-      api: 'business_user/update-profile-photo',
-      body: formData
-    );
+        token: usrToken,
+        api: 'business_user/update-profile-photo',
+        body: formData);
     return response;
   }
 
@@ -48,11 +43,17 @@ class ProfileService {
     required String oldPassword,
     required String newPassword,
   }) async {
-    await Future.delayed(Duration(seconds: 2),);
     var response = await BaseClient.postData(
       fullUrlGiven: true,
-      api: '${NetWorkStrings.baseUrl}/business_user/send-otp-for-change-password/',
-      body: {"phone": phoneNumber, "old_password": oldPassword, "password": newPassword, "password_confirmation": newPassword},
+      token: usrToken,
+      api:
+          '${NetWorkStrings.baseUrl}/business_user/send-otp-for-change-password',
+      body: {
+        "phone": phoneNumber,
+        "old_password": oldPassword,
+        "password": newPassword,
+        "password_confirmation": newPassword
+      },
     );
     return response;
   }
@@ -62,13 +63,32 @@ class ProfileService {
     required String usrToken,
     required String otp,
   }) async {
-    await Future.delayed(Duration(seconds: 2),);
     var response = await BaseClient.postData(
       fullUrlGiven: true,
       token: usrToken,
       api: '${NetWorkStrings.baseUrl}/verify-otp',
-      body: {"medium": phoneNumber, "check_place": 1,'otp':otp},
+      body: {"medium": phoneNumber, "check_place": 2, 'otp': otp},
     );
     return response;
   }
+
+  static Future<dynamic> changePassword({
+    required String usrToken,
+    required String oldPassword,
+    required String newPassword,
+  }) async {
+    var response = await BaseClient.postData(
+      fullUrlGiven: true,
+      token: usrToken,
+      api:
+      '${NetWorkStrings.baseUrl}/business_user/change-password',
+      body: {
+        "old_password": oldPassword,
+        "password": newPassword,
+        "password_confirmation": newPassword
+      },
+    );
+    return response;
+  }
+
 }

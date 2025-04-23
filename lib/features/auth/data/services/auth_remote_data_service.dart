@@ -25,12 +25,13 @@ class AuthRemoteDataService {
   //Reset password
   static Future<dynamic> sendOTP({
     required String phoneNumber,
+    int? checkPlace
   }) async {
-    await Future.delayed(Duration(seconds: 2),);
+    logger.i(checkPlace);
     var response = await BaseClient.postData(
       fullUrlGiven: true,
       api: '${NetWorkStrings.baseUrl}/send-otp-phone',
-      body: {"phone": phoneNumber, "check_place": 1},
+      body: {"phone": phoneNumber, "check_place": checkPlace ?? 1},
     );
     return response;
   }
@@ -38,23 +39,31 @@ class AuthRemoteDataService {
   static Future<dynamic> verifyOTP({
     required String phoneNumber,
     required String otp,
+    int? checkPlace
   }) async {
-    await Future.delayed(Duration(seconds: 2),);
     var response = await BaseClient.postData(
       fullUrlGiven: true,
       api: '${NetWorkStrings.baseUrl}/verify-otp',
-      body: {"medium": phoneNumber, "check_place": 1,'otp':otp},
+      body: {"medium": phoneNumber, "check_place": checkPlace ?? 1,'otp':otp},
     );
     return response;
   }
 
   static Future<dynamic> signUp(var formData) async {
-    await Future.delayed(Duration(seconds: 2),);
-
     var response = await BaseClient.postData(
       fullUrlGiven: true,
       shouldExtractErros : true,
       api: '${NetWorkStrings.baseUrl}/business/signup',
+      body: formData,
+    );
+    return response;
+  }
+
+  static Future<dynamic> changePassword(var formData) async {
+    var response = await BaseClient.postData(
+      fullUrlGiven: true,
+      shouldExtractErros : true,
+      api: '${NetWorkStrings.baseUrl}/business/reset-password',
       body: formData,
     );
     return response;

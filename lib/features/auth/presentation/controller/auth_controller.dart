@@ -30,10 +30,24 @@ enum AuthStep {
   signingUpFailed,
 }
 
+enum ForgotPasswordStep {
+  enterPhone,
+  sendingOtp,
+  otpSent,
+  otpSendingFailed,
+  verifyingOtp,
+  otpVerified,
+  otpVerifyingFailed,
+  forgettingPassword,
+  forgetPasswordFailed,
+  forgetPasswordSuccess,
+}
+
 class AuthController extends GetxController{
   RxBool isLoggedIn = false.obs;
   RxBool loading = false.obs;
   final authStep = AuthStep.enterPhone.obs;
+  final forgotPasswordStep = ForgotPasswordStep.enterPhone.obs;
   network.SignInResponse? signInResponse;
   // UserInfo? userInfo;
   RxString message = ''.obs;
@@ -42,6 +56,7 @@ class AuthController extends GetxController{
   bool rememberMeFlag  = false;
 
   bool showSignUpView = false;
+  bool showChangePasswordInputFields = false;
   late final TextEditingController emailController;
   late final TextEditingController passwordController;
   late final TextEditingController phoneCon;
@@ -195,61 +210,90 @@ class AuthController extends GetxController{
   }
 
   //Send OTP
-  Future<bool> sendOTP(String phone) async {
-    authStep.value = AuthStep.sendingOtp;
+  Future<bool> sendOTP(String phone, {int? checkPlace, bool? isForgotPassword}) async {
+    if(isForgotPassword != null){
+      forgotPasswordStep.value = ForgotPasswordStep.sendingOtp;
+    }else{
+      authStep.value = AuthStep.sendingOtp;
+    }
     Methods.showLoading();
     try {
       var response = await AuthRemoteDataService.sendOTP(
         phoneNumber: phone,
+        checkPlace: checkPlace,
       );
 
-      update(['register_screen']);
+      update(['register_screen','forgot_password']);
       if(response['success']){
-        authStep.value = AuthStep.otpSent;
+        if(isForgotPassword != null){
+          forgotPasswordStep.value = ForgotPasswordStep.otpSent;
+        }else{
+          authStep.value = AuthStep.otpSent;
+        }
         Methods.showSnackbar(msg: response['message'],isSuccess: true);
         return true;
       }else{
-        authStep.value = AuthStep.otpSendingFailed;
         Methods.showSnackbar(msg: response['message']);
+        throw(Exception());
       }
     } catch(e){
-      authStep.value = AuthStep.otpSendingFailed;
+      if(isForgotPassword != null){
+        forgotPasswordStep.value = ForgotPasswordStep.otpSendingFailed;
+      }else{
+        authStep.value = AuthStep.otpSendingFailed;
+      }
       Methods.showSnackbar(msg: AppStrings.kWentWrong);
     }finally {
       Methods.hideLoading();
-      update(['register_screen']);
+      update(['register_screen','forgot_password']);
     }
     return false;
   }
 
-  Future verifyOTP(String otp, String phone) async {
+  Future verifyOTP(String otp, String phone,{int? checkPlace,bool? isForgotPassword}) async {
     if(otp.isEmpty && otp.length != 6){
       Methods.showSnackbar(msg: "Please enter valid OTP");
       return;
     }
-    authStep.value = AuthStep.verifyingOtp;
+
+    if(isForgotPassword != null){
+      forgotPasswordStep.value = ForgotPasswordStep.verifyingOtp;
+    }else{
+      authStep.value = AuthStep.verifyingOtp;
+    }
     Methods.showLoading();
     try {
       var response = await AuthRemoteDataService.verifyOTP(
         phoneNumber: phone,
         otp: otp,
+        checkPlace: checkPlace
       );
 
-      update(['register_screen']);
+      update(['register_screen','forgot_password']);
       if(response['success']){
-        authStep.value = AuthStep.otpVerified;
-        showSignUpView = true;
+        if(isForgotPassword != null){
+          forgotPasswordStep.value = ForgotPasswordStep.otpVerified;
+          showChangePasswordInputFields = true;
+        }else{
+          authStep.value = AuthStep.otpVerified;
+          showSignUpView = true;
+        }
         Methods.showSnackbar(msg: response['message'],isSuccess: true);
       }else{
-        authStep.value = AuthStep.otpVerifyingFailed;
         Methods.showSnackbar(msg: response['message']);
+        throw(Exception());
       }
     } catch(e){
-      authStep.value = AuthStep.otpVerifyingFailed;
+      if(isForgotPassword != null){
+        forgotPasswordStep.value = ForgotPasswordStep.otpVerifyingFailed;
+      }else{
+        authStep.value = AuthStep.otpVerifyingFailed;
+      }
+
       Methods.showSnackbar(msg: AppStrings.kWentWrong);
     }finally {
       Methods.hideLoading();
-      update(['register_screen']);
+      update(['register_screen','forgot_password']);
     }
   }
 
@@ -383,5 +427,41 @@ class AuthController extends GetxController{
     );
   }
 
+
+  Future changePassword(var formData) async {
+    forgotPasswordStep.value = ForgotPasswordStep.forgettingPassword;
+    // Methods.showLoading();
+    try {
+      var response = await AuthRemoteDataService.changePassword(
+          formData
+      );
+
+      update(['forgot_password']);
+      if(response['success']){
+        forgotPasswordStep.value = ForgotPasswordStep.forgetPasswordSuccess;
+        Methods.showSnackbar(msg: response['message'],isSuccess: true);
+      }else{
+        forgotPasswordStep.value = ForgotPasswordStep.forgetPasswordFailed;
+        if(response['errors'] is Map<String, dynamic>){
+          List<String> errors = ErrorExtractor.extractErrorMessages(response);
+          logger.i(errors);
+          String message = "";
+          for (int i = 0; i<errors.length; i++) {
+            message += "${i+1}. ${errors[i]} ${i<errors.length?"\n":''}";
+          }
+          Methods.showSnackbar(msg: message);
+        }else{
+          Methods.showSnackbar(msg: response['message']);
+        }
+
+      }
+    } catch(e){
+      forgotPasswordStep.value = ForgotPasswordStep.forgetPasswordFailed;
+      Methods.showSnackbar(msg: AppStrings.kWentWrong);
+    }finally {
+      // Methods.hideLoading();
+      update(['forgot_password']);
+    }
+  }
 }
 

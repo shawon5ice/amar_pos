@@ -9,7 +9,6 @@ import 'package:pinput/pinput.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/responsive/pixel_perfect.dart';
 import '../../../../core/widgets/custom_btn.dart';
-import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/custom_glass_morf_field.dart';
 import '../../../../core/widgets/dotted_border_painter.dart';
 import '../../../../core/widgets/methods/helper_methods.dart';
@@ -79,8 +78,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
   @override
   void initState() {
-    controller.showSignUpView = true;
-    controller.authStep.value  = AuthStep.otpVerified;
     emailController = TextEditingController();
     passwordController = TextEditingController();
     confirmPassword = TextEditingController();
@@ -91,7 +88,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     ownerName = TextEditingController();
     addressField = TextEditingController();
 
-    phoneCon.text = '01878907235';
     emailFocus = FocusNode();
     passwordFocus = FocusNode();
     phoneFocus = FocusNode();
