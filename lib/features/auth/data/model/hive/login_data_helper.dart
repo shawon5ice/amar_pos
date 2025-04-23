@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:hive/hive.dart';
+import 'package:hive_flutter/adapters.dart';
 
 import 'login_data.dart';
 
@@ -9,6 +11,9 @@ class LoginDataBoxManager {
   factory LoginDataBoxManager() {
     return _instance;
   }
+
+  ValueListenable<Box> get listenable => _box.listenable();
+
 
   LoginDataBoxManager._internal();
 

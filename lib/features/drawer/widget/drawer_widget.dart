@@ -13,7 +13,9 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../auth/data/model/hive/login_data.dart';
 import '../model/drawer_item.dart';
 import '../model/drawer_items.dart';
 
@@ -95,41 +97,53 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                       onParentTap(DrawerItems.profile);
                       // Get.to(()=> ProfileScreen());
                     },
-                    child: Container(
-                      padding: EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(8)),
-                        color: selectedParentItem == DrawerItems.profile ? AppColors.lightGreen.withOpacity(.3) : null
-                      ),
-                      child: Row(
-                        children: [
-                          (controller.loginData?.photo != null && controller.loginData!.photo!.contains('http')) ?ClipOval(child: Image.network(controller.loginData!.photo!, fit: BoxFit.cover,width: 50,height: 50,)): const Icon(Icons.broken_image),
-                          const SizedBox(
-                            width: 12,
+                    child: GetBuilder<DrawerMenuController>(
+                      id: 'profile_picture',
+                      builder: (controller) {
+                        return Container(
+                          padding: EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(8)),
+                            color: selectedParentItem == DrawerItems.profile ? AppColors.lightGreen.withOpacity(.3) : null
                           ),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  controller.loginData?.name ?? '--',
-                                  style: context.textTheme.titleSmall?.copyWith(
-                                      color: Colors.white, fontWeight: FontWeight.bold),
-                                  maxLines: 1,
-                                ),
-                                Text(
-                                  controller.loginData?.email ?? "--",
-                                  style: context.textTheme.bodyLarge?.copyWith(
-                                      color: AppColors.accent,
-                                      fontWeight: FontWeight.normal),
-                                  maxLines: 1,
-                                )
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
+                          child: ValueListenableBuilder<Box>(
+                            valueListenable: controller.manager.listenable,
+                            builder: (context, box, _) {
+                              final loginData = box.get(LoginDataBoxManager.logInBoxName) as LoginData?;
+                              return Row(
+                                children: [
+                                  (loginData?.photo != null && loginData!.photo!.contains('http')) ?ClipOval(child: Image.network(loginData!.photo!, fit: BoxFit.cover,width: 50,height: 50,)): const Icon(Icons.broken_image),
+                                  const SizedBox(
+                                    width: 12,
+                                  ),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          loginData?.name ?? '--',
+                                          style: context.textTheme.titleSmall?.copyWith(
+                                              color: Colors.white, fontWeight: FontWeight.bold),
+                                          maxLines: 1,
+                                        ),
+                                        Text(
+                                          loginData?.email ?? "--",
+                                          style: context.textTheme.bodyLarge?.copyWith(
+                                              color: AppColors.accent,
+                                              fontWeight: FontWeight.normal),
+                                          maxLines: 1,
+                                        )
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              );
+                            },
+                          ),
+
+                        );
+                      }
                     ),
                   ),
                   const SizedBox(

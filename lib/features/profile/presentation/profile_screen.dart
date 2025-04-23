@@ -3,6 +3,7 @@ import 'package:amar_pos/core/widgets/reusable/filter_bottom_sheet/product_brand
 import 'package:amar_pos/core/widgets/reusable/filter_bottom_sheet/simple_filter_bottom_sheet_widget.dart';
 import 'package:amar_pos/features/inventory/presentation/products/product_controller.dart';
 import 'package:amar_pos/features/profile/presentation/profile_controller.dart';
+import 'package:amar_pos/features/profile/presentation/views/change_password.dart';
 import 'package:amar_pos/features/profile/presentation/views/profile_view.dart';
 import 'package:amar_pos/features/purchase/presentation/pages/purchase_history_screen.dart';
 import 'package:amar_pos/features/purchase/presentation/pages/purchase_products.dart';
@@ -188,7 +189,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                       controller: _tabController,
                       children: [
                         PersonalInfoView(),
-                        Placeholder(),
+                        ChangePassword(),
                       ],
                     ),
                   )

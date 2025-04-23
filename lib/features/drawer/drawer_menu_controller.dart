@@ -30,6 +30,7 @@ class DrawerMenuController extends GetxController {
   RxBool isDrawerOpened = false.obs;
   RxString currentScreen = HomeScreen.routeName.obs;
   bool isDragging = false;
+  final LoginDataBoxManager manager = LoginDataBoxManager();
 
   Rx<MenuSelection?> selectedMenuItem = Rx<MenuSelection?>(null);
 
