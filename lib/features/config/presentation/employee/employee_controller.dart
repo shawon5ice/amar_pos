@@ -110,7 +110,7 @@ class EmployeeController extends GetxController {
       var response = await EmployeeService.getPermissions(usrToken: LoginDataBoxManager().loginData!.token);
 
       if (response != null) {
-        permissionApiResponse = PermissionApiResponse.fromJson(response,params: 'data');
+        permissionApiResponse = PermissionApiResponse.fromJson(response);
         logger.e(permissionStatus['Warranty']);
       }
     }catch(e){

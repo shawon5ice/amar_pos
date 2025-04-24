@@ -7,10 +7,20 @@ part of 'permissions.dart';
 // **************************************************************************
 
 PermissionApiResponse _$PermissionApiResponseFromJson(
-        Map<String, dynamic> json,{String? params}) =>
+        Map<String, dynamic> json) =>
     PermissionApiResponse(
       success: json['success'] as bool,
-      data: (json[params?? 'groupedData'] as Map<String, dynamic>).map(
+      data: (json['data'] as Map<String, dynamic>).map(
+        (k, e) => MapEntry(k, Map<String, String>.from(e as Map)),
+      ),
+    );
+
+
+PermissionApiResponse _$PermissionApiResponseFromJsonForGroupData(
+        Map<String, dynamic> json,) =>
+    PermissionApiResponse(
+      success: json['success'] as bool,
+      data: (json['groupedData'] as Map<String, dynamic>).map(
         (k, e) => MapEntry(k, Map<String, String>.from(e as Map)),
       ),
     );

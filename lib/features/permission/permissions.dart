@@ -13,8 +13,11 @@ class PermissionApiResponse {
     required this.data,
   });
 
-  factory PermissionApiResponse.fromJson(Map<String, dynamic> json,{String? params}) =>
-      _$PermissionApiResponseFromJson(json,params: params);
+  factory PermissionApiResponse.fromJson(Map<String, dynamic> json) =>
+      _$PermissionApiResponseFromJson(json,);
+
+  factory PermissionApiResponse.fromJsonForGroupData(Map<String, dynamic> json) =>
+      _$PermissionApiResponseFromJsonForGroupData(json,);
 
   Map<String, dynamic> toJson() => _$PermissionApiResponseToJson(this);
 }

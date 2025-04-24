@@ -1,3 +1,4 @@
+import 'package:amar_pos/features/home/data/models/dashboard_response_model.dart';
 import 'package:amar_pos/features/home/presentation/home_screen_service.dart';
 import 'package:amar_pos/features/permission/permissions.dart';
 import 'package:amar_pos/permission_manager.dart';
@@ -25,8 +26,9 @@ class HomeScreenController extends GetxController{
     update(['permissions_loading']);
     try{
       var response = await HomeScreenService.getPermissions(usrToken: LoginDataBoxManager().loginData!.token);
+      logger.i(response);
       if (response != null) {
-        permissionApiResponse = PermissionApiResponse.fromJson(response);
+        permissionApiResponse = PermissionApiResponse.fromJsonForGroupData(response);
         logger.d(permissionApiResponse?.success);
         await PermissionManager.loadPermissions();
         await drawerMenuController.loadModules();
@@ -36,6 +38,33 @@ class HomeScreenController extends GetxController{
     }finally{
       permissionLoading = false.obs;
       EasyLoading.dismiss();
+    }
+
+  }
+
+  @override
+  void onInit() {
+    // getDashboardData();
+    super.onInit();
+  }
+
+  bool dashboardDataLoading = false;
+  DashboardResponseModel? dashboardResponseModel;
+
+  Future<void> getDashboardData() async {
+    dashboardDataLoading = true;
+    update(['dashboard_data']);
+    try{
+      var response = await HomeScreenService.getDashboardData(usrToken: LoginDataBoxManager().loginData!.token);
+      if (response != null) {
+        dashboardResponseModel = DashboardResponseModel.fromJson(response);
+        logger.d(dashboardResponseModel);
+      }
+    }catch(e){
+      logger.e(e);
+    }finally{
+      dashboardDataLoading = false;
+      update(['dashboard_data']);
     }
 
   }

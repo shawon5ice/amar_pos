@@ -1,6 +1,7 @@
 import 'package:amar_pos/core/constants/app_colors.dart';
 import 'package:amar_pos/features/drawer/drawer_menu_controller.dart';
 import 'package:amar_pos/features/home/presentation/home_screen_controller.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -60,9 +61,21 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           }, icon: Get.isDarkMode? Icon(Icons.sunny): Icon(Icons.nightlight))
         ],
       ),
-      body: const Column(
+      body: Column(
         children: [
-
+          GetBuilder<HomeScreenController>(
+              id: 'dashboard_data',
+              builder: (controller){
+            if(controller.dashboardDataLoading){
+              return const Center(
+                child: CupertinoActivityIndicator(),
+              );
+            }else if(controller.dashboardResponseModel == null){
+              return Text("No data found");
+            }else{
+              return Text("GOT DATA");
+            }
+          })
         ],
       ),
     );

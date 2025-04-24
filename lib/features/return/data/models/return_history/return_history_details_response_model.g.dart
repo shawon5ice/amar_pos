@@ -31,8 +31,9 @@ ReturnHistoryDetailsData _$ReturnHistoryDetailsDataFromJson(
       customer: Customer.fromJson(json['customer'] as Map<String, dynamic>),
       vat: (json['vat'] as num).toDouble(),
       store: Store.fromJson(json['store'] as Map<String, dynamic>),
-      serviceBy: json['service_by'] is Map<String, dynamic>
-          ? ServiceBy.fromJson(json['service_by'] as Map<String, dynamic>) : null,
+      serviceBy: json['service_by'] == null
+          ? null
+          : ServiceBy.fromJson(json['service_by'] as Map<String, dynamic>),
       soldBy: json['sold_by'] as String,
       subTotal: (json['sub_total'] as num).toDouble(),
       changeAmount: (json['change_amount'] as num).toDouble(),
@@ -104,7 +105,7 @@ Customer _$CustomerFromJson(Map<String, dynamic> json) => Customer(
       id: (json['id'] as num).toInt(),
       name: json['name'] as String,
       phone: json['phone'] as String,
-      address: json['address'] ?? 'N/A' ,
+      address: json['address'] as String,
     );
 
 Map<String, dynamic> _$CustomerToJson(Customer instance) => <String, dynamic>{
