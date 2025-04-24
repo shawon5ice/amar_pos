@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:amar_pos/core/constants/app_strings.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -113,12 +114,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   }
 
   Future<bool> validatePhoneNumber() async {
+    final phoneRegex = RegExp(AppStrings.bdPhoneNumber);
     if (phoneCon.text.isEmpty) {
       Methods.showSnackbar(msg: "Please enter your phone number");
       phoneFocus.requestFocus();
       return false;
-    } else if (!phoneCon.text.toString().isPhoneNumber) {
-      Methods.showSnackbar(msg: "Please enter a valid phone number");
+    } else if (!phoneRegex.hasMatch(phoneCon.text)) {
+      Methods.showSnackbar(msg: "Please enter a valid Bangladeshi phone number");
       phoneFocus.requestFocus();
       return false;
     }

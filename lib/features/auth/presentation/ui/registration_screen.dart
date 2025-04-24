@@ -8,6 +8,7 @@ import 'package:get/get.dart';
 import 'package:pinput/pinput.dart';
 import '../../../../core/constants/app_assets.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/constants/app_strings.dart';
 import '../../../../core/responsive/pixel_perfect.dart';
 import '../../../../core/widgets/custom_btn.dart';
 import '../../../../core/widgets/custom_glass_morf_field.dart';
@@ -151,12 +152,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   }
 
   Future<bool> validatePhoneNumber() async {
+    final phoneRegex = RegExp(AppStrings.bdPhoneNumber);
     if (phoneCon.text.isEmpty) {
       Methods.showSnackbar(msg: "Please enter your phone number");
       phoneFocus.requestFocus();
       return false;
-    } else if (!phoneCon.text.toString().isPhoneNumber) {
-      Methods.showSnackbar(msg: "Please enter a valid phone number");
+    } else if (!phoneRegex.hasMatch(phoneCon.text)) {
+      Methods.showSnackbar(msg: "Please enter a valid Bangladeshi phone number");
       phoneFocus.requestFocus();
       return false;
     }
