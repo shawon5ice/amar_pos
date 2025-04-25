@@ -112,7 +112,7 @@ class _ExchangeProductSelectionStepState extends State<ExchangeProductSelectionS
                                     controller
                                         .addProduct(items.first, unitPrice: items.first.mrpPrice, isReturn: false);
                                     int value = controller
-                                        .exchangeRequestModel.returnProducts
+                                        .exchangeRequestModel.exchangeProducts
                                         .singleWhere(
                                             (e) => e.id == items.first.id)
                                         .quantity;
@@ -120,9 +120,9 @@ class _ExchangeProductSelectionStepState extends State<ExchangeProductSelectionS
                                     if (value>1) {
                                       logger.e("HERE");
                                       int index = controller
-                                          .exchangeRequestModel.returnProducts
+                                          .exchangeRequestModel.exchangeProducts
                                           .indexOf(controller
-                                          .exchangeRequestModel.returnProducts
+                                          .exchangeRequestModel.exchangeProducts
                                           .singleWhere((e) =>
                                       e.id == items.first.id));
                                       purchaseQTYControllers[index].text =
@@ -202,15 +202,15 @@ class _ExchangeProductSelectionStepState extends State<ExchangeProductSelectionS
                     onSelected: (product) {
                       int i = 0;
                       int value = 0;
-                      for (; i < controller.exchangeRequestModel.returnProducts.length; i++) {
-                        if (product.id == controller.exchangeRequestModel.returnProducts[i].id) {
+                      for (; i < controller.exchangeRequestModel.exchangeProducts.length; i++) {
+                        if (product.id == controller.exchangeRequestModel.exchangeProducts[i].id) {
                           value = controller.exchangeRequestModel
-                              .returnProducts[i].quantity;
+                              .exchangeProducts[i].quantity;
                           break;
                         }
                       }
 
-                      if (controller.returnOrderProducts
+                      if (controller.exchangeProducts
                           .any((e) => e.id == product.id)) {
                         purchaseQTYControllers[i].text =
                             (++value).toString();
@@ -299,7 +299,7 @@ class _ExchangeProductSelectionStepState extends State<ExchangeProductSelectionS
                                     purchaseQTYControllers.removeAt(index);
                                     controller.removePlaceOrderProduct(
                                         controller
-                                            .exchangeProducts[index],true);
+                                            .exchangeProducts[index],false);
                                   },
                                   backgroundColor: const Color(0xffEF4B4B),
                                   borderRadius: const BorderRadius.all(

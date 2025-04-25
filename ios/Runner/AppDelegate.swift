@@ -3,7 +3,7 @@ import Flutter
 
 @UIApplicationMain
 @objc class AppDelegate: FlutterAppDelegate {
-  private let channelName = "com.motionview.amarPos/openfile"
+  private let channelName = "com.motionsoft.amar_pos/openfile"
 
   override func application(
     _ application: UIApplication,

@@ -124,7 +124,7 @@ class ReturnServices{
     logger.d("Page: $page");
     var response = await BaseClient.getData(
         token: usrToken,
-        api: NetWorkStrings.getAllSoldProductList,
+        api: 'return/get-return-product-list',
         parameter: {
           "status": 1,
           "page": page,
@@ -142,7 +142,7 @@ class ReturnServices{
     required ReturnHistory returnHistory}) async {
     var response = await BaseClient.deleteData(
         token: usrToken,
-        api: 'return/delete/${returnHistory.id}',);
+        api: 'return/delete-order/${returnHistory.id}',);
     return response;
   }
 
@@ -153,6 +153,7 @@ class ReturnServices{
     required DateTime? endDate,
     required String? search,
     required int? saleType,
+    required bool? shouldPrint,
 
   }) async {
     // logger.d("PDF: $isPdf");
@@ -170,7 +171,7 @@ class ReturnServices{
       if(isPdf){
         downloadUrl = "${NetWorkStrings.baseUrl}/return/download-pdf-return-list/";
       }else{
-        downloadUrl = "${NetWorkStrings.baseUrl}/return/download-pdf-return-list/";
+        downloadUrl = "${NetWorkStrings.baseUrl}/return/download-excel-return-list/";
       }
     }else{
       if(isPdf){
@@ -185,7 +186,9 @@ class ReturnServices{
       url: downloadUrl,
       token: usrToken,
       query: query,
-      fileName: fileName,);
+      fileName: fileName,
+      shouldPrint: shouldPrint
+    );
   }
 
 

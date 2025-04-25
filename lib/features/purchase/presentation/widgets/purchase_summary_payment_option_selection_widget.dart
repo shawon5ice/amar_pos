@@ -188,7 +188,10 @@ class _PurchaseSummaryPaymentOptionSelectionWidgetState
               ),
               addW(4),
               GestureDetector(onTap: (){
-                FocusScope.of(context).unfocus();
+                if (mounted) {
+                  FocusScope.of(context).unfocus();
+                }
+
                 if(controller.paymentMethodTracker.length == 1){
                   widget.paymentMethodTracker.paidAmount = 0;
                   paidAmount.text = "";

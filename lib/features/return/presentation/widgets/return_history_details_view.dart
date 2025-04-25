@@ -160,7 +160,7 @@ class _ReturnHistoryDetailsWidgetState extends State<ReturnHistoryDetailsWidget>
                                       mainAxisSize: MainAxisSize.min,
                                       mainAxisAlignment: MainAxisAlignment.start,
                                       children: [
-                                        Text("Supplier Name: ${data.customer.name}",
+                                        Text("Customer Name: ${data.customer.name}",
                                             style: const TextStyle(
                                                 fontWeight: FontWeight.bold)),
                                         Text("Phone: ${data.customer.phone}"),
@@ -324,7 +324,7 @@ class _ReturnHistoryDetailsWidgetState extends State<ReturnHistoryDetailsWidget>
                                       value: data.vat,
                                     ),
                                     TitleWithValue(
-                                      title: "Discount",
+                                      title: "Deduction",
                                       value: data.discount,
                                     ),
                                     const Divider(color: Colors.black),
@@ -353,7 +353,12 @@ class _ReturnHistoryDetailsWidgetState extends State<ReturnHistoryDetailsWidget>
                               const SizedBox(height: 40),
                               Align(
                                 alignment: Alignment.centerRight,
-                                child: Text("Prepared by: ${data.serviceBy?.name}",
+                                child: Text("Prepared by: ${data.soldBy}",
+                                    style: TextStyle(fontWeight: FontWeight.bold)),
+                              ),
+                             if(data.serviceBy != null) Align(
+                                alignment: Alignment.centerRight,
+                                child: Text("Assist by: ${data.serviceBy?.name}",
                                     style: TextStyle(fontWeight: FontWeight.bold)),
                               ),
                             ],

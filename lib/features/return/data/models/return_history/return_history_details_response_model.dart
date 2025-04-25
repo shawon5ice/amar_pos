@@ -27,6 +27,7 @@ class ReturnHistoryDetailsData {
   final Customer customer;
   @JsonKey(name: 'sold_by')
   final String soldBy;
+  @ServiceByConverter()
   @JsonKey(name: 'service_by')
   final ServiceBy? serviceBy;
   @JsonKey(name: 'sub_total')
@@ -86,17 +87,17 @@ class Store {
 class ServiceBy {
   final int id;
   final String name;
-  final String phone;
-  final String email;
+  String? phone;
+  String? email;
   @JsonKey(name: 'photo_url')
-  final String photoUrl;
+  String? photoUrl;
 
   ServiceBy({
     required this.id,
     required this.name,
-    required this.email,
-    required this.photoUrl,
-    required this.phone,});
+    this.email,
+    this.photoUrl,
+    this.phone,});
 
   factory ServiceBy.fromJson(Map<String, dynamic> json) => _$ServiceByFromJson(json);
   Map<String, dynamic> toJson() => _$ServiceByToJson(this);
@@ -236,5 +237,26 @@ class SnNo {
     _data['id'] = id;
     _data['serial_no'] = serialNo;
     return _data;
+  }
+}
+
+
+class ServiceByConverter implements JsonConverter<ServiceBy?, dynamic> {
+  const ServiceByConverter();
+
+  @override
+  ServiceBy? fromJson(dynamic json) {
+    if (json == null || (json is List && json.isEmpty)) {
+      return null;
+    } else if (json is Map<String, dynamic>) {
+      return ServiceBy.fromJson(json);
+    } else {
+      throw Exception("Unexpected format for ServiceBy: $json");
+    }
+  }
+
+  @override
+  dynamic toJson(ServiceBy? object) {
+    return object?.toJson();
   }
 }

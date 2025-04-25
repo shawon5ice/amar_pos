@@ -28,6 +28,7 @@ class DashboardResponseData {
   final num cashOut;
   final num balance;
   final num retailSale;
+  @JsonKey(name: 'wholesale')
   final num wholeSale;
   final num expense;
   final num collection;

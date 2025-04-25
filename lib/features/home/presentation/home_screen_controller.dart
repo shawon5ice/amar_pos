@@ -20,7 +20,7 @@ class HomeScreenController extends GetxController{
   Future<void> getPermissions() async {
     permissionLoading = true.obs;
     if(firstTime){
-      EasyLoading.show();
+      // EasyLoading.show();
       firstTime = false;
     }
     update(['permissions_loading']);
@@ -37,14 +37,14 @@ class HomeScreenController extends GetxController{
       logger.e(e);
     }finally{
       permissionLoading = false.obs;
-      EasyLoading.dismiss();
+      // EasyLoading.dismiss();
     }
 
   }
 
   @override
   void onInit() {
-    // getDashboardData();
+    getDashboardData();
     super.onInit();
   }
 
@@ -56,6 +56,7 @@ class HomeScreenController extends GetxController{
     update(['dashboard_data']);
     try{
       var response = await HomeScreenService.getDashboardData(usrToken: LoginDataBoxManager().loginData!.token);
+      logger.i(response);
       if (response != null) {
         dashboardResponseModel = DashboardResponseModel.fromJson(response);
         logger.d(dashboardResponseModel);

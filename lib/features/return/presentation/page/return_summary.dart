@@ -1,19 +1,22 @@
 import 'package:amar_pos/core/constants/app_colors.dart';
+import 'package:amar_pos/core/constants/logger/logger.dart';
 import 'package:amar_pos/core/core.dart';
+import 'package:amar_pos/core/network/helpers/error_extractor.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/core/widgets/custom_button.dart';
 import 'package:amar_pos/core/widgets/custom_text_field.dart';
 import 'package:amar_pos/core/widgets/field_title.dart';
+import 'package:amar_pos/features/inventory/presentation/products/widgets/custom_drop_down_widget.dart';
 import 'package:amar_pos/features/inventory/presentation/products/widgets/custom_dropdown_widget.dart';
 import 'package:amar_pos/features/return/presentation/controller/return_controller.dart';
 import 'package:amar_pos/features/return/presentation/widgets/return_history_details_view.dart';
 import 'package:amar_pos/features/return/presentation/widgets/return_summary_payment_option_selection_widget.dart';
-import 'package:auto_size_text/auto_size_text.dart';
-import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../../core/methods/number_input_formatter.dart';
+import '../../../../core/widgets/dashed_line.dart';
 import '../../../sales/presentation/widgets/billing_summary_payment_option_selection_widget.dart';
 import '../../data/models/client_list_response_model.dart';
 import '../../data/models/create_return_order_model.dart';
@@ -33,12 +36,13 @@ class _ReturnSummaryState extends State<ReturnSummary> {
   late final TextEditingController customerTotalDiscountEditingController;
   late final TextEditingController customerPayableAmountEditingController;
   late final TextEditingController customerChangeAmountEditingController;
+  late TextEditingController suggestionEditingController;
 
   ReturnController controller = Get.find();
 
   @override
   void initState() {
-
+    suggestionEditingController = TextEditingController();
     customerNameEditingController = TextEditingController();
     customerPhoneNumberEditingController = TextEditingController();
     customerAddressEditingController = TextEditingController();
@@ -47,6 +51,7 @@ class _ReturnSummaryState extends State<ReturnSummary> {
     customerPayableAmountEditingController = TextEditingController();
     customerChangeAmountEditingController = TextEditingController();
 
+    suggestionEditingController.text = controller.selectedClient?.name ?? '';
     customerNameEditingController.text = controller.createOrderModel.name;
     customerPhoneNumberEditingController.text = controller.createOrderModel.phone;
     customerAddressEditingController.text = controller.createOrderModel.address;
@@ -66,11 +71,6 @@ class _ReturnSummaryState extends State<ReturnSummary> {
       if(controller.isRetailSale == false && controller.clientList.isEmpty){
         controller.getAllClientList();
       }
-    }
-
-
-    if(!controller.isEditing && controller.paymentMethodTracker.isEmpty){
-      controller.addPaymentMethod();
     }
 
     controller.calculateAmount(firstTime: true);
@@ -99,6 +99,7 @@ class _ReturnSummaryState extends State<ReturnSummary> {
         appBar: AppBar(
           centerTitle: true,
           title: const Text("Return Summary"),
+          backgroundColor: AppColors.scaffoldBackground,
         ),
         body: SingleChildScrollView(
           child: Padding(
@@ -131,72 +132,164 @@ class _ReturnSummaryState extends State<ReturnSummary> {
                           )
                               : GetBuilder<ReturnController>(
                             id: 'client_list',
-                            builder: (controller) =>
-                                DropdownButtonHideUnderline(
-                                  child: DropdownButton2<ClientData>(
-                                    isExpanded: true,
-                                    hint: Text(
-                                      controller.clientList.isNotEmpty
-                                          ? "Select Client"
-                                          : "Loading...",
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Theme.of(context).hintColor,
-                                      ),
-                                    ),
-                                    items: controller.clientList
-                                        .map((ClientData item) {
-                                      return DropdownMenuItem<ClientData>(
-                                        value: item,
-                                        child: Text(
-                                          item.name,
-                                          style: const TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      );
-                                    }).toList(),
-                                    value: controller.selectedClient,
-                                    onChanged: (value) {
-                                      if (value != null) {
-                                        controller.selectedClient = value;
-                                        customerPhoneNumberEditingController
-                                            .text = value.phone;
-                                        customerAddressEditingController.text =
-                                            value.address;
-                                        controller.createOrderModel.phone = value.phone;
-                                        controller.createOrderModel.address = value.address;
-                                        controller.createOrderModel.customerId = value.id;
-                                        controller.update(['client_list']);
-                                      }
-                                    },
-                                    buttonStyleData: ButtonStyleData(
-                                      height: 56,
-                                      padding: EdgeInsets.zero,
-                                      decoration: BoxDecoration(
-                                        border: Border.all(
-                                            color: AppColors.inputBorderColor),
-                                        borderRadius: const BorderRadius.all(
-                                            Radius.circular(8)),
-                                      ),
-                                    ),
-                                    dropdownStyleData: const DropdownStyleData(
-                                      maxHeight: 200,
-                                      offset: Offset(0, 4),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(8)),
-                                      ),
-                                    ),
-                                    menuItemStyleData: const MenuItemStyleData(
-                                      height: 40,
-                                    ),
+                            builder: (controller) => TypeAheadField<ClientData>(
+                              hideOnUnfocus: false,
+                              hideOnSelect: true,
+                              showOnFocus: true,
+                              controller: suggestionEditingController,
+                              builder: (context, textController, focusNode) {
+                                suggestionEditingController = textController;
+                                return TextFormField(
+                                  autofocus: false,
+                                  validator: (value) =>
+                                      FieldValidator.nonNullableFieldValidator(
+                                          value, "Supplier name"),
+                                  controller: suggestionEditingController,
+                                  focusNode: focusNode,
+                                  decoration: InputDecoration(
+                                    border: _getInputBorder(),
+                                    suffixIcon: Icon(Icons.arrow_drop_down_sharp),
+                                    hintText: "Select Supplier",
+                                    contentPadding:
+                                    const EdgeInsets.symmetric(horizontal: 20),
+                                    hintStyle:
+                                    TextStyle(color: Colors.grey, fontSize: 14),
                                   ),
-                                ),
-                          ),
+                                );
+                              },
+                              suggestionsCallback: controller.clientSuggestionsCallback,
+                              itemBuilder: (context, supplier) {
+                                return ListTile(
+                                  minVerticalPadding: 4,
+                                  isThreeLine: true,
+                                  dense: true,
+                                  visualDensity: VisualDensity.compact,
+                                  title: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        supplier.name,
+                                        style: const TextStyle(
+                                            color: Colors.deepPurple,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      Text(supplier.phone),
+                                    ],
+                                  ),
+                                  subtitle: Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 4),
+                                    child: DashedLine(),
+                                  ),
+                                );
+                              },
+                              onSelected: (value) {
+                                controller.selectedClient = value;
+                                suggestionEditingController.text = value.name;
+                                customerNameEditingController.text = value.name ?? '';
+                                customerPhoneNumberEditingController
+                                    .text = value.phone ?? '';
+                                customerAddressEditingController.text =
+                                    value.address ?? '';
+                                controller.selectedClient = value;
+                                customerPhoneNumberEditingController
+                                    .text = value.phone;
+                                customerAddressEditingController.text =
+                                    value.address;
+                                controller.createOrderModel.phone = value.phone;
+                                controller.createOrderModel.address = value.address;
+                                controller.createOrderModel.customerId = value.id;
+                                controller.update(['client_list']);
+                                FocusScope.of(context).unfocus();
+                              },
+
+                              decorationBuilder: (context, child) {
+                                return Material(
+                                  type: MaterialType.card,
+                                  elevation: 8,
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: child,
+                                );
+                              },
+                              offset: const Offset(0, 4),
+                              constraints: const BoxConstraints(
+                                maxHeight: 300,
+                              ),
+                              emptyBuilder: (_) => const Center(
+                                child: Text("No Items found!"),
+                              ),
+                              loadingBuilder: (_) => const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                            ),),
+
+                          // GetBuilder<ReturnController>(
+                          //   id: 'client_list',
+                          //   builder: (controller) =>
+                          //       DropdownButtonHideUnderline(
+                          //         child: DropdownButton2<ClientData>(
+                          //           isExpanded: true,
+                          //           hint: Text(
+                          //             controller.clientList.isNotEmpty
+                          //                 ? "Select Client"
+                          //                 : "Loading...",
+                          //             style: TextStyle(
+                          //               fontSize: 12,
+                          //               color: Theme.of(context).hintColor,
+                          //             ),
+                          //           ),
+                          //           items: controller.clientList
+                          //               .map((ClientData item) {
+                          //             return DropdownMenuItem<ClientData>(
+                          //               value: item,
+                          //               child: Text(
+                          //                 item.name,
+                          //                 style: const TextStyle(
+                          //                   fontSize: 12,
+                          //                   fontWeight: FontWeight.bold,
+                          //                 ),
+                          //                 overflow: TextOverflow.ellipsis,
+                          //               ),
+                          //             );
+                          //           }).toList(),
+                          //           value: controller.selectedClient,
+                          //           onChanged: (value) {
+                          //             if (value != null) {
+                          //               controller.selectedClient = value;
+                          //               customerPhoneNumberEditingController
+                          //                   .text = value.phone;
+                          //               customerAddressEditingController.text =
+                          //                   value.address;
+                          //               controller.createOrderModel.phone = value.phone;
+                          //               controller.createOrderModel.address = value.address;
+                          //               controller.createOrderModel.customerId = value.id;
+                          //               controller.update(['client_list']);
+                          //             }
+                          //           },
+                          //           buttonStyleData: ButtonStyleData(
+                          //             height: 56,
+                          //             padding: EdgeInsets.zero,
+                          //             decoration: BoxDecoration(
+                          //               border: Border.all(
+                          //                   color: AppColors.inputBorderColor),
+                          //               borderRadius: const BorderRadius.all(
+                          //                   Radius.circular(8)),
+                          //             ),
+                          //           ),
+                          //           dropdownStyleData: const DropdownStyleData(
+                          //             maxHeight: 200,
+                          //             offset: Offset(0, 4),
+                          //             decoration: BoxDecoration(
+                          //               color: Colors.white,
+                          //               borderRadius: BorderRadius.all(
+                          //                   Radius.circular(8)),
+                          //             ),
+                          //           ),
+                          //           menuItemStyleData: const MenuItemStyleData(
+                          //             height: 40,
+                          //           ),
+                          //         ),
+                          //       ),
+                          // ),
                           addH(8),
                           const FieldTitle("Phone Number"),
                           addH(4),
@@ -389,22 +482,20 @@ class _ReturnSummaryState extends State<ReturnSummary> {
                                 child: GetBuilder<ReturnController>(
                                   id: 'service_stuff_list',
                                   builder: (controller) =>
-                                      CustomDropdown<ServiceStuffInfo>(
-                                        validator: (value) => value == null
-                                            ? "Please select a service stuff"
-                                            : null,
+                                      CustomDropdownWithSearchWidget<ServiceStuffInfo>(
+                                        searchHintText: "Select service staff",
                                         value: controller.serviceStuffInfo,
                                         items: controller.serviceStuffList,
-                                        isMandatory: true,
-                                        title: "Service Stuff",
+                                        isMandatory: false,
+                                        title: "Service Staff",
                                         itemLabel: (ServiceStuffInfo stuffInfo) =>
                                         stuffInfo.name,
                                         onChanged: (value) {
                                           controller.serviceStuffInfo = value;
                                         },
                                         hintText:controller.serviceStuffListLoading? 'Loading...': controller.serviceStuffList.isNotEmpty
-                                            ? "Select Service Stuff"
-                                            : "No Stuff found!",
+                                            ? "Select service staff"
+                                            : "No staff found!",
                                       ),
                                 ),
                               ),
@@ -448,19 +539,20 @@ class _ReturnSummaryState extends State<ReturnSummary> {
                 controller.createOrderModel.address = controller.isRetailSale
                     ? customerAddressEditingController.text
                     : controller.selectedClient!.address;
-                if (controller.serviceStuffInfo == null) {
-                  Methods.showSnackbar(msg: "Please select a service stuff");
+                if(controller.totalPaid > controller.paidAmount){
+                  ErrorExtractor.showSingleErrorDialog(context, "Payment amount must be equal to ${controller.paidAmount}. Please adjust.");
+                  // Methods.showSnackbar(
+                  //     msg: "Payment amount must be equal to ${controller.paidAmount}. Please adjust.");
                   return;
                 }
                 controller.createOrderModel.serviceBy =
-                    controller.serviceStuffInfo!.id;
+                    controller.serviceStuffInfo?.id;
 
                 controller.createOrderModel.payments.clear();
                 for (var e in controller.paymentMethodTracker) {
                   if (e.paymentMethod == null) {
                     Methods.showSnackbar(
-                        msg:
-                        "Please insert valid amount or remove not selected payment methods");
+                        msg: "Please insert valid payment method or remove not selected payment methods", duration: 5);
                     return;
                   } else if (e.paymentMethod != null &&
                       e.paymentMethod!.paymentOptions.isNotEmpty &&
@@ -478,14 +570,14 @@ class _ReturnSummaryState extends State<ReturnSummary> {
                 if(controller.isEditing){
                   controller.updateReturnOrder(context).then((value){
                     if(value){
-                      Get.to(const ReturnHistoryDetailsWidget(),arguments: [controller.pOrderId, controller.pOrderNo]);
+                      Get.to(() => const ReturnHistoryDetailsWidget(),arguments: [controller.pOrderId, controller.pOrderNo]);
                       controller.clearEditing();
                     }
                   });
                 }else{
                   controller.createReturnOrder(context).then((value){
                     if(value){
-                      Get.to(const ReturnHistoryDetailsWidget(),arguments: [controller.pOrderId, controller.pOrderNo]);
+                      Get.to(() => const ReturnHistoryDetailsWidget(),arguments: [controller.pOrderId, controller.pOrderNo]);
                     }
                   });
                 }
@@ -495,6 +587,16 @@ class _ReturnSummaryState extends State<ReturnSummary> {
             text: controller.isEditing ? "Update Order" : "Place Order",
           ),
         ),
+      ),
+    );
+  }
+
+  InputBorder _getInputBorder() {
+    return OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+      borderSide: BorderSide(
+        color: AppColors.inputBorderColor,
+        width:  1,
       ),
     );
   }

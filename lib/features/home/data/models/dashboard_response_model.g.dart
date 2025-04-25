@@ -10,8 +10,8 @@ DashboardResponseModel _$DashboardResponseModelFromJson(
         Map<String, dynamic> json) =>
     DashboardResponseModel(
       success: json['success'] as bool,
-      dashboardResponseData: DashboardResponseData.fromJson(
-          json['data'] as Map<String, dynamic>),
+      dashboardResponseData:
+          DashboardResponseData.fromJson(json['data'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$DashboardResponseModelToJson(
@@ -29,7 +29,7 @@ DashboardResponseData _$DashboardResponseDataFromJson(
           .toList(),
       expense: json['expense'] as num,
       balance: json['balance'] as num,
-      wholeSale: json['wholeSale'] as num,
+      wholeSale: json['wholesale'] as num,
       retailSale: json['retailSale'] as num,
       cashOut: json['cashOut'] as num,
       cashIn: json['cashIn'] as num,
@@ -39,12 +39,12 @@ DashboardResponseData _$DashboardResponseDataFromJson(
 Map<String, dynamic> _$DashboardResponseDataToJson(
         DashboardResponseData instance) =>
     <String, dynamic>{
-      'data': instance.products,
+      'products': instance.products,
       'cashIn': instance.cashIn,
       'cashOut': instance.cashOut,
       'balance': instance.balance,
       'retailSale': instance.retailSale,
-      'wholeSale': instance.wholeSale,
+      'wholesale': instance.wholeSale,
       'expense': instance.expense,
       'collection': instance.collection,
     };

@@ -75,7 +75,7 @@ class FileDownloader {
 
   Future<void> _initializeNotifications() async {
     const initializationSettingsAndroid =
-    AndroidInitializationSettings('hrm_notification');
+    AndroidInitializationSettings('ic_notification');
     const initializationSettingsDarwin = DarwinInitializationSettings();
     const initializationSettings = InitializationSettings(
       android: initializationSettingsAndroid,
@@ -148,7 +148,7 @@ class FileDownloader {
   Future<void> _handleNotificationTap(String? payload) async {
     if (payload != null) {
       // Open the downloaded file
-      const platform = MethodChannel('com.motionview.amarPos/openfile');
+      const platform = MethodChannel('com.motionsoft.amar_pos/openfile');
       try {
         await platform.invokeMethod('openFile', {'filePath': payload});
       } on PlatformException catch (e) {

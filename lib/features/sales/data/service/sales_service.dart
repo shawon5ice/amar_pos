@@ -116,6 +116,8 @@ class SalesService {
     int? saleType,
     DateTime? startDate,
     DateTime? endDate,
+    int? categoryId,
+    int? brandId,
   }) async {
     logger.d("Page: $page");
     var response = await BaseClient.getData(
@@ -128,6 +130,8 @@ class SalesService {
           "start_date": startDate,
           "end_date": endDate,
           "sale_type": saleType,
+          "brand_id": brandId,
+          "category_id":categoryId,
           "limit": 10,
         });
     return response;

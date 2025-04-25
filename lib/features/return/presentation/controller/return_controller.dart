@@ -156,6 +156,12 @@ class ReturnController extends GetxController {
       excludeAmount += e.paidAmount ?? 0;
     }
     totalPaid = excludeAmount;
+    if(totalPaid >= paidAmount){
+      logger.i("HHH");
+      ErrorExtractor.showSingleErrorDialog(Get.context!, "Total amount already distributed");
+      // Methods.showSnackbar(msg: "Total amount already distributed");
+      return;
+    }
     paymentMethodTracker.add(ReturnPaymentMethodTracker(
         id: paymentMethodTracker.length + 1,
         paidAmount: paidAmount - excludeAmount
@@ -288,6 +294,12 @@ class ReturnController extends GetxController {
     totalVat = totalV;
     totalQTY = totalQ;
     paidAmount = totalAmount  + additionalExpense - totalDiscount;
+
+    if (firstTime != null && !isEditing) {
+      addPaymentMethod();
+    }else{
+      totalDeu = totalPaid - paidAmount;
+    }
 
     update(['change-due-amount', 'return_summary_form']);
   }
@@ -626,7 +638,7 @@ class ReturnController extends GetxController {
       // Parse the response
       if (response != null && response['success']) {
         // Remove the item from the list
-        returnHistoryList.remove(returnHistory);
+        getReturnHistory();
         Methods.showSnackbar(msg: response['message'], isSuccess: true);
       } else {
         Methods.showSnackbar(msg: 'Error: Unable to delete the item');
@@ -664,7 +676,7 @@ class ReturnController extends GetxController {
     }
   }
 
-  Future<void> downloadList({required bool isPdf,required bool returnHistory}) async {
+  Future<void> downloadList({required bool isPdf,required bool returnHistory,bool? shouldPrint}) async {
     hasError.value = false;
 
     String fileName = "${returnHistory? "Return Order history": "Return Product History"}-${
@@ -676,11 +688,12 @@ class ReturnController extends GetxController {
         returnHistory: returnHistory,
         usrToken: loginData!.token,
         isPdf: isPdf,
+        shouldPrint: shouldPrint,
         search: searchProductController.text,
         startDate: selectedDateTimeRange.value?.start,
         endDate: selectedDateTimeRange.value?.end,
-        saleType: retailSale && wholeSale ? null : retailSale ? 1 : wholeSale
-            ? 2
+        saleType: retailSale && wholeSale ? null : retailSale ? 3 : wholeSale
+            ? 4
             : null,
         fileName: fileName,
       );
@@ -836,4 +849,16 @@ class ReturnController extends GetxController {
     }
   }
 
+
+  FutureOr<List<ClientData>> clientSuggestionsCallback(String search) async {
+    // Check if the search term is in the existing items
+    return  getAllClient(search);
+  }
+
+  getAllClient(search) {
+    var filteredItems = clientList
+        .where((item) => item.phone.toLowerCase().contains(search.toLowerCase()) || (item.name.toLowerCase().contains(search.toLowerCase())))
+        .toList();
+    return filteredItems;
+  }
 }

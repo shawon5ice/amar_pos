@@ -21,13 +21,16 @@ class FilterController extends GetxController{
   List<FilterItem> brands = [];
   List<FilterItem> categories= [];
 
+  bool retailSale = false;
+  bool wholeSale = false;
+
   Rx<DateTimeRange?> selectedDateTimeRange = Rx<DateTimeRange?>(null);
 
 
   Future<void> getCategoriesBrandWarrantyUnits() async {
     loading = true;
     hasError = false; // Reset error before loading
-    update(['filter_list']);
+    update(['filter_list','brand_dd','category_dd','selected_b_C']);
 
     try {
       var response = await BaseClient.getData(
@@ -49,7 +52,7 @@ class FilterController extends GetxController{
       logger.e(e);
     } finally {
       loading = false;
-      update(['filter_list']);
+      update(['filter_list','brand_dd','category_dd','selected_b_C']);
     }
   }
 

@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:amar_pos/core/constants/logger/logger.dart';
 import 'package:amar_pos/core/core.dart';
+import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:amar_pos/core/widgets/custom_text_field.dart';
 import 'package:amar_pos/features/return/presentation/controller/return_controller.dart';
@@ -84,7 +85,9 @@ class _ReturnHistoryScreenState extends State<ReturnHistoryScreen> {
                 addW(4),
                 CustomSvgIconButton(
                   bgColor: const Color(0xffFFFCF8),
-                  onTap: () {},
+                  onTap: () {
+                    controller.downloadList(isPdf: true, returnHistory: true,shouldPrint: true);
+                  },
                   assetPath: AppAssets.printIcon,
                 )
               ],
@@ -127,11 +130,7 @@ class _ReturnHistoryScreenState extends State<ReturnHistoryScreen> {
                 builder: (controller) {
                   if (controller.isReturnHistoryListLoading) {
                     return Center(
-                      child: Lottie.asset(
-                        AppAssets.lottieFiles[Random().nextInt(AppAssets.lottieFiles.length)],
-                        width: 150,
-                        height: 150,
-                      ),
+                      child: RandomLottieLoader.lottieLoader(),
                     );
                   }else if(controller.returnHistoryResponseModel == null){
                     return Center(

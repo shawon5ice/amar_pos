@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:amar_pos/core/core.dart';
 import 'package:amar_pos/core/data/data.dart';
 import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
+import 'package:amar_pos/core/widgets/reusable/filter_bottom_sheet/product_brand_category_warranty_unit_response_model.dart';
 import 'package:amar_pos/features/sales/data/models/client_list_response_model.dart';
 import 'package:amar_pos/features/sales/data/models/create_order_model.dart';
 import 'package:amar_pos/features/sales/data/models/payment_method_tracker.dart';
@@ -40,6 +41,9 @@ class SalesController extends GetxController {
 
   bool cashSelected = false;
   bool creditSelected = false;
+
+  FilterItem? brand;
+  FilterItem? category;
 
   TextEditingController searchProductController = TextEditingController();
   ProductsListResponseModel? productsListResponseModel;
@@ -124,6 +128,8 @@ class SalesController extends GetxController {
     searchProductController.clear();
     wholeSale = false;
     retailSale = false;
+    brand = null;
+    category = null;
     selectedDateTimeRange.value = null;
     update(['filter_view']);
   }
@@ -577,6 +583,8 @@ class SalesController extends GetxController {
           search: searchProductController.text,
           startDate: selectedDateTimeRange.value?.start,
           endDate: selectedDateTimeRange.value?.end,
+          categoryId: category?.id,
+          brandId: brand?.id,
           saleType: retailSale && wholeSale ? null : retailSale ? 1 : wholeSale
               ? 2
               : null

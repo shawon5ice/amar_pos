@@ -35,8 +35,11 @@ class _ReturnSummaryPaymentOptionSelectionWidgetState
 
   final ReturnController controller = Get.find();
 
+  late TextEditingController _textEditingController;
+
   @override
   void initState() {
+    _textEditingController = TextEditingController();
     paidAmount = TextEditingController();
     paidAmount.text = widget.paymentMethodTracker.paidAmount.toString();
     super.initState();
@@ -44,19 +47,32 @@ class _ReturnSummaryPaymentOptionSelectionWidgetState
 
   @override
   void didUpdateWidget(covariant ReturnSummaryPaymentOptionSelectionWidget oldWidget) {
-    if(oldWidget.key != widget.key){
-      paidAmount.text = "";
-      controller.calculateAmount();
+    if(mounted){
+      if(oldWidget.key != widget.key){
+        paidAmount.text = "";
+        controller.calculateAmount();
+      }
     }
+
     super.didUpdateWidget(oldWidget);
   }
 
+  @override
+  void dispose() {
+    if(mounted){
+      _textEditingController.dispose();
+      paidAmount.dispose();
+    }
+
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return GetBuilder<ReturnController>(
       key: Key(controller.paymentMethodTracker.indexOf(widget.paymentMethodTracker).toString()),
       id: "billing_payment_methods",
       builder: (controller) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           addH(8),
           Row(
@@ -75,7 +91,7 @@ class _ReturnSummaryPaymentOptionSelectionWidgetState
                         hint: Text(
                           "Select Payment",
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 12.sp,
                             color: Theme.of(context).hintColor,
                           ),
                         ),
@@ -151,13 +167,10 @@ class _ReturnSummaryPaymentOptionSelectionWidgetState
                       textCon: paidAmount,
                       hintText: "Type here",
                       inputType: TextInputType.number,
-                      inputFormatters: [
-                        NumberInputFormatter()
-                      ],
                       onChanged: (value) {
                         if(value.isNotEmpty){
                           try{
-                            widget.paymentMethodTracker.paidAmount = num.parse(value.replaceAll(',', ''));
+                            widget.paymentMethodTracker.paidAmount = num.parse(value);
                             controller.calculateAmount();
                           }catch(e){
                             Methods.showSnackbar(msg: "Please type a valid amount");
@@ -167,24 +180,30 @@ class _ReturnSummaryPaymentOptionSelectionWidgetState
                           controller.calculateAmount();
                         }
                       },
-                      // validator: (value) {
-                      //   try{
-                      //     if(value != null && value.isNotEmpty){
-                      //       var x = num.parse(value);
-                      //     }
-                      //   }catch(e){
-                      //     return '⚠️ Please type a valid amount';
-                      //   }
-                      //   return null;
-                      // },
+                      validator: (value) {
+                        try{
+                          if(value != null && value.isNotEmpty){
+                            var x = num.parse(value);
+                          }
+                        }catch(e){
+                          return '⚠️ Please type a valid amount';
+                        }
+                        return null;
+                      },
                     ),
                   ],
                 ),
               ),
               addW(4),
               GestureDetector(onTap: (){
-                FocusScope.of(context).unfocus();
-                if(controller.paymentMethodTracker.length == 1){
+                    WidgetsBinding.instance.addPostFrameCallback(
+                      (_) {
+                        if (mounted) {
+                          FocusScope.of(context).unfocus();
+                        }
+                      },
+                    );
+                    if(controller.paymentMethodTracker.length == 1){
                   widget.paymentMethodTracker.paidAmount = 0;
                   paidAmount.text = "";
                   controller.calculateAmount();
@@ -214,7 +233,7 @@ class _ReturnSummaryPaymentOptionSelectionWidgetState
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               addH(8),
-              RichFieldTitle(
+              const RichFieldTitle(
                 text: "Payment Options",
               ),
               addH(4),
@@ -228,6 +247,30 @@ class _ReturnSummaryPaymentOptionSelectionWidgetState
                       color: Theme.of(context).hintColor,
                     ),
                   ),
+                  dropdownSearchData: DropdownSearchData(
+                    searchController: _textEditingController,
+                    searchInnerWidgetHeight: 48,
+                    searchInnerWidget: Padding(
+                      padding:
+                      const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+                      child: TextFormField(
+                        controller: _textEditingController,
+                        decoration: InputDecoration(
+                          isDense: true,
+                          hintText: "Search Supplier",
+                          hintStyle: const TextStyle(fontSize: 12),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                    ),
+                    searchMatchFn: (item, searchValue) {
+                      return item.value!.name
+                          .toLowerCase()
+                          .contains(searchValue.toLowerCase());
+                    },
+                  ),
                   items: widget
                       .paymentMethodTracker.paymentMethod?.paymentOptions
                       .map((PaymentOption item) =>
@@ -235,7 +278,7 @@ class _ReturnSummaryPaymentOptionSelectionWidgetState
                         value: item,
                         child: Text(
                           item.name,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
                           ),
@@ -256,7 +299,7 @@ class _ReturnSummaryPaymentOptionSelectionWidgetState
                         .update(['billing_payment_methods', 'billing_summary_form']);
                   },
                   buttonStyleData: ButtonStyleData(
-                    height: 48,
+                    height: 56,
                     padding: EdgeInsets.zero,
                     decoration: BoxDecoration(
                       border:

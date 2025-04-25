@@ -1,3 +1,4 @@
+import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:amar_pos/core/widgets/reusable/status/total_status_widget.dart';
 import 'package:amar_pos/features/return/data/models/return_products/return_product_response_model.dart';
 import 'package:amar_pos/features/return/presentation/controller/return_controller.dart';
@@ -90,7 +91,7 @@ class _SoldHistoryState extends State<ReturnProducts> {
                 children: [
                   TotalStatusWidget(
                     flex: 3,
-                    isLoading: controller.isReturnHistoryListLoading,
+                    isLoading: controller.isReturnProductListLoading,
                     title: 'Total QTY',
                     value: controller.returnProductResponseModel != null
                   ? Methods.getFormattedNumber(controller
@@ -102,7 +103,7 @@ class _SoldHistoryState extends State<ReturnProducts> {
                   addW(12),
                   TotalStatusWidget(
                     flex: 4,
-                    isLoading: controller.isReturnHistoryListLoading,
+                    isLoading: controller.isReturnProductListLoading,
                     title: 'Sold Amount',
                     value: controller.returnProductResponseModel != null
                         ? Methods.getFormattedNumber(controller
@@ -120,8 +121,8 @@ class _SoldHistoryState extends State<ReturnProducts> {
                 id: 'return_product_list',
                 builder: (controller) {
                   if (controller.isReturnProductListLoading) {
-                    return const Center(
-                      child: CircularProgressIndicator(),
+                    return Center(
+                      child: RandomLottieLoader.lottieLoader(),
                     );
                   }else if(controller.returnProductResponseModel == null){
                     return Center(

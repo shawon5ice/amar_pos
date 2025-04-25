@@ -319,7 +319,8 @@ class ExchangeController extends GetxController {
     }
     totalPaid = excludeAmount;
     if (totalPaid >= paidAmount) {
-      Methods.showSnackbar(msg: "Full amount already distributed");
+      ErrorExtractor.showSingleErrorDialog(Get.context!, "Full amount already distributed");
+      // Methods.showSnackbar(msg: "Full amount already distributed");
       return;
     }
     paymentMethodTracker.add(ExchangePaymentMethodTracker(
@@ -487,7 +488,7 @@ class ExchangeController extends GetxController {
     //     totalDeu = 0;
     //   }
     // }
-    if (firstTime != null && paymentMethodTracker.isEmpty) {
+    if (firstTime != null && paymentMethodTracker.isEmpty && totalReturnAmount != totalExchangeAmount) {
       addPaymentMethod();
     }
 

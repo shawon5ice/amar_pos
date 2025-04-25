@@ -10,6 +10,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/data/model/outlet_model.dart';
+import '../../../core/widgets/reusable/filter_bottom_sheet/product_brand_category_warranty_unit_response_model.dart';
+import '../../../core/widgets/reusable/filter_bottom_sheet/simple_filter_bottom_sheet_widget.dart';
 import '../../drawer/drawer_menu_controller.dart';
 
 class SalesScreen extends StatefulWidget {
@@ -155,10 +158,15 @@ class _SalesScreenState extends State<SalesScreen>
               //   child: SvgPicture.asset(AppAssets.pauseBillingIcon),
               // )
                   :
+
               GestureDetector(
                 onTap: (){
-                  showModalBottomSheet(context: context, builder:(context) => SoldHistoryFilterBottomSheet(
+                  showModalBottomSheet(
+                      isScrollControlled: true,
+                      context: context, builder:(context) => SoldHistoryFilterBottomSheet(
                     saleHistory: _tabController.index == 1,
+                    selectedCategory: controller.category,
+                    selectedBrand:  controller.brand,
                   ));
                 },
                 child: SvgPicture.asset(AppAssets.funnelFilter),

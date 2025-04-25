@@ -1,7 +1,10 @@
 import 'dart:async';
 
+import 'package:amar_pos/core/constants/app_assets.dart';
 import 'package:amar_pos/core/constants/app_colors.dart';
 import 'package:amar_pos/core/data/preference.dart';
+import 'package:amar_pos/core/responsive/pixel_perfect.dart';
+import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:amar_pos/features/auth/data/model/hive/login_data_helper.dart';
 import 'package:amar_pos/features/auth/presentation/ui/login_screen.dart';
 import 'package:amar_pos/features/drawer/main_page.dart';
@@ -39,7 +42,7 @@ class _SplashScreenState extends State<SplashScreen> {
   //   await prefs.setBool(ConstantStrings.openFlag, true);
   // }
 
-  static const platform = MethodChannel("com.motionview.app_info");
+  static const platform = MethodChannel("com.motionsoft.amar_pos/app_info");
 
   String _version = 'Unknown';
   String _buildNumber = 'Unknown';
@@ -47,7 +50,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    // _getAppInfo();
+    _getAppInfo();
     // appUpdate();
     navigate();
   }
@@ -70,7 +73,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   void navigate() {
     Future.delayed(
-      const Duration(milliseconds: 1000),
+      const Duration(milliseconds: 2000),
       () {
         if (LoginDataBoxManager().loginData != null) {
           Get.offAndToNamed(MainPage.routeName);
@@ -153,30 +156,38 @@ class _SplashScreenState extends State<SplashScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  SvgPicture.asset(
-                    context.isDarkMode
-                        ? 'assets/svg/logo_white.svg'
-                        : 'assets/svg/logo.svg',
-                    width: 210,
-                    fit: BoxFit.fitWidth,
+                  Image.asset(
+                    AppAssets.amarPosLogo,
+                    width: 200,
+                    height: 100,
+                    fit: BoxFit.fill,
                   ),
-                  const SizedBox(height: 20),
-                  SpinKitRipple(
-                    color: AppColors.primary,
-                    size: 50,
-                    duration: const Duration(milliseconds: 1500),
-                    borderWidth: 3,
-                  ),
+                  const SizedBox(height: 32),
+                  SizedBox(
+                      height: 100,
+                      child: RandomLottieLoader.lottieLoader())
                 ],
               ),
             ),
             Align(
               alignment: Alignment.bottomCenter,
               child: Padding(
-                padding: const EdgeInsets.only(bottom: 50),
-                child: Text(
-                  'V$_version($_buildNumber)',
-                  style: TextStyle(fontSize: 12),
+                padding: const EdgeInsets.only(bottom: 24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Image.asset(
+                      AppAssets.motionSoftLogo,
+                      width: 220,
+                      height: 48,
+                      fit: BoxFit.fitHeight,
+                    ),
+                    addH(24),
+                    Text(
+                      'V$_version($_buildNumber)',
+                      style: TextStyle(fontSize: 12),
+                    ),
+                  ],
                 ),
               ),
             ),

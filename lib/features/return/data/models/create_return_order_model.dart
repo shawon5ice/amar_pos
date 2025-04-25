@@ -9,7 +9,7 @@ class CreateReturnOrderModel {
   double amount;
   double vat;
   List<Payment> payments;
-  int serviceBy;
+  int? serviceBy;
   int? customerId;
 
   CreateReturnOrderModel({
@@ -23,7 +23,7 @@ class CreateReturnOrderModel {
     required this.vat,
     required this.amount,
     required this.payments,
-    required this.serviceBy,
+    this.serviceBy,
     this.customerId,
   });
 

@@ -73,9 +73,16 @@ class AppAssets {
   static const String motionSoftLogo = "assets/images/motion_soft_logo.png";
 
 
+  static const String invoiceIcon = "assets/icon/invoice_icon.svg";
   static const String cashIn = "assets/icon/cash_in.svg";
+  static const String cashInIcon = "assets/icon/cash_in_icon.svg";
   static const String cashOut = "assets/icon/cash_out.svg";
+  static const String cashOutIcon = "assets/icon/cash_out_icon.svg";
   static const String cash = "assets/icon/cash.svg";
+  static const String cashIcon = "assets/icon/cash_icon.svg";
+
+  static const String expense = "assets/icon/expense_icon.svg";
+  static const String collection = "assets/icon/collection_icon.svg";
 
   static const String person = "assets/icon/person.svg";
   static const String client = "assets/icon/client.svg";
