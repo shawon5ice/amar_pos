@@ -26,6 +26,7 @@ class ExchangeHistoryDetailsData {
   final Customer customer;
   @JsonKey(name: 'sold_by')
   final String soldBy;
+  @ServiceByConverter()
   @JsonKey(name: 'service_by')
   final ServiceBy? serviceBy;
   // @JsonKey(name: 'sub_total')
@@ -244,5 +245,25 @@ class SnNo {
     _data['id'] = id;
     _data['serial_no'] = serialNo;
     return _data;
+  }
+}
+
+
+
+class ServiceByConverter implements JsonConverter<ServiceBy?, dynamic> {
+  const ServiceByConverter();
+
+  @override
+  ServiceBy? fromJson(dynamic json) {
+    if (json is Map<String, dynamic>) {
+      return ServiceBy.fromJson(json);
+    }else{
+      return null;
+    }
+  }
+
+  @override
+  dynamic toJson(ServiceBy? object) {
+    return object?.toJson();
   }
 }

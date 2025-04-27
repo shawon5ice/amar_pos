@@ -1,3 +1,4 @@
+import 'package:amar_pos/core/constants/logger/logger.dart';
 import 'package:amar_pos/core/core.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/features/sales/data/models/payment_method_tracker.dart';
@@ -118,7 +119,7 @@ class _BillingSummaryPaymentOptionSelectionWidgetState
                             widget.paymentMethodTracker.paymentOption = null;
                             widget.paymentMethodTracker.paymentMethod = value;
                             controller.update(
-                                ['billing_payment_methods', 'payments','return_summary_form']);
+                                ['billing_payment_methods', 'payments','billing_summary_form']);
                             controller.calculateAmount();
                           }
                         },

@@ -5,12 +5,6 @@ import 'package:amar_pos/core/widgets/field_title.dart';
 import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:amar_pos/features/exchange/data/models/exchange_history_response_model.dart';
 import 'package:amar_pos/features/exchange/exchange_controller.dart';
-import 'package:amar_pos/features/return/data/models/return_history/return_history_details_response_model.dart';
-import 'package:amar_pos/features/return/data/models/return_history/return_history_response_model.dart';
-import 'package:amar_pos/features/return/presentation/controller/return_controller.dart';
-import 'package:amar_pos/features/sales/data/models/sale_history/sold_history_response_model.dart';
-import 'package:amar_pos/features/sales/data/models/sale_history_details_response_model.dart';
-import 'package:amar_pos/features/sales/presentation/controller/sales_controller.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:barcode/barcode.dart';
 import 'package:flutter/material.dart';
@@ -38,12 +32,14 @@ class _ReturnHistoryDetailsWidgetState extends State<ExchangeHistoryDetailsWidge
   late String orderNo;
 
   int i= 1;
+  int j= 1;
   @override
   void initState() {
     orderId = Get.arguments[0];
     orderNo = Get.arguments[1];
 
     i = 1;
+    j = 1;
     controller.getExchangeHistoryDetails(orderId);
     super.initState();
   }
@@ -354,7 +350,7 @@ class _ReturnHistoryDetailsWidgetState extends State<ExchangeHistoryDetailsWidge
                                         Padding(
                                             padding: const EdgeInsets.symmetric(
                                                 horizontal: 4, vertical: 8),
-                                            child: AutoSizeText("${i++}",
+                                            child: AutoSizeText("${j++}",
                                                 textAlign: TextAlign.center)),
                                         Padding(
                                             padding: const EdgeInsets.symmetric(

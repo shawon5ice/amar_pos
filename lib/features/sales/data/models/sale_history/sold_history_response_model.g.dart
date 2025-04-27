@@ -25,6 +25,7 @@ SaleHistory _$SaleHistoryFromJson(Map<String, dynamic> json) => SaleHistory(
       date: json['date'] as String,
       orderNo: json['order_no'] as String,
       saleType: json['sale_type'] as String,
+      quantity: json['quantity'] as int,
       customer: Customer.fromJson(json['customer'] as Map<String, dynamic>),
       discount: (json['discount'] as num).toDouble(),
       amount: (json['amount'] as num).toDouble(),

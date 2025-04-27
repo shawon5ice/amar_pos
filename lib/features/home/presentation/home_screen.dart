@@ -121,7 +121,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                             SizedBox(height: 16.h),
                             LayoutBuilder(
                               builder: (context, constraints) {
-                                final isSmallScreen = constraints.maxWidth < 300;
+                                final isSmallScreen = constraints.maxWidth <= 240;
 
                                 return Flex(
                                   direction: isSmallScreen
@@ -135,7 +135,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                       width: isSmallScreen
                                           ? double.infinity
                                           : constraints.maxWidth * 0.5,
-                                      height: isSmallScreen ? null : 180.h,
+                                      height: isSmallScreen ? null : 170.h,
                                       child: Column(
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
@@ -468,8 +468,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                             ListView.builder(
                                 physics: NeverScrollableScrollPhysics(),
                                 shrinkWrap: true,
-                                itemCount: controller.dashboardResponseModel!
-                                    .dashboardResponseData.products.length,
+                                itemCount: controller.dashboardResponseModel != null? controller.dashboardResponseModel!.dashboardResponseData.products.length : 0,
                                 itemBuilder: (context, index) {
                                   DashBoardProduct product = controller
                                       .dashboardResponseModel!

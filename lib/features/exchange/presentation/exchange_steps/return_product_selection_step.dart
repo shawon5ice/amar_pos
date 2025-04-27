@@ -133,7 +133,7 @@ class _ReturnProductSelectionStepState extends State<ReturnProductSelectionStep>
                                         purchaseControllers.insert(0,
                                             TextEditingController(
                                                 text: items
-                                                    .first.wholesalePrice
+                                                    .first.mrpPrice
                                                     .toString()));
                                         purchaseQTYControllers.insert(0,
                                             TextEditingController(
@@ -142,7 +142,7 @@ class _ReturnProductSelectionStepState extends State<ReturnProductSelectionStep>
                                         purchaseControllers.add(
                                             TextEditingController(
                                                 text: items
-                                                    .first.wholesalePrice
+                                                    .first.mrpPrice
                                                     .toString()));
                                         purchaseQTYControllers.add(
                                             TextEditingController(
@@ -217,17 +217,17 @@ class _ReturnProductSelectionStepState extends State<ReturnProductSelectionStep>
                       } else {
                         if(purchaseControllers.isNotEmpty){
                           purchaseControllers.insert(0,TextEditingController(
-                              text: product.wholesalePrice.toString()));
+                              text: product.mrpPrice.toString()));
                           purchaseQTYControllers
                               .insert(0,TextEditingController(text: "1"));
                         }else{
                           purchaseControllers.add(TextEditingController(
-                              text: product.wholesalePrice.toString()));
+                              text: product.mrpPrice.toString()));
                           purchaseQTYControllers
                               .add(TextEditingController(text: "1"));
                         }
                       }
-                      controller.addProduct(product, unitPrice: product.wholesalePrice, isReturn: true);
+                      controller.addProduct(product, unitPrice: product.mrpPrice, isReturn: true);
                       suggestionEditingController.clear();
                       FocusScope.of(context).unfocus();
                     },
@@ -285,8 +285,13 @@ class _ReturnProductSelectionStepState extends State<ReturnProductSelectionStep>
                 return Form(
                   key: formKey,
                   child: ListView.builder(
-                    itemCount: controller.returnOrderProducts.length,
+                    shrinkWrap: true, // important
+                    // physics: NeverScrollableScrollPhysics(), // important
+                    itemCount: controller.returnOrderProducts.length+1,
                     itemBuilder: (_, index) {
+                      if(index == controller.returnOrderProducts.length) {
+                        return addH(context.height/2);
+                      }
                       return Slidable(
                         endActionPane: ActionPane(
                             motion: const ScrollMotion(),

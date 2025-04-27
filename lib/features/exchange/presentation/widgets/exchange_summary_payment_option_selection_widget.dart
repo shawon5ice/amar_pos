@@ -189,7 +189,7 @@ class _ExchangeSummaryPaymentOptionSelectionWidgetState
                   widget.onDeleteTap();
                 }
                 // controller.deletePaymentMethod(widget.key!);
-                controller.update(['billing_summary_form']);
+                controller.update(['billing_summary_form','summary_form']);
               }, child: Padding(
                 padding: const EdgeInsets.only(top: 24),
                 child: SvgPicture.asset(
@@ -242,7 +242,7 @@ class _ExchangeSummaryPaymentOptionSelectionWidgetState
                   onChanged: (value) {
                     widget.paymentMethodTracker.paymentOption = value;
                     controller
-                        .update(['billing_payment_methods', 'billing_summary_form']);
+                        .update(['billing_payment_methods', 'billing_summary_form','summary_form']);
                   },
                   buttonStyleData: ButtonStyleData(
                     height: 48,

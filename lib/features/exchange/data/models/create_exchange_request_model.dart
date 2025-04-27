@@ -10,7 +10,7 @@ class CreateExchangeRequestModel {
   double discount;
   double payable;
   List<Payment> payments;
-  int serviceBy;
+  int? serviceBy;
   int? customerId;
 
   CreateExchangeRequestModel({

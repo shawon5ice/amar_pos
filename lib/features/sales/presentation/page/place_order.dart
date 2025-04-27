@@ -595,9 +595,9 @@ class _PlaceOrderState extends State<PlaceOrder> {
                                                   contentPadding: 12,
                                                   txtSize: 14,
                                                   inputFormatters: [
-                                                    FilteringTextInputFormatter
-                                                        .digitsOnly,
-                                                    NumberInputFormatter(),
+                                                    // FilteringTextInputFormatter
+                                                    //     .digitsOnly,
+                                                    // NumberInputFormatter(),
                                                   ],
                                                   onTap: () {
                                                     purchaseControllers[

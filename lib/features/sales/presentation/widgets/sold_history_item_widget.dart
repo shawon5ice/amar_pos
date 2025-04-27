@@ -17,7 +17,8 @@ import '../../../../core/constants/app_assets.dart';
 import '../../../inventory/presentation/stock_report/widget/custom_svg_icon_widget.dart';
 
 class SoldHistoryItemWidget extends StatelessWidget {
-  SoldHistoryItemWidget({super.key, required this.saleHistory,required this.onChange});
+  SoldHistoryItemWidget(
+      {super.key, required this.saleHistory, required this.onChange});
 
   Function(int value) onChange;
 
@@ -28,8 +29,9 @@ class SoldHistoryItemWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: (){
-        Get.to(()=> InvoiceWidget(),arguments: [saleHistory.id, saleHistory.orderNo]);
+      onTap: () {
+        Get.to(() => InvoiceWidget(),
+            arguments: [saleHistory.id, saleHistory.orderNo]);
       },
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 5),
@@ -52,8 +54,8 @@ class SoldHistoryItemWidget extends StatelessWidget {
                   child: Row(
                     children: [
                       Container(
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 5),
                         decoration: BoxDecoration(
                             color: const Color(0xffF6FFF6),
                             border: Border.all(
@@ -64,33 +66,13 @@ class SoldHistoryItemWidget extends StatelessWidget {
                         child: AutoSizeText(
                           saleHistory.date,
                           maxFontSize: 10,
-                          minFontSize: 8,
+                          minFontSize: 5,
                           style: const TextStyle(
                             fontWeight: FontWeight.w500,
                           ),
                         ),
                       ),
-                      addW(8),
-                      Container(
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                        decoration: BoxDecoration(
-                            color: const Color(0xffF2E8FF),
-                            border: Border.all(
-                              color: const Color(0xff500DA0),
-                              width: .5,
-                            ),
-                            borderRadius: BorderRadius.circular(20)),
-                        child: AutoSizeText(
-                          saleHistory.saleType,
-                          minFontSize: 8,
-                          maxFontSize: 10,
-                          style: const TextStyle(
-                            color: Color(0xff500DA0),
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
+                      // addW(4),
                     ],
                   ),
                 ),
@@ -100,7 +82,9 @@ class SoldHistoryItemWidget extends StatelessWidget {
                   bgColor: const Color(0xffE1F2FF),
                   onTap: () {
                     controller.downloadSaleHistory(
-                        isPdf: true,  orderId: saleHistory.id, orderNo: saleHistory.orderNo);
+                        isPdf: true,
+                        orderId: saleHistory.id,
+                        orderNo: saleHistory.orderNo);
                   },
                   assetPath: AppAssets.downloadIcon,
                 ),
@@ -110,17 +94,22 @@ class SoldHistoryItemWidget extends StatelessWidget {
                   bgColor: const Color(0xffFFFCF8),
                   onTap: () {
                     controller.downloadSaleHistory(
-                      shouldPrint: true,
-                        isPdf: true,  orderId: saleHistory.id, orderNo: saleHistory.orderNo);
+                        shouldPrint: true,
+                        isPdf: true,
+                        orderId: saleHistory.id,
+                        orderNo: saleHistory.orderNo);
                   },
                   assetPath: AppAssets.printIcon,
                 ),
                 addW(8),
                 SoldHistoryItemActionMenu(
-                  onSelected: (value) async{
+                  onSelected: (value) async {
                     switch (value) {
                       case "edit":
-                        await controller.processEdit(saleHistory: saleHistory,context: context).then((value){
+                        await controller
+                            .processEdit(
+                                saleHistory: saleHistory, context: context)
+                            .then((value) {
                           onChange(0);
                         });
 
@@ -144,7 +133,7 @@ class SoldHistoryItemWidget extends StatelessWidget {
                 ),
               ],
             ),
-            addH(12),
+            addH(8),
             Container(
               padding: const EdgeInsets.all(12),
               decoration: const BoxDecoration(
@@ -169,6 +158,54 @@ class SoldHistoryItemWidget extends StatelessWidget {
                     title: "Amount",
                     value: Methods.getFormatedPrice(saleHistory.amount),
                   ),
+                  addH(4),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                            color: const Color(0xFFFFFFFF),
+                            border: Border.all(
+                              color: const Color(0xff01712a),
+                              width: .5,
+                            ),
+                            borderRadius: BorderRadius.circular(20)),
+                        child: AutoSizeText(
+                          "QTY : ${saleHistory.quantity}",
+                          minFontSize: 5,
+                          maxFontSize: 10,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Color(0xff01712a),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                            color: const Color(0xffF2E8FF),
+                            border: Border.all(
+                              color: const Color(0xff500DA0),
+                              width: .5,
+                            ),
+                            borderRadius: BorderRadius.circular(20)),
+                        child: AutoSizeText(
+                          saleHistory.saleType,
+                          minFontSize: 5,
+                          maxFontSize: 10,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Color(0xff500DA0),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
                 ],
               ),
             )
@@ -180,11 +217,12 @@ class SoldHistoryItemWidget extends StatelessWidget {
 }
 
 class SaleHistoryItemTitleValueWidget extends StatelessWidget {
-  const SaleHistoryItemTitleValueWidget(
-      {super.key, required this.title, required this.value});
+  SaleHistoryItemTitleValueWidget(
+      {super.key, required this.title, required this.value, this.widget});
 
   final String title;
   final String value;
+  final Widget? widget;
 
   @override
   Widget build(BuildContext context) {
@@ -197,7 +235,8 @@ class SaleHistoryItemTitleValueWidget extends StatelessWidget {
               style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
             )),
         const Text(" : "),
-        Expanded(
+        if(widget != null )Expanded(flex: 2, child: SizedBox.shrink()),
+        widget != null ? widget! : Expanded(
             flex: 3,
             child: Text(
               value,

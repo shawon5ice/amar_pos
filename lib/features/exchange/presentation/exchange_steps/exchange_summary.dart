@@ -1,7 +1,7 @@
 import 'package:amar_pos/features/exchange/exchange_controller.dart';
 import 'package:amar_pos/features/exchange/presentation/widgets/exchange_summary_payment_option_selection_widget.dart';
+import 'package:amar_pos/features/inventory/presentation/products/widgets/custom_drop_down_widget.dart';
 import 'package:amar_pos/features/inventory/presentation/products/widgets/custom_dropdown_widget.dart';
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_colors.dart';
@@ -54,6 +54,9 @@ class _ExchangeSummaryState extends State<ExchangeSummary> {
     customerTotalDiscountEditingController.text = controller.totalDiscount.toString();
 
     controller.calculateAmount(firstTime: true);
+    if(controller.paymentMethodsResponseModel == null){
+      controller.getPaymentMethods();
+    }
 
     super.initState();
   }
@@ -296,22 +299,20 @@ class _ExchangeSummaryState extends State<ExchangeSummary> {
                           child: GetBuilder<ExchangeController>(
                             id: 'service_stuff_list',
                             builder: (controller) =>
-                                CustomDropdown<ServiceStuffInfo>(
-                                  validator: (value) => value == null
-                                      ? "Please select a service stuff"
-                                      : null,
+                                CustomDropdownWithSearchWidget<ServiceStuffInfo>(
+                                  searchHintText: "Type staff name...",
                                   value: controller.serviceStuffInfo,
                                   items: controller.serviceStuffList,
-                                  isMandatory: true,
-                                  title: "Service Stuff",
+                                  isMandatory: false,
+                                  title: "Service Staff",
                                   itemLabel: (ServiceStuffInfo stuffInfo) =>
                                   stuffInfo.name,
                                   onChanged: (value) {
                                     controller.serviceStuffInfo = value;
                                   },
                                   hintText:controller.serviceStuffListLoading? 'Loading...': controller.serviceStuffList.isNotEmpty
-                                      ? "Select Service Stuff"
-                                      : "No Stuff found!",
+                                      ? "Select Service Staff"
+                                      : "No Staff found!",
                                 ),
                           ),
                         ),

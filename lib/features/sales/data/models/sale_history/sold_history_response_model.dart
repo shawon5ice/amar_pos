@@ -35,6 +35,7 @@ class SaleHistory {
   @JsonKey(name: 'paid_amount')
   final double paidAmount;
   final double vat;
+  final int quantity;
   @JsonKey(name: 'is_actionable')
   final bool isActionable;
 
@@ -48,6 +49,7 @@ class SaleHistory {
     required this.amount,
     required this.paidAmount,
     required this.vat,
+    required this.quantity,
     required this.isActionable,
   });
 

@@ -146,10 +146,11 @@ class _PersonalInfoViewState extends State<PersonalInfoView> {
                             ),
                           ),
                           onPressed: ()async {
-                            await controller.selectFile();
-                            var req = await prepareData();
-
-                            controller.updateProfilePhoto(req);
+                            bool res = await controller.selectFile();
+                            if(controller.photo != null){
+                              var req = await prepareProfileData();
+                              controller.updateProfilePhoto(req);
+                            }
                           },
                         ),
                       )

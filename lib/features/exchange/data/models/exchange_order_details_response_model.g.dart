@@ -32,9 +32,7 @@ ExchangeHistoryDetailsData _$ExchangeHistoryDetailsDataFromJson(
       returnTotal: json['return_total'] as num,
       exchangeTotal: json['exchange_total'] as num,
       store: Store.fromJson(json['store'] as Map<String, dynamic>),
-      serviceBy: json['service_by'] == null
-          ? null
-          : ServiceBy.fromJson(json['service_by'] as Map<String, dynamic>),
+      serviceBy: json['service_by'] is Map<String, dynamic> ? ServiceBy.fromJson(json['service_by'] as Map<String, dynamic>) : null,
       soldBy: json['sold_by'] as String,
       changeAmount: (json['change_amount'] as num).toDouble(),
       payable: json['payable'] as num,

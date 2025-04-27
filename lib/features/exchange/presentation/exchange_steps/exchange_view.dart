@@ -26,6 +26,7 @@ class _ExchangeViewState extends State<ExchangeView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       body: Theme(
         data: ThemeData(
           canvasColor: AppColors.lightGreen.withOpacity(.2),

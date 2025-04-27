@@ -148,11 +148,8 @@ class ExchangeController extends GetxController {
       exchangeRequestModel.discount = totalDiscount.toDouble();
       exchangeRequestModel.payable = paidAmount.toDouble();
 
-      if (serviceStuffInfo == null) {
-        Methods.showSnackbar(msg: "Please select a service stuff");
-        return;
-      }
-      exchangeRequestModel.serviceBy = serviceStuffInfo!.id;
+
+      exchangeRequestModel?.serviceBy = serviceStuffInfo?.id;
 
       exchangeRequestModel.payments.clear();
       for (var e in paymentMethodTracker) {
@@ -318,7 +315,9 @@ class ExchangeController extends GetxController {
       excludeAmount += e.paidAmount ?? 0;
     }
     totalPaid = excludeAmount;
-    if (totalPaid >= paidAmount) {
+    logger.i(totalPaid);
+    logger.i(paidAmount);
+    if (totalPaid > paidAmount) {
       ErrorExtractor.showSingleErrorDialog(Get.context!, "Full amount already distributed");
       // Methods.showSnackbar(msg: "Full amount already distributed");
       return;
@@ -488,7 +487,7 @@ class ExchangeController extends GetxController {
     //     totalDeu = 0;
     //   }
     // }
-    if (firstTime != null && paymentMethodTracker.isEmpty && totalReturnAmount != totalExchangeAmount) {
+    if (firstTime != null && paymentMethodTracker.isEmpty && paidAmount>0) {
       addPaymentMethod();
     }
 
