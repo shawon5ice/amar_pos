@@ -69,6 +69,9 @@ dependencies:
   cached_network_image:
   change_app_package_name:
 
+  flutter_blue_plus:
+  bluetooth_print_plus:
+
 
 dev_dependencies:
   flutter_test:

@@ -7,6 +7,7 @@ import 'package:amar_pos/core/widgets/field_title.dart';
 import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:amar_pos/features/drawer/drawer_menu_controller.dart';
 import 'package:amar_pos/features/home/presentation/home_screen_controller.dart';
+import 'package:amar_pos/features/pos_print/POSPrintScreen.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -75,7 +76,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 Get.changeThemeMode(
                     Get.isDarkMode ? ThemeMode.light : ThemeMode.dark);
               },
-              icon: Get.isDarkMode ? Icon(Icons.sunny) : Icon(Icons.nightlight))
+              icon: Get.isDarkMode ? Icon(Icons.sunny) : Icon(Icons.nightlight)),
+          IconButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => POSPrintScreen()));
+              },
+              icon: Icon(Icons.print))
         ],
       ),
       body: GetBuilder<HomeScreenController>(
