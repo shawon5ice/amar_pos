@@ -68,10 +68,10 @@ dependencies:
   mobile_scanner:
   cached_network_image:
   change_app_package_name:
-
-  flutter_blue_plus:
   bluetooth_print_plus:
-
+  screenshot:
+  esc_pos_utils_plus:
+  flutter_pos_printer_platform_image_3:
 
 dev_dependencies:
   flutter_test:

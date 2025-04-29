@@ -4,17 +4,14 @@ import 'package:amar_pos/core/core.dart';
 import 'package:amar_pos/core/methods/helper_methods.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/core/widgets/field_title.dart';
-import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:amar_pos/features/drawer/drawer_menu_controller.dart';
 import 'package:amar_pos/features/home/presentation/home_screen_controller.dart';
-import 'package:amar_pos/features/pos_print/POSPrintScreen.dart';
+import 'package:amar_pos/features/pos_printing/POSPrintScreen.dart';
+import 'package:amar_pos/features/pos_printing/bluetooth_printer_screen.dart';
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 
-import '../../../core/widgets/reusable/status/total_status_widget.dart';
 import '../../../permission_manager.dart';
 import '../data/models/dashboard_response_model.dart';
 
@@ -79,7 +76,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               icon: Get.isDarkMode ? Icon(Icons.sunny) : Icon(Icons.nightlight)),
           IconButton(
               onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => POSPrintScreen()));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => BluetoothPrinterScreen()));
               },
               icon: Icon(Icons.print))
         ],
@@ -141,7 +138,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                       width: isSmallScreen
                                           ? double.infinity
                                           : constraints.maxWidth * 0.5,
-                                      height: isSmallScreen ? null : 170.h,
+                                      height: isSmallScreen ? null : 180.h,
                                       child: Column(
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
