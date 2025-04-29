@@ -142,6 +142,21 @@ flutter:
       fonts:
         - asset: assets/fonts/sfPro.otf
           weight: 500
+
+    - family: CourierPrime
+      fonts:
+        - asset: assets/fonts/CourierPrime-Bold.ttf
+          weight: 900
+        - asset: assets/fonts/CourierPrime-Regular.ttf
+          weight: 500
+
+
+    - family: RobotoMono
+      fonts:
+        - asset: assets/fonts/RobotoMono-Bold.ttf
+          weight: 900
+        - asset: assets/fonts/RobotoMono-Regular.ttf
+          weight: 500
   # example:
   # fonts:
   #   - family: Schyler

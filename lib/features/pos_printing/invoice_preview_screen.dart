@@ -112,7 +112,7 @@ class _InvoicePreviewScreenState extends State<InvoicePreviewScreen> {
                   final generator = Generator(PaperSize.mm80, await CapabilityProfile.load());
                   final bytes = <int>[
                     ...generator.imageRaster(resized, align: PosAlign.center),
-                    ...generator.qrcode(posInvoiceModel.invoiceNo,size: QRSize.size6),
+                    // ...generator.qrcode(posInvoiceModel.invoiceNo,size: QRSize.size6),
                     ...generator.cut(),
                   ];
 
@@ -144,55 +144,55 @@ class _InvoicePreviewScreenState extends State<InvoicePreviewScreen> {
           Center(
             child: Column(
               children: [
-                Text(posInvoiceModel.storeName, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 32,letterSpacing: 2),),
-                Text(posInvoiceModel.storeAddress, style: TextStyle( fontSize: 20,fontWeight: FontWeight.w600,letterSpacing: 2),textAlign: TextAlign.center,),
-                Text(posInvoiceModel.storePhone, style: TextStyle( fontSize: 20,fontWeight: FontWeight.bold,letterSpacing: 2),textAlign: TextAlign.center,),
-                Text("Invoice # :${posInvoiceModel.invoiceNo}", style: TextStyle( fontSize: 24,fontWeight: FontWeight.bold),textAlign: TextAlign.center,),
-                Text("Date & Time :${posInvoiceModel.invoiceDate}", style: TextStyle( fontSize: 18,fontWeight: FontWeight.w600,letterSpacing: 2),textAlign: TextAlign.center,),
-                SizedBox(height: 4,),
+                Text(posInvoiceModel.storeName, style: TextStyle(fontFamily: 'RobotoMono',fontWeight: FontWeight.bold, fontSize: 26,letterSpacing: 1),),
+                Text(posInvoiceModel.storeAddress, style: TextStyle(fontFamily: 'RobotoMono', fontSize: 16,fontWeight: FontWeight.w600,letterSpacing: 1),textAlign: TextAlign.center,),
+                Text(posInvoiceModel.storePhone, style: TextStyle(fontFamily: 'RobotoMono', fontSize: 20,fontWeight: FontWeight.bold,letterSpacing: 1),textAlign: TextAlign.center,),
+                Text("Invoice # :${posInvoiceModel.invoiceNo}", style: TextStyle(fontFamily: 'RobotoMono', fontSize: 22,fontWeight: FontWeight.bold),textAlign: TextAlign.center,),
+                Text("Date & Time :${posInvoiceModel.invoiceDate}", style: TextStyle(fontFamily: 'RobotoMono', fontSize: 14,fontWeight: FontWeight.w600,letterSpacing: 1),textAlign: TextAlign.center,),
+                // SizedBox(height: 4,),
               ],
             ),
           ),
-          Divider(thickness: 2,height: 4,color: Colors.black,),
-          Text(posInvoiceModel.customerName, style: TextStyle( fontSize: 22,fontWeight: FontWeight.bold,letterSpacing: 2),textAlign: TextAlign.center,),
-          Text(posInvoiceModel.customerPhone, style: TextStyle( fontSize: 22,fontWeight: FontWeight.w600,letterSpacing: 2),textAlign: TextAlign.center,),
-          Text("Address : ${posInvoiceModel.customerAddress ?? 'N/A'}", style: TextStyle( fontSize: 20,fontWeight: FontWeight.w500,letterSpacing: 2),textAlign: TextAlign.center,),
-          const Divider(color: Colors.black,thickness: 2,),
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(flex: 3, child: Text("Item", style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16,letterSpacing: 2),)),
-              Expanded(flex: 1, child: Text('Qty',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16,letterSpacing: 2),)),
-              Expanded(flex: 1, child: Text('Price', style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16,letterSpacing: 2),)),
-              Expanded(flex: 1, child: Text('Total',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16,letterSpacing: 2),)),
-            ],
-          ),
-         const  Divider(
-            thickness: 2, height: 1,
-            color: Colors.black,
-          ),
-          ...posInvoiceModel.products.map((item) {
-            int index = posInvoiceModel.products.indexOf(item);
-
-            return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(flex: 3, child: Text("${index+1}. ${item.name}",style: TextStyle(fontWeight: FontWeight.w500,fontSize: 16,letterSpacing: 2),)),
-                    Expanded(flex: 1, child: Text('x${Methods.getFormattedNumber(item.qty.toDouble())}',style: TextStyle(fontWeight: FontWeight.w500,fontSize: 16,letterSpacing: 2),)),
-                    Expanded(flex: 1, child: Text('${Methods.getFormatedPrice((item.unitPrice).toDouble())}',style: TextStyle(fontWeight: FontWeight.w500,fontSize: 16,letterSpacing: 2),)),
-                    Expanded(flex: 1, child: Text('${Methods.getFormatedPrice((item.qty * item.unitPrice).toDouble())}',style: TextStyle(fontWeight: FontWeight.w500,fontSize: 16,letterSpacing: 2),)),
-                  ],
-                ),
-              );
-          }),
-          const Divider(color: Colors.black,thickness: 2,),
-          _buildSummaryRow('Subtotal', subtotal),
-          _buildSummaryRow('VAT', posInvoiceModel.vat.toDouble()),
-          _buildSummaryRow('Additional Charge', posInvoiceModel.additionalCharge.toDouble()),
-          _buildSummaryRow('Discount', posInvoiceModel.discount.toDouble()),
-          _buildSummaryRow('Total', total, isBold: true),
+         //  Divider(thickness: 2,height: 4,color: Colors.black,),
+         //  Text(posInvoiceModel.customerName, style: TextStyle(fontFamily: 'CourierPrime', fontSize: 22,fontWeight: FontWeight.bold,letterSpacing: 2),textAlign: TextAlign.center,),
+         //  Text(posInvoiceModel.customerPhone, style: TextStyle( fontSize: 22,fontWeight: FontWeight.w600,letterSpacing: 2),textAlign: TextAlign.center,),
+         //  Text("Address : ${posInvoiceModel.customerAddress ?? 'N/A'}", style: TextStyle( fontSize: 20,fontWeight: FontWeight.w500,letterSpacing: 2),textAlign: TextAlign.center,),
+         //  const Divider(color: Colors.black,thickness: 2,),
+         //  const Row(
+         //    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+         //    children: [
+         //      Expanded(flex: 3, child: Text("Item", style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16,letterSpacing: 2),)),
+         //      Expanded(flex: 1, child: Text('Qty',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16,letterSpacing: 2),)),
+         //      Expanded(flex: 1, child: Text('Price', style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16,letterSpacing: 2),)),
+         //      Expanded(flex: 1, child: Text('Total',style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16,letterSpacing: 2),)),
+         //    ],
+         //  ),
+         // const  Divider(
+         //    thickness: 2, height: 1,
+         //    color: Colors.black,
+         //  ),
+         //  ...posInvoiceModel.products.map((item) {
+         //    int index = posInvoiceModel.products.indexOf(item);
+         //
+         //    return Padding(
+         //        padding: const EdgeInsets.symmetric(vertical: 4.0),
+         //        child: Row(
+         //          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+         //          children: [
+         //            Expanded(flex: 3, child: Text("${index+1}. ${item.name}",style: TextStyle(fontWeight: FontWeight.w500,fontSize: 16,letterSpacing: 2),)),
+         //            Expanded(flex: 1, child: Text('x${Methods.getFormattedNumber(item.qty.toDouble())}',style: TextStyle(fontWeight: FontWeight.w500,fontSize: 16,letterSpacing: 2),)),
+         //            Expanded(flex: 1, child: Text('${Methods.getFormatedPrice((item.unitPrice).toDouble())}',style: TextStyle(fontWeight: FontWeight.w500,fontSize: 16,letterSpacing: 2),)),
+         //            Expanded(flex: 1, child: Text('${Methods.getFormatedPrice((item.qty * item.unitPrice).toDouble())}',style: TextStyle(fontWeight: FontWeight.w500,fontSize: 16,letterSpacing: 2),)),
+         //          ],
+         //        ),
+         //      );
+         //  }),
+         //  const Divider(color: Colors.black,thickness: 2,),
+         //  _buildSummaryRow('Subtotal', subtotal),
+         //  _buildSummaryRow('VAT', posInvoiceModel.vat.toDouble()),
+         //  _buildSummaryRow('Additional Charge', posInvoiceModel.additionalCharge.toDouble()),
+         //  _buildSummaryRow('Discount', posInvoiceModel.discount.toDouble()),
+         //  _buildSummaryRow('Total', total, isBold: true),
         ],
       ),
     );
