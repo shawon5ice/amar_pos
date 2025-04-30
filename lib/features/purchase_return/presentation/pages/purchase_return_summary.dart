@@ -277,7 +277,7 @@ class _PurchaseReturnSummaryState extends State<PurchaseReturnSummary> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const FieldTitle("Additional expenses"),
+                                    const FieldTitle("Additional Charge"),
                                     addH(4),
                                     CustomTextField(
                                       textCon:

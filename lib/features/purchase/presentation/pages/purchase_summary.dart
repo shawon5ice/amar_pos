@@ -10,8 +10,6 @@ import 'package:amar_pos/features/purchase/presentation/pages/purchase_history_d
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:amar_pos/features/purchase/presentation/purchase_controller.dart';
 import 'package:amar_pos/features/purchase/presentation/widgets/purchase_summary_payment_option_selection_widget.dart';
-import 'package:auto_size_text/auto_size_text.dart';
-import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';

@@ -764,9 +764,11 @@ class PurchaseReturnController extends GetxController {
     } finally {}
   }
 
-  FutureOr<List<SupplierInfo>> supplierSuggestionsCallback(
-      String search) async {
+  FutureOr<List<SupplierInfo>> supplierSuggestionsCallback(String search) async {
     // Check if the search term is in the existing items
+    if(search.isEmpty){
+      return supplierList;
+    }
     return getAllSupplier(search);
   }
 
@@ -776,6 +778,7 @@ class PurchaseReturnController extends GetxController {
             item.phone.toLowerCase().contains(search.toLowerCase()) ||
             (item.name.toLowerCase().contains(search.toLowerCase())))
         .toList();
+    logger.i(filteredItems.length);
     return filteredItems;
   }
 

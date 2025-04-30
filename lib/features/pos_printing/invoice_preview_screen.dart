@@ -1,21 +1,15 @@
-import 'dart:async';
-import 'dart:convert';
-import 'dart:developer';
 import 'dart:typed_data';
 import 'package:amar_pos/core/core.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image/image.dart' as img;
 import 'package:flutter_pos_printer_platform_image_3/flutter_pos_printer_platform_image_3.dart';
 import 'package:amar_pos/features/pos_printing/pos_invoice_model.dart';
 import 'package:bluetooth_print_plus/bluetooth_print_plus.dart';
 import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:image/image.dart';
 import 'package:flutter/services.dart';
 import 'package:screenshot/screenshot.dart';
 
 import 'invoice_gen_from_screen_shot.dart';
-import 'invoice_generator.dart';
 
 
 class InvoicePreviewScreen extends StatefulWidget {

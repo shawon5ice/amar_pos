@@ -202,6 +202,9 @@ class PurchaseController extends GetxController{
 
   FutureOr<List<SupplierInfo>> supplierSuggestionsCallback(String search) async {
     // Check if the search term is in the existing items
+    if(search.isEmpty){
+      return supplierList;
+    }
     return  getAllSupplier(search);
   }
 
@@ -360,7 +363,7 @@ class PurchaseController extends GetxController{
       excludeAmount += e.paidAmount ?? 0;
     }
     totalPaid = excludeAmount;
-    if(totalPaid==paidAmount){
+    if(totalPaid>=paidAmount){
       Methods.showSnackbar(msg: "Full amount already distributed", duration: 5);
       return;
 
@@ -404,7 +407,7 @@ class PurchaseController extends GetxController{
     totalAmount = totalA;
     totalQTY = totalQ;
     paidAmount = totalAmount + additionalExpense - totalDiscount;
-    if (firstTime != null) {
+    if (firstTime != null && !isEditing) {
       addPaymentMethod();
     }else{
       totalDeu = totalPaid - paidAmount;
