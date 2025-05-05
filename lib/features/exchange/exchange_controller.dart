@@ -215,6 +215,7 @@ class ExchangeController extends GetxController {
             Get.back();
             Get.to(()=> ExchangeHistoryDetailsWidget(),arguments: [pOrderId, pOrderNo]);
             currentStep = 0;
+            isEditing = false;
             update(['exchange_view_controller', 'exchange_view']);
             Methods.showSnackbar(msg: response['message'], isSuccess: true);
           } else {
@@ -272,6 +273,7 @@ class ExchangeController extends GetxController {
 
   void clearFilter() {
     searchProductController.clear();
+
     // wholeSale = false;
     // retailSale = false;
     selectedDateTimeRange.value = null;
@@ -876,9 +878,12 @@ class ExchangeController extends GetxController {
   }
 
   Future<void> downloadList(
-      {required bool isPdf, required bool returnHistory}) async {
+      {required bool isPdf, required bool returnHistory,bool? shouldPrint}) async {
     hasError.value = false;
-
+    if(returnHistory && exchangeHistoryList.isEmpty || exchangeProductList.isEmpty){
+      ErrorExtractor.showSingleErrorDialog(Get.context!, "File should not be downloaded with empty data");
+      return;
+    }
     String fileName =
         "${returnHistory ? "Exchange Order history" : "Exchange Product History"}-${selectedDateTimeRange.value != null ? "${selectedDateTimeRange.value!.start.toIso8601String().split("T")[0]}-${selectedDateTimeRange.value!.end.toIso8601String().split("T")[0]}" : DateTime.now().toIso8601String().split("T")[0].toString()}${isPdf ? ".pdf" : ".xlsx"}";
     try {
@@ -890,6 +895,7 @@ class ExchangeController extends GetxController {
         startDate: selectedDateTimeRange.value?.start,
         endDate: selectedDateTimeRange.value?.end,
         fileName: fileName,
+        shouldPrint: shouldPrint
       );
     } catch (e) {
       logger.e(e);
@@ -904,11 +910,13 @@ class ExchangeController extends GetxController {
   ExchangeOrderDetailsResponseModel? exchangeOrderDetailsResponseModel;
 
   //
+  bool isProcessing = false;
   Future<void> processEdit(
       {required ExchangeOrderInfo exchangeOrderInfo,
       required BuildContext context}) async {
     editReturnHistoryItemLoading = true;
     isEditing = true;
+    isProcessing = true;
     RandomLottieLoader.show();
     serviceStuffInfo = null;
     paymentMethodTracker.clear();
@@ -1002,6 +1010,7 @@ class ExchangeController extends GetxController {
     } catch (e) {
       hasError.value = true;
     } finally {
+      isProcessing = false;
       editReturnHistoryItemLoading = false;
       update(['edit_sold_history_item']);
       // Methods.hideLoading();

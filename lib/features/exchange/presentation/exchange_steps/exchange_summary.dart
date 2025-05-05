@@ -198,7 +198,7 @@ class _ExchangeSummaryState extends State<ExchangeSummary> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const FieldTitle("Deduction"),
+                              const FieldTitle("Discount"),
                               addH(4),
                               CustomTextField(
                                 textCon: customerTotalDiscountEditingController,

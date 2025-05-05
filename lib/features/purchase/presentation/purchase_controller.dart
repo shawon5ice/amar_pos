@@ -188,6 +188,9 @@ class PurchaseController extends GetxController{
   }
 
   FutureOr<List<ProductInfo>> suggestionsCallback(String search) async {
+    if(search.isEmpty){
+      return purchaseOrderProducts;
+    }
     // Check if the search term is in the existing items
     List<ProductInfo> exactlyFound = currentSearchList.where((item) => item.sku.toLowerCase() == search.toString().toLowerCase()).toList();
 
@@ -364,7 +367,7 @@ class PurchaseController extends GetxController{
     }
     totalPaid = excludeAmount;
     if(totalPaid>=paidAmount){
-      Methods.showSnackbar(msg: "Full amount already distributed", duration: 5);
+      ErrorExtractor.showSingleErrorDialog(Get.context!, "Full amount already distributed");
       return;
 
     }else if(totalPaid> paidAmount){

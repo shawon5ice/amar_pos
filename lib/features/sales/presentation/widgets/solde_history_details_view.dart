@@ -2,6 +2,8 @@ import 'package:amar_pos/core/constants/app_colors.dart';
 import 'package:amar_pos/core/core.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
+import 'package:amar_pos/features/pos_printing/bluetooth_printer_screen.dart';
+import 'package:amar_pos/features/pos_printing/pos_invoice_model.dart';
 import 'package:amar_pos/features/sales/data/models/sale_history/sold_history_response_model.dart';
 import 'package:amar_pos/features/sales/data/models/sale_history_details_response_model.dart';
 import 'package:amar_pos/features/sales/presentation/controller/sales_controller.dart';
@@ -15,9 +17,9 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/methods/number_to_word.dart';
 import '../../data/models/sale_history/sold_history_details_response_model.dart';
+import 'package:get/get.dart';
 
 class InvoiceWidget extends StatefulWidget {
-
   const InvoiceWidget({
     super.key,
   });
@@ -32,7 +34,8 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
   late int orderId;
   late String orderNo;
 
-  int i= 1;
+  int i = 1;
+
   @override
   void initState() {
     orderId = Get.arguments[0];
@@ -42,7 +45,6 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
     controller.getSoldHistoryDetails(orderId);
     super.initState();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +77,8 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
                               Column(
                                 children: [
                                   Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Expanded(
                                         child: Row(
@@ -83,14 +86,14 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
                                             Expanded(
                                               child: Column(
                                                 crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                                    CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
                                                     data.business.name,
                                                     style: const TextStyle(
                                                         fontSize: 20,
                                                         fontWeight:
-                                                        FontWeight.bold),
+                                                            FontWeight.bold),
                                                   ),
                                                   Text(
                                                       "Phone: ${controller.saleHistoryDetailsResponseModel!.data.business.phone}"),
@@ -155,23 +158,28 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment:
-                                      CrossAxisAlignment.stretch,
+                                          CrossAxisAlignment.stretch,
                                       mainAxisSize: MainAxisSize.min,
-                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
                                       children: [
-                                        Text("Customer Name: ${data.customer.name}",
+                                        Text(
+                                            "Customer Name: ${data.customer.name}",
                                             style: const TextStyle(
                                                 fontWeight: FontWeight.bold)),
                                         Text("Phone: ${data.customer.phone}"),
-                                        Text("Address: ${data.customer.address}"),
+                                        Text(
+                                            "Address: ${data.customer.address}"),
                                       ],
                                     ),
                                   ),
                                   addW(20),
                                   SvgPicture.string(Barcode.code128(
-                                      useCode128B: false, useCode128C: false)
+                                          useCode128B: false,
+                                          useCode128C: false)
                                       .toSvg(data.orderNo,
-                                      height: 60, width: context.width / 3)),
+                                          height: 60,
+                                          width: context.width / 3)),
                                 ],
                               ),
                               addH(20),
@@ -188,7 +196,7 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
                                 children: [
                                   TableRow(
                                     decoration:
-                                    BoxDecoration(color: Colors.grey[200]),
+                                        BoxDecoration(color: Colors.grey[200]),
                                     children: const [
                                       Padding(
                                           padding: EdgeInsets.symmetric(
@@ -229,7 +237,7 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
                                                 horizontal: 4, vertical: 8),
                                             child: Column(
                                               crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                                  CrossAxisAlignment.start,
                                               children: [
                                                 AutoSizeText(product.name),
                                                 addH(4),
@@ -239,29 +247,30 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
                                                     runSpacing: 4,
                                                     children: product.snNo!
                                                         .map((e) => Container(
-                                                      padding:
-                                                      const EdgeInsets
-                                                          .symmetric(
-                                                          horizontal:
-                                                          12,
-                                                          vertical: 4),
-                                                      decoration:
-                                                      const BoxDecoration(
-                                                        borderRadius:
-                                                        BorderRadius
-                                                            .all(Radius
-                                                            .circular(
-                                                            8)),
-                                                        color: Colors.black,
-                                                      ),
-                                                      child: AutoSizeText(
-                                                        e.serialNo,
-                                                        style:
-                                                        const TextStyle(
-                                                            color: Colors
-                                                                .white),
-                                                      ),
-                                                    ))
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .symmetric(
+                                                                      horizontal:
+                                                                          12,
+                                                                      vertical:
+                                                                          4),
+                                                              decoration:
+                                                                  const BoxDecoration(
+                                                                borderRadius: BorderRadius
+                                                                    .all(Radius
+                                                                        .circular(
+                                                                            8)),
+                                                                color: Colors
+                                                                    .black,
+                                                              ),
+                                                              child:
+                                                                  AutoSizeText(
+                                                                e.serialNo,
+                                                                style: const TextStyle(
+                                                                    color: Colors
+                                                                        .white),
+                                                              ),
+                                                            ))
                                                         .toList(),
                                                   )
                                               ],
@@ -271,21 +280,24 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
                                                 horizontal: 4, vertical: 8),
                                             child: AutoSizeText(
                                                 Methods.getFormattedNumber(
-                                                    product.unitPrice.toDouble()),
+                                                    product.unitPrice
+                                                        .toDouble()),
                                                 textAlign: TextAlign.center)),
                                         Padding(
                                             padding: const EdgeInsets.symmetric(
                                                 horizontal: 4, vertical: 8),
                                             child: AutoSizeText(
                                                 Methods.getFormattedNumber(
-                                                    product.quantity.toDouble()),
+                                                    product.quantity
+                                                        .toDouble()),
                                                 textAlign: TextAlign.center)),
                                         Padding(
                                             padding: const EdgeInsets.symmetric(
                                                 horizontal: 4, vertical: 8),
                                             child: AutoSizeText(
                                                 Methods.getFormattedNumber(
-                                                    product.totalPrice.toDouble()),
+                                                    product.totalPrice
+                                                        .toDouble()),
                                                 textAlign: TextAlign.center)),
                                       ],
                                     );
@@ -296,13 +308,14 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
                               Row(
                                 children: [
                                   Text("In Words : ",
-                                      style:
-                                      TextStyle(fontWeight: FontWeight.bold)),
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold)),
                                   Expanded(
                                       child: Text(
-                                        _convertToWords(data.payable),
-                                        style: TextStyle(fontWeight: FontWeight.bold),
-                                      )),
+                                    _convertToWords(data.payable),
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                  )),
                                 ],
                               ),
                               const SizedBox(height: 20),
@@ -335,8 +348,10 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
                                     ),
                                     Text("Paid By "),
                                     ...data.paymentDetails.map(
-                                          (e) => TitleWithValue(
-                                        title: e.bank != null ? e.bank!.name : e.name,
+                                      (e) => TitleWithValue(
+                                        title: e.bank != null
+                                            ? e.bank!.name
+                                            : e.name,
                                         value: e.amount,
                                       ),
                                     ),
@@ -353,13 +368,17 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
                               Align(
                                 alignment: Alignment.centerRight,
                                 child: Text("Prepared by: ${data.soldBy}",
-                                    style: TextStyle(fontWeight: FontWeight.bold)),
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold)),
                               ),
-                             if(data.serviceBy != null) Align(
-                                alignment: Alignment.centerRight,
-                                child: Text("Assist by: ${data.serviceBy?.name}",
-                                    style: TextStyle(fontWeight: FontWeight.bold)),
-                              ),
+                              if (data.serviceBy != null)
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: Text(
+                                      "Assist by: ${data.serviceBy?.name}",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold)),
+                                ),
                             ],
                           ),
                         );
@@ -376,8 +395,8 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
         ),
         bottomNavigationBar: GetBuilder<SalesController>(
             id: 'download_print_buttons',
-            builder: (controller){
-              if(controller.saleHistoryDetailsResponseModel != null){
+            builder: (controller) {
+              if (controller.saleHistoryDetailsResponseModel != null) {
                 return Padding(
                   padding: const EdgeInsets.all(20),
                   child: Row(
@@ -389,7 +408,9 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
                           radius: 8,
                           onTap: () {
                             controller.downloadSaleHistory(
-                                isPdf: true, orderId: orderId, orderNo: orderNo);
+                                isPdf: true,
+                                orderId: orderId,
+                                orderNo: orderNo);
                           },
                         ),
                       ),
@@ -408,10 +429,66 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
                           },
                         ),
                       ),
+                      addW(20),
+                      Expanded(
+                        child: CustomButton(
+                          text: "POS Print",
+                          radius: 8,
+                          color: AppColors.primary,
+                          onTap: () {
+
+                            SoldHistoryDetailsData invoice = controller
+                                .saleHistoryDetailsResponseModel!.data;
+
+                            final Map<String, double> paymentDetails = invoice.paymentDetails.fold({}, (map, e) {
+                              final key = e.bank != null ? e.bank!.name : e.name;
+                              map[key] = e.amount;
+                              return map;
+                            });
+
+                            Map<String, dynamic> upperSectionData = {
+                              "Sub Total" : invoice.subTotal,
+                              "Additional Charge": invoice.expense,
+                              "Vat": invoice.vat,
+                              "Discount": invoice.discount,
+                              "Payable Amount": invoice.payable,
+                            };
+
+                            var posInvoiceModel = PosInvoiceModel(
+                                storeName: invoice.store.name,
+                                storeAddress: invoice.store.address,
+                                storePhone: invoice.store.phone,
+                                customerName: invoice.customer.name,
+                                customerPhone: invoice.customer.phone,
+                                customerAddress: invoice.customer.address,
+                                invoiceDate: invoice.dateTime,
+                                invoiceNo: invoice.orderNo,
+                                paymentUpperSection: upperSectionData,
+                                paymentDetails: paymentDetails,
+                                changeAmount: invoice.changeAmount,
+                                products: invoice.details
+                                    .map((e) => PosProduct(
+                                        name: e.name,
+                                        qty: e.quantity,
+                                        unitPrice: e.unitPrice,
+                                        subTotal: e.totalPrice))
+                                    .toList());
+
+                            Get.to(BluetoothPrinterScreen(),arguments: posInvoiceModel);
+                            // Navigator.push(context, MaterialPageRoute(builder: (context) => BluetoothPrinterScreen(),),);
+                            // controller.downloadSaleHistory(
+                            //     shouldPrint: true,
+                            //     orderNo: orderNo,
+                            //     isPdf: true,
+                            //     orderId: orderId);
+
+                          },
+                        ),
+                      ),
                     ],
                   ),
                 );
-              }else{
+              } else {
                 return SizedBox.shrink();
               }
             }));
@@ -426,10 +503,10 @@ class _InvoiceWidgetState extends State<InvoiceWidget> {
 class TitleWithValue extends StatelessWidget {
   const TitleWithValue(
       {super.key,
-        required this.value,
-        required this.title,
-        this.isTitleBold,
-        this.isValueBold});
+      required this.value,
+      required this.title,
+      this.isTitleBold,
+      this.isValueBold});
 
   final num value;
   final String title;
@@ -444,12 +521,12 @@ class TitleWithValue extends StatelessWidget {
         Text(title,
             style: TextStyle(
                 fontWeight:
-                isTitleBold != null ? FontWeight.bold : FontWeight.normal)),
+                    isTitleBold != null ? FontWeight.bold : FontWeight.normal)),
         Text(
           Methods.getFormattedNumberWithDecimal(value.toDouble()),
           style: TextStyle(
               fontWeight:
-              isValueBold != null ? FontWeight.bold : FontWeight.normal),
+                  isValueBold != null ? FontWeight.bold : FontWeight.normal),
         ),
       ],
     );

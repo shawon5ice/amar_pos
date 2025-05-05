@@ -1,4 +1,5 @@
 import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
+import 'package:amar_pos/features/exchange/data/models/exchange_product_response_model.dart';
 import 'package:amar_pos/features/exchange/exchange_controller.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +20,7 @@ import '../../../../core/widgets/qr_code_scanner.dart';
 import '../../../inventory/data/products/product_list_response_model.dart';
 import '../../../inventory/presentation/products/add_product_screen.dart';
 import '../../../return/presentation/widgets/return_order_product_sn_selection_dialog.dart';
+import '../../data/models/create_exchange_request_model.dart';
 import '../widgets/exchange_product_sn_selection_widget.dart';
 
 class ExchangeProductSelectionStep extends StatefulWidget {
@@ -94,69 +96,136 @@ class _ExchangeProductSelectionStepState extends State<ExchangeProductSelectionS
                           ),
                           suffixIcon: InkWell(
                               onTap: () async {
-                                final String? scannedCode =
-                                await Navigator.of(context).push(
+                                final scannedCode = await Navigator.of(context).push<String>(
                                   MaterialPageRoute(
-                                    builder: (context) =>
-                                    const QRCodeScannerScreen(),
+                                    builder: (_) => const QRCodeScannerScreen(),
                                   ),
                                 );
-                                if (scannedCode != null &&
-                                    scannedCode.isNotEmpty) {
-                                  suggestionEditingController.text =
-                                      scannedCode;
-                                  var items = await controller
-                                      .suggestionsCallback(scannedCode);
-                                  if (items.length == 1) {
-                                    suggestionEditingController.clear();
-                                    controller
-                                        .addProduct(items.first, unitPrice: items.first.mrpPrice, isReturn: false);
-                                    int value = controller
-                                        .exchangeRequestModel.exchangeProducts
-                                        .singleWhere(
-                                            (e) => e.id == items.first.id)
-                                        .quantity;
-                                    logger.i(value);
-                                    if (value>1) {
-                                      logger.e("HERE");
-                                      int index = controller
-                                          .exchangeRequestModel.exchangeProducts
-                                          .indexOf(controller
-                                          .exchangeRequestModel.exchangeProducts
-                                          .singleWhere((e) =>
-                                      e.id == items.first.id));
-                                      purchaseQTYControllers[index].text =
-                                          (value++).toString();
-                                      logger.e(purchaseQTYControllers[index].text);
-                                      controller.update(['purchase_order_items']);
-                                    } else {
-                                      if(purchaseControllers.isNotEmpty){
-                                        purchaseControllers.insert(0,
-                                            TextEditingController(
-                                                text: items
-                                                    .first.mrpPrice
-                                                    .toString()));
-                                        purchaseQTYControllers.insert(0,
-                                            TextEditingController(
-                                                text: value.toString()));
-                                      }else{
-                                        purchaseControllers.add(
-                                            TextEditingController(
-                                                text: items
-                                                    .first.mrpPrice
-                                                    .toString()));
-                                        purchaseQTYControllers.add(
-                                            TextEditingController(
-                                                text: value.toString()));
-                                      }
-                                    }
 
-                                    FocusScope.of(context).unfocus();
-                                  }else{
-                                    Methods.showSnackbar(msg: "No product found with keyword:$scannedCode");
+                                if (scannedCode == null || scannedCode.isEmpty) return;
+
+                                suggestionEditingController.text = scannedCode;
+
+                                final items = await controller.suggestionsCallback(scannedCode);
+
+                                if (items.length != 1) {
+                                  Methods.showSnackbar(msg: "No product found with keyword: $scannedCode");
+                                  return;
+                                }
+
+                                final item = items.first;
+                                suggestionEditingController.clear();
+
+                                // Check if the product already exists in the current order
+                                final productList = controller.exchangeRequestModel.exchangeProducts;
+                                final existingIndex = productList.indexWhere((e) => e.id == item.id);
+
+                                ProductModel? product;
+
+                                if (existingIndex != -1) {
+                                  // Product exists already
+                                  product = productList[existingIndex];
+                                  final initialQty = product.quantity;
+
+                                  // Don't increment again if your controller method already does
+                                  logger.i("Existing quantity before add: $initialQty");
+
+                                  controller.addProduct(item, unitPrice: product.unitPrice, isReturn: false);
+
+                                  logger.i("Quantity after addPlaceOrderProduct: ${product.quantity}");
+
+                                  purchaseQTYControllers[existingIndex].text = product.quantity.toString();
+                                  controller.update(['purchase_order_items']);
+                                } else {
+                                  // Product not in list — add new
+                                  controller.addProduct(item, unitPrice: item.mrpPrice, isReturn: false);
+
+                                  final newIndex = productList.indexWhere((e) => e.id == item.id);
+                                  if (newIndex == -1) {
+                                    logger.e("Product insert failed");
+                                    return;
+                                  }
+
+                                  product = productList[newIndex];
+
+                                  final priceController = TextEditingController(text: item.mrpPrice.toString());
+                                  final qtyController = TextEditingController(text: product.quantity.toString());
+
+                                  if (purchaseControllers.isNotEmpty) {
+                                    purchaseControllers.insert(0, priceController);
+                                    purchaseQTYControllers.insert(0, qtyController);
+                                  } else {
+                                    purchaseControllers.add(priceController);
+                                    purchaseQTYControllers.add(qtyController);
                                   }
                                 }
+
+                                FocusScope.of(context).unfocus();
                               },
+                              // onTap: () async {
+                              //   final String? scannedCode =
+                              //   await Navigator.of(context).push(
+                              //     MaterialPageRoute(
+                              //       builder: (context) =>
+                              //       const QRCodeScannerScreen(),
+                              //     ),
+                              //   );
+                              //   if (scannedCode != null &&
+                              //       scannedCode.isNotEmpty) {
+                              //     suggestionEditingController.text =
+                              //         scannedCode;
+                              //     var items = await controller
+                              //         .suggestionsCallback(scannedCode);
+                              //     if (items.length == 1) {
+                              //       suggestionEditingController.clear();
+                              //       controller
+                              //           .addProduct(items.first, unitPrice: items.first.mrpPrice, isReturn: false);
+                              //       int value = controller
+                              //           .exchangeRequestModel.exchangeProducts
+                              //           .singleWhere(
+                              //               (e) => e.id == items.first.id)
+                              //           .quantity;
+                              //       logger.i(value);
+                              //       if (value>1) {
+                              //         logger.e("HERE");
+                              //         int index = controller
+                              //             .exchangeRequestModel.exchangeProducts
+                              //             .indexOf(controller
+                              //             .exchangeRequestModel.exchangeProducts
+                              //             .singleWhere((e) =>
+                              //         e.id == items.first.id));
+                              //         purchaseQTYControllers[index].text =
+                              //             (value++).toString();
+                              //         logger.e(purchaseQTYControllers[index].text);
+                              //         controller.update(['purchase_order_items']);
+                              //       } else {
+                              //         if(purchaseControllers.isNotEmpty){
+                              //           purchaseControllers.insert(0,
+                              //               TextEditingController(
+                              //                   text: items
+                              //                       .first.mrpPrice
+                              //                       .toString()));
+                              //           purchaseQTYControllers.insert(0,
+                              //               TextEditingController(
+                              //                   text: value.toString()));
+                              //         }else{
+                              //           purchaseControllers.add(
+                              //               TextEditingController(
+                              //                   text: items
+                              //                       .first.mrpPrice
+                              //                       .toString()));
+                              //           purchaseQTYControllers.add(
+                              //               TextEditingController(
+                              //                   text: value.toString()));
+                              //         }
+                              //       }
+                              //
+                              //       FocusScope.of(context).unfocus();
+                              //     }else{
+                              //       Methods.showSnackbar(msg: "No product found with keyword:$scannedCode");
+                              //     }
+                              //   }
+                              // },
                               child: const Icon(
                                 Icons.qr_code_scanner_sharp,
                                 color: AppColors.accent,
@@ -260,7 +329,7 @@ class _ExchangeProductSelectionStepState extends State<ExchangeProductSelectionS
                 backgroundColor: AppColors.accent,
                 child: IconButton(
                   onPressed: () {
-                    Get.toNamed(AddProductScreen.routeName);
+                    Get.toNamed(AddProductScreen.routeName,arguments: true);
                   },
                   icon: const Icon(Icons.add),
                 ),

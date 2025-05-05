@@ -50,7 +50,7 @@ class TotalStatusWidget extends StatelessWidget {
               addH(8.h),
               isLoading
                   ? SizedBox(
-                  height: 24.sp, width: 24.sp, child: CupertinoActivityIndicator() )
+                  height: 18.sp, width: 18.sp, child: CupertinoActivityIndicator() )
                   : AutoSizeText(
                 value != null ? value! : '--',
                 maxFontSize: 18.sp,

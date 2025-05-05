@@ -148,6 +148,7 @@ class ExchangeService{
     required DateTime? startDate,
     required DateTime? endDate,
     required String? search,
+    required bool? shouldPrint,
 
   }) async {
     // logger.d("PDF: $isPdf");
@@ -179,6 +180,7 @@ class ExchangeService{
       url: downloadUrl,
       token: usrToken,
       query: query,
+      shouldPrint: shouldPrint,
       fileName: fileName,);
   }
 

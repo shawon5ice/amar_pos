@@ -10,6 +10,8 @@ ExchangeHistoryResponseModel _$ExchangeHistoryResponseModelFromJson(
         Map<String, dynamic> json) =>
     ExchangeHistoryResponseModel(
       success: json['success'] as bool,
+      countTotal: json['count_total'] as num,
+      amountTotal: json['amount_total'] as num,
       data: ExchangeHistoryData.fromJson(json['data'] as Map<String, dynamic>),
     );
 
@@ -18,6 +20,8 @@ Map<String, dynamic> _$ExchangeHistoryResponseModelToJson(
     <String, dynamic>{
       'success': instance.success,
       'data': instance.data,
+      'count_total': instance.countTotal,
+      'amount_total': instance.amountTotal,
     };
 
 ExchangeHistoryData _$ExchangeHistoryDataFromJson(Map<String, dynamic> json) =>

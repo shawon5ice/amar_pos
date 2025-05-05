@@ -28,7 +28,9 @@ class _SoldHistoryState extends State<ExchangeProducts> {
 
   @override
   void initState() {
-    controller.getExchangeProducts();
+    controller.getExchangeProducts(
+      productType: _selected.first == 'exchange' ? 3 : 2,
+    );
     super.initState();
   }
 
@@ -49,7 +51,7 @@ class _SoldHistoryState extends State<ExchangeProducts> {
           child: Column(
             children: [
               SegmentedButton(
-                segments: [
+                segments: const [
                 ButtonSegment(value: 'exchange', label: Text('Exchange Produccts')),
                 ButtonSegment(value: 'return', label: Text('Return Products'))
               ], selected: _selected,
@@ -129,7 +131,7 @@ class _SoldHistoryState extends State<ExchangeProducts> {
                     TotalStatusWidget(
                       flex: 4,
                       isLoading: controller.isExchangeProductListLoading,
-                      title: 'Sold Amount',
+                      title: 'Total Amount',
                       value: controller.exchangeProductResponseModel != null
                           ? Methods.getFormattedNumber(controller
                           .exchangeProductResponseModel!.amountTotal

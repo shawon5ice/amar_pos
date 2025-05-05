@@ -8,117 +8,117 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
 
-Future<Uint8List> generateOptimizedInvoicePdf(PosInvoiceModel posInvoiceModel) async {
-  final pdf = pw.Document();
-
-  final subtotal = posInvoiceModel.products.fold<num>(
-    0,
-        (sum, item) => sum + (item.qty * item.unitPrice),
-  );
-
-  final vat = posInvoiceModel.vat.toDouble();
-  final additionalCharge = posInvoiceModel.additionalCharge.toDouble();
-  final discount = posInvoiceModel.discount.toDouble();
-  final total = subtotal + vat + additionalCharge - discount;
-
-  pdf.addPage(
-    pw.Page(
-      pageFormat: PdfPageFormat.roll80,
-      build: (pw.Context context) {
-        return pw.Padding(
-          padding: pw.EdgeInsets.symmetric(horizontal: 4),
-          child: pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: [
-              pw.Center(
-                child: pw.Column(
-                  children: [
-                    pw.Text(posInvoiceModel.storeName, style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold)),
-                    pw.Text(posInvoiceModel.storeAddress, style: pw.TextStyle(fontSize: 8), textAlign: pw.TextAlign.center),
-                    pw.Text(posInvoiceModel.storePhone, style: pw.TextStyle(fontSize: 8)),
-                    pw.SizedBox(height: 4),
-                    pw.Text("Invoice #: ${posInvoiceModel.invoiceNo}", style: pw.TextStyle(fontSize: 8)),
-                    pw.Text("Date: ${posInvoiceModel.invoiceDate}", style: pw.TextStyle(fontSize: 8)),
-                  ],
-                ),
-              ),
-              pw.Divider(thickness: 1),
-              pw.Text('Customer: ${posInvoiceModel.customerName}', style: pw.TextStyle(fontSize: 8)),
-              pw.Text('Phone: ${posInvoiceModel.customerPhone}', style: pw.TextStyle(fontSize: 8)),
-              if (posInvoiceModel.customerAddress != null) pw.Text('Address: ${posInvoiceModel.customerAddress}', style: pw.TextStyle(fontSize: 8)),
-              pw.Divider(thickness: 1),
-              pw.Row(
-                children: [
-                  pw.Expanded(
-                    flex: 3,
-                    child: pw.Text("Item", style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold)),
-                  ),
-                  pw.SizedBox(width: 4),
-                  pw.Expanded(
-                    flex: 1,
-                    child: pw.Text('Qty', style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold)),
-                  ),
-                  pw.SizedBox(width: 4),
-                  pw.Expanded(
-                    flex: 1,
-                    child: pw.Text('Price', style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold)),
-                  ),
-                  pw.SizedBox(width: 4),
-                  pw.Expanded(
-                    flex: 1,
-                    child: pw.Text('Total', style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold)),
-                  ),
-                ],
-              ),
-              pw.Divider(thickness: 1),
-              ...posInvoiceModel.products.map((item) {
-                int index = posInvoiceModel.products.indexOf(item);
-                return pw.Padding(
-                padding: pw.EdgeInsets.symmetric(vertical: 2),
-                child: pw.Row(
-                  crossAxisAlignment: pw.CrossAxisAlignment.start,
-                  children: [
-                    pw.Expanded(
-                      flex: 3,
-                      child: pw.Text("${index+1}. ${item.name}", style: pw.TextStyle(fontSize: 8)),
-                    ),
-                    pw.SizedBox(width: 4),
-                    pw.Expanded(
-                      flex: 1,
-                      child: pw.Text('x${item.qty}', style: const pw.TextStyle(fontSize: 8)),
-                    ),
-                    pw.SizedBox(width: 4),
-                    pw.Expanded(
-                      flex: 1,
-                      child: pw.Text('${item.unitPrice}', style: pw.TextStyle(fontSize: 8)),
-                    ),
-                    pw.SizedBox(width: 4),
-                    pw.Expanded(
-                      flex: 1,
-                      child: pw.Text('${item.qty * item.unitPrice}', style: pw.TextStyle(fontSize: 8)),
-                    ),
-                  ],
-                ),
-              );
-              }),
-              pw.Divider(thickness: 1),
-              _buildSummaryRow('Subtotal', subtotal),
-              _buildSummaryRow('VAT', vat),
-              _buildSummaryRow('Add. Charge', additionalCharge),
-              _buildSummaryRow('Discount', discount),
-              pw.Divider(thickness: 1),
-              _buildSummaryRow('Total', total, isBold: true),
-              pw.Divider(thickness: 1),
-              pw.Center(child: pw.Text('Thank You!', style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold))),
-            ],
-          ),
-        );
-      },
-    ),
-  );
-
-  return await pdf.save();
-}
+// Future<Uint8List> generateOptimizedInvoicePdf(PosInvoiceModel posInvoiceModel) async {
+//   final pdf = pw.Document();
+//
+//   final subtotal = posInvoiceModel.products.fold<num>(
+//     0,
+//         (sum, item) => sum + (item.qty * item.unitPrice),
+//   );
+//
+//   final vat = posInvoiceModel.vat.toDouble();
+//   final additionalCharge = posInvoiceModel.additionalCharge.toDouble();
+//   final discount = posInvoiceModel.discount.toDouble();
+//   final total = subtotal + vat + additionalCharge - discount;
+//
+//   pdf.addPage(
+//     pw.Page(
+//       pageFormat: PdfPageFormat.roll80,
+//       build: (pw.Context context) {
+//         return pw.Padding(
+//           padding: pw.EdgeInsets.symmetric(horizontal: 4),
+//           child: pw.Column(
+//             crossAxisAlignment: pw.CrossAxisAlignment.start,
+//             children: [
+//               pw.Center(
+//                 child: pw.Column(
+//                   children: [
+//                     pw.Text(posInvoiceModel.storeName, style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold)),
+//                     pw.Text(posInvoiceModel.storeAddress, style: pw.TextStyle(fontSize: 8), textAlign: pw.TextAlign.center),
+//                     pw.Text(posInvoiceModel.storePhone, style: pw.TextStyle(fontSize: 8)),
+//                     pw.SizedBox(height: 4),
+//                     pw.Text("Invoice #: ${posInvoiceModel.invoiceNo}", style: pw.TextStyle(fontSize: 8)),
+//                     pw.Text("Date: ${posInvoiceModel.invoiceDate}", style: pw.TextStyle(fontSize: 8)),
+//                   ],
+//                 ),
+//               ),
+//               pw.Divider(thickness: 1),
+//               pw.Text('Customer: ${posInvoiceModel.customerName}', style: pw.TextStyle(fontSize: 8)),
+//               pw.Text('Phone: ${posInvoiceModel.customerPhone}', style: pw.TextStyle(fontSize: 8)),
+//               if (posInvoiceModel.customerAddress != null) pw.Text('Address: ${posInvoiceModel.customerAddress}', style: pw.TextStyle(fontSize: 8)),
+//               pw.Divider(thickness: 1),
+//               pw.Row(
+//                 children: [
+//                   pw.Expanded(
+//                     flex: 3,
+//                     child: pw.Text("Item", style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold)),
+//                   ),
+//                   pw.SizedBox(width: 4),
+//                   pw.Expanded(
+//                     flex: 1,
+//                     child: pw.Text('Qty', style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold)),
+//                   ),
+//                   pw.SizedBox(width: 4),
+//                   pw.Expanded(
+//                     flex: 1,
+//                     child: pw.Text('Price', style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold)),
+//                   ),
+//                   pw.SizedBox(width: 4),
+//                   pw.Expanded(
+//                     flex: 1,
+//                     child: pw.Text('Total', style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold)),
+//                   ),
+//                 ],
+//               ),
+//               pw.Divider(thickness: 1),
+//               ...posInvoiceModel.products.map((item) {
+//                 int index = posInvoiceModel.products.indexOf(item);
+//                 return pw.Padding(
+//                 padding: pw.EdgeInsets.symmetric(vertical: 2),
+//                 child: pw.Row(
+//                   crossAxisAlignment: pw.CrossAxisAlignment.start,
+//                   children: [
+//                     pw.Expanded(
+//                       flex: 3,
+//                       child: pw.Text("${index+1}. ${item.name}", style: pw.TextStyle(fontSize: 8)),
+//                     ),
+//                     pw.SizedBox(width: 4),
+//                     pw.Expanded(
+//                       flex: 1,
+//                       child: pw.Text('x${item.qty}', style: const pw.TextStyle(fontSize: 8)),
+//                     ),
+//                     pw.SizedBox(width: 4),
+//                     pw.Expanded(
+//                       flex: 1,
+//                       child: pw.Text('${item.unitPrice}', style: pw.TextStyle(fontSize: 8)),
+//                     ),
+//                     pw.SizedBox(width: 4),
+//                     pw.Expanded(
+//                       flex: 1,
+//                       child: pw.Text('${item.qty * item.unitPrice}', style: pw.TextStyle(fontSize: 8)),
+//                     ),
+//                   ],
+//                 ),
+//               );
+//               }),
+//               pw.Divider(thickness: 1),
+//               _buildSummaryRow('Subtotal', subtotal),
+//               _buildSummaryRow('VAT', vat),
+//               _buildSummaryRow('Add. Charge', additionalCharge),
+//               _buildSummaryRow('Discount', discount),
+//               pw.Divider(thickness: 1),
+//               _buildSummaryRow('Total', total, isBold: true),
+//               pw.Divider(thickness: 1),
+//               pw.Center(child: pw.Text('Thank You!', style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold))),
+//             ],
+//           ),
+//         );
+//       },
+//     ),
+//   );
+//
+//   return await pdf.save();
+// }
 
 pw.Widget _buildSummaryRow(String label, num value, {bool isBold = false}) {
   return pw.Padding(

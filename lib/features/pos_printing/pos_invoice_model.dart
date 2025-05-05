@@ -7,11 +7,10 @@ class PosInvoiceModel {
   final String customerName;
   final String customerPhone;
   final String? customerAddress;
+  final num? changeAmount;
   final List<PosProduct> products;
-  final num vat;
-  final num subTotal;
-  final num discount;
-  final num additionalCharge;
+  final Map<String, dynamic> paymentUpperSection;
+  final Map<String, dynamic> paymentDetails;
 
 
   PosInvoiceModel({
@@ -24,10 +23,9 @@ class PosInvoiceModel {
     required this.customerPhone,
     required this.customerAddress,
     required this.products,
-    required this.vat,
-    required this.discount,
-    required this.additionalCharge,
-    required this.subTotal,
+    required this.changeAmount,
+    required this.paymentUpperSection,
+    required this.paymentDetails,
   });
 
 
@@ -42,7 +40,7 @@ class PosInvoiceModel {
       'customerName': customerName,
       'customerPhone': customerPhone,
       'customerAddress': customerAddress,
-      'additionalCharge': additionalCharge,
+      'changeAmount': changeAmount,
       'products': products.map((product) => product.toJson()).toList(),
     };
   }
@@ -55,13 +53,12 @@ class PosInvoiceModel {
       storePhone: json['storePhone'],
       invoiceDate: json['invoiceDate'],
       invoiceNo: json['invoiceNo'],
-      additionalCharge: json['additionalCharge'],
       customerName: json['customerName'],
       customerPhone: json['customerPhone'],
+      paymentUpperSection: json['paymentUpperSection'],
+      paymentDetails: json['paymentDetails'],
+      changeAmount: json['changeAmount'],
       customerAddress: json['customerAddress'],
-      vat: json['vat'],
-      discount: json['discount'],
-      subTotal: json['subTotal'],
       products: (json['products'] as List)
           .map((productJson) => PosProduct.fromJson(productJson))
           .toList(),

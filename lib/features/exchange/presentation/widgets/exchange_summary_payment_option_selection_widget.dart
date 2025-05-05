@@ -34,8 +34,11 @@ class _ExchangeSummaryPaymentOptionSelectionWidgetState
 
   final ExchangeController controller = Get.find();
 
+  late TextEditingController _textEditingController;
+
   @override
   void initState() {
+    _textEditingController = TextEditingController();
     paidAmount = TextEditingController();
     paidAmount.text = widget.paymentMethodTracker.paidAmount.toString();
     super.initState();
@@ -43,19 +46,32 @@ class _ExchangeSummaryPaymentOptionSelectionWidgetState
 
   @override
   void didUpdateWidget(covariant ExchangeSummaryPaymentOptionSelectionWidget oldWidget) {
-    if(oldWidget.key != widget.key){
-      paidAmount.text = "";
-      controller.calculateAmount();
+    if(mounted){
+      if(oldWidget.key != widget.key){
+        paidAmount.text = "";
+        controller.calculateAmount();
+      }
     }
+
     super.didUpdateWidget(oldWidget);
   }
 
+  @override
+  void dispose() {
+    if(mounted){
+      _textEditingController.dispose();
+      paidAmount.dispose();
+    }
+
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return GetBuilder<ExchangeController>(
       key: Key(controller.paymentMethodTracker.indexOf(widget.paymentMethodTracker).toString()),
       id: "billing_payment_methods",
       builder: (controller) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           addH(8),
           Row(
@@ -74,7 +90,7 @@ class _ExchangeSummaryPaymentOptionSelectionWidgetState
                         hint: Text(
                           "Select Payment",
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 12.sp,
                             color: Theme.of(context).hintColor,
                           ),
                         ),
@@ -84,7 +100,7 @@ class _ExchangeSummaryPaymentOptionSelectionWidgetState
                             value: item,
                             child: Text(
                               item.name,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -113,7 +129,7 @@ class _ExchangeSummaryPaymentOptionSelectionWidgetState
                           }
                         },
                         buttonStyleData: ButtonStyleData(
-                          height: 48.sp,
+                          height: 56,
                           padding: EdgeInsets.zero,
                           decoration: BoxDecoration(
                             border:
@@ -179,7 +195,13 @@ class _ExchangeSummaryPaymentOptionSelectionWidgetState
               ),
               addW(4),
               GestureDetector(onTap: (){
-                FocusScope.of(context).unfocus();
+                WidgetsBinding.instance.addPostFrameCallback(
+                      (_) {
+                    if (mounted) {
+                      FocusScope.of(context).unfocus();
+                    }
+                  },
+                );
                 if(controller.paymentMethodTracker.length == 1){
                   widget.paymentMethodTracker.paidAmount = 0;
                   paidAmount.text = "";
@@ -188,8 +210,9 @@ class _ExchangeSummaryPaymentOptionSelectionWidgetState
                   widget.paymentMethodTracker.paidAmount = 0;
                   widget.onDeleteTap();
                 }
+
                 // controller.deletePaymentMethod(widget.key!);
-                controller.update(['billing_summary_form','summary_form']);
+                controller.update(['billing_summary_form']);
               }, child: Padding(
                 padding: const EdgeInsets.only(top: 24),
                 child: SvgPicture.asset(
@@ -209,7 +232,7 @@ class _ExchangeSummaryPaymentOptionSelectionWidgetState
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               addH(8),
-              RichFieldTitle(
+              const RichFieldTitle(
                 text: "Payment Options",
               ),
               addH(4),
@@ -223,6 +246,30 @@ class _ExchangeSummaryPaymentOptionSelectionWidgetState
                       color: Theme.of(context).hintColor,
                     ),
                   ),
+                  dropdownSearchData: DropdownSearchData(
+                    searchController: _textEditingController,
+                    searchInnerWidgetHeight: 48,
+                    searchInnerWidget: Padding(
+                      padding:
+                      const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+                      child: TextFormField(
+                        controller: _textEditingController,
+                        decoration: InputDecoration(
+                          isDense: true,
+                          hintText: "Search Supplier",
+                          hintStyle: const TextStyle(fontSize: 12),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                    ),
+                    searchMatchFn: (item, searchValue) {
+                      return item.value!.name
+                          .toLowerCase()
+                          .contains(searchValue.toLowerCase());
+                    },
+                  ),
                   items: widget
                       .paymentMethodTracker.paymentMethod?.paymentOptions
                       .map((PaymentOption item) =>
@@ -230,7 +277,7 @@ class _ExchangeSummaryPaymentOptionSelectionWidgetState
                         value: item,
                         child: Text(
                           item.name,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
                           ),
@@ -240,12 +287,18 @@ class _ExchangeSummaryPaymentOptionSelectionWidgetState
                       .toList(),
                   value: widget.paymentMethodTracker.paymentOption,
                   onChanged: (value) {
+                    for(int i=0;i<controller.paymentMethodTracker.length; i++){
+                      if(controller.paymentMethodTracker[i].paymentOption?.id == value?.id ){
+                        Methods.showSnackbar(msg: "Please select another bank");
+                        return;
+                      }
+                    }
                     widget.paymentMethodTracker.paymentOption = value;
                     controller
                         .update(['billing_payment_methods', 'billing_summary_form','summary_form']);
                   },
                   buttonStyleData: ButtonStyleData(
-                    height: 48,
+                    height: 56,
                     padding: EdgeInsets.zero,
                     decoration: BoxDecoration(
                       border:

@@ -539,7 +539,7 @@ class _ReturnSummaryState extends State<ReturnSummary> {
                 controller.createOrderModel.address = controller.isRetailSale
                     ? customerAddressEditingController.text
                     : controller.selectedClient!.address;
-                if(controller.totalPaid > controller.paidAmount){
+                if(controller.totalPaid != controller.paidAmount){
                   ErrorExtractor.showSingleErrorDialog(context, "Payment amount must be equal to ${controller.paidAmount}. Please adjust.");
                   // Methods.showSnackbar(
                   //     msg: "Payment amount must be equal to ${controller.paidAmount}. Please adjust.");

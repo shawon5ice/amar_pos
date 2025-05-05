@@ -6,10 +6,16 @@ part 'exchange_history_response_model.g.dart';
 class ExchangeHistoryResponseModel {
   final bool success;
   final ExchangeHistoryData data;
+  @JsonKey(name: "count_total")
+  final num countTotal;
+  @JsonKey(name: "amount_total")
+  final num amountTotal;
 
   ExchangeHistoryResponseModel({
     required this.success,
     required this.data,
+    required this.amountTotal,
+    required this.countTotal
   });
 
   factory ExchangeHistoryResponseModel.fromJson(Map<String, dynamic> json) =>

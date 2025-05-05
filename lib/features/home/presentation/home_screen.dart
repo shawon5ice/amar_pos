@@ -76,7 +76,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               icon: Get.isDarkMode ? Icon(Icons.sunny) : Icon(Icons.nightlight)),
           IconButton(
               onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => BluetoothPrinterScreen()));
+                // Navigator.push(context, MaterialPageRoute(builder: (context) => BluetoothPrinterScreen()));
               },
               icon: Icon(Icons.print))
         ],

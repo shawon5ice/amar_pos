@@ -10,6 +10,8 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../core/responsive/pixel_perfect.dart';
 import '../../../../core/widgets/methods/helper_methods.dart';
 import '../../../../core/widgets/methods/number_to_word.dart';
+import '../../../pos_printing/bluetooth_printer_screen.dart';
+import '../../../pos_printing/pos_invoice_model.dart';
 import '../../data/models/purchase_history_details/purchase_history_details_response_model.dart';
 
 class PurchaseHistoryDetailsView extends StatefulWidget {
@@ -400,6 +402,61 @@ class _PurchaseHistoryDetailsViewState
                             orderNo: orderNo,
                             isPdf: true,
                             orderId: orderId);
+                      },
+                    ),
+                  ),
+                  addW(20),
+                  Expanded(
+                    child: CustomButton(
+                      text: "POS Print",
+                      radius: 8,
+                      color: AppColors.primary,
+                      onTap: () {
+
+                        PurchaseHistoryDetailsData invoice = controller
+                            .purchaseHistoryDetailsResponseModel!.data;
+
+                        final Map<String, double> paymentDetails = invoice.paymentDetails.fold({}, (map, e) {
+                          final key = e.bank != null ? e.bank!.name : e.name;
+                          map[key] = e.amount;
+                          return map;
+                        });
+
+                        Map<String, dynamic> upperSectionData = {
+                          "Sub Total" : invoice.subTotal,
+                          "Additional Charge": invoice.expense,
+                          "Discount": invoice.discount,
+                          "Payable Amount": invoice.payable,
+                        };
+
+                        var posInvoiceModel = PosInvoiceModel(
+                            storeName: invoice.business.name,
+                            storeAddress: invoice.business.address,
+                            storePhone: invoice.business.phone,
+                            customerName: invoice.supplier.name,
+                            customerPhone: invoice.supplier.phone,
+                            customerAddress: invoice.supplier.address,
+                            invoiceDate: invoice.dateTime,
+                            invoiceNo: invoice.orderNo,
+                            paymentUpperSection: upperSectionData,
+                            paymentDetails: paymentDetails,
+                            changeAmount: null,
+                            products: invoice.details
+                                .map((e) => PosProduct(
+                                name: e.name,
+                                qty: e.quantity,
+                                unitPrice: e.unitPrice,
+                                subTotal: e.total))
+                                .toList());
+
+                        Get.to(BluetoothPrinterScreen(),arguments: posInvoiceModel);
+                        // Navigator.push(context, MaterialPageRoute(builder: (context) => BluetoothPrinterScreen(),),);
+                        // controller.downloadSaleHistory(
+                        //     shouldPrint: true,
+                        //     orderNo: orderNo,
+                        //     isPdf: true,
+                        //     orderId: orderId);
+
                       },
                     ),
                   ),

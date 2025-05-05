@@ -79,10 +79,12 @@ class _ExchangeScreenState extends State<ExchangeScreen> with SingleTickerProvid
           controller.exchangeProducts.clear();
           _tabController.animateTo(newIndex);
         }
+      }else if(_tabController.index == 2){
+        controller.getExchangeProducts(
+          productType: 3,
+        );
       }
-      if(_tabController.indexIsChanging && _tabController.index != _tabController.previousIndex){
-        controller.clearFilter();
-      }
+      controller.clearFilter();
       controller.update(['action_icon']);
     });
     super.initState();
@@ -141,11 +143,12 @@ class _ExchangeScreenState extends State<ExchangeScreen> with SingleTickerProvid
                         selectedBrand: controller.brand,
                         disableOutlet: true,
                         selectedCategory: controller.category,
-                        selectedDateTimeRange: null,
+                        selectedDateTimeRange: controller.selectedDateTimeRange.value,
                         onSubmit: (FilterItem? brand,FilterItem? category,DateTimeRange? dateTimeRange, OutletModel? outlet){
                           controller.update(['action_icon']);
                           controller.brand = brand;
                           controller.category = category;
+                          controller.selectedDateTimeRange.value = dateTimeRange;
                           // controller.selectedDateTimeRange.value = dateTimeRange;
                           logger.i(controller.brand);
                           logger.i(controller.category?.id);

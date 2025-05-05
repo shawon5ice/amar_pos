@@ -10,7 +10,9 @@ import '../../../core/constants/app_assets.dart';
 import '../../../core/methods/helper_methods.dart';
 import '../../../core/responsive/pixel_perfect.dart';
 import '../../../core/widgets/custom_text_field.dart';
+import '../../../core/widgets/methods/helper_methods.dart';
 import '../../../core/widgets/pager_list_view.dart';
+import '../../../core/widgets/reusable/status/total_status_widget.dart';
 import '../../inventory/presentation/stock_report/widget/custom_svg_icon_widget.dart';
 import 'widgets/exchange_history_item_widget.dart';
 
@@ -84,42 +86,45 @@ class _ExchangeHistoryScreenState extends State<ExchangeHistoryScreen> {
                   addW(4),
                   CustomSvgIconButton(
                     bgColor: const Color(0xffFFFCF8),
-                    onTap: () {},
+                    onTap: () {
+                      controller.downloadList(isPdf: true, returnHistory: true,shouldPrint: true);
+                    },
                     assetPath: AppAssets.printIcon,
                   )
                 ],
               ),
-              // addH(8.px),
-              // GetBuilder<ExchangeController>(
-              //   id: 'total_widget',
-              //   builder: (controller) => Row(
-              //     children: [
-              //       TotalStatusWidget(
-              //         flex: 3,
-              //         isLoading: controller.isExchangeHistoryListLoading,
-              //         title: 'Invoice',
-              //         value: controller.exchangeHistoryResponseModel != null
-              //             ? Methods.getFormattedNumber(controller
-              //             .exchangeHistoryResponseModel!.data.exchangeHistoryList.length
-              //             .toDouble())
-              //             : null,
-              //         asset: AppAssets.invoice,
-              //       ),
-              //       addW(12),
-              //       TotalStatusWidget(
-              //         flex: 4,
-              //         isLoading: controller.isReturnHistoryListLoading,
-              //         title: 'Returned Amount',
-              //         value: controller.returnHistoryResponseModel != null
-              //             ? Methods.getFormatedPrice(controller
-              //             .returnHistoryResponseModel!.amountTotal
-              //             .toDouble())
-              //             : null,
-              //         asset: AppAssets.amount,
-              //       ),
-              //     ],
-              //   ),
-              // ),
+              addH(8),
+              GetBuilder<ExchangeController>(
+                id: 'total_widget',
+                builder: (controller) => Row(
+                  children: [
+                    TotalStatusWidget(
+                      flex: 3,
+                      isLoading: controller.isExchangeHistoryListLoading,
+                      title: 'Invoice',
+                      value: controller.exchangeHistoryResponseModel != null
+                          ? Methods.getFormattedNumber(controller
+                          .exchangeHistoryResponseModel!.data.exchangeHistoryList.length
+                          .toDouble())
+                          : null,
+                      asset: AppAssets.invoice,
+                    ),
+                    addW(12),
+                    TotalStatusWidget(
+                      flex: 4,
+                      isLoading: controller.isExchangeHistoryListLoading,
+                      title: 'Returned Amount',
+                      value: controller.exchangeHistoryResponseModel != null
+                          ? Methods.getFormatedPrice(controller
+                          .exchangeHistoryResponseModel!.amountTotal
+                          .toDouble())
+                          : null,
+                      asset: AppAssets.amount,
+                    ),
+                  ],
+                ),
+              ),
+              addH(4),
               Obx(() {
                 return controller.selectedDateTimeRange.value == null ? addH(0): Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -183,66 +188,5 @@ class _ExchangeHistoryScreenState extends State<ExchangeHistoryScreen> {
         ),
       ),
     );
-  }
-}
-
-class TotalStatusWidget extends StatelessWidget {
-  const TotalStatusWidget({
-    super.key,
-    required this.title,
-    this.value,
-    required this.isLoading,
-    required this.asset,
-    this.flex = 1,
-  });
-
-  final String title;
-  final String? value;
-  final bool isLoading;
-  final String asset;
-  final int flex;
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-        flex: flex,
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      color: Color(0xffA2A2A2),
-                      fontSize: 14.sp,
-                    ),
-                  ),
-                  const Spacer(),
-                  SvgPicture.asset(asset)
-                ],
-              ),
-              addH(12),
-              isLoading
-                  ? Container(
-                  height: 30.sp, width: 30.sp, child: SpinKitFadingGrid(color: Colors.black,size: 20,))
-                  : Text(
-                value != null ? value! : '--',
-                style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 20.sp,
-                    height: 1.5.sp
-                ),
-              )
-            ],
-          ),
-        ));
   }
 }
