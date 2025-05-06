@@ -15,16 +15,6 @@ PermissionApiResponse _$PermissionApiResponseFromJson(
       ),
     );
 
-
-PermissionApiResponse _$PermissionApiResponseFromJsonForGroupData(
-        Map<String, dynamic> json,) =>
-    PermissionApiResponse(
-      success: json['success'] as bool,
-      data: (json['groupedData'] as Map<String, dynamic>).map(
-        (k, e) => MapEntry(k, Map<String, String>.from(e as Map)),
-      ),
-    );
-
 Map<String, dynamic> _$PermissionApiResponseToJson(
         PermissionApiResponse instance) =>
     <String, dynamic>{

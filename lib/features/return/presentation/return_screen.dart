@@ -117,8 +117,12 @@ class _SalesScreenState extends State<ReturnScreen>
               id: 'action_icon',
               builder: (controller) => _tabController.index == 0? SizedBox(): GestureDetector(
                 onTap: (){
-                  showModalBottomSheet(context: context, builder:(context) => ReturnHistoryFilterBottomSheet(
-                    saleHistory: _tabController.index == 1,
+                  showModalBottomSheet(
+                      isScrollControlled: true,
+                      context: context, builder:(context) => ReturnHistoryFilterBottomSheet(
+                    returnHistory: _tabController.index == 1,
+                    selectedBrand: controller.brand,
+                    selectedCategory: controller.category,
                   ));
                 },
                 child: SvgPicture.asset(AppAssets.funnelFilter),

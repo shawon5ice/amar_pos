@@ -52,7 +52,7 @@ class SupplierController extends GetxController {
       } else {
         // Perform case-insensitive search
         supplierList = allSupplierCopy
-            .where((e) => e.name.toLowerCase().contains(search.toLowerCase()))
+            .where((supplier) => supplier.phone.toString().toLowerCase().contains(search.toLowerCase()) || (supplier.name.toLowerCase().contains(search.toLowerCase())))
             .toList();
       }
     } catch (e) {

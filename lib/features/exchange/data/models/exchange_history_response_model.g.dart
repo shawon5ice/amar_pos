@@ -10,9 +10,9 @@ ExchangeHistoryResponseModel _$ExchangeHistoryResponseModelFromJson(
         Map<String, dynamic> json) =>
     ExchangeHistoryResponseModel(
       success: json['success'] as bool,
-      countTotal: json['count_total'] as num,
-      amountTotal: json['amount_total'] as num,
       data: ExchangeHistoryData.fromJson(json['data'] as Map<String, dynamic>),
+      amountTotal: json['amount_total'] as num,
+      countTotal: json['count_total'] as num,
     );
 
 Map<String, dynamic> _$ExchangeHistoryResponseModelToJson(
@@ -72,8 +72,8 @@ Map<String, dynamic> _$ExchangeOrderInfoToJson(ExchangeOrderInfo instance) =>
 Customer _$CustomerFromJson(Map<String, dynamic> json) => Customer(
       id: (json['id'] as num).toInt(),
       name: json['name'] as String,
-      phone: json['phone'] as String? ?? 'N/A',
-      address: json['address'] as String? ??'N/A',
+      phone: json['phone'] as String,
+      address: json['address'] as String?,
     );
 
 Map<String, dynamic> _$CustomerToJson(Customer instance) => <String, dynamic>{

@@ -25,12 +25,12 @@ SaleHistory _$SaleHistoryFromJson(Map<String, dynamic> json) => SaleHistory(
       date: json['date'] as String,
       orderNo: json['order_no'] as String,
       saleType: json['sale_type'] as String,
-      quantity: json['quantity'] as int,
       customer: Customer.fromJson(json['customer'] as Map<String, dynamic>),
       discount: (json['discount'] as num).toDouble(),
       amount: (json['amount'] as num).toDouble(),
       paidAmount: (json['paid_amount'] as num).toDouble(),
       vat: (json['vat'] as num).toDouble(),
+      quantity: (json['quantity'] as num).toInt(),
       isActionable: json['is_actionable'] as bool,
     );
 
@@ -45,6 +45,7 @@ Map<String, dynamic> _$SaleHistoryToJson(SaleHistory instance) =>
       'amount': instance.amount,
       'paid_amount': instance.paidAmount,
       'vat': instance.vat,
+      'quantity': instance.quantity,
       'is_actionable': instance.isActionable,
     };
 
