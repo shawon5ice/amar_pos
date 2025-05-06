@@ -71,7 +71,7 @@ class Supplier {
     id = json['id'];
     business = json['business'];
     name = json['name'];
-    code  = json['code '];
+    code  = json['code'];
     phone = json['phone'];
     address = json['address'];
     openingBalance = json['opening_balance'];

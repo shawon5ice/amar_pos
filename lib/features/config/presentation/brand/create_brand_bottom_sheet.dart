@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:amar_pos/core/constants/app_colors.dart';
+import 'package:amar_pos/core/network/helpers/error_extractor.dart';
 import 'package:amar_pos/core/widgets/custom_button.dart';
 import 'package:amar_pos/core/widgets/dotted_border_painter.dart';
 import 'package:file_picker/file_picker.dart';
@@ -15,6 +17,7 @@ import 'brand_controller.dart';
 
 class CreateBrandBottomSheet extends StatefulWidget {
   const CreateBrandBottomSheet({super.key, this.brand});
+
   final BrandDetails? brand;
 
   @override
@@ -29,7 +32,7 @@ class _CreateBrandBottomSheetState extends State<CreateBrandBottomSheet> {
   @override
   void initState() {
     _textEditingController = TextEditingController();
-    if(widget.brand != null){
+    if (widget.brand != null) {
       _textEditingController.text = widget.brand!.name;
       fileName = widget.brand!.logo;
     }
@@ -39,9 +42,14 @@ class _CreateBrandBottomSheetState extends State<CreateBrandBottomSheet> {
   Future<void> selectFile() async {
     final result = await FilePicker.platform.pickFiles();
     if (result != null) {
-      setState(() {
-        fileName = result.files.single.path;
-      });
+      if(result.files.first.size > 256 * 1024){
+        ErrorExtractor.showSingleErrorDialog(context, "File size must be within 256KB");
+        return;
+      }else{
+        setState(() {
+          fileName = result.files.single.path;
+        });
+      }
     }
   }
 
@@ -71,8 +79,8 @@ class _CreateBrandBottomSheetState extends State<CreateBrandBottomSheet> {
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
-                const Text(
-                  "Create New Brand",
+                Text(
+                  widget.brand != null ? "Update Brand" : "Create New Brand",
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
@@ -83,8 +91,7 @@ class _CreateBrandBottomSheetState extends State<CreateBrandBottomSheet> {
                   padding: EdgeInsets.all(20.w),
                   decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.all(Radius.circular(20.sp))
-                  ),
+                      borderRadius: BorderRadius.all(Radius.circular(20.sp))),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -118,32 +125,55 @@ class _CreateBrandBottomSheetState extends State<CreateBrandBottomSheet> {
                               child: SizedBox(
                                 height: 150,
                                 width: double.infinity,
-                                child: Center(
-                                  child: fileName == null
-                                      ? const Column(
-                                    mainAxisAlignment:
-                                    MainAxisAlignment.center,
-                                    children: [
-                                      Icon(Icons.image_outlined,
-                                          size: 40, color: Colors.grey),
-                                      SizedBox(height: 8),
-                                      Text(
-                                        "Select employee picture",
-                                        style:
-                                        TextStyle(color: Colors.grey),
-                                      ),
-                                    ],
-                                  )
-                                      : Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: fileName!.contains('https://') && widget.brand!=null
-                                        ? Image.network(
-                                        widget.brand!.logo)
-                                        : Image.file(
-                                      fit: BoxFit.cover,
-                                      File(fileName!),
+                                child: Stack(
+                                  fit: StackFit.expand,
+                                  children: [
+                                    Center(
+                                      child: fileName == null
+                                          ? const Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Icon(Icons.image_outlined,
+                                                    size: 40,
+                                                    color: Colors.grey),
+                                                SizedBox(height: 8),
+                                                Text(
+                                                  textAlign: TextAlign.center,
+                                                  "Select brand logo (256 * 256)\nMax file size 256KB",
+                                                  style: TextStyle(
+                                                      color: Colors.grey),
+                                                ),
+                                              ],
+                                            )
+                                          : Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: fileName!.contains(
+                                                          'https://') &&
+                                                      widget.brand != null
+                                                  ? Image.network(
+                                                      widget.brand!.logo)
+                                                  : Image.file(
+                                                      fit: BoxFit.cover,
+                                                      File(fileName!),
+                                                    ),
+                                            ),
                                     ),
-                                  ),
+                                    if(fileName != null)Positioned(
+                                      right: 0,
+                                      child: IconButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              fileName = null;
+                                            });
+                                          },
+                                          icon: Icon(
+                                            Icons.remove_circle,
+                                            color: AppColors.error,
+                                          )),
+                                    )
+                                  ],
                                 ),
                               ),
                             ),
@@ -155,16 +185,23 @@ class _CreateBrandBottomSheetState extends State<CreateBrandBottomSheet> {
                 ),
                 const SizedBox(height: 20),
                 CustomButton(
-                  text: widget.brand != null ? "Update" :"Add Now",
-                  onTap: widget.brand != null ? (){
-                    if(formKey.currentState!.validate()){
-                      _brandController.editBrand(brand: widget.brand! ,brandName: _textEditingController.text, brandLogo: fileName);
-                    }
-                  } : (){
-                    if(formKey.currentState!.validate()){
-                      _brandController.addNewBrand(brandName: _textEditingController.text, brandLogo: fileName);
-                    }
-                  },
+                  text: widget.brand != null ? "Update" : "Add Now",
+                  onTap: widget.brand != null
+                      ? () {
+                          if (formKey.currentState!.validate()) {
+                            _brandController.editBrand(
+                                brand: widget.brand!,
+                                brandName: _textEditingController.text,
+                                brandLogo: fileName);
+                          }
+                        }
+                      : () {
+                          if (formKey.currentState!.validate()) {
+                            _brandController.addNewBrand(
+                                brandName: _textEditingController.text,
+                                brandLogo: fileName);
+                          }
+                        },
                 ),
                 const SizedBox(height: 20),
               ],

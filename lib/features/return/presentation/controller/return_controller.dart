@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:amar_pos/core/core.dart';
 import 'package:amar_pos/core/network/helpers/error_extractor.dart';
 import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
+import 'package:amar_pos/core/widgets/reusable/filter_bottom_sheet/product_brand_category_warranty_unit_response_model.dart';
 import 'package:amar_pos/features/return/data/models/create_return_order_model.dart';
 import 'package:amar_pos/features/return/data/models/return_history/return_history_details_response_model.dart';
 import 'package:amar_pos/features/return/data/models/return_history/return_history_response_model.dart';
@@ -26,6 +27,9 @@ class ReturnController extends GetxController {
   bool filterListLoading = false;
   String generatedBarcode = "";
   bool barcodeGenerationLoading = false;
+
+  FilterItem? brand;
+  FilterItem? category;
 
   bool justChanged = false;
 
@@ -85,7 +89,7 @@ class ReturnController extends GetxController {
 
   //Return Products
   ReturnProductResponseModel? returnProductResponseModel;
-  List<ReturnProduct> soldProductList = [];
+  List<ReturnProduct> returnProductList = [];
   bool isReturnProductListLoading = false;
   bool isReturnProductsLoadingMore = false;
 
@@ -96,6 +100,8 @@ class ReturnController extends GetxController {
   }
 
   void clearFilter(){
+    brand = null;
+    category = null;
     searchProductController.clear();
     wholeSale = false;
     retailSale = false;
@@ -113,7 +119,7 @@ class ReturnController extends GetxController {
     serviceStuffInfo = null;
     paymentMethodTracker.clear();
     returnOrderProducts.clear();
-    soldProductList.clear();
+    returnProductList.clear();
     returnHistoryList.clear();
     paidAmount = 0;
     totalDiscount = 0;
@@ -549,7 +555,9 @@ class ReturnController extends GetxController {
         search: searchProductController.text,
         startDate: selectedDateTimeRange.value?.start,
         endDate: selectedDateTimeRange.value?.end,
-        saleType: retailSale && wholeSale? null : retailSale ? 3: wholeSale ? 4: null
+        saleType: retailSale && wholeSale? null : retailSale ? 3: wholeSale ? 4: null,
+        brandId: brand?.id,
+        categoryId: category?.id,
       );
 
       logger.i(response);
@@ -580,7 +588,7 @@ class ReturnController extends GetxController {
 
     if(page == 1){
       returnProductResponseModel = null;
-      soldProductList.clear();
+      returnProductList.clear();
     }
 
     hasError.value = false;
@@ -594,7 +602,9 @@ class ReturnController extends GetxController {
           search: searchProductController.text,
           startDate: selectedDateTimeRange.value?.start,
           endDate: selectedDateTimeRange.value?.end,
-          saleType: retailSale && wholeSale? null : retailSale ? 1: wholeSale ? 2: null
+          saleType: retailSale && wholeSale? null : retailSale ? 1: wholeSale ? 2: null,
+        brandId: brand?.id,
+        categoryId: category?.id,
       );
 
       logger.i(response);
@@ -602,8 +612,8 @@ class ReturnController extends GetxController {
         returnProductResponseModel =
             ReturnProductResponseModel.fromJson(response);
 
-        if (returnProductResponseModel != null) {
-          soldProductList.addAll(returnProductResponseModel!.data.returnProducts);
+        if (returnProductResponseModel != null && returnProductResponseModel!.data != null) {
+          returnProductList.addAll(returnProductResponseModel!.data!.returnProducts);
         }
       } else {
         if(page != 1){
@@ -612,7 +622,7 @@ class ReturnController extends GetxController {
       }
     } catch (e) {
       hasError.value = true;
-      soldProductList.clear();
+      returnProductList.clear();
       logger.e(e);
     } finally {
       isReturnProductListLoading = false;
@@ -677,6 +687,14 @@ class ReturnController extends GetxController {
   }
 
   Future<void> downloadList({required bool isPdf,required bool returnHistory,bool? shouldPrint}) async {
+    
+    if(returnHistory && returnHistoryList.isEmpty){
+      ErrorExtractor.showSingleErrorDialog(Get.context!, "File should not be ${shouldPrint != null? "printed": "downloaded"} with empty data.");
+      return;
+    }else if(!returnHistory && returnProductList.isEmpty){
+      ErrorExtractor.showSingleErrorDialog(Get.context!, "File should not be ${shouldPrint != null? "printed": "downloaded"} with empty data.");
+      return;
+    }
     hasError.value = false;
 
     String fileName = "${returnHistory? "Return Order history": "Return Product History"}-${

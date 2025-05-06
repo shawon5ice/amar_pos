@@ -10,7 +10,7 @@ ReturnProductResponseModel _$ReturnProductResponseModelFromJson(
         Map<String, dynamic> json) =>
     ReturnProductResponseModel(
       success: json['success'] as bool,
-      data: Data.fromJson(json['data'] as Map<String, dynamic>),
+      data: const DataConverter().fromJson(json['data']),
       amountTotal: json['amount_total'] as num? ?? 0,
       countTotal: (json['count_total'] as num?)?.toInt() ?? 0,
     );
@@ -19,7 +19,7 @@ Map<String, dynamic> _$ReturnProductResponseModelToJson(
         ReturnProductResponseModel instance) =>
     <String, dynamic>{
       'success': instance.success,
-      'data': instance.data,
+      'data': const DataConverter().toJson(instance.data),
       'count_total': instance.countTotal,
       'amount_total': instance.amountTotal,
     };

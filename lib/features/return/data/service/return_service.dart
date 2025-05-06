@@ -96,6 +96,8 @@ class ReturnServices{
     int? saleType,
     DateTime? startDate,
     DateTime? endDate,
+    int? brandId,
+    int? categoryId,
   }) async {
     logger.d("Page: $page");
     var response = await BaseClient.getData(
@@ -109,6 +111,8 @@ class ReturnServices{
           "end_date": endDate,
           "sale_type": saleType,
           "limit": 10,
+          "category_id": categoryId,
+          "brand_id": brandId,
         });
     return response;
   }
@@ -120,6 +124,8 @@ class ReturnServices{
     int? saleType,
     DateTime? startDate,
     DateTime? endDate,
+    int? brandId,
+    int? categoryId,
   }) async {
     logger.d("Page: $page");
     var response = await BaseClient.getData(
@@ -133,6 +139,8 @@ class ReturnServices{
           "end_date": endDate,
           "sale_type": saleType,
           "limit": 10,
+          "category_id": categoryId,
+          "brand_id": brandId,
         });
     return response;
   }

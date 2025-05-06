@@ -3,9 +3,7 @@ import 'package:amar_pos/core/widgets/reusable/status/total_status_widget.dart';
 import 'package:amar_pos/features/return/data/models/return_products/return_product_response_model.dart';
 import 'package:amar_pos/features/return/presentation/controller/return_controller.dart';
 import 'package:amar_pos/features/return/presentation/widgets/return_product_item_widget.dart';
-import 'package:amar_pos/features/sales/presentation/widgets/sold_product_list_item.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import '../../../../core/constants/app_assets.dart';
 import '../../../../core/responsive/pixel_perfect.dart';
@@ -19,10 +17,10 @@ class ReturnProducts extends StatefulWidget {
   const ReturnProducts({super.key});
 
   @override
-  State<ReturnProducts> createState() => _SoldHistoryState();
+  State<ReturnProducts> createState() => _ReturnProductsState();
 }
 
-class _SoldHistoryState extends State<ReturnProducts> {
+class _ReturnProductsState extends State<ReturnProducts> {
   final ReturnController controller = Get.find();
 
   @override
@@ -79,7 +77,9 @@ class _SoldHistoryState extends State<ReturnProducts> {
                 addW(4),
                 CustomSvgIconButton(
                   bgColor: const Color(0xffFFFCF8),
-                  onTap: () {},
+                  onTap: () {
+                    controller.downloadList(isPdf: true, returnHistory: false,shouldPrint: true);
+                  },
                   assetPath: AppAssets.printIcon,
                 )
               ],
@@ -128,7 +128,7 @@ class _SoldHistoryState extends State<ReturnProducts> {
                     return Center(
                       child: Text("Something went wrong", style: context.textTheme.titleLarge,),
                     );
-                  }else if(controller.returnProductResponseModel!.data.returnProducts.isEmpty){
+                  }else if(controller.returnProductList.isEmpty){
                     return Center(
                       child: Text("No data found", style: context.textTheme.titleLarge,),
                     );
@@ -139,7 +139,7 @@ class _SoldHistoryState extends State<ReturnProducts> {
                     },
                     child: PagerListView<ReturnProduct>(
                       // scrollController: _scrollController,
-                      items: controller.soldProductList,
+                      items: controller.returnProductList,
                       itemBuilder: (_, item) {
                         return ReturnProductListItem(productInfo: item);
                       },
@@ -149,10 +149,10 @@ class _SoldHistoryState extends State<ReturnProducts> {
                         await controller.getReturnProducts(page: nextPage);
                       },
                       totalPage: controller
-                          .returnProductResponseModel?.data.meta.lastPage ??
+                          .returnProductResponseModel?.data?.meta.lastPage ??
                           0,
                       totalSize:
-                      controller.returnProductResponseModel?.data.meta.total ??
+                      controller.returnProductResponseModel?.data?.meta.total ??
                           0,
                       itemPerPage: 10,
                     ),
