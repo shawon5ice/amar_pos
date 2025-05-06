@@ -14,6 +14,7 @@ import 'package:amar_pos/features/accounting/presentation/views/trial_balance/tr
 import 'package:amar_pos/features/auth/presentation/controller/auth_controller.dart';
 import 'package:amar_pos/features/drawer/drawer_menu_controller.dart';
 import 'package:amar_pos/features/inventory/presentation/products/product_controller.dart';
+import 'package:amar_pos/features/return/presentation/controller/return_controller.dart';
 import 'package:get/get.dart';
 
 import '../../features/config/presentation/category/category_controller.dart';
@@ -53,6 +54,13 @@ class AddProductBinding extends Bindings{
   @override
   void dependencies() {
     Get.lazyPut(()=> ProductController());
+  }
+}
+
+class ReturnBinding extends Bindings{
+  @override
+  void dependencies() {
+    Get.lazyPut(()=> ReturnController());
   }
 }
 

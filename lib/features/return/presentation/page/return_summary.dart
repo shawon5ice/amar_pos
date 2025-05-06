@@ -14,14 +14,12 @@ import 'package:amar_pos/features/return/presentation/widgets/return_summary_pay
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
-import '../../../../core/methods/number_input_formatter.dart';
 import '../../../../core/widgets/dashed_line.dart';
-import '../../../sales/presentation/widgets/billing_summary_payment_option_selection_widget.dart';
 import '../../data/models/client_list_response_model.dart';
 import '../../data/models/create_return_order_model.dart';
 
 class ReturnSummary extends StatefulWidget {
+  static const routeName = '/return_summary';
   const ReturnSummary({super.key});
 
   @override

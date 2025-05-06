@@ -6,8 +6,6 @@ import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/core/widgets/field_title.dart';
 import 'package:amar_pos/features/drawer/drawer_menu_controller.dart';
 import 'package:amar_pos/features/home/presentation/home_screen_controller.dart';
-import 'package:amar_pos/features/pos_printing/POSPrintScreen.dart';
-import 'package:amar_pos/features/pos_printing/bluetooth_printer_screen.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

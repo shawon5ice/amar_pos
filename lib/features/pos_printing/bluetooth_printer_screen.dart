@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
 import 'package:image/image.dart' as img;
-import 'package:flutter_pos_printer_platform_image_3/flutter_pos_printer_platform_image_3.dart';
 import 'package:amar_pos/core/widgets/dashed_line.dart';
 import 'package:amar_pos/features/pos_printing/pos_invoice_model.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +17,6 @@ import '../../core/widgets/loading/random_lottie_loader.dart';
 import '../../core/widgets/methods/helper_methods.dart';
 import '../inventory/presentation/products/widgets/custom_dropdown_widget.dart';
 import 'invoice_gen_from_screen_shot.dart';
-import 'invoice_preview_screen.dart';
 
 class BluetoothPrinterScreen extends StatefulWidget {
   const BluetoothPrinterScreen({
@@ -90,9 +88,12 @@ class _BluetoothPrinterScreenState extends State<BluetoothPrinterScreen> {
       print('********** blueState change: $event **********');
       if (mounted) {
         if(event == BlueState.blueOn){
-          BluetoothPrintPlus.startScan();
+          _selectedDevice = null;
+          _device = null;
+          _scanResults.clear();
+          BluetoothPrintPlus.startScan(timeout: const Duration(seconds: 5));
         }else{
-          Methods.showSnackbar(msg: "Please turn on bluetooth");
+          ErrorExtractor.showSingleErrorDialog(Get.context!, "Please turn on bluetooth");
         }
         setState(() {});
       }
@@ -149,7 +150,7 @@ class _BluetoothPrinterScreenState extends State<BluetoothPrinterScreen> {
   Widget _buildInvoiceWidget(BuildContext context) {
     return Container(
       // padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-      width: 576,
+      width: selectedSize == sizes.first ? 576: selectedSize == sizes.last ? 520 : 418,
       color: Colors.white,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -174,7 +175,7 @@ class _BluetoothPrinterScreenState extends State<BluetoothPrinterScreen> {
                 ),
                 Text(
                   posInvoiceModel.storePhone,
-                  style: TextStyle(
+                  style: const TextStyle(
                       fontFamily: 'RobotoMono',
                       fontSize: 20,
                       letterSpacing: 1),
@@ -182,7 +183,7 @@ class _BluetoothPrinterScreenState extends State<BluetoothPrinterScreen> {
                 ),
                 Text(
                   "Invoice :${posInvoiceModel.invoiceNo}",
-                  style: TextStyle(
+                  style: const TextStyle(
                       fontFamily: 'RobotoMono',
                       fontSize: 22,
                       ),
@@ -284,7 +285,7 @@ class _BluetoothPrinterScreenState extends State<BluetoothPrinterScreen> {
                       flex: 4,
                       child: Text(
                         "${index + 1}.${item.name}",
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontFamily: 'RobotoMono',
                             fontWeight: FontWeight.w500,
                             fontSize: 20,),
@@ -303,7 +304,7 @@ class _BluetoothPrinterScreenState extends State<BluetoothPrinterScreen> {
                       flex: 2,
                       child: Text(
                         Methods.getFormatedPrice((item.unitPrice).toDouble()),
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontFamily: 'RobotoMono',
                             fontWeight: FontWeight.w500,
                             fontSize: 20,),
@@ -313,7 +314,7 @@ class _BluetoothPrinterScreenState extends State<BluetoothPrinterScreen> {
                       flex: 2,
                       child: Text(
                         Methods.getFormatedPrice((item.subTotal).toDouble()),
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontFamily: 'RobotoMono',
                             fontWeight: FontWeight.w500,
                             fontSize: 20,),
@@ -373,7 +374,7 @@ class _BluetoothPrinterScreenState extends State<BluetoothPrinterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('BluetoothPrintPlus'),
+          title: const Text('POS Print'),
         ),
         body: SafeArea(
           child: Padding(
@@ -390,14 +391,15 @@ class _BluetoothPrinterScreenState extends State<BluetoothPrinterScreen> {
                         items: isScanning? []:_scanResults,
                         isMandatory: false,
                         noTitle: true,
-                        title: "Select Device",
+                        value: _selectedDevice,
+                        title: !isScanning && _scanResults.isEmpty ? "No Device found!" :  "Select Device",
                         itemLabel: (e) => e.name,
                         onChanged: (device) {
                           setState(() {
                             _selectedDevice = device;
                           });
                         },
-                        hintText:  isScanning ? "Loading...": "Select Device",
+                        hintText:  isScanning ? "Loading...": !isScanning && _scanResults.isEmpty ? "No Device found!" :  "Select Device",
                       ),
                     ),
                     addW(8),
@@ -628,8 +630,14 @@ class _BluetoothPrinterScreenState extends State<BluetoothPrinterScreen> {
     }
   }
 
+
   Future onScanPressed() async {
+
     try {
+      _selectedDevice = null;
+      _device = null;
+      _scanResults.clear();
+
       await BluetoothPrintPlus.startScan(timeout: Duration(seconds: 4));
     } catch (e) {
       print("onScanPressed error: $e");

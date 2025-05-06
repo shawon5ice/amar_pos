@@ -795,7 +795,7 @@ class _ReturnPageState extends State<ReturnPage> {
                       }
                     }
                     if (formKey.currentState!.validate()) {
-                      await Get.to(() => const ReturnSummary())?.then((value) {
+                      await Get.toNamed(ReturnSummary.routeName)?.then((value) {
                         FocusScope.of(context).unfocus();
                       });
                     }

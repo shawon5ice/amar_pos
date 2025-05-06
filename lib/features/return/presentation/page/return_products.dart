@@ -104,7 +104,7 @@ class _SoldHistoryState extends State<ReturnProducts> {
                   TotalStatusWidget(
                     flex: 4,
                     isLoading: controller.isReturnProductListLoading,
-                    title: 'Sold Amount',
+                    title: 'Amount',
                     value: controller.returnProductResponseModel != null
                         ? Methods.getFormattedNumber(controller
                         .returnProductResponseModel!.amountTotal

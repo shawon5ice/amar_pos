@@ -71,7 +71,6 @@ dependencies:
   bluetooth_print_plus:
   screenshot:
   esc_pos_utils_plus:
-  flutter_pos_printer_platform_image_3:
 
 dev_dependencies:
   flutter_test:

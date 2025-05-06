@@ -5,7 +5,6 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   file_selector_windows
   firebase_core
-  flutter_pos_printer_platform_image_3
   permission_handler_windows
   printing
   rive_common

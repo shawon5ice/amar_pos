@@ -19,6 +19,7 @@ import 'package:amar_pos/features/inventory/presentation/products/add_product_sc
 import 'package:amar_pos/features/inventory/presentation/products/products_screen.dart';
 import 'package:amar_pos/features/inventory/presentation/stock_transfer/stock_tansfer.dart';
 import 'package:amar_pos/features/purchase/presentation/pages/purchase_history_details_view.dart';
+import 'package:amar_pos/features/return/presentation/page/return_summary.dart';
 import 'package:amar_pos/features/splash/splash_screen.dart';
 import 'package:get/get.dart';
 
@@ -95,6 +96,12 @@ class AppRoutes {
       name: AddProductScreen.routeName,
       page: () => const AddProductScreen(),
       binding: AddProductBinding(),
+    ),
+
+    GetPage(
+      name: ReturnSummary.routeName,
+      page: () => const ReturnSummary(),
+      binding: ReturnBinding(),
     ),
 
 
