@@ -62,6 +62,7 @@ class OutletService {
       token: token,
       api: "${NetWorkStrings.updateOutlet}$outletId",
       body: formData,
+      shouldExtractErros: false
     );
     return response;
   }

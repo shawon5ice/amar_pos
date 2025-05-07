@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:amar_pos/core/constants/logger/logger.dart';
+import 'package:amar_pos/core/network/helpers/error_extractor.dart';
 import 'package:amar_pos/core/widgets/methods/helper_methods.dart';
 import 'package:amar_pos/features/config/data/model/outlet/outlet_list_model_response.dart';
 import 'package:amar_pos/features/config/data/service/outlet_service.dart';
@@ -55,7 +56,7 @@ class OutletController extends GetxController {
       } else {
         // Perform case-insensitive search
         outletList = allOutletCopy
-            .where((e) => e.name.toLowerCase().contains(search.toLowerCase()))
+            .where((e) => e.name.toLowerCase().contains(search.toLowerCase()) || e.phone.toLowerCase().contains(search.toLowerCase()))
             .toList();
       }
     } catch (e) {
@@ -159,8 +160,15 @@ class OutletController extends GetxController {
         if(response['success']){
           Get.back();
           getAllOutlets();
+          Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true: null );
+        }else{
+          if(response['message'] != null){
+            ErrorExtractor.showSingleErrorDialog(Get.context!, response['message']);
+          }else{
+            ErrorExtractor.showSingleErrorDialog(Get.context!, response);
+          }
         }
-        Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true: null );
+
       }
     }catch(e){
       logger.e(e);

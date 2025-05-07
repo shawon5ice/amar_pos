@@ -58,7 +58,7 @@ class _StockTransferViewState extends State<StockTransferView> {
           CreateStockTransferRequestModel.defaultConstructor();
       controller.purchaseOrderProducts.clear();
     } else {
-      logger.i(controller.remarks);
+      logger.i(controller.createStockTransferRequestModel.storeId);
       _remarks.text = controller.remarks ?? '';
       for (var e in controller.createStockTransferRequestModel.products) {
         if(purchaseQTYControllers.isNotEmpty && !controller.isEditing){

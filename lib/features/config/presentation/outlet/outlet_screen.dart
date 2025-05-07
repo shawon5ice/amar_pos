@@ -57,7 +57,7 @@ class _OutletScreenState extends State<OutletScreen> {
                       }else if (_controller.outletList.isEmpty) {
                         return Center(
                           child: Text(
-                            "No Brand Added",
+                            "No Outlet Found!",
                             style: context.textTheme.titleLarge,
                           ),
                         );
@@ -189,22 +189,25 @@ class _OutletScreenState extends State<OutletScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: CustomButton(
-        text: "Add New Brand",
-        marginHorizontal: 20,
-        marginVertical: 10,
-        onTap: () {
-          showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-            ),
-            builder: (context) {
-              return const CreateOutletBottomSheet();
-            },
-          );
-        },
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.only(bottom: 20),
+        child: CustomButton(
+          text: "Add New Outlet",
+          marginHorizontal: 20,
+          marginVertical: 10,
+          onTap: () {
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              builder: (context) {
+                return const CreateOutletBottomSheet();
+              },
+            );
+          },
+        ),
       ),
     );
   }

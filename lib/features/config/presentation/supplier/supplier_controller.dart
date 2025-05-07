@@ -92,6 +92,8 @@ class SupplierController extends GetxController {
           getAllSupplier();
           Methods.showSnackbar(msg: response['message'], isSuccess: true);
         }
+      }else{
+        ErrorExtractor.showErrorDialog(Get.context!, response,shouldNotPop: true);
       }
     }catch(e){
       logger.e(e);
@@ -129,8 +131,11 @@ class SupplierController extends GetxController {
         if(response['success']){
           Get.back();
           getAllSupplier();
+          Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true: null );
+        }else{
+          ErrorExtractor.showErrorDialog(Get.context!, response,shouldNotPop: true);
         }
-        Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true: null );
+
       }
     }catch(e){
       logger.e(e);

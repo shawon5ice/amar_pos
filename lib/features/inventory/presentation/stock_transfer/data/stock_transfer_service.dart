@@ -192,7 +192,7 @@ class StockTransferService {
     if(isPdf){
       downloadUrl = "${NetWorkStrings.baseUrl}/inventory/stock_transfer/download-pdf-transfer-list";
     }else{
-      downloadUrl = "${NetWorkStrings.baseUrl}/inventory/stock_transfer/download-pdf-transfer-list";
+      downloadUrl = "${NetWorkStrings.baseUrl}/inventory/stock_transfer/download-excel-transfer-list";
     }
 
 
@@ -217,7 +217,7 @@ class StockTransferService {
         token: usrToken,
         api: "inventory/stock_transfer/get-transfer-list",
         parameter: {
-          "type": status,
+          "status": status,
           "page": page,
           "search": search,
           "start_date": startDate,

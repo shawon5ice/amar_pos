@@ -53,6 +53,7 @@ class SupplierService {
       token: token,
       api: NetWorkStrings.addSupplier,
       body: formData,
+      shouldExtractErros: false
     );
     logger.e(response);
     return response;
@@ -117,6 +118,7 @@ class SupplierService {
       token: token,
       api: "${NetWorkStrings.updateSupplier}$supplierId",
       body: formData,
+      shouldExtractErros: false
     );
     return response;
   }

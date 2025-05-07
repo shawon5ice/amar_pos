@@ -69,6 +69,7 @@ class StockTransferController extends GetxController{
 
 
   bool isEditing = false;
+  bool isProcessing = false;
   bool detailsLoading =false;
 
 
@@ -173,14 +174,13 @@ class StockTransferController extends GetxController{
 
   void addPlaceOrderProduct(ProductInfo product, {List<String>? snNo, int? quantity,}) {
     totalQTY+= quantity ?? 1;
-    logger.i(snNo);
     if (purchaseOrderProducts.any((e) => e.id == product.id)) {
       var x  = createStockTransferRequestModel.products
           .firstWhere((e) => e.id  == product.id);
       x.quantity++;
 
     } else {
-      if(purchaseOrderProducts.isNotEmpty && !isEditing){
+      if(purchaseOrderProducts.isNotEmpty && !isProcessing){
         purchaseOrderProducts.insert(0, product);
 
         createStockTransferRequestModel.products.insert(0, StockTransferProduct(
@@ -341,8 +341,7 @@ class StockTransferController extends GetxController{
         if (stockTransferResponse != null) {
           stockTransferHistory.addAll(stockTransferResponse!.data.data);
         }
-
-        logger.i(stockTransferHistory);
+        logger.i(stockTransferResponse?.countTotal);
       } else {
         if(page != 1){
           hasError.value = true;
@@ -365,9 +364,10 @@ class StockTransferController extends GetxController{
   bool editStockTransferItemLoading = false;
   //
   Future<void> processEdit({required int stockTransferId,required BuildContext context}) async{
-    editStockTransferItemLoading = true;
     isEditing = true;
+    isProcessing = true;
     RandomLottieLoader.show();
+    selectedOutlet = null;
     createStockTransferRequestModel = CreateStockTransferRequestModel.defaultConstructor();
 
     // Methods.showLoading();
@@ -385,37 +385,98 @@ class StockTransferController extends GetxController{
 
         stockTransferHistoryDetailsResponseModel =
             StockTransferHistoryDetailsResponseModel.fromJson(response);
-        logger.i(stockTransferHistoryDetailsResponseModel);
 
-        resetOutletSelection();
-        remarks = stockTransferHistoryDetailsResponseModel!.data.remarks;
+        if(outlets.isEmpty){
+          await getAllOutlet();
+        }
+
+
         //selecting products
         for (var e in stockTransferHistoryDetailsResponseModel!.data.details) {
           ProductInfo productInfo = productsListResponseModel!.data.productList.singleWhere((f) => f.id == e.id);
           addPlaceOrderProduct(productInfo, quantity:  e.quantity,snNo: e.snNo?.map((e)=> e.serialNo).toList(),);
         }
-        selectedOutlet = null;
-        if(outlets.isEmpty){
-          await getAllOutlet().then((value){
-            selectedOutlet = outlets.singleWhere((e) => e.id == stockTransferHistoryDetailsResponseModel!.data.toStore.id);
-          });
-        }else{
-          selectedOutlet = outlets.singleWhere((e) => e.id == stockTransferHistoryDetailsResponseModel!.data.toStore.id);
-        }
-        createStockTransferRequestModel.storeId = selectedOutlet?.id ?? -1;
-        logger.i(stockTransferHistoryDetailsResponseModel!.data.type);
         changeTransferType(stockTransferHistoryDetailsResponseModel!.data.type == 1);
+
+        if (stockTransferHistoryDetailsResponseModel?.data != null) {
+          if (stockTransferHistoryDetailsResponseModel!.data.type != 1) {
+            selectedOutlet = outlets.firstWhereOrNull((e) => e.id == stockTransferHistoryDetailsResponseModel!.data.fromStore.id);
+          } else {
+            selectedOutlet = outlets.firstWhereOrNull((e) => e.id == stockTransferHistoryDetailsResponseModel!.data.toStore.id);
+          }
+        }
+        if (selectedOutlet != null) {
+          print('Selected Outlet ID: ${selectedOutlet?.id}');
+        } else {
+          print('No matching outlet found.');
+        }
+        logger.e("====> ${selectedOutlet?.id}");
+        createStockTransferRequestModel.storeId = selectedOutlet?.id ?? -1;
+        remarks = stockTransferHistoryDetailsResponseModel!.data.remarks;
       }
     } catch (e) {
       hasError.value = true;
     } finally {
-
-      editStockTransferItemLoading = false;
-      update(['edit_purchase_history_item']);
+      isProcessing = false;
+      update(['edit_purchase_history_item','']);
       // Methods.hideLoading();
       RandomLottieLoader.hide();
     }
   }
+  // Future<void> processEdit({required int stockTransferId,required BuildContext context}) async{
+  //   editStockTransferItemLoading = true;
+  //   isEditing = true;
+  //   isProcessing = true;
+  //   RandomLottieLoader.show();
+  //   createStockTransferRequestModel = CreateStockTransferRequestModel.defaultConstructor();
+  //
+  //   // Methods.showLoading();
+  //   update(['edit_purchase_history_item']);
+  //   try {
+  //     var response = await StockTransferService.getStockTransferHistoryDetails(
+  //       usrToken: loginData!.token,
+  //       id: stockTransferId,
+  //     );
+  //
+  //
+  //     if (response != null) {
+  //       purchaseOrderProducts.clear();
+  //       getAllProducts(search: '', page: 1);
+  //
+  //       stockTransferHistoryDetailsResponseModel =
+  //           StockTransferHistoryDetailsResponseModel.fromJson(response);
+  //       logger.i(stockTransferHistoryDetailsResponseModel);
+  //
+  //       resetOutletSelection();
+  //       remarks = stockTransferHistoryDetailsResponseModel!.data.remarks;
+  //       //selecting products
+  //       for (var e in stockTransferHistoryDetailsResponseModel!.data.details) {
+  //         ProductInfo productInfo = productsListResponseModel!.data.productList.singleWhere((f) => f.id == e.id);
+  //         addPlaceOrderProduct(productInfo, quantity:  e.quantity,snNo: e.snNo?.map((e)=> e.serialNo).toList(),);
+  //       }
+  //       selectedOutlet = null;
+  //       if(outlets.isEmpty){
+  //         await getAllOutlet().then((value){
+  //           selectedOutlet = outlets.singleWhere((e) => e.id == stockTransferHistoryDetailsResponseModel!.data.toStore.id);
+  //         });
+  //       }else{
+  //         selectedOutlet = outlets.singleWhere((e) => e.id == stockTransferHistoryDetailsResponseModel!.data.toStore.id);
+  //       }
+  //       logger.e(stockTransferHistoryDetailsResponseModel!.data.toStore);
+  //       createStockTransferRequestModel.storeId = selectedOutlet?.id ?? -1;
+  //       logger.i(stockTransferHistoryDetailsResponseModel!.data.type);
+  //       changeTransferType(stockTransferHistoryDetailsResponseModel!.data.type == 1);
+  //     }
+  //   } catch (e) {
+  //     hasError.value = true;
+  //   } finally {
+  //
+  //     editStockTransferItemLoading = false;
+  //     update(['edit_purchase_history_item']);
+  //     // Methods.hideLoading();
+  //     RandomLottieLoader.hide();
+  //   }
+  // }
   //
   Future<void> deleteStockTransfer({
     required int stockTransferId,
@@ -497,7 +558,7 @@ class StockTransferController extends GetxController{
           endDate: selectedDateTimeRange.value?.end,
           fileName: fileName,
           shouldPrint: shouldPrint,
-          type: null,
+          type: transferType?.type,
       );
     } catch (e) {
       logger.e(e);
@@ -552,12 +613,6 @@ class StockTransferController extends GetxController{
   bool outletListLoading = false;
   List<OutletModel> outlets = [];
 
-
-  // Reset the selected outlet
-  void resetOutletSelection() {
-    selectedOutlet = null;
-    update(['outlet_dd']);
-  }
 
   // Fetch all outlets
   Future getAllOutlet() async {

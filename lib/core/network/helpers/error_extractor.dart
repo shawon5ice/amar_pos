@@ -42,14 +42,14 @@ class ErrorExtractor {
   }
   /// Shows a dialog with the extracted error messages.
   static Future<void> showErrorDialog(
-      BuildContext context, Map<String, dynamic> response, ) async {
+      BuildContext context, Map<String, dynamic> response, {bool? shouldNotPop}) async {
     logger.i(response);
     final errorMessages = extractErrorMessages(response);
 
     var widgets = getListOfTextWidget(errorMessages);
 
     if (isDialogOpen(context)) {
-      Get.back();
+      if(shouldNotPop == null)Get.back();
       print('A dialog is currently open!');
     } else {
       print('No dialog is open.');

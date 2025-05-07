@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:amar_pos/core/constants/logger/logger.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/core/widgets/custom_button.dart';
 import 'package:amar_pos/core/widgets/custom_text_field.dart';
@@ -8,7 +9,12 @@ import 'package:amar_pos/features/config/data/model/supplier/supplier_list_respo
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../../core/constants/app_colors.dart';
+import '../../../../core/constants/app_strings.dart';
 import '../../../../core/widgets/dotted_border_painter.dart';
+import '../../../../core/widgets/methods/field_validator.dart';
+import '../../../../core/widgets/methods/helper_methods.dart';
+import '../../../../core/widgets/reusable/upload_photo_widget.dart';
 import '../../data/model/category/category_model_response.dart';
 import 'supplier_controller.dart';
 
@@ -57,6 +63,7 @@ class _CreateSupplierBottomSheetState extends State<CreateSupplierBottomSheet> {
     }
   }
 
+  final formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -81,126 +88,107 @@ class _CreateSupplierBottomSheetState extends State<CreateSupplierBottomSheet> {
                 ),
               ),
               Text(
-                "Create New Supplier",
+                widget.supplier != null ?"Update Supplier" : "Create New Supplier",
                 style: TextStyle(
                   fontSize: 22.sp,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               addH(20.h),
-              Container(
-                padding: EdgeInsets.all(20.w),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(20.sp))
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const FieldTitle(
-                      "Name",
-                    ),
-                    addH(8.h),
-                    CustomTextField(
-                      textCon: _nameTextEditingController,
-                      hintText: "Type name here...",
-                      maxLength: 50,
-                    ),
-                    addH(16.h),
-                    const FieldTitle(
-                      "Phone No.",
-                    ),
-                    addH(8.h),
-                    CustomTextField(
-                      textCon: _phoneNoTextEditingController,
-                      hintText: "Type number here...",
-                      inputType: TextInputType.phone,
-                    ),
-                    addH(16.h),
-                    const FieldTitle(
-                      "Address",
-                    ),
-                    addH(8.h),
-                    CustomTextField(
-                      textCon: _addressTextEditingController,
-                      hintText: "Type address here...",
-                      maxLength: 250,
-                    ),
-                    addH(16.h),
-                    const FieldTitle(
-                      "Opening Balance",
-                    ),
-                    addH(8.h),
-                    CustomTextField(
-                      textCon: _openingBalanceTextEditingController,
-                      hintText: "Enter opening balance here...",
-                      enabledFlag: widget.supplier != null && (widget.supplier!.openingBalance! > 0) ? false : true,
-                      inputType: const TextInputType.numberWithOptions(signed: false,decimal: false),
-                    ),
-                    addH(16.h),
-                    const FieldTitle(
-                      "Upload Photo",
-                    ),
-                    addH(8.h),
-                    InkWell(
-                      borderRadius: const BorderRadius.all(Radius.circular(8)),
-                      onTap: selectFile,
-                      child: CustomPaint(
-                        painter: DottedBorderPainter(
-                          color: const Color(0xffD8E0EC),
-                        ),
-                        child: SizedBox(
-                          height: 150,
-                          width: double.infinity,
-                          child: Center(
-                            child: fileName == null
-                                ? const Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.image_outlined,
-                                    size: 40, color: Colors.grey),
-                                SizedBox(height: 8),
-                                Text(
-                                  "Select supplier logo",
-                                  style: TextStyle(color: Colors.grey),
-                                ),
-                              ],
-                            )
-                                : Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: widget.supplier != null && widget.supplier!.photo != null && fileName!.contains("http")? Image.network(widget.supplier!.photo!): Image.file(
-                                fit: BoxFit.cover,
-                                File(fileName!),
-                              ),
-                            ),
-                          ),
-                        ),
+              Form(
+                key: formKey,
+                child: Container(
+                  padding: EdgeInsets.all(20.w),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.all(Radius.circular(20.sp))
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const FieldTitle(
+                        "Name",
                       ),
-                    ),
-                  ],
+                      addH(8.h),
+                      CustomTextField(
+                        textCon: _nameTextEditingController,
+                        hintText: "Type name here...",
+                        maxLength: 50,
+                        validator: (value) =>
+                            FieldValidator.nonNullableFieldValidator(
+                                value, "supplier name"),
+                      ),
+                      addH(16.h),
+                      const FieldTitle(
+                        "Phone No.",
+                      ),
+                      addH(8.h),
+                      CustomTextField(
+                        textCon: _phoneNoTextEditingController,
+                        hintText: "Type number here...",
+                        inputType: TextInputType.phone,
+                        validator: (value) =>
+                            FieldValidator.phoneNumberFieldValidator(
+                                value, "Supplier phone number", false),
+                      ),
+                      addH(16.h),
+                      const FieldTitle(
+                        "Address",
+                      ),
+                      addH(8.h),
+                      CustomTextField(
+                        textCon: _addressTextEditingController,
+                        hintText: "Type address here...",
+                        maxLength: 250,
+                      ),
+                      addH(16.h),
+                      const FieldTitle(
+                        "Opening Balance",
+                      ),
+                      addH(8.h),
+                      CustomTextField(
+                        textCon: _openingBalanceTextEditingController,
+                        hintText: "Enter opening balance here...",
+                        enabledFlag: widget.supplier != null && (widget.supplier!.openingBalance! > 0) ? false : true,
+                        inputType: const TextInputType.numberWithOptions(signed: false,decimal: false),
+                      ),
+                      addH(16.h),
+                      UploadPhotoWidget(
+                        title: "Supplier logo",
+                        getFileName: (fn){
+                          fileName = fn;
+                        },
+                        initialPhoto: widget.supplier?.photo,
+                      )
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: 20),
               CustomButton(
                 text: widget.supplier != null ? "Update" :"Add Now",
-                onTap: widget.supplier != null ? (){
-                  _controller.editSupplier(
-                    supplier: widget.supplier!,
-                    name: _nameTextEditingController.text,
-                    phoneNo: _phoneNoTextEditingController.text,
-                    balance: _openingBalanceTextEditingController.text,
-                    address: _addressTextEditingController.text,
-                    supplierLogo: fileName??''
-                  );
-                } : (){
-                  _controller.addNewSupplier(
-                    name: _nameTextEditingController.text,
-                      phoneNo: _phoneNoTextEditingController.text,
-                      balance: _openingBalanceTextEditingController.text,
-                      address: _addressTextEditingController.text,
-                      supplierLogo: fileName
-                  );
-                },
+                onTap: () async{
+                  if(formKey.currentState!.validate()){
+                    if(widget.supplier != null){
+                      _controller.editSupplier(
+                          supplier: widget.supplier!,
+                          name: _nameTextEditingController.text,
+                          phoneNo: _phoneNoTextEditingController.text,
+                          balance: _openingBalanceTextEditingController.text,
+                          address: _addressTextEditingController.text,
+                          supplierLogo: fileName??''
+                      );
+                    }else{
+                      _controller.addNewSupplier(
+                          name: _nameTextEditingController.text,
+                          phoneNo: _phoneNoTextEditingController.text,
+                          balance: _openingBalanceTextEditingController.text,
+                          address: _addressTextEditingController.text,
+                          supplierLogo: fileName
+                      );
+                    }
+                  }
+                }
               ),
               const SizedBox(height: 20),
             ],
