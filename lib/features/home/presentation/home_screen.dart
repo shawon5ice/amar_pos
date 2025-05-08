@@ -5,13 +5,18 @@ import 'package:amar_pos/core/methods/helper_methods.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/core/widgets/field_title.dart';
 import 'package:amar_pos/features/drawer/drawer_menu_controller.dart';
+import 'package:amar_pos/features/drawer/model/menu_selection.dart';
 import 'package:amar_pos/features/home/presentation/home_screen_controller.dart';
+import 'package:amar_pos/features/inventory/presentation/products/add_product_screen.dart';
+import 'package:amar_pos/features/inventory/presentation/products/products_screen.dart';
+import 'package:amar_pos/features/sales/presentation/sales_screen.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../permission_manager.dart';
 import '../../auth/data/model/hive/login_data_helper.dart';
+import '../../drawer/model/drawer_items.dart';
 import '../data/models/dashboard_response_model.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -69,12 +74,14 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         title: Text(LoginDataBoxManager().loginData!.business.name),
         centerTitle: true,
         actions: [
-          // IconButton(
-          //     onPressed: () {
-          //       Get.changeThemeMode(
-          //           Get.isDarkMode ? ThemeMode.light : ThemeMode.dark);
-          //     },
-          //     icon: Get.isDarkMode ? Icon(Icons.sunny) : Icon(Icons.nightlight)),
+          IconButton(
+              onPressed: () {
+                drawerMenuController.selectMenuItem(MenuSelection(parent: DrawerItems.sales));
+                // drawerMenuController.selectMenuItem(DrawerItems.overview)
+                // Get.changeThemeMode(
+                //     Get.isDarkMode ? ThemeMode.light : ThemeMode.dark);
+              },
+              icon: Get.isDarkMode ? Icon(Icons.sunny) : Icon(Icons.nightlight)),
         ],
       ),
       body: GetBuilder<HomeScreenController>(

@@ -20,6 +20,7 @@ import 'package:amar_pos/features/inventory/presentation/products/products_scree
 import 'package:amar_pos/features/inventory/presentation/stock_transfer/stock_tansfer.dart';
 import 'package:amar_pos/features/purchase/presentation/pages/purchase_history_details_view.dart';
 import 'package:amar_pos/features/return/presentation/page/return_summary.dart';
+import 'package:amar_pos/features/sales/presentation/sales_screen.dart';
 import 'package:amar_pos/features/splash/splash_screen.dart';
 import 'package:get/get.dart';
 
@@ -176,6 +177,12 @@ class AppRoutes {
       name: BalanceSheetScreen.routeName,
       page: () => const BalanceSheetScreen(),
       binding: BalanceSheetScreenBindings(),
+    ),
+
+    GetPage(
+      name: SalesScreen.routeName,
+      page: () => const SalesScreen(),
+      binding: SalesScreenBindings(),
     ),
   ];
 }
