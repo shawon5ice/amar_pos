@@ -9,7 +9,6 @@ class PermissionManager{
 
   static Future<void> loadPermissions() async {
     HomeScreenController homeScreenController = Get.find();
-    logger.e(homeScreenController.permissionApiResponse?.data);
     _permissions = homeScreenController.permissionApiResponse!.data;
   }
 

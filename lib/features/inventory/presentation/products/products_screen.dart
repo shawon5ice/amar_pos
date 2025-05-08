@@ -230,10 +230,8 @@ class _ProductsScreenState extends State<ProductsScreen>
                           ),
                         );
                       }else if(controller.productList.isEmpty){
-                        return const Expanded(
-                          child: Center(
-                            child: Text("No product found!"),
-                          ),
+                        return Center(
+                          child: Text("No product found!"),
                         );
                       }
                       return PagerListView(

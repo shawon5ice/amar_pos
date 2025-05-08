@@ -2,6 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
 
 import '../../../responsive/pixel_perfect.dart';
 
@@ -28,7 +29,7 @@ class TotalStatusWidget extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: context.theme.cardColor,
             borderRadius: BorderRadius.circular(12.r),
           ),
           child: Column(
@@ -56,7 +57,7 @@ class TotalStatusWidget extends StatelessWidget {
                 maxFontSize: 18.sp,
                 minFontSize: 4,
                 style: TextStyle(
-                    color: Colors.black,
+                    // color: context.textTheme.titleSmall?.color,
                     fontWeight: FontWeight.w600,
                     height: 1.5.sp
                 ),
@@ -86,7 +87,7 @@ class TotalStatusWidgetWithoutExpanded extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.theme.cardColor,
         borderRadius: BorderRadius.circular(12.r),
       ),
       child: Column(
@@ -117,7 +118,7 @@ class TotalStatusWidgetWithoutExpanded extends StatelessWidget {
             maxFontSize: 18.sp,
             minFontSize: 4,
             style: TextStyle(
-              color: Colors.black,
+              // color: context.textTheme.titleSmall?.color,
               fontWeight: FontWeight.w600,
               height: 1.5.sp,
             ),
@@ -153,7 +154,7 @@ class TotalStatusWidgetLeftIcon extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: context.theme.cardColor,
             borderRadius: BorderRadius.circular(12.r),
           ),
           child: Column(
@@ -181,7 +182,7 @@ class TotalStatusWidgetLeftIcon extends StatelessWidget {
                 maxFontSize: 18.sp,
                 minFontSize: 4,
                 style: TextStyle(
-                    color: Colors.black,
+                    // color: context.textTheme.titleSmall?.color,
                     fontWeight: FontWeight.w600,
                     height: 1.5.sp
                 ),

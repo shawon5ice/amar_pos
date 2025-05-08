@@ -11,7 +11,7 @@ class DarkTheme {
       cardColor: AppColors.darkCard,
       textTheme: DarkTextTheme.textTheme(context),
       appBarTheme: AppBarTheme(
-        color: AppColors.darkPrimary,
+        color: AppColors.darkCard,
       ),
       bottomSheetTheme: BottomSheetThemeData(
           backgroundColor: AppColors.bottomSheetBGColor

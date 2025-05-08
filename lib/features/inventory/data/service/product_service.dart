@@ -14,7 +14,6 @@ class ProductService {
     required int? brandId,
     String? search,
   }) async {
-    logger.d("active: $activeStatus");
     var response = await BaseClient.getData(
         token: usrToken,
         api: NetWorkStrings.getAllProducts,

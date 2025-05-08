@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../permission_manager.dart';
+import '../../auth/data/model/hive/login_data_helper.dart';
 import '../data/models/dashboard_response_model.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -49,6 +50,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   void initializePermissions() async {
+    await controller.getDashboardData();
     await controller.getPermissions();
     if (controller.permissionApiResponse?.success == true) {
       await PermissionManager.loadPermissions();
@@ -60,23 +62,19 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     final DrawerMenuController drawerMenuController = Get.find();
 
     return Scaffold(
-      backgroundColor: AppColors.scaffoldBackground,
+      backgroundColor: context.theme.scaffoldBackgroundColor,
       // drawer: CustomDrawer(),
       appBar: AppBar(
         leading: DrawerMenuWidget(onClicked: drawerMenuController.openDrawer),
-        title: const Text("H O M E"),
+        title: Text(LoginDataBoxManager().loginData!.business.name),
+        centerTitle: true,
         actions: [
-          IconButton(
-              onPressed: () {
-                Get.changeThemeMode(
-                    Get.isDarkMode ? ThemeMode.light : ThemeMode.dark);
-              },
-              icon: Get.isDarkMode ? Icon(Icons.sunny) : Icon(Icons.nightlight)),
-          IconButton(
-              onPressed: () {
-                // Navigator.push(context, MaterialPageRoute(builder: (context) => BluetoothPrinterScreen()));
-              },
-              icon: Icon(Icons.print))
+          // IconButton(
+          //     onPressed: () {
+          //       Get.changeThemeMode(
+          //           Get.isDarkMode ? ThemeMode.light : ThemeMode.dark);
+          //     },
+          //     icon: Get.isDarkMode ? Icon(Icons.sunny) : Icon(Icons.nightlight)),
         ],
       ),
       body: GetBuilder<HomeScreenController>(
@@ -84,9 +82,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           builder: (controller) {
             return RefreshIndicator(
               onRefresh: () async{
+                controller.firstTimeLoading = false;
                 controller.getDashboardData();
               },
               child: SingleChildScrollView(
+                physics: AlwaysScrollableScrollPhysics(),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
@@ -96,7 +96,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       Container(
                         padding: EdgeInsets.all(24.w),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: context.theme.cardColor,
                           borderRadius: BorderRadius.circular(12.r),
                         ),
                         child: Column(
@@ -218,7 +218,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                                     maxFontSize: 18.sp,
                                                     minFontSize: 10.sp,
                                                     style: TextStyle(
-                                                      color: Colors.black,
+                                                      // color: Colors.black,
                                                       fontWeight: FontWeight.w600,
                                                       height: 1.5.sp,
                                                     ),
@@ -249,7 +249,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       Container(
                         padding: EdgeInsets.all(24.w),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: context.theme.cardColor,
                           borderRadius: BorderRadius.circular(12.r),
                         ),
                         child: Column(
@@ -454,14 +454,14 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       Container(
                         padding: EdgeInsets.all(24.w),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: context.theme.cardColor,
                           borderRadius: BorderRadius.circular(12.r),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             FieldTitle(
-                              'Daily Summary',
+                              'Low Stock Products',
                               color: AppColors.accent,
                               fontSize: 16.sp,
                               fontWeight: FontWeight.bold,

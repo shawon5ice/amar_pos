@@ -43,7 +43,6 @@ class DrawerMenuController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    selectMenuItem(MenuSelection(parent: DrawerItems.overview));
     update();
   }
 
@@ -54,7 +53,6 @@ class DrawerMenuController extends GetxController {
     loadSaleModule();
     loadPurchaseModule();
     loadInventoryModule();
-    logger.d(salesModule);
     update(['drawer_menu']);
   }
 

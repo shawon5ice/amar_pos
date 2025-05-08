@@ -33,7 +33,7 @@ class ProductListItemWidget extends StatelessWidget {
               )
             : null,
         decoration: BoxDecoration(
-            color: Colors.white,
+            color: context.theme.cardColor,
             borderRadius: BorderRadius.all(Radius.circular(20))),
         child: Column(
           children: [

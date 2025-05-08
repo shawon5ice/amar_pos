@@ -26,10 +26,8 @@ class HomeScreenController extends GetxController{
     update(['permissions_loading']);
     try{
       var response = await HomeScreenService.getPermissions(usrToken: LoginDataBoxManager().loginData!.token);
-      logger.i(response);
       if (response != null) {
         permissionApiResponse = PermissionApiResponse.fromJsonForGroupData(response);
-        logger.d(permissionApiResponse?.success);
         await PermissionManager.loadPermissions();
         await drawerMenuController.loadModules();
       }
@@ -42,24 +40,23 @@ class HomeScreenController extends GetxController{
 
   }
 
-  @override
-  void onInit() {
-    getDashboardData();
-    super.onInit();
-  }
-
   bool dashboardDataLoading = false;
   DashboardResponseModel? dashboardResponseModel;
 
+  bool firstTimeLoading = false;
+
   Future<void> getDashboardData() async {
-    dashboardDataLoading = true;
+    if(!firstTimeLoading){
+      dashboardDataLoading = true;
+      firstTimeLoading = true;
+    }
     update(['dashboard_data']);
     try{
       var response = await HomeScreenService.getDashboardData(usrToken: LoginDataBoxManager().loginData!.token);
       logger.i(response);
       if (response != null) {
         dashboardResponseModel = DashboardResponseModel.fromJson(response);
-        logger.d(dashboardResponseModel);
+        logger.d(dashboardResponseModel?.dashboardResponseData.balance);
       }
     }catch(e){
       logger.e(e);

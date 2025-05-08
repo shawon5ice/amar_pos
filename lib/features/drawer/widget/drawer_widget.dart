@@ -40,6 +40,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   // bool childItemChanged = false;
   @override
   void initState() {
+    onParentTap(DrawerItems.overview);
     super.initState();
   }
 
