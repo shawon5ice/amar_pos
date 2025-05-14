@@ -95,22 +95,22 @@ class _CreateClientBottomSheetState extends State<CreateClientBottomSheet> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const FieldTitle(
-                        "Outlet Name",
+                      const RichFieldTitle(
+                        text: "Client Name",
                       ),
-                      addH(8.h),
+                      addH(4.h),
                       CustomTextField(
+                        maxLength: 50,
                         textCon: outletName,
                         hintText: "Type name here...",
                         validator: (value) =>
                             FieldValidator.nonNullableFieldValidator(
                                 value, "client name"),
                       ),
-                      addH(20.h),
-                      const FieldTitle(
-                        "Phone",
+                      const RichFieldTitle(
+                        text: "Phone",
                       ),
-                      addH(8.h),
+                      addH(4.h),
                       CustomTextField(
                         textCon: outletPhone,
                         inputType: TextInputType.phone,
@@ -119,11 +119,11 @@ class _CreateClientBottomSheetState extends State<CreateClientBottomSheet> {
                             FieldValidator.phoneNumberFieldValidator(
                                 value, "Outlet phone number", false),
                       ),
-                      addH(20.h),
-                      const FieldTitle(
-                        "Address",
-                      ),
                       addH(8.h),
+                      const RichFieldTitle(
+                        text: "Address",
+                      ),
+                      addH(4.h),
                       CustomTextField(
                         textCon: outletAddress,
                         hintText: "Type address here...",
@@ -131,11 +131,11 @@ class _CreateClientBottomSheetState extends State<CreateClientBottomSheet> {
                             FieldValidator.nonNullableFieldValidator(
                                 value, "Client address"),
                       ),
-                      addH(20.h),
+                      addH(8.h),
                       const FieldTitle(
                         "Opening Balance",
                       ),
-                      addH(8.h),
+                      addH(4.h),
                       CustomTextField(
                         textCon: openingBalance,
                         hintText: "Type opening balance here...",

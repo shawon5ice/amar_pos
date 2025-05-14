@@ -25,14 +25,18 @@ class OutletController extends GetxController {
 
   void getAllOutlets() async {
     outletListLoading = true;
+    outletList.clear();
+    allOutletCopy.clear();
     update(['outlet_list']);
     try{
       var response = await OutletService.getAll(usrToken: loginData!.token);
       if (response != null) {
         logger.d(response);
         outletListModelResponse = OutletListModelResponse.fromJson(response);
-        outletList = outletListModelResponse!.data.outletList;
-        allOutletCopy = outletList;
+        if(outletListModelResponse != null && outletListModelResponse!.data != null){
+          outletList = outletListModelResponse!.data!.outletList;
+          allOutletCopy = outletList;
+        }
       }
     }catch(e){
       logger.e(e);

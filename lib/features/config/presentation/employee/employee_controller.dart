@@ -68,6 +68,9 @@ class EmployeeController extends GetxController {
 
   void getAllEmployee() async {
     logger.i("HELLO EMPLOYEE");
+    employeeList.clear();
+    allEmployeeCopy.clear();
+
     employeeListLoading = true;
     update(['employee_list']);
     try{
@@ -75,8 +78,10 @@ class EmployeeController extends GetxController {
       if (response != null) {
         // logger.d(response);
         employeeListModelResponse = EmployeeListModelResponse.fromJson(response);
-        employeeList = employeeListModelResponse!.data.employeeList;
-        allEmployeeCopy = employeeList;
+        if(employeeListModelResponse != null && employeeListModelResponse!.data != null){
+          employeeList = employeeListModelResponse!.data!.employeeList;
+          allEmployeeCopy = employeeList;
+        }
       }
     }catch(e){
       logger.e(e);

@@ -1,3 +1,4 @@
+import 'package:amar_pos/core/constants/app_colors.dart';
 import 'package:amar_pos/core/constants/logger/logger.dart';
 import 'package:amar_pos/core/network/base_client.dart';
 import 'package:amar_pos/core/notification/firebase_service.dart';
@@ -30,6 +31,13 @@ Future<void> handleInitialMessage() async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      systemNavigationBarColor: AppColors.scaffoldBackground, // Change this to match your app
+      systemNavigationBarIconBrightness: Brightness.dark, // Icons color
+    ),
+  );
   // debugPaintSizeEnabled = true;
   await Firebase.initializeApp(options: DefaultFirebaseOptions.android);
   NotificationService().initNotification();

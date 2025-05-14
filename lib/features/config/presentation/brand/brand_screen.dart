@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:amar_pos/core/constants/app_assets.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
+import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:amar_pos/features/config/presentation/brand/brand_controller.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
@@ -56,9 +57,7 @@ class _BrandScreenState extends State<BrandScreen> {
                     id: "brand_list",
                     builder: (controller) {
                       if (_brandController.branListLoading) {
-                        return const Center(
-                          child: CircularProgressIndicator(),
-                        );
+                        return RandomLottieLoader.lottieLoader();
                       } else if (_brandController.brandModelResponse == null) {
                         return const Center(
                             child: Text("Something went wrong"));

@@ -1,3 +1,4 @@
+import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:amar_pos/features/config/presentation/unit/unit_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -51,9 +52,7 @@ class _UnitScreenState extends State<UnitScreen> {
                         id: "unit_list",
                         builder: (controller) {
                           if(_unitController.unitListLoading){
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
+                            return RandomLottieLoader.lottieLoader();
                           }else if(_unitController.unitListModelResponse == null){
                             return Center(
                               child: Text(

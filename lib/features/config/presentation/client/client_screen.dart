@@ -1,4 +1,5 @@
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
+import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:amar_pos/features/config/data/model/client/client_list_model_response.dart';
 import 'package:amar_pos/features/config/presentation/client/client_controller.dart';
 import 'package:amar_pos/features/config/presentation/client/create_client_bottom_sheet.dart';
@@ -43,7 +44,7 @@ class _ClientScreenState extends State<ClientScreen> {
             children: [
               SearchWidget(
                 onChanged: (value){
-                  _controller.searchBrand(search: value);
+                  _controller.searchClient(search: value);
                 },
               ),
               addH(16.px),
@@ -52,7 +53,7 @@ class _ClientScreenState extends State<ClientScreen> {
                     id: "client_list",
                     builder: (controller) {
                       if(_controller.clientListLoading){
-                        return const Center(child: CircularProgressIndicator(),);
+                        return RandomLottieLoader.lottieLoader();
                       }else if(_controller.clientListModelResponse == null){
                         return Center(child: Text(NetWorkStrings.errorMessage, textAlign: TextAlign.center,style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),));
                       }else if (_controller.clientList.isEmpty) {
@@ -179,6 +180,21 @@ class _ClientScreenState extends State<ClientScreen> {
                                   // )
                                 ],
                               ),
+                              addH(12.h),
+                              Container(
+                                margin: EdgeInsets.only(right: 20),
+                                height: 30.h,
+                                decoration: BoxDecoration(
+                                    color: Color(0xffF6FBFF),
+                                    borderRadius:
+                                    BorderRadius.all(Radius.circular(20.r)),
+                                    border: Border.all(color: const Color(0xffD3ECFF))),
+                                child: Center(
+                                    child: Text(
+                                      "ID : ${controller.clientList[index].clientNo}",
+                                      style: context.textTheme.titleSmall,
+                                    )),
+                              )
                             ],
                           ),
                         );
@@ -190,22 +206,25 @@ class _ClientScreenState extends State<ClientScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: CustomButton(
-        text: "Add New Client",
-        marginHorizontal: 20,
-        marginVertical: 10,
-        onTap: () {
-          showModalBottomSheet(
-            context: context,
-            isScrollControlled: true,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-            ),
-            builder: (context) {
-              return const CreateClientBottomSheet();
-            },
-          );
-        },
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.only(bottom: 20),
+        child: CustomButton(
+          text: "Add New Client",
+          marginHorizontal: 20,
+          marginVertical: 10,
+          onTap: () {
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              builder: (context) {
+                return const CreateClientBottomSheet();
+              },
+            );
+          },
+        ),
       ),
     );
   }

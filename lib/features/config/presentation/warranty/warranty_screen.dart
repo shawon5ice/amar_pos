@@ -1,3 +1,4 @@
+import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:amar_pos/features/config/presentation/unit/unit_controller.dart';
 import 'package:amar_pos/features/config/presentation/warranty/warranty_controller.dart';
 import 'package:flutter/material.dart';
@@ -52,9 +53,7 @@ class _WarrantyScreenState extends State<WarrantyScreen> {
                         id: "unit_list",
                         builder: (controller) {
                           if(_warrantyController.warrantyListLoading){
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
+                            return RandomLottieLoader.lottieLoader();
                           }else if(_warrantyController.warrantyListModelResponse == null){
                             return Center(
                               child: Text(

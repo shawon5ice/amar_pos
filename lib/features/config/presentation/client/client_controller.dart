@@ -1,4 +1,5 @@
 import 'package:amar_pos/core/constants/logger/logger.dart';
+import 'package:amar_pos/core/network/helpers/error_extractor.dart';
 import 'package:amar_pos/core/widgets/methods/helper_methods.dart';
 import 'package:amar_pos/features/config/data/model/client/client_list_model_response.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -22,14 +23,18 @@ class ClientController extends GetxController {
 
   void getAllClient() async {
     clientListLoading = true;
+    clientList.clear();
+    allClientCopy.clear();
     update(['client_list']);
     try{
       var response = await ClientService.getAll(usrToken: loginData!.token);
       if (response != null) {
         logger.d(response);
         clientListModelResponse = ClientListModelResponse.fromJson(response);
-        clientList = clientListModelResponse!.data.clientList;
-        allClientCopy = clientList;
+        if(clientListModelResponse!.data != null){
+          clientList = clientListModelResponse!.data!.clientList;
+          allClientCopy = clientList;
+        }
       }
     }catch(e){
       logger.e(e);
@@ -40,7 +45,7 @@ class ClientController extends GetxController {
 
   }
 
-  void searchBrand({required String search}) async {
+  void searchClient({required String search}) async {
     try {
       // Show loading state
       isAddClientLoading = true;
@@ -53,7 +58,7 @@ class ClientController extends GetxController {
       } else {
         // Perform case-insensitive search
         clientList = allClientCopy
-            .where((e) => e.name.toLowerCase().contains(search.toLowerCase()))
+            .where((e) => e.name.toLowerCase().contains(search.toLowerCase()) || e.phone.toLowerCase().contains(search.toLowerCase()))
             .toList();
       }
     } catch (e) {
@@ -96,7 +101,13 @@ class ClientController extends GetxController {
           Get.back();
           getAllClient();
         }
-        Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true: null );
+
+        if(!response['success'] && response['errors']  != null){
+          ErrorExtractor.showErrorDialog(Get.context!, response,shouldNotPop: true);
+        }else{
+          Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true: null );
+        }
+
       }
     }catch(e){
       logger.e(e);
