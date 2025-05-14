@@ -39,6 +39,7 @@ class DailyStatementService {
     DateTime? endDate,
     String? search,
     int? caId,
+    bool? shouldPrint
   }) async {
     // logger.d("PDF: $isPdf");
 
@@ -62,6 +63,7 @@ class DailyStatementService {
       url: downloadUrl,
       token: usrToken,
       fileName: fileName,
+      shouldPrint: shouldPrint,
       query: query,);
   }
 }

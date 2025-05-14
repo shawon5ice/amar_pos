@@ -13,7 +13,8 @@ class OutletDropDownWidget extends StatefulWidget {
     this.isMandatory,
     this.hideTitle,
     this.borderRadius,
-    this.filled
+    this.filled,
+    this.isTransitional,
   });
 
   final Function(OutletModel? outlet) onOutletSelection;
@@ -21,6 +22,7 @@ class OutletDropDownWidget extends StatefulWidget {
   final bool? isMandatory;
   final bool? hideTitle;
   final bool? filled;
+  final bool? isTransitional;
   final double? borderRadius;
 
   @override
@@ -41,6 +43,7 @@ class _OutletDropDownWidgetState extends State<OutletDropDownWidget> {
 
   @override
   void initState() {
+    controller.getAllOutlet(widget.isTransitional);
     controller.resetOutletSelection();
     controller.selectedOutlet = widget.initialOutletModel;
     super.initState();

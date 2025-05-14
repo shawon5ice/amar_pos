@@ -31,7 +31,7 @@ class _DailyStatementState extends State<DailyStatement> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Daily Statement"),centerTitle: true,
+      appBar: AppBar(title: const Text("Daily Statement"),centerTitle: true,
         actions: [
           IconButton(
             onPressed: () async {
@@ -55,19 +55,20 @@ class _DailyStatementState extends State<DailyStatement> {
         child: Column(
           children: [
             Container(
-              padding: EdgeInsets.only(left: 20,top: 20,right: 20),
-              decoration: BoxDecoration(
+              padding: const EdgeInsets.only(left: 20,top: 20,right: 20),
+              decoration: const BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.all(Radius.circular(20))
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  FieldTitle("Select Account"),
+                  const FieldTitle("Select Outlet"),
                   addH(4),
                   Row(children: [
                     Expanded(
                           child: OutletDropDownWidget(
+                            isTransitional: false,
                         onOutletSelection: (OutletModel? outlet) {
                           controller.getDailyStatement(caId: outlet?.id);
                         },
@@ -91,7 +92,9 @@ class _DailyStatementState extends State<DailyStatement> {
                     addW(4),
                     CustomSvgIconButton(
                       bgColor: const Color(0xffFFFCF8),
-                      onTap: () {},
+                      onTap: () {
+                        controller.downloadDailyStatement(isPdf: true,shouldPrint: true);
+                      },
                       assetPath: AppAssets.printIcon,
                     )
                   ],),
