@@ -26,6 +26,9 @@ class EmployeeService {
     var response = await BaseClient.getData(
       token: usrToken,
       api: NetWorkStrings.getAllOutletsDD,
+      parameter: {
+        "is_transitional" : 0
+      }
     );
     return response;
   }

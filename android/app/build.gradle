@@ -11,6 +11,15 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
 
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withInputStream { stream ->
+        localProperties.load(stream)
+    }
+}
+
+
 android {
     namespace = "com.motionsoft.amar_pos"
     compileSdk = flutter.compileSdkVersion
@@ -30,10 +39,11 @@ android {
         applicationId = "com.motionsoft.amar_pos"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        minSdk = 23
         targetSdk = flutter.targetSdkVersion
-        versionCode = 1
-        versionName = "1.0.0"
+
+        versionCode = Integer.parseInt(localProperties['flutter.versionCode'] ?: "1")
+        versionName = localProperties['flutter.versionName'] ?: "1.0.0"
     }
 
     signingConfigs {

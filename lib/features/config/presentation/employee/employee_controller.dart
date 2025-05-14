@@ -92,15 +92,15 @@ class EmployeeController extends GetxController {
   PermissionApiResponse? permissionApiResponse;
   Map<String, Map<String, bool>> permissionStatus = {};
 
-  Future<void> preparePermissions() async{
+  Future<void> preparePermissions({bool? value}) async{
     permissionStatus = {};
-    permissionApiResponse!.data.entries.forEach((outer) {
+    for (var outer in permissionApiResponse!.data.entries) {
       permissionStatus[outer.key] = {}; // initialize inner map
 
-      outer.value.entries.forEach((inner) {
-        permissionStatus[outer.key]![inner.key] = false; // assign value
-      });
-    });
+      for (var inner in outer.value.entries) {
+        permissionStatus[outer.key]![inner.key] = value?? true; // assign value
+      }
+    }
   }
   void getAllPermissions() async {
     logger.i("HELLO EMPLOYEE");
@@ -122,7 +122,7 @@ class EmployeeController extends GetxController {
 
   }
 
-  void searchSupplier({required String search}) async {
+  void searchEmployee({required String search}) async {
     try {
       // Show loading state
       isAddEmployeeLoading = true;
@@ -135,7 +135,7 @@ class EmployeeController extends GetxController {
       } else {
         // Perform case-insensitive search
         employeeList = allEmployeeCopy
-            .where((e) => e.name.toLowerCase().contains(search.toLowerCase()))
+            .where((e) => e.name.toLowerCase().contains(search.toLowerCase()) ||  e.phone.toLowerCase().contains(search.toLowerCase()))
             .toList();
       }
     } catch (e) {

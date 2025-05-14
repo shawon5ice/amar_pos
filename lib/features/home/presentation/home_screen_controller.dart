@@ -53,10 +53,8 @@ class HomeScreenController extends GetxController{
     update(['dashboard_data']);
     try{
       var response = await HomeScreenService.getDashboardData(usrToken: LoginDataBoxManager().loginData!.token);
-      logger.i(response);
       if (response != null) {
         dashboardResponseModel = DashboardResponseModel.fromJson(response);
-        logger.d(dashboardResponseModel?.dashboardResponseData.balance);
       }
     }catch(e){
       logger.e(e);

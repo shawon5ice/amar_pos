@@ -14,6 +14,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 
+import '../../main.dart';
 import '../drawer/drawer.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -51,6 +52,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     _getAppInfo();
+    handleInitialMessage();
     // appUpdate();
     navigate();
   }

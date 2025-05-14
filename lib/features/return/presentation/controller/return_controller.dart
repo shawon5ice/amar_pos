@@ -299,7 +299,7 @@ class ReturnController extends GetxController {
     totalAmount = totalA;
     totalVat = totalV;
     totalQTY = totalQ;
-    paidAmount = totalAmount  + additionalExpense - totalDiscount;
+    paidAmount = totalAmount  + additionalExpense - totalDiscount + totalVat;
 
     if (firstTime != null && !isEditing) {
       addPaymentMethod();

@@ -117,6 +117,7 @@ class _CreateOutletBottomSheetState extends State<CreateOutletBottomSheet> {
                       CustomTextField(
                         textCon: outletName,
                         hintText: "Type name here...",
+                        maxLength: 50,
                         validator: (value) =>
                             FieldValidator.nonNullableFieldValidator(
                                 value, "Outlet name"),

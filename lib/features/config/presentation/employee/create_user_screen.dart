@@ -165,7 +165,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Create Employee"),
+        title: Text(widget.user != null ? "Update Employee": "Create Employee"),
         centerTitle: true,
       ),
       resizeToAvoidBottomInset: true,
@@ -330,7 +330,7 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
               addH(20.h),
               Container(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                 decoration: const BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.all(Radius.circular(20))),
@@ -340,15 +340,153 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                     const FieldTitle("Select Outlet"),
                     addH(8),
                     GetBuilder<EmployeeController>(
-                      id: 'employee_permissions',
-                      builder: (controller) {
-                        if (controller.permissionLoading) {
-                          return CircularProgressIndicator();
-                        } else if (controller.permissionApiResponse == null) {
-                          return Container();
-                        } else {
+                      id: 'outlet_dd',
+                      builder: (controller) => DropdownButtonHideUnderline(
+                        child: DropdownButton2<OutletModel>(
+                          isExpanded: true,
+                          hint: Text(
+                            controller.outlets.isEmpty
+                                ? 'Loading...'
+                                : controller.outletListDDResponseModel == null
+                                ? AppStrings.kWentWrong
+                                : 'Select an outlet...',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Theme.of(context).hintColor,
+                            ),
+                          ),
+                          items: controller.outlets
+                              .map((item) => DropdownMenuItem(
+                            value: item,
+                            child: Text(
+                              item.name,
+                              style: const TextStyle(
+                                fontSize: 14,
+                              ),
+                            ),
+                          ))
+                              .toList(),
+                          value: controller.selectedOutlet,
+                          onChanged: (value) {
+                            setState(() {
+                              controller.selectedOutlet = value;
+                            });
+                          },
+                          buttonStyleData: ButtonStyleData(
+                            height: 58,
+                            decoration: BoxDecoration(
+                                border: Border.all(
+                                    color: AppColors.inputBorderColor),
+                                borderRadius:
+                                const BorderRadius.all(Radius.circular(8))),
+                            // width: 200,
+                          ),
+                          dropdownStyleData: const DropdownStyleData(
+                            maxHeight: 200,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius:
+                              BorderRadius.all(Radius.circular(8)),
+                            ),
+                          ),
+                          menuItemStyleData: const MenuItemStyleData(
+                            height: 40,
+                          ),
+                          dropdownSearchData: DropdownSearchData(
+                            searchController: textEditingController,
+                            searchInnerWidgetHeight: 58,
+                            searchInnerWidget: Container(
+                              height: 58,
+                              padding: const EdgeInsets.only(
+                                top: 8,
+                                bottom: 4,
+                                right: 8,
+                                left: 8,
+                              ),
+                              child: TextFormField(
+                                expands: true,
+                                maxLines: null,
+                                controller: textEditingController,
+                                validator: (value) {
+                                  if (controller.selectedOutlet == null) {
+                                    return "Please select an outlet";
+                                  }
+                                  return null;
+                                },
+                                decoration: InputDecoration(
+                                  isDense: true,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 8,
+                                  ),
+                                  hintText: 'Search for an item...',
+                                  hintStyle: const TextStyle(fontSize: 12),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            searchMatchFn: (item, searchValue) {
+                              return item.value!.name
+                                  .toString()
+                                  .contains(searchValue);
+                            },
+                          ),
+                          //This to clear the search value when you close the menu
+                          onMenuStateChange: (isOpen) {
+                            if (!isOpen) {
+                              textEditingController.clear();
+                            }
+                          },
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              addH(20.h),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.all(Radius.circular(20))),
+                child: GetBuilder<EmployeeController>(
+                  id: 'employee_permissions',
+                  builder: (controller) {
+                    if (controller.permissionLoading) {
+                      return CircularProgressIndicator();
+                    } else if (controller.permissionApiResponse == null) {
+                      return Container();
+                    } else {
+                      bool isAllGroupPermissionSelected = controller.permissionStatus.keys.every((outerEntry) =>  controller.permissionStatus[outerEntry]?.values.every((v) => v) ?? false);
+                      return Column(
+                        children: [
+                          Row(
+                            children: [
+                              const FieldTitle("Select Permission"),
+                              Spacer(),
+                              TextButton(
+                                onPressed: ()  {
+                                  if(isAllGroupPermissionSelected){
+                                    controller.preparePermissions(value: false);
+                                    isAllGroupPermissionSelected = false;
+                                  }else{
+                                    controller.preparePermissions(value: true);
+                                    isAllGroupPermissionSelected = true;
+                                  }
+                                  controller.update(['employee_permissions']);
+                                  setState(() {
 
-                          return ListView(
+                                  });
+                                },
+                                child: Text(isAllGroupPermissionSelected ? "Deselect All" : "Select All"),
+                              ),
+                            ],
+                          ),
+                          addH(8),
+                          ListView(
                             physics: NeverScrollableScrollPhysics(),
                             shrinkWrap: true,
                             children: controller
@@ -457,131 +595,13 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                                 ],
                               );
                             }).toList(),
-                          );
-                        }
-                      },
-                    )
-                  ],
+                          ),
+                        ],
+                      );
+                    }
+                  },
                 ),
               ),
-              addH(20.h),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.all(Radius.circular(20))),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const FieldTitle("Select Outlet"),
-                    addH(8),
-                    GetBuilder<EmployeeController>(
-                      id: 'outlet_dd',
-                      builder: (controller) => DropdownButtonHideUnderline(
-                        child: DropdownButton2<OutletModel>(
-                          isExpanded: true,
-                          hint: Text(
-                            controller.outlets.isEmpty
-                                ? 'Loading...'
-                                : controller.outletListDDResponseModel == null
-                                    ? AppStrings.kWentWrong
-                                    : 'Select an outlet...',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Theme.of(context).hintColor,
-                            ),
-                          ),
-                          items: controller.outlets
-                              .map((item) => DropdownMenuItem(
-                                    value: item,
-                                    child: Text(
-                                      item.name,
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                  ))
-                              .toList(),
-                          value: controller.selectedOutlet,
-                          onChanged: (value) {
-                            setState(() {
-                              controller.selectedOutlet = value;
-                            });
-                          },
-                          buttonStyleData: ButtonStyleData(
-                            height: 58,
-                            decoration: BoxDecoration(
-                                border: Border.all(
-                                    color: AppColors.inputBorderColor),
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(8))),
-                            // width: 200,
-                          ),
-                          dropdownStyleData: const DropdownStyleData(
-                            maxHeight: 200,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(8)),
-                            ),
-                          ),
-                          menuItemStyleData: const MenuItemStyleData(
-                            height: 40,
-                          ),
-                          dropdownSearchData: DropdownSearchData(
-                            searchController: textEditingController,
-                            searchInnerWidgetHeight: 58,
-                            searchInnerWidget: Container(
-                              height: 58,
-                              padding: const EdgeInsets.only(
-                                top: 8,
-                                bottom: 4,
-                                right: 8,
-                                left: 8,
-                              ),
-                              child: TextFormField(
-                                expands: true,
-                                maxLines: null,
-                                controller: textEditingController,
-                                validator: (value) {
-                                  if (controller.selectedOutlet == null) {
-                                    return "Please select an outlet";
-                                  }
-                                  return null;
-                                },
-                                decoration: InputDecoration(
-                                  isDense: true,
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 8,
-                                  ),
-                                  hintText: 'Search for an item...',
-                                  hintStyle: const TextStyle(fontSize: 12),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            searchMatchFn: (item, searchValue) {
-                              return item.value!.name
-                                  .toString()
-                                  .contains(searchValue);
-                            },
-                          ),
-                          //This to clear the search value when you close the menu
-                          onMenuStateChange: (isOpen) {
-                            if (!isOpen) {
-                              textEditingController.clear();
-                            }
-                          },
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              )
             ],
           ),
         ),

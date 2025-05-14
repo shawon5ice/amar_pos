@@ -40,7 +40,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
             children: [
               SearchWidget(
                 onChanged: (value) {
-                  _controller.searchSupplier(search: value);
+                  _controller.searchEmployee(search: value);
                 },
               ),
               addH(16.h),
@@ -207,13 +207,16 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: CustomButton(
-        text: "Create User",
-        marginHorizontal: 20,
-        marginVertical: 10,
-        onTap: () {
-          Get.to(() => CreateUserScreen(), transition: Transition.fadeIn);
-        },
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: CustomButton(
+          text: "Create User",
+          marginHorizontal: 20,
+          marginVertical: 10,
+          onTap: () {
+            Get.to(() => CreateUserScreen(), transition: Transition.fadeIn);
+          },
+        ),
       ),
     );
   }

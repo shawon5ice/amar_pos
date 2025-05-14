@@ -1,7 +1,11 @@
+import 'package:amar_pos/core/constants/logger/logger.dart';
 import 'package:amar_pos/core/network/base_client.dart';
+import 'package:amar_pos/core/notification/firebase_service.dart';
+import 'package:amar_pos/core/notification/notification_service.dart';
 import 'package:amar_pos/features/auth/data/model/hive/login_data_helper.dart';
 import 'package:device_preview_plus/device_preview_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,12 +19,21 @@ import 'features/splash/splash_screen.dart';
 import 'firebase_options.dart';
 import 'package:flutter/rendering.dart';
 
+Future<void> handleInitialMessage() async {
+  RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+
+  if (initialMessage != null) {
+    handleInitialFirebaseMessage(initialMessage);
+  }
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   // debugPaintSizeEnabled = true;
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.ios);
-  // FirebaseService().initNotification();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.android);
+  NotificationService().initNotification();
+  FirebaseService().initNotification();
   final directory = await getApplicationDocumentsDirectory();
   Hive.init(directory.path);
 
