@@ -99,8 +99,9 @@ class ExpenseVoucherController extends GetxController{
     }
   }
 
-  Future<void> getExpenseCategories({int page = 1, int limit = 20}) async {
+  Future<void> getExpenseCategories({int page = 1, int limit = 20, String? search}) async {
     if(page == 1){
+      hasError.value = false;
       isExpenseCategoriesListLoading = true;
       expenseCategoriesList.clear();
     }else{
@@ -115,6 +116,7 @@ class ExpenseVoucherController extends GetxController{
         usrToken: loginData!.token,
         page: page,
         limit: limit,
+        search: search
       );
 
       logger.d(response);
@@ -137,7 +139,9 @@ class ExpenseVoucherController extends GetxController{
         // currentSearchList.clear();
       }
     } catch (e) {
-      hasError.value = true; // Handle exceptions
+      if(page != 1){
+        hasError.value = true;
+      }
       // currentSearchList.clear();
       logger.e(e);
     } finally {

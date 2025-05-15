@@ -1,9 +1,12 @@
 import 'package:amar_pos/core/widgets/custom_button.dart';
+import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:amar_pos/features/accounting/presentation/views/expense_voucher/expense_voucher_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../../../../core/responsive/pixel_perfect.dart';
 import '../../../../../../core/widgets/pager_list_view.dart';
+import '../../../../../../core/widgets/search_widget.dart';
 import '../../../../data/models/expense_voucher/expense_voucher_response_model.dart';
 import '../../widgets/create_expense_voucher_bottom_sheet.dart';
 import '../../widgets/expense_voucher_item.dart';
@@ -20,9 +23,12 @@ class _ExpensePageState extends State<ExpensePage> {
 
   @override
   void initState() {
+    search = null;
     controller.getExpenseVouchers(page: 1);
     super.initState();
   }
+  String? search;
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -31,14 +37,20 @@ class _ExpensePageState extends State<ExpensePage> {
         child: Scaffold(
           body: Column(
             children: [
+              SearchWidget(
+                hintText: 'Search expense voucher...',
+                onChanged: (value){
+                  search = value;
+                  controller.getExpenseVouchers(search: search);
+                },
+              ),
+              addH(8),
               Expanded(
                 child: GetBuilder<ExpenseVoucherController>(
                   id: 'expense_vouchers_list',
                   builder: (controller) {
                     if (controller.isExpenseVouchersListLoading) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
+                      return RandomLottieLoader.lottieLoader();
                     }else if(controller.expenseVoucherResponseModel == null){
                       return Center(
                         child: Text("Something went wrong", style: context.textTheme.titleLarge,),
@@ -50,7 +62,7 @@ class _ExpensePageState extends State<ExpensePage> {
                     }
                     return RefreshIndicator(
                       onRefresh: () async {
-                        controller.getExpenseVouchers(page: 1);
+                        controller.getExpenseVouchers(page: 1,search: search);
                       },
                       child: PagerListView<TransactionData>(
                         // scrollController: _scrollController,
@@ -61,7 +73,7 @@ class _ExpensePageState extends State<ExpensePage> {
                         isLoading: controller.isLoadingMore,
                         hasError: controller.hasError.value,
                         onNewLoad: (int nextPage) async {
-                          await controller.getExpenseVouchers(page: nextPage);
+                          await controller.getExpenseVouchers(page: nextPage,search: search);
                         },
                         totalPage: controller
                             .expenseVoucherResponseModel?.data?.meta?.lastPage ?? 0,
@@ -78,7 +90,7 @@ class _ExpensePageState extends State<ExpensePage> {
             ],
           ),
           bottomNavigationBar: Padding(
-            padding: const EdgeInsets.only(left: 20,right: 20,bottom: 10,top: 10),
+            padding: const EdgeInsets.only(bottom: 10,top: 10),
             child: CustomButton(
               text: "Create Voucher",
               onTap: () {

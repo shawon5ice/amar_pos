@@ -97,7 +97,7 @@ class _ExpenseVoucherState extends State<ExpenseVoucher> with SingleTickerProvid
           ),
           // addH(12),
           Obx(() {
-            return controller.selectedDateTimeRange.value == null ? addH(20): Row(
+            return controller.selectedDateTimeRange.value == null ? addH(8): Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text("${formatDate(controller.selectedDateTimeRange.value!.start)} - ${formatDate(controller.selectedDateTimeRange.value!.end)}", style:const TextStyle(fontSize: 14, color: AppColors.error),),

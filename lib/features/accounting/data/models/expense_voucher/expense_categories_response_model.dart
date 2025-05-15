@@ -6,23 +6,25 @@ part 'expense_categories_response_model.g.dart';
 class ExpenseCategoriesResponseModel {
   final bool success;
   @DataConverter()
-  final DataWrapper data;
+  final DataWrapper data; // Non-nullable DataWrapper
 
   ExpenseCategoriesResponseModel({required this.success, required this.data});
 
-  factory ExpenseCategoriesResponseModel.fromJson(Map<String, dynamic> json) => _$ExpenseCategoriesResponseModelFromJson(json);
+  factory ExpenseCategoriesResponseModel.fromJson(Map<String, dynamic> json) =>
+      _$ExpenseCategoriesResponseModelFromJson(json);
   Map<String, dynamic> toJson() => _$ExpenseCategoriesResponseModelToJson(this);
 }
 
 @JsonSerializable()
 class DataWrapper {
   @JsonKey(name: 'data')
-  final List<ExpenseCategory>? data;
+  final List<ExpenseCategory>? data; // Nullable list within DataWrapper
   final Meta? meta;
 
   DataWrapper({this.data, this.meta});
 
-  factory DataWrapper.fromJson(Map<String, dynamic> json) => _$DataWrapperFromJson(json);
+  factory DataWrapper.fromJson(Map<String, dynamic> json) =>
+      _$DataWrapperFromJson(json);
   Map<String, dynamic> toJson() => _$DataWrapperToJson(this);
 }
 
@@ -51,7 +53,8 @@ class ExpenseCategory {
     required this.isActionable,
   });
 
-  factory ExpenseCategory.fromJson(Map<String, dynamic> json) => _$ExpenseCategoryFromJson(json);
+  factory ExpenseCategory.fromJson(Map<String, dynamic> json) =>
+      _$ExpenseCategoryFromJson(json);
   Map<String, dynamic> toJson() => _$ExpenseCategoryToJson(this);
 }
 
@@ -78,22 +81,21 @@ class Meta {
   Map<String, dynamic> toJson() => _$MetaToJson(this);
 }
 
-
-
-class DataConverter implements JsonConverter<DataWrapper?, dynamic> {
+class DataConverter implements JsonConverter<DataWrapper, dynamic> {
   const DataConverter();
 
   @override
-  DataWrapper? fromJson(dynamic json) {
+  DataWrapper fromJson(dynamic json) {
     if (json is List) {
-      return null;
+      return DataWrapper(data: []);
     } else if (json is Map<String, dynamic>) {
       return DataWrapper.fromJson(json);
     } else {
-      throw Exception('Unexpected type for data: ${json.runtimeType}');
+      // Handle unexpected types by returning a default DataWrapper
+      return DataWrapper(data: []); // Or throw an error if preferred
     }
   }
 
   @override
-  dynamic toJson(DataWrapper? object) => object?.toJson();
+  dynamic toJson(DataWrapper object) => object.toJson();
 }
