@@ -102,7 +102,7 @@ class _ExpensePageState extends State<ExpensePage> {
                         top: Radius.circular(20)),
                   ),
                   builder: (context) {
-                    return CreateExpenseVoucherBottomSheet();
+                    return const CreateExpenseVoucherBottomSheet();
                   },
                 );
               },

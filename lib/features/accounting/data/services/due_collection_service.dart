@@ -262,4 +262,29 @@ class DueCollectionService {
         parameter: query);
     return response;
   }
+
+  static Future<dynamic> getDueCollectionDetails({
+    required String usrToken,
+    required int id,
+  }) async {
+    var response = await BaseClient.getData(
+      token: usrToken,
+      api: "due_collection/get-details/$id",
+    );
+    return response;
+  }
+
+  static downloadDueCollection(
+      {required String usrToken, required int orderId, required String fileName, bool? shouldPrint}) async {
+    // logger.d("PDF: $isPdf");
+
+    String downloadUrl =
+        "${NetWorkStrings.baseUrl}/due_collection/download-receipt/$orderId";
+
+    FileDownloader().downloadFile(
+      url: downloadUrl,
+      token: usrToken,
+      shouldPrint: shouldPrint,
+      fileName: fileName,);
+  }
 }

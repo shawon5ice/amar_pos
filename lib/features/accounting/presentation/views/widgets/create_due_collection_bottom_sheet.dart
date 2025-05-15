@@ -167,7 +167,7 @@ class _CreateDueCollectionBottomSheetState
                         children: [
                           Expanded(
                             child: CAPaymentMethodsDropDownWidget(
-                              initialCAPaymentMethod: widget.dueCollectionData?.paymentMethod,
+                              initialCAPaymentMethod: selectedPaymentMethod,
                               onCAPaymentMethodSelection: (ChartOfAccountPaymentMethod? method) {
                               selectedPaymentMethod = method;
                             },),

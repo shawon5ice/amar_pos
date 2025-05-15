@@ -1,5 +1,6 @@
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/core/widgets/custom_button.dart';
+import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:amar_pos/features/accounting/data/models/due_collection/due_collection_list_response_model.dart';
 import 'package:amar_pos/features/accounting/presentation/views/due_collection/due_collection_controller.dart';
 import 'package:amar_pos/features/accounting/presentation/views/widgets/create_due_collection_bottom_sheet.dart';
@@ -115,7 +116,7 @@ class _CollectionPageState extends State<CollectionPage> {
                   )
                 ],
               ),
-              addH(8),
+
               Obx(() {
                 return controller.selectedDateTimeRange.value == null ? addH(8) : Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -134,9 +135,7 @@ class _CollectionPageState extends State<CollectionPage> {
                   id: 'collection_list',
                   builder: (controller) {
                     if (controller.isDueCollectionListLoading) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
+                      return RandomLottieLoader.lottieLoader();
                     }else if(controller.dueCollectionListResponseModel == null){
                       return Center(
                         child: Text("Something went wrong", style: context.textTheme.titleLarge,),

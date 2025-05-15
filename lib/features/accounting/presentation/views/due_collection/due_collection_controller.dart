@@ -1,6 +1,7 @@
 import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:amar_pos/features/accounting/data/models/client_ledger/client_ledger_list_response_model.dart';
 import 'package:amar_pos/features/accounting/data/models/client_ledger/client_ledger_statement_response_model.dart';
+import 'package:amar_pos/features/accounting/data/models/due_collection/due_collection_details_response_model.dart';
 import 'package:amar_pos/features/accounting/data/models/due_collection/due_collection_list_response_model.dart';
 import 'package:amar_pos/features/accounting/data/models/expense_voucher/expense_voucher_response_model.dart';
 import 'package:amar_pos/features/accounting/data/models/expense_voucher/expense_payment_methods_response_model.dart';
@@ -524,6 +525,52 @@ class DueCollectionController extends GetxController{
         endDate: selectedDateTimeRange.value?.end,
         fileName: fileName,
         clientID: clientID,
+      );
+    } catch (e) {
+      logger.e(e);
+    } finally {
+
+    }
+  }
+
+  bool detailsLoading = false;
+  DueCollectionDetailsResponseModel? dueCollectionDetailsResponseModel;
+  Future<void> getDueCollectionDetails(BuildContext context, int orderId) async {
+    detailsLoading = true;
+    dueCollectionDetailsResponseModel = null;
+    update(['due_collection_details', 'download_print_buttons']);
+    try {
+      var response = await DueCollectionService.getDueCollectionDetails(
+        usrToken: loginData!.token,
+        id: orderId,
+      );
+
+      logger.i(response);
+      if (response != null) {
+        dueCollectionDetailsResponseModel =
+            DueCollectionDetailsResponseModel.fromJson(response);
+      }
+    } catch (e) {
+    } finally {
+      detailsLoading = false;
+      update(['due_collection_details', 'download_print_buttons']);
+    }
+  }
+
+  Future<void> downloadDueCollection(
+      {required bool isPdf, required int orderId,required String orderNo, bool? shouldPrint}) async {
+    hasError.value = false;
+
+    String fileName = "$orderNo-${DateTime
+        .now()
+        .microsecondsSinceEpoch
+        .toString()}${isPdf ? ".pdf" : ".xlsx"}";
+    try {
+      var response = await DueCollectionService.downloadDueCollection(
+          orderId: orderId,
+          usrToken: loginData!.token,
+          fileName: fileName,
+          shouldPrint: shouldPrint
       );
     } catch (e) {
       logger.e(e);
