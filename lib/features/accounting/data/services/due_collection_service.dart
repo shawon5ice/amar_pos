@@ -57,7 +57,7 @@ class DueCollectionService {
     required DateTime? startDate,
     required DateTime? endDate,
     required String? search,
-
+    bool? shouldPrint,
   }) async {
     // logger.d("PDF: $isPdf");
 
@@ -88,6 +88,7 @@ class DueCollectionService {
       url: downloadUrl,
       token: usrToken,
       query: query,
+      shouldPrint: shouldPrint,
       fileName: fileName,);
   }
 
@@ -97,6 +98,7 @@ class DueCollectionService {
     required DateTime? endDate,
     required String? search,
     required int clientID,
+    bool? shouldPrint
   }) async {
     // logger.d("PDF: $isPdf");
 
@@ -119,6 +121,7 @@ class DueCollectionService {
       url: downloadUrl,
       token: usrToken,
       query: query,
+      shouldPrint: shouldPrint,
       fileName: fileName,);
   }
 

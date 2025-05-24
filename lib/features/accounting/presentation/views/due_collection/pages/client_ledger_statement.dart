@@ -5,8 +5,11 @@ import 'package:amar_pos/features/accounting/data/models/client_ledger/client_le
 import 'package:amar_pos/features/accounting/presentation/views/due_collection/due_collection_controller.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import '../../../../../../core/constants/app_assets.dart';
+import '../../../../../../core/constants/app_colors.dart';
+import '../../../../../../core/methods/helper_methods.dart';
 import '../../../../../../core/widgets/custom_text_field.dart';
 import '../../../../../../core/widgets/reusable/custom_svg_icon_widget.dart';
 import '../../widgets/client_ledger_item.dart';
@@ -50,6 +53,24 @@ class _ClientLedgerStatementScreenState
       appBar: AppBar(
         title: const Text("Statement"),
         centerTitle: true,
+        actions: [
+          IconButton(
+            onPressed: () async {
+              DateTimeRange? selectedDate = await showDateRangePicker(
+                context: context,
+                firstDate: DateTime.now().subtract(const Duration(days: 1000)),
+                lastDate: DateTime.now().add(const Duration(days: 1000)),
+                initialDateRange: controller.selectedDateTimeRange.value,
+              );
+              controller.selectedDateTimeRange.value = selectedDate;
+              if (selectedDate != null) {
+                controller.update(['date_status']);
+                controller.getClientLedgerStatement(id: clientLedgerData.id);
+              }
+            },
+            icon: SvgPicture.asset(AppAssets.calenderIcon),
+          )
+        ],
       ),
       body: SafeArea(
         child: Padding(
@@ -72,6 +93,7 @@ class _ClientLedgerStatementScreenState
                       brdrRadius: 40,
                       prefixWidget: Icon(Icons.search),
                       onChanged: (value){
+                        i = 1;
                         controller.getClientLedgerStatement(id: clientLedgerData.id,);
                       },
                     ),
@@ -95,12 +117,28 @@ class _ClientLedgerStatementScreenState
                   addW(4),
                   CustomSvgIconButton(
                     bgColor: const Color(0xffFFFCF8),
-                    onTap: () {},
+                    onTap: () {
+                      controller.downloadStatement(isPdf: false, clientID: clientLedgerData.id, shouldPrint: true);
+                    },
                     assetPath: AppAssets.printIcon,
                   )
                 ],
               ),
-              addH(8.px),
+
+              Obx(() {
+                return controller.selectedDateTimeRange.value == null ? addH(0): Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("${formatDate(controller.selectedDateTimeRange.value!.start)} - ${formatDate(controller.selectedDateTimeRange.value!.end)}", style:const TextStyle(fontSize: 14, color: AppColors.error),),
+                    addW(16),
+                    IconButton(onPressed: (){
+                      controller.selectedDateTimeRange.value = null;
+                      controller.getClientLedgerStatement(id: clientLedgerData.id);
+                    }, icon: const Icon(Icons.cancel_outlined, size: 18, color: AppColors.error,))
+                  ],
+                );
+              }),
+
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: const BoxDecoration(
@@ -110,8 +148,20 @@ class _ClientLedgerStatementScreenState
                 child: Column(
                   children: [
                     StatementItemTitleValueWidget(
+                      title: "Client ID",
+                      value: clientLedgerData.clientNo,
+                      valueFontSize: 16,
+                      valueFontWeight: FontWeight.w600,
+                    ),
+                    StatementItemTitleValueWidget(
                       title: "Client Name",
                       value: clientLedgerData.name,
+                      valueFontSize: 16,
+                      valueFontWeight: FontWeight.w600,
+                    ),
+                    StatementItemTitleValueWidget(
+                      title: "Phone",
+                      value: clientLedgerData.phone,
                       valueFontSize: 16,
                       valueFontWeight: FontWeight.w600,
                     ),
@@ -248,7 +298,7 @@ class _ClientLedgerStatementScreenState
                               Padding(
                                   padding: EdgeInsets.all(8),
                                   child: AutoSizeText("${statement.date}",
-                                      maxLines: 1,
+                                      maxLines: 2,
                                       minFontSize: 2,
                                       maxFontSize: 10,
                                       overflow: TextOverflow.visible,
@@ -256,7 +306,7 @@ class _ClientLedgerStatementScreenState
                               Padding(
                                   padding: EdgeInsets.all(8),
                                   child: AutoSizeText("${statement.slNo}",
-                                      maxLines: 1,
+                                      maxLines: 2,
                                       minFontSize: 2,
                                       maxFontSize: 10,
                                       overflow: TextOverflow.visible,

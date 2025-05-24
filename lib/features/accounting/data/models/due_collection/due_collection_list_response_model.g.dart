@@ -44,6 +44,7 @@ DueCollectionData _$DueCollectionDataFromJson(Map<String, dynamic> json) =>
       id: (json['id'] as num).toInt(),
       date: json['date'] as String,
       slNo: json['sl_no'] as String,
+      isAuto: json['is_auto'] as int?,
       paymentMethod: ChartOfAccountPaymentMethod.fromJson(
           json['payment_method'] as Map<String, dynamic>),
       amount: (json['amount'] as num).toDouble(),
@@ -74,6 +75,7 @@ Map<String, dynamic> _$DueCollectionDataToJson(DueCollectionData instance) =>
       'client': instance.client,
       'amount': instance.amount,
       'remarks': instance.remarks,
+      'is_auto': instance.isAuto,
     };
 
 Category _$CategoryFromJson(Map<String, dynamic> json) => Category(

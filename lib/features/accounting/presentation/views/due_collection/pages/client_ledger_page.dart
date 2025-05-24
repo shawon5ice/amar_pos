@@ -113,7 +113,9 @@ class _ClientLedgerPageState extends State<ClientLedgerPage> {
                   addW(4),
                   CustomSvgIconButton(
                     bgColor: const Color(0xffFFFCF8),
-                    onTap: () {},
+                    onTap: () {
+                      controller.downloadList(isPdf: false, clientLedger: true, shouldPrint: true);
+                    },
                     assetPath: AppAssets.printIcon,
                   )
                 ],

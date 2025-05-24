@@ -40,7 +40,7 @@ class ClientLedgerData {
   final String address;
 
   final num due;
-  @JsonKey(name: 'last_payment_date')
+  @JsonKey(name: 'last_payment_date', defaultValue: 'N/A')
   final String lastPaymentDate;
   @JsonKey(name: 'client_no')
   final String clientNo;

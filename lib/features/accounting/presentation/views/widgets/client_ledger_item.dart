@@ -39,39 +39,39 @@ class ClientLedgerItem extends StatelessWidget {
             borderRadius: BorderRadius.all(Radius.circular(20.r))),
         child: Column(
           children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Flexible(
-                  child: Row(
-                    children: [
-                      Container(
-                        padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                        decoration: BoxDecoration(
-                            color: const Color(0xffF6FFF6),
-                            border: Border.all(
-                              color: const Color(0xff94DB8C),
-                              width: .5,
-                            ),
-                            borderRadius: BorderRadius.circular(20)),
-                        child: AutoSizeText(
-                          clientLedgerData.lastPaymentDate,
-                          maxFontSize: 10,
-                          minFontSize: 8,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                      addW(8.w),
-                      Spacer(),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            addH(12),
+            // Row(
+            //   crossAxisAlignment: CrossAxisAlignment.start,
+            //   children: [
+            //     Flexible(
+            //       child: Row(
+            //         children: [
+            //           Container(
+            //             padding:
+            //             const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            //             decoration: BoxDecoration(
+            //                 color: const Color(0xffF6FFF6),
+            //                 border: Border.all(
+            //                   color: const Color(0xff94DB8C),
+            //                   width: .5,
+            //                 ),
+            //                 borderRadius: BorderRadius.circular(20)),
+            //             child: AutoSizeText(
+            //               clientLedgerData.lastPaymentDate,
+            //               maxFontSize: 10,
+            //               minFontSize: 8,
+            //               style: const TextStyle(
+            //                 fontWeight: FontWeight.w500,
+            //               ),
+            //             ),
+            //           ),
+            //           addW(8.w),
+            //           Spacer(),
+            //         ],
+            //       ),
+            //     ),
+            //   ],
+            // ),
+            // addH(12),
             Container(
               padding: const EdgeInsets.all(12),
               decoration: const BoxDecoration(
@@ -81,8 +81,20 @@ class ClientLedgerItem extends StatelessWidget {
               child: Column(
                 children: [
                   StatementItemTitleValueWidget(
+                    title: "Client ID",
+                    value: clientLedgerData.clientNo,
+                    valueFontSize: 16,
+                    valueFontWeight: FontWeight.w600,
+                  ),
+                  StatementItemTitleValueWidget(
                     title: "Client Name",
                     value: clientLedgerData.name,
+                    valueFontSize: 16,
+                    valueFontWeight: FontWeight.w600,
+                  ),
+                  StatementItemTitleValueWidget(
+                    title: "Phone",
+                    value: clientLedgerData.phone,
                     valueFontSize: 16,
                     valueFontWeight: FontWeight.w600,
                   ),

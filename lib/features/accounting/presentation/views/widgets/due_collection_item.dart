@@ -64,7 +64,7 @@ class DueCollectionItem extends StatelessWidget {
                 ),
               ),
               Spacer(),
-              ExpenseVoucherActionMenu(
+              if(dueCollectionData.isAuto != 1)ExpenseVoucherActionMenu(
                 status: 1,
                 onSelected: (value) {
                   switch (value) {

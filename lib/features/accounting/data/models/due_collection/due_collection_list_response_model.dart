@@ -46,6 +46,8 @@ class DueCollectionData {
   final Store? store;
   @JsonKey(name: 'creator')
   final Creator? creator;
+  @JsonKey(name: 'is_auto')
+  final int? isAuto;
 
   // @ClientConverter()
   // @JsonKey(name: 'client',)
@@ -64,6 +66,7 @@ class DueCollectionData {
     required this.business,
     required this.client,
     this.remarks,
+    this.isAuto
   });
 
   factory DueCollectionData.fromJson(Map<String, dynamic> json) => _$DueCollectionDataFromJson(json);

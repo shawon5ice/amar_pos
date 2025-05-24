@@ -13,6 +13,7 @@ import 'package:get/get_rx/get_rx.dart';
 
 import '../../../../../core/constants/logger/logger.dart';
 import '../../../../../core/core.dart';
+import '../../../../../core/network/helpers/error_extractor.dart';
 import '../../../../auth/data/model/hive/login_data.dart';
 import '../../../../auth/data/model/hive/login_data_helper.dart';
 import '../../../data/models/expense_voucher/expense_categories_response_model.dart';
@@ -483,8 +484,13 @@ class DueCollectionController extends GetxController{
     }
   }
 
-  Future<void> downloadList({required bool isPdf, required bool clientLedger}) async {
+  Future<void> downloadList({required bool isPdf, required bool clientLedger, bool? shouldPrint}) async {
     hasError.value = false;
+
+    if((clientLedger && clientLedgerList.isEmpty) || dueCollectionList.isEmpty){
+      ErrorExtractor.showSingleErrorDialog(Get.context!, "File should not be ${shouldPrint != null? "printed": "downloaded"} with empty data.");
+      return;
+    }
 
     String fileName = "${clientLedger ? 'Client Ledger': 'Due Collection'}-${DateTime
         .now()
@@ -499,6 +505,7 @@ class DueCollectionController extends GetxController{
         startDate: selectedDateTimeRange.value?.start,
         endDate: selectedDateTimeRange.value?.end,
         fileName: fileName,
+        shouldPrint: shouldPrint
       );
     } catch (e) {
       logger.e(e);
@@ -508,7 +515,7 @@ class DueCollectionController extends GetxController{
   }
 
 
-  Future<void> downloadStatement({required bool isPdf, required int clientID}) async {
+  Future<void> downloadStatement({required bool isPdf, required int clientID, bool? shouldPrint}) async {
     hasError.value = false;
 
     String fileName = "Due Statement'-${DateTime
@@ -523,6 +530,7 @@ class DueCollectionController extends GetxController{
         startDate: selectedDateTimeRange.value?.start,
         endDate: selectedDateTimeRange.value?.end,
         fileName: fileName,
+        shouldPrint: shouldPrint,
         clientID: clientID,
       );
     } catch (e) {
