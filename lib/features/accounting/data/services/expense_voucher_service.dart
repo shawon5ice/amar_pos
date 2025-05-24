@@ -37,6 +37,7 @@ class ExpenseVoucherService {
 
  static Future<dynamic> getExpenseCategories({
     required String usrToken,
+   String? search,
    required int page,
    required int limit,
   }) async {
@@ -47,6 +48,7 @@ class ExpenseVoucherService {
         parameter: {
           "page": page,
           "limit": limit,
+          "search": search
         }
     );
     return response;
@@ -156,7 +158,7 @@ class ExpenseVoucherService {
 
     var response = await BaseClient.postData(
       token: token,
-      api: "pos/accounting/expense-category",
+      api: "chart_of_accounts/store",
       body: {
         "name": categoryName,
         "remarks":'',

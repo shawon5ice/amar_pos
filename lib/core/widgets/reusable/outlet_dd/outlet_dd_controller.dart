@@ -14,11 +14,6 @@ class OutletDDController extends GetxController {
   List<OutletModel> outlets = [];
   OutletModel? selectedOutlet;
 
-  @override
-  void onReady() {
-    getAllOutlet();
-    super.onReady();
-  }
 
   // Reset the selected outlet
   void resetOutletSelection() {
@@ -27,13 +22,16 @@ class OutletDDController extends GetxController {
   }
 
   // Fetch all outlets
-  void getAllOutlet() async {
+  void getAllOutlet(bool? isTransitional) async {
     outletListLoading = true;
     logger.e("GETTING OUTLET");
     update(['outlet_dd']); // Update the UI for loading state
     var response = await BaseClient.getData(
       token: loginData!.token,
       api: NetWorkStrings.getAllOutletsDD,
+      parameter: isTransitional != null ? {
+        "is_transitional" : 0
+      }: null
     );
 
     if (response != null && response['success']) {

@@ -1,5 +1,6 @@
 import 'package:amar_pos/core/constants/app_assets.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
+import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:amar_pos/features/config/presentation/category/category_controller.dart';
 import 'package:amar_pos/features/config/presentation/category/create_category_bottom_sheet.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -54,9 +55,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                           id: "category_list",
                           builder: (controller) {
                             if (_categoryController.categoryListLoading) {
-                              return const Center(
-                                child: CircularProgressIndicator(),
-                              );
+                              return RandomLottieLoader.lottieLoader();
                             }else if(_categoryController.categoryModelResponse == null){
                               return Center(
                                 child: Text(

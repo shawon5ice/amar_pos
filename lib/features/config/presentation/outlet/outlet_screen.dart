@@ -1,4 +1,5 @@
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
+import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:amar_pos/features/config/data/model/outlet/outlet_list_model_response.dart';
 import 'package:amar_pos/features/config/presentation/outlet/create_outlet_bottom_sheet.dart';
 import 'package:amar_pos/features/config/presentation/outlet/outlet_controller.dart';
@@ -51,7 +52,7 @@ class _OutletScreenState extends State<OutletScreen> {
                     id: "outlet_list",
                     builder: (controller) {
                       if(_controller.outletListLoading){
-                        return const Center(child: CircularProgressIndicator(),);
+                        return RandomLottieLoader.lottieLoader();
                       }else if(_controller.outletListModelResponse == null){
                         return Center(child: Text(NetWorkStrings.errorMessage, textAlign: TextAlign.center,style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),));
                       }else if (_controller.outletList.isEmpty) {

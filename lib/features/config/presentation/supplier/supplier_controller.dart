@@ -21,14 +21,18 @@ class SupplierController extends GetxController {
 
   void getAllSupplier() async {
     supplierListLoading = true;
+    supplierList.clear();
+    allSupplierCopy.clear();
     update(['supplier_list']);
     try{
       var response = await SupplierService.get(usrToken: loginData!.token);
       if (response != null) {
         logger.d(response);
         supplierListResponseModel = SupplierListResponseModel.fromJson(response);
-        supplierList = supplierListResponseModel!.data.supplierList;
-        allSupplierCopy = supplierList;
+        if( supplierListResponseModel != null && supplierListResponseModel!.data != null){
+          supplierList = supplierListResponseModel!.data!.supplierList;
+          allSupplierCopy = supplierList;
+        }
       }
     }catch(e){
       logger.e(e);

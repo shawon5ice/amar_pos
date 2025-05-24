@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:get/get_rx/get_rx.dart';
 
 import '../../../../../core/constants/logger/logger.dart';
+import '../../../../../core/network/helpers/error_extractor.dart';
 import '../../../../auth/data/model/hive/login_data.dart';
 import '../../../../auth/data/model/hive/login_data_helper.dart';
 
@@ -27,6 +28,7 @@ class DailyStatementController extends GetxController{
   @override
   onInit(){
     super.onInit();
+    selectedDateTimeRange.value = DateTimeRange(start: DateTime.now(), end: DateTime.now());
     getDailyStatement(page: 1);
   }
 
@@ -87,8 +89,12 @@ class DailyStatementController extends GetxController{
     }
   }
 
-  Future<void> downloadDailyStatement({required bool isPdf,}) async {
+  Future<void> downloadDailyStatement({required bool isPdf,bool? shouldPrint}) async {
     hasError.value = false;
+    if(dailyStatementList.isEmpty){
+      ErrorExtractor.showSingleErrorDialog(Get.context!, "File should not be ${shouldPrint != null ? 'printed': 'downloaded'} with empty data");
+      return;
+    }
 
     String fileName = "Daily statement-${
         selectedDateTimeRange.value != null ? "${selectedDateTimeRange.value!.start.toIso8601String().split("T")[0]}-${selectedDateTimeRange.value!.end.toIso8601String().split("T")[0]}": DateTime.now().toIso8601String().split("T")[0]
@@ -103,6 +109,7 @@ class DailyStatementController extends GetxController{
         endDate: selectedDateTimeRange.value?.end,
         caId: selectedOutletId,
         fileName: fileName,
+        shouldPrint: shouldPrint
       );
     } catch (e) {
       logger.e(e);

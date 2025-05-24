@@ -76,7 +76,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         actions: [
           IconButton(
               onPressed: () {
-                drawerMenuController.selectMenuItem(MenuSelection(parent: DrawerItems.sales));
+                drawerMenuController.selectMenuItem(MenuSelection(parent: DrawerItems.returnAndExchange,child: 'Return'));
                 // drawerMenuController.selectMenuItem(DrawerItems.overview)
                 // Get.changeThemeMode(
                 //     Get.isDarkMode ? ThemeMode.light : ThemeMode.dark);

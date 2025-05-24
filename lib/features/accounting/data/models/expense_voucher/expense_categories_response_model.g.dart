@@ -10,14 +10,14 @@ ExpenseCategoriesResponseModel _$ExpenseCategoriesResponseModelFromJson(
         Map<String, dynamic> json) =>
     ExpenseCategoriesResponseModel(
       success: json['success'] as bool,
-      data: DataWrapper.fromJson(json['data'] as Map<String, dynamic>),
+      data: const DataConverter().fromJson(json['data']),
     );
 
 Map<String, dynamic> _$ExpenseCategoriesResponseModelToJson(
         ExpenseCategoriesResponseModel instance) =>
     <String, dynamic>{
       'success': instance.success,
-      'data': instance.data,
+      'data': const DataConverter().toJson(instance.data),
     };
 
 DataWrapper _$DataWrapperFromJson(Map<String, dynamic> json) => DataWrapper(

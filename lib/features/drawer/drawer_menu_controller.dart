@@ -22,6 +22,7 @@ import 'package:amar_pos/features/drawer/model/menu_selection.dart';
 
 import '../../permission_manager.dart';
 import '../sales/presentation/sales_screen.dart';
+import 'model/drawer_item.dart';
 
 class DrawerMenuController extends GetxController {
   RxDouble xOffset = 0.0.obs;
@@ -110,8 +111,13 @@ class DrawerMenuController extends GetxController {
     scaleFactor.value = 1.0;
   }
 
-  void selectMenuItem(MenuSelection? menuItem) {
+  void selectMenuItem(MenuSelection menuItem) {
     selectedMenuItem.value = menuItem;
+    selectParent(menuItem.parent);
+    if(menuItem.child != null){
+      selectChild(menuItem.parent, menuItem.child!);
+    }
+
     closeDrawer();
   }
 
@@ -178,4 +184,47 @@ class DrawerMenuController extends GetxController {
         return const HomeScreen(); // Fallback to HomeScreen
     }
   }
+
+  DrawerItem? selectedParentItem;
+  String? selectedChildItem;
+  bool isExpanded = false;
+
+  void selectParent(DrawerItem item) {
+    selectedParentItem = item;
+    selectedChildItem = null;
+    isExpanded = hasVisibleChildren(item);
+    update(['drawer_menu']);
+  }
+
+
+
+
+  void selectChild(DrawerItem parent, String child) {
+    if (selectedChildItem != child) {
+      selectedParentItem = parent;
+      selectedChildItem = child;
+      _updateMenuSelection();
+    }
+  }
+
+  void _updateMenuSelection() {
+    selectedMenuItem.value = MenuSelection(
+      parent: selectedParentItem!,
+      child: selectedChildItem,
+    );
+    update(['drawer_menu']);
+    // closeDrawer();
+  }
+
+  bool hasVisibleChildren(DrawerItem item) {
+    if (item == DrawerItems.inventory) {
+      return inventoryModule.isNotEmpty;
+    } else if (item == DrawerItems.purchase) {
+      return purchaseModule.isNotEmpty;
+    } else if (item == DrawerItems.returnAndExchange) {
+      return true; // Always has Return/Exchange
+    }
+    return false; // Other menu items have no children
+  }
+
 }

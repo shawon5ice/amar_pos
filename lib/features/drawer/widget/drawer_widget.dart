@@ -1,13 +1,9 @@
 import 'package:amar_pos/core/constants/app_assets.dart';
-import 'package:amar_pos/core/constants/logger/logger.dart';
 import 'package:amar_pos/core/data/preference.dart';
 import 'package:amar_pos/features/auth/data/model/hive/login_data_helper.dart';
 import 'package:amar_pos/features/auth/presentation/ui/login_screen.dart';
 import 'package:amar_pos/features/drawer/drawer_menu_controller.dart';
 import 'package:amar_pos/features/drawer/model/menu_selection.dart';
-import 'package:amar_pos/features/inventory/presentation/products/products_screen.dart';
-import 'package:amar_pos/features/profile/presentation/profile_screen.dart';
-import 'package:amar_pos/permission_manager.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:get/get.dart';
@@ -21,19 +17,16 @@ import '../model/drawer_item.dart';
 import '../model/drawer_items.dart';
 
 class DrawerWidget extends StatefulWidget {
-  final ValueChanged<MenuSelection?> onSelectedItem;
+  // final ValueChanged<MenuSelection?> onSelectedItem;
 
   const DrawerWidget(
-      {super.key, required this.onSelectedItem,});
+      {super.key,});
 
   @override
   State<DrawerWidget> createState() => _DrawerWidgetState();
 }
 
 class _DrawerWidgetState extends State<DrawerWidget> {
-  DrawerItem? selectedParentItem;
-  String? selectedChildItem;
-  bool isExpanded = false;
   final DrawerMenuController  controller = Get.find();
 
   // bool parentItemChanged = false;
@@ -46,39 +39,20 @@ class _DrawerWidgetState extends State<DrawerWidget> {
 
 
   void onParentTap(DrawerItem item) {
-    // Only update if the selection has actually changed
-    if (selectedParentItem != item) {
-      setState(() {
-        selectedParentItem = item;
-        selectedChildItem = null; // Reset child selection on parent change
-        isExpanded = true; // Parent item should always expand when selected
-      });
+    final hasChildren = controller.hasVisibleChildren(item);
 
-      // Update callbacks only when the parent item changes
-      // if (!parentItemChanged) {
-      //   widget.onSelectedItem(selectedParentItem);
-      //   widget.onSelectedChildItem(selectedChildItem);
-      //   parentItemChanged = true; // Flag set to prevent redundant callback calls
-      // }
-      widget.onSelectedItem(MenuSelection(parent: selectedParentItem!, child: selectedChildItem));
+    controller.selectParent(item);
+
+    if (!hasChildren) {
+      // Treat as a leaf — trigger immediate navigation and drawer close
+      controller.selectedMenuItem.value = MenuSelection(parent: item, child: null);
+      controller.closeDrawer();
     }
   }
 
+
   void onChildTap(DrawerItem parent, String child) {
-    // Update only if the child item has changed
-    if (selectedChildItem != child) {
-      setState(() {
-        selectedParentItem = parent;
-        selectedChildItem = child;
-      });
-      // Update callback only when child selection changes
-      // if (!childItemChanged) {
-      //   widget.onSelectedItem(selectedParentItem);
-      //   widget.onSelectedChildItem(selectedChildItem);
-      //   childItemChanged = true; // Prevent redundant callback calls
-      // }
-      widget.onSelectedItem(MenuSelection(parent: selectedParentItem!, child: selectedChildItem));
-    }
+    controller.selectChild(parent, child);
   }
 
   @override
@@ -103,10 +77,10 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                       id: 'profile_picture',
                       builder: (controller) {
                         return Container(
-                          padding: EdgeInsets.all(5),
+                          padding: const EdgeInsets.all(5),
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(8)),
-                            color: selectedParentItem == DrawerItems.profile ? AppColors.lightGreen.withOpacity(.3) : null
+                            borderRadius: const BorderRadius.all(Radius.circular(8)),
+                            color: controller.selectedParentItem == DrawerItems.profile ? AppColors.lightGreen.withOpacity(.3) : null
                           ),
                           child: ValueListenableBuilder<Box>(
                             valueListenable: controller.manager.listenable,
@@ -167,11 +141,11 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                             children: controller.inventoryModule.toList(),
                             expanded: (bool isExpanded) {
                               setState(() {
-                                if (isExpanded) selectedParentItem = DrawerItems.inventory;
+                                if (isExpanded) controller.selectedParentItem = DrawerItems.inventory;
                               });
                             },
-                            isExpanded: isExpanded && selectedParentItem == DrawerItems.inventory,
-                            selectedChild: selectedChildItem,
+                            isExpanded: controller.isExpanded && controller.selectedParentItem == DrawerItems.inventory,
+                            selectedChild: controller.selectedChildItem,
                             onParentTap: () => onParentTap(DrawerItems.inventory),
                             onChildTap: (child) => onChildTap(DrawerItems.inventory, child),
                           ),
@@ -195,11 +169,11 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                             children: const ["Return", "Exchange",],
                             expanded: (bool isExpanded) {
                               setState(() {
-                                if (isExpanded) selectedParentItem = DrawerItems.returnAndExchange;
+                                if (isExpanded) controller.selectedParentItem = DrawerItems.returnAndExchange;
                               });
                             },
-                            isExpanded: isExpanded && selectedParentItem == DrawerItems.returnAndExchange,
-                            selectedChild: selectedChildItem,
+                            isExpanded: controller.isExpanded && controller.selectedParentItem == DrawerItems.returnAndExchange,
+                            selectedChild: controller.selectedChildItem,
                             onParentTap: () => onParentTap(DrawerItems.returnAndExchange),
                             onChildTap: (child) => onChildTap(DrawerItems.returnAndExchange, child),
                           ),
@@ -208,11 +182,11 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                             children: controller.purchaseModule.toList(),
                             expanded: (bool isExpanded) {
                               setState(() {
-                                if (isExpanded) selectedParentItem = DrawerItems.purchase;
+                                if (isExpanded) controller.selectedParentItem = DrawerItems.purchase;
                               });
                             },
-                            isExpanded: isExpanded && selectedParentItem == DrawerItems.purchase,
-                            selectedChild: selectedChildItem,
+                            isExpanded: controller.isExpanded && controller.selectedParentItem == DrawerItems.purchase,
+                            selectedChild: controller.selectedChildItem,
                             onParentTap: () => onParentTap(DrawerItems.purchase),
                             onChildTap: (child) => onChildTap(DrawerItems.purchase, child),
                           ),
@@ -286,7 +260,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   }
 
   Widget buildDrawerItems(BuildContext context, DrawerItem item) {
-    bool isSelected = selectedParentItem == item;
+    bool isSelected = controller.selectedParentItem == item;
     return ListTile(
       selected: isSelected,
       selectedTileColor: AppColors.lightGreen.withOpacity(.3),
@@ -310,7 +284,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
   }
 
   Widget buildProfileDrawerItems(BuildContext context, DrawerItem item) {
-    bool isSelected = selectedParentItem == item;
+    bool isSelected = controller.selectedParentItem == item;
     return ListTile(
       selected: isSelected,
       selectedTileColor: AppColors.lightGreen.withOpacity(.3),

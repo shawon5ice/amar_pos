@@ -1,4 +1,5 @@
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
+import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:amar_pos/features/config/presentation/employee/create_user_screen.dart';
 import 'package:amar_pos/features/config/presentation/employee/employee_controller.dart';
 import 'package:amar_pos/features/config/presentation/supplier/create_supplier_bottom_sheet.dart';
@@ -49,9 +50,7 @@ class _EmployeeScreenState extends State<EmployeeScreen> {
                   id: "employee_list",
                   builder: (controller) {
                     if (_controller.employeeListLoading) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
+                      return RandomLottieLoader.lottieLoader();
                     } else if (_controller.employeeListModelResponse == null) {
                       return Center(
                         child: Text(

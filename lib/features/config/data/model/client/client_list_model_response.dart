@@ -4,17 +4,17 @@ class ClientListModelResponse {
     required this.data,
   });
   late final bool success;
-  late final Data data;
+  late final Data? data;
 
   ClientListModelResponse.fromJson(Map<String, dynamic> json){
     success = json['success'];
-    data = Data.fromJson(json['data']);
+    data = json['data'] is Map ? Data.fromJson(json['data']) : null;
   }
 
   Map<String, dynamic> toJson() {
     final _data = <String, dynamic>{};
     _data['success'] = success;
-    _data['data'] = data.toJson();
+    _data['data'] = data?.toJson();
     return _data;
   }
 }

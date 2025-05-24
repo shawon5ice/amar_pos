@@ -35,6 +35,7 @@ class ClientService {
       token: token,
       api: NetWorkStrings.addClient,
       body: formData,
+      shouldExtractErros: false,
     );
     return response;
   }
