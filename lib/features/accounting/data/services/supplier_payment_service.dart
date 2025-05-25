@@ -57,6 +57,7 @@ class SupplierPaymentService {
     required DateTime? startDate,
     required DateTime? endDate,
     required String? search,
+    bool? shouldPrint,
 
   }) async {
     // logger.d("PDF: $isPdf");
@@ -88,6 +89,7 @@ class SupplierPaymentService {
       url: downloadUrl,
       token: usrToken,
       query: query,
+      shouldPrint: shouldPrint,
       fileName: fileName,);
   }
 
@@ -97,6 +99,7 @@ class SupplierPaymentService {
     required DateTime? endDate,
     required String? search,
     required int clientID,
+    bool? shouldPrint,
   }) async {
     // logger.d("PDF: $isPdf");
 
@@ -119,6 +122,7 @@ class SupplierPaymentService {
       url: downloadUrl,
       token: usrToken,
       query: query,
+      shouldPrint: shouldPrint,
       fileName: fileName,);
   }
 

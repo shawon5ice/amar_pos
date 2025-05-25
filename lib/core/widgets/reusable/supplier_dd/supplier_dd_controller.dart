@@ -33,11 +33,12 @@ class SupplierDDController extends GetxController {
     update(['supplier_dd']);
     var response = await BaseClient.getData(
       token: loginData!.token,
-      api: NetWorkStrings.getAllClientList,
+      api: NetWorkStrings.getAllSupplierList,
     );
 
 
     if (response != null && response['success']) {
+      logger.i(response);
       SupplierListResponseModel supplierListResponseModel =
       SupplierListResponseModel.fromJson(response);
       suppliers = supplierListResponseModel.supplierList;

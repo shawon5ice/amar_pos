@@ -42,40 +42,40 @@ class SupplierLedgerItem extends StatelessWidget {
             borderRadius: BorderRadius.all(Radius.circular(20.r))),
         child: Column(
           children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Flexible(
-                  child: Row(
-                    children: [
-                      Container(
-                        padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                        decoration: BoxDecoration(
-                            color: const Color(0xffF6FFF6),
-                            border: Border.all(
-                              color: const Color(0xff94DB8C),
-                              width: .5,
-                            ),
-                            borderRadius: BorderRadius.circular(20)),
-                        child: AutoSizeText(
-                          supplierLedgerData.lastPaymentDate ?? '--',
-                          maxFontSize: 10,
-                          minFontSize: 8,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                      addW(8.w),
-                      Spacer(),
-
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            addH(12),
+            // Row(
+            //   crossAxisAlignment: CrossAxisAlignment.start,
+            //   children: [
+            //     Flexible(
+            //       child: Row(
+            //         children: [
+            //           Container(
+            //             padding:
+            //             const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            //             decoration: BoxDecoration(
+            //                 color: const Color(0xffF6FFF6),
+            //                 border: Border.all(
+            //                   color: const Color(0xff94DB8C),
+            //                   width: .5,
+            //                 ),
+            //                 borderRadius: BorderRadius.circular(20)),
+            //             child: AutoSizeText(
+            //               supplierLedgerData.lastPaymentDate ?? '--',
+            //               maxFontSize: 10,
+            //               minFontSize: 8,
+            //               style: const TextStyle(
+            //                 fontWeight: FontWeight.w500,
+            //               ),
+            //             ),
+            //           ),
+            //           addW(8.w),
+            //           Spacer(),
+            //
+            //         ],
+            //       ),
+            //     ),
+            //   ],
+            // ),
+            // addH(12),
             Container(
               padding: const EdgeInsets.all(12),
               decoration: const BoxDecoration(
@@ -85,10 +85,22 @@ class SupplierLedgerItem extends StatelessWidget {
               child: Column(
                 children: [
                   StatementItemTitleValueWidget(
-                    title: "Client Name",
+                    title: "Supplier ID",
+                    value: supplierLedgerData.code ?? '--',
+                    valueFontSize: 16,
+                    valueFontWeight: FontWeight.w600,
+                  ),
+                  StatementItemTitleValueWidget(
+                    title: "Supplier Name",
                     value: supplierLedgerData.name ?? '--',
                     valueFontSize: 16,
                     valueFontWeight: FontWeight.w600,
+                  ),
+                  StatementItemTitleValueWidget(
+                    title: "Phone",
+                    value: supplierLedgerData.phone ?? '--',
+                    valueFontSize: 16,
+                    valueFontWeight: FontWeight.w400,
                   ),
                   // StatementItemTitleValueWidget(
                   //   title: "Purpose",
@@ -126,6 +138,7 @@ class StatementItemTitleValueWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
             flex: 2,

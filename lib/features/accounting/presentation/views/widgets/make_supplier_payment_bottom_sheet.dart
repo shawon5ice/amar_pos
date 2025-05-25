@@ -28,10 +28,10 @@ class MakeSupplierPaymentBottomSheet extends StatefulWidget {
 
 class __MakeSupplierPaymentBottomSheetState
     extends State<MakeSupplierPaymentBottomSheet> {
-  
   final SupplierPaymentController _supplierPaymentController = Get.find();
   late TextEditingController _textEditingController;
   late TextEditingController _remarksEditingController;
+
   // ExpenseCategory? selectedExpenseCategory;
   ChartOfAccountPaymentMethod? selectedPaymentMethod;
 
@@ -43,19 +43,33 @@ class __MakeSupplierPaymentBottomSheetState
     // await _supplierPaymentController.getPaymentMethods();
   }
 
+  ChartOfAccountPaymentMethod? chartOfAccountPaymentMethod;
+  
   @override
   void initState() {
-
     Get.put<SupplierDDController>(SupplierDDController());
     Get.put<CAPaymentMethodDDController>(CAPaymentMethodDDController());
 
     _textEditingController = TextEditingController();
     _remarksEditingController = TextEditingController();
 
-
-    _remarksEditingController.text = widget.supplierPayment?.remarks?? '';
-    _textEditingController.text = widget.supplierPayment?.amount.toString()?? '';
-    if(widget.supplierPayment != null){
+    _remarksEditingController.text = widget.supplierPayment?.remarks ?? '';
+    _textEditingController.text =
+        widget.supplierPayment?.amount.toString() ?? '';
+    if (widget.supplierPayment != null) {
+      chartOfAccountPaymentMethod =  widget.supplierPayment?.paymentMethod;
+      SupplierData supplierData = widget.supplierPayment!.supplier!;
+      selectedSupplier = SupplierInfo(
+          id: supplierData.id,
+          name: supplierData.name,
+          business: supplierData.business,
+          code: supplierData.code,
+          phone: supplierData.phone,
+          openingBalance: supplierData.openingBalance,
+          address: supplierData.address,
+          photo: supplierData.photo,
+          due:  supplierData.due,
+          status: supplierData.status);
       selectedSupplierId = widget.supplierPayment!.supplier?.id;
       selectedPaymentMethod = widget.supplierPayment?.paymentMethod;
     }
@@ -117,46 +131,53 @@ class __MakeSupplierPaymentBottomSheetState
                       // ),
                       // addH(8),
                       SupplierDropDownWidget(
-                        initialSupplierId: selectedSupplierId,
                         onSupplierSelection: (SupplierInfo? supplier) {
-                        selectedSupplier = supplier;
-                        _supplierPaymentController.update(['supplier_status_widget']);
-                      },),
+                          selectedSupplier = supplier;
+                          selectedSupplierId = supplier?.id;
+                          _supplierPaymentController
+                              .update(['supplier_status_widget']);
+                        },
+                        initialSupplierInfo: selectedSupplier,
+                      ),
                       addH(8),
                       GetBuilder<SupplierPaymentController>(
                         id: 'supplier_status_widget',
                         builder: (controller) {
-                          return selectedSupplier != null ? Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: const Color(0xffF6FBFF),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: const Color(0xffE0E0E0)),
-                            ),
-                            child: Column(
-
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                TitleValueStatusWidget(
-                                  title: "Client Name: ",
-                                  value: selectedSupplier!.name ,
-                                ),
-                                TitleValueStatusWidget(
-                                  title: "Phone Number: ",
-                                  value: selectedSupplier!.phone,
-                                ),
-                                TitleValueStatusWidget(
-                                  title: "Address: ",
-                                  value: selectedSupplier!.address,
-                                ),
-                                TitleValueStatusWidget(
-                                  title: "Previous Due: ",
-                                  value: Methods.getFormatedPrice(
-                                      selectedSupplier!.previousDue.toDouble()),
-                                ),
-                              ],
-                            ),
-                          ): const SizedBox.shrink();
+                          return selectedSupplier != null
+                              ? Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xffF6FBFF),
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                        color: const Color(0xffE0E0E0)),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    children: [
+                                      TitleValueStatusWidget(
+                                        title: "Client Name: ",
+                                        value: selectedSupplier!.name,
+                                      ),
+                                      TitleValueStatusWidget(
+                                        title: "Phone Number: ",
+                                        value: selectedSupplier!.phone,
+                                      ),
+                                      TitleValueStatusWidget(
+                                        title: "Address: ",
+                                        value: selectedSupplier!.address,
+                                      ),
+                                      TitleValueStatusWidget(
+                                        title: "Previous Due: ",
+                                        value: Methods.getFormatedPrice(
+                                            selectedSupplier!.due
+                                                .toDouble()),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              : const SizedBox.shrink();
                         },
                       ),
                       addH(8),
@@ -164,31 +185,36 @@ class __MakeSupplierPaymentBottomSheetState
                         children: [
                           Expanded(
                             child: CAPaymentMethodsDropDownWidget(
-                              initialCAPaymentMethod: widget.supplierPayment?.paymentMethod,
-                              onCAPaymentMethodSelection: (ChartOfAccountPaymentMethod? method) {
-                              selectedPaymentMethod = method;
-                            },),
+                              initialCAPaymentMethod: selectedPaymentMethod,
+                              onCAPaymentMethodSelection:
+                                  (ChartOfAccountPaymentMethod? method) {
+                                selectedPaymentMethod = method;
+                              },
+                            ),
                           ),
                           addW(8),
-                          
-                          Expanded(child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              const RichFieldTitle(text: "Paid Amount",),
-                              addH(4),
-                              CustomTextField(
-                                contentPadding: 16,
-                                inputType: TextInputType.number,
-                                textCon: _textEditingController,
-                                hintText: "Type amount",
-                                // height: 40,
-                                validator: (value) =>
-                                    FieldValidator.nonNullableFieldValidator(
-                                        value, "Paid Amount"),
-                              ),
-                            ],
-                          ),)
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                const RichFieldTitle(
+                                  text: "Paid Amount",
+                                ),
+                                addH(4),
+                                CustomTextField(
+                                  contentPadding: 16,
+                                  inputType: TextInputType.number,
+                                  textCon: _textEditingController,
+                                  hintText: "Type amount",
+                                  // height: 40,
+                                  validator: (value) =>
+                                      FieldValidator.nonNullableFieldValidator(
+                                          value, "Paid Amount"),
+                                ),
+                              ],
+                            ),
+                          )
                         ],
                       ),
                       addH(8),
@@ -214,23 +240,21 @@ class __MakeSupplierPaymentBottomSheetState
                           if (formKey.currentState!.validate()) {
                             Get.back();
                             _supplierPaymentController.updateSupplierPayment(
-                              id: widget.supplierPayment!.id,
+                                id: widget.supplierPayment!.id,
                                 caID: selectedPaymentMethod!.id,
                                 supplierID: selectedSupplier!.id,
                                 amount: num.parse(_textEditingController.text),
-                                remarks: _remarksEditingController.text
-                            );
+                                remarks: _remarksEditingController.text);
                           }
                         }
                       : () {
                           if (formKey.currentState!.validate()) {
                             Get.back();
                             _supplierPaymentController.addNewSupplierPayment(
-                              clientID: selectedSupplier!.id,
-                              caID: selectedPaymentMethod!.id,
-                              amount: num.parse(_textEditingController.text),
-                              remarks: _remarksEditingController.text
-                            );
+                                clientID: selectedSupplier!.id,
+                                caID: selectedPaymentMethod!.id,
+                                amount: num.parse(_textEditingController.text),
+                                remarks: _remarksEditingController.text);
                           }
                         },
                 ),
@@ -264,7 +288,7 @@ class TitleValueStatusWidget extends StatelessWidget {
             children: [
               TextSpan(
                 text: title,
-                style:const TextStyle(
+                style: const TextStyle(
                   color: Colors.black,
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
@@ -273,7 +297,7 @@ class TitleValueStatusWidget extends StatelessWidget {
               ),
               TextSpan(
                 text: value,
-                style:const TextStyle(
+                style: const TextStyle(
                   color: Colors.black,
                   fontSize: 12,
                   fontWeight: FontWeight.w400,

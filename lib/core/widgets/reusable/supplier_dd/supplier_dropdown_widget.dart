@@ -10,13 +10,11 @@ class SupplierDropDownWidget extends StatefulWidget {
     super.key,
     required this.onSupplierSelection,
     this.initialSupplierInfo,
-    this.initialSupplierId,
     this.isMandatory,
   });
 
   final Function(SupplierInfo? client) onSupplierSelection;
   final SupplierInfo? initialSupplierInfo;
-  final int? initialSupplierId;
   final bool? isMandatory;
 
   @override
@@ -38,13 +36,14 @@ class _SupplierDropDownWidgetState extends State<SupplierDropDownWidget> {
   @override
   void initState() {
     controller.getAllSuppliers().then((value){
-      if(widget.initialSupplierId != null){
+      if(widget.initialSupplierInfo != null){
         controller.resetSupplierSelection();
-        controller.selectedSupplier = controller.suppliers.singleWhere((e) => e.id == widget.initialSupplierId);
-        // controller.selectedClient = widget.initialSupplierInfo;
+        controller.selectedSupplier = controller.suppliers.singleWhere((e) => e.id == widget.initialSupplierInfo?.id);
+        // controller.selectedClient = widget.initialClientInfo;
       }
       controller.update(['supplier_dd']);
     });
+
     super.initState();
   }
 

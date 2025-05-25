@@ -16,6 +16,7 @@ import 'package:get/get_rx/get_rx.dart';
 
 import '../../../../../core/constants/logger/logger.dart';
 import '../../../../../core/core.dart';
+import '../../../../../core/network/helpers/error_extractor.dart';
 import '../../../../auth/data/model/hive/login_data.dart';
 import '../../../../auth/data/model/hive/login_data_helper.dart';
 import '../../../data/models/expense_voucher/expense_categories_response_model.dart';
@@ -392,8 +393,13 @@ class SupplierPaymentController extends GetxController{
     }
   }
 
-  Future<void> downloadList({required bool isPdf, required bool supplierLedger}) async {
+  Future<void> downloadList({required bool isPdf, required bool supplierLedger, bool? shouldPrint}) async {
     hasError.value = false;
+
+    if((supplierLedger && supplierLedgerList.isEmpty)|| !supplierLedger && supplierPaymentList.isEmpty){
+      ErrorExtractor.showSingleErrorDialog(Get.context!, "File should not be downloaded with empty data");
+      return;
+    }
 
     String fileName = "${supplierLedger ? 'Supplier Payment Ledger': 'Supplier Payment'}-${DateTime
         .now()
@@ -408,6 +414,7 @@ class SupplierPaymentController extends GetxController{
         startDate: selectedDateTimeRange.value?.start,
         endDate: selectedDateTimeRange.value?.end,
         fileName: fileName,
+        shouldPrint: shouldPrint
       );
     } catch (e) {
       logger.e(e);
@@ -417,7 +424,7 @@ class SupplierPaymentController extends GetxController{
   }
 
 
-  Future<void> downloadStatement({required bool isPdf, required int clientID}) async {
+  Future<void> downloadStatement({required bool isPdf, required int clientID, bool? shouldPrint}) async {
     hasError.value = false;
 
     String fileName = "Supplier Payment Statement'-${DateTime

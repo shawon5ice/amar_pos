@@ -112,7 +112,9 @@ class _SupplierLedgerPageState extends State<SupplierLedgerPage> {
                   addW(4),
                   CustomSvgIconButton(
                     bgColor: const Color(0xffFFFCF8),
-                    onTap: () {},
+                    onTap: () {
+                      controller.downloadList(isPdf: false, supplierLedger: true, shouldPrint: true);
+                    },
                     assetPath: AppAssets.printIcon,
                   )
                 ],
@@ -177,25 +179,25 @@ class _SupplierLedgerPageState extends State<SupplierLedgerPage> {
             ],
           ),
         ),
-        bottomNavigationBar: Padding(
-          padding: const EdgeInsets.only(left: 20,right: 20,top: 10,bottom: 10),
-          child: CustomButton(
-            text: "Collect Due",
-            onTap: () {
-              showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(20)),
-                ),
-                builder: (context) {
-                  return CreateDueCollectionBottomSheet();
-                },
-              );
-            },
-          ),
-        ),
+        // bottomNavigationBar: Padding(
+        //   padding: const EdgeInsets.only(left: 20,right: 20,top: 10,bottom: 10),
+        //   child: CustomButton(
+        //     text: "Collect Due",
+        //     onTap: () {
+        //       showModalBottomSheet(
+        //         context: context,
+        //         isScrollControlled: true,
+        //         shape: const RoundedRectangleBorder(
+        //           borderRadius: BorderRadius.vertical(
+        //               top: Radius.circular(20)),
+        //         ),
+        //         builder: (context) {
+        //           return CreateDueCollectionBottomSheet();
+        //         },
+        //       );
+        //     },
+        //   ),
+        // ),
       ),
     );
   }
