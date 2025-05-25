@@ -34,8 +34,8 @@ class SupplierInfo {
   final String address;
   @JsonKey(name: 'opening_balance', defaultValue: 0)
   final num openingBalance;
-  @JsonKey(name: 'previous_due', defaultValue: 0)
-  final num previousDue;
+  @JsonKey(name: 'due', defaultValue: 0)
+  final num due;
   @JsonKey(defaultValue: 'N/A')
   final String photo;
   @JsonKey(defaultValue: -1)
@@ -50,7 +50,7 @@ class SupplierInfo {
     required this.openingBalance,
     required this.address,
     required this.photo,
-    required this.previousDue,
+    required this.due,
     required this.status,
   });
 

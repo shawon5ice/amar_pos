@@ -31,7 +31,7 @@ SupplierInfo _$SupplierInfoFromJson(Map<String, dynamic> json) => SupplierInfo(
       openingBalance: json['opening_balance'] as num? ?? 0,
       address: json['address'] as String? ?? 'N/A',
       photo: json['photo'] as String? ?? 'N/A',
-      previousDue: json['previous_due'] as num? ?? 0,
+      due: json['due'] as num? ?? 0,
       status: (json['status'] as num?)?.toInt() ?? -1,
     );
 
@@ -44,7 +44,7 @@ Map<String, dynamic> _$SupplierInfoToJson(SupplierInfo instance) =>
       'phone': instance.phone,
       'address': instance.address,
       'opening_balance': instance.openingBalance,
-      'previous_due': instance.previousDue,
+      'previous_due': instance.due,
       'photo': instance.photo,
       'status': instance.status,
     };

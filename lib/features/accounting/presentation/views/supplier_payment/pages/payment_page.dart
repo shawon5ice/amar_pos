@@ -111,7 +111,9 @@ class _PaymentPageState extends State<PaymentPage> {
                   addW(4),
                   CustomSvgIconButton(
                     bgColor: const Color(0xffFFFCF8),
-                    onTap: () {},
+                    onTap: () {
+                      controller.downloadList(isPdf: false, supplierLedger: false,shouldPrint: true);
+                    },
                     assetPath: AppAssets.printIcon,
                   )
                 ],
