@@ -262,4 +262,16 @@ class SupplierPaymentService {
         parameter: query);
     return response;
   }
+
+
+  static Future<dynamic> getSupplierPaymentDetail({
+    required String usrToken,
+    required int id,
+  }) async {
+
+    var response = await BaseClient.getData(
+        token: usrToken,
+        api: "due_payment/get-details/$id",);
+    return response;
+  }
 }

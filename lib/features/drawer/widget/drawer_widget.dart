@@ -53,6 +53,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
 
   void onChildTap(DrawerItem parent, String child) {
     controller.selectChild(parent, child);
+    controller.closeDrawer();
   }
 
   @override

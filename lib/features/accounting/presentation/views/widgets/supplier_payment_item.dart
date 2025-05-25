@@ -119,6 +119,10 @@ class SupplierPaymentItem extends StatelessWidget {
                   title: "Invoice No.",
                   value: supplierPaymentData.slNo,
                 ),
+                StatementItemTitleValueWidget(
+                  title: "Supplier Name",
+                  value: supplierPaymentData.supplier?.name ?? 'N/A',
+                ),
                 // StatementItemTitleValueWidget(
                 //   title: "Purpose",
                 //   value: supplierPaymentData..name,

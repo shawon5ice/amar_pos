@@ -440,4 +440,29 @@ class SupplierPaymentController extends GetxController{
 
     }
   }
+
+
+  bool detailsLoading = false;
+
+  Future<void> getSupplierPaymentDetail(int orderId) async {
+    detailsLoading = true;
+    saleHistoryDetailsResponseModel = null;
+    update(['sold_history_details','download_print_buttons']);
+    try {
+      var response = await SupplierPaymentService.getSupplierPaymentDetail(
+        usrToken: loginData!.token,
+        id: orderId,
+      );
+
+      logger.i(response);
+      if (response != null) {
+        saleHistoryDetailsResponseModel =
+            ReturnHistoryDetailsResponseModel.fromJson(response);
+      }
+    } catch (e) {
+    } finally {
+      detailsLoading = false;
+      update(['sold_history_details','download_print_buttons']);
+    }
+  }
 }
