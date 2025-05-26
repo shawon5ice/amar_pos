@@ -95,6 +95,7 @@ class Creator {
   Map<String, dynamic> toJson() => _$CreatorToJson(this);
 }
 
+
 @JsonSerializable()
 class Detail {
   final int id;

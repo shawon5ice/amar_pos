@@ -2,14 +2,17 @@ import 'package:amar_pos/core/constants/app_colors.dart';
 import 'package:amar_pos/core/core.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
+import 'package:amar_pos/features/accounting/data/models/supplier_payment/supplier_payment_invoice_details_response_model.dart';
 import 'package:amar_pos/features/accounting/presentation/views/supplier_payment/supplier_payment_controller.dart';
-import 'package:amar_pos/features/return/data/models/return_history/return_history_details_response_model.dart';
 import 'package:amar_pos/features/return/presentation/controller/return_controller.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:barcode/barcode.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+
+import '../../../../../core/widgets/custom_button.dart';
+import '../../../../../core/widgets/methods/number_to_word.dart';
 
 class SupplierPaymentInvoiceDetailsViewWidget extends StatefulWidget {
 
@@ -26,12 +29,14 @@ class _SupplierPaymentInvoiceDetailsViewWidgetState extends State<SupplierPaymen
 
   late int orderId;
   late String orderNo;
+  late double amount;
 
   int i= 1;
   @override
   void initState() {
     orderId = Get.arguments[0];
     orderNo = Get.arguments[1];
+    amount = Get.arguments[2];
 
     i = 1;
     controller.getSupplierPaymentDetail(orderId);
@@ -54,15 +59,15 @@ class _SupplierPaymentInvoiceDetailsViewWidgetState extends State<SupplierPaymen
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Header Section
-                  GetBuilder<ReturnController>(
+                  GetBuilder<SupplierPaymentController>(
                     id: 'sold_history_details',
                     builder: (controller) {
                       if (controller.detailsLoading) {
                         return Center(child: RandomLottieLoader.lottieLoader());
-                      } else if (controller.saleHistoryDetailsResponseModel !=
+                      } else if (controller.supplierPaymentInvoiceDetailsResponseModel !=
                           null) {
-                        ReturnHistoryDetailsData data =
-                            controller.saleHistoryDetailsResponseModel!.data;
+                        SupplierPaymentInvoiceDetailsData data =
+                            controller.supplierPaymentInvoiceDetailsResponseModel!.data;
                         return SingleChildScrollView(
                           child: Column(
                             children: [
@@ -88,7 +93,13 @@ class _SupplierPaymentInvoiceDetailsViewWidgetState extends State<SupplierPaymen
                                                         FontWeight.bold),
                                                   ),
                                                   Text(
-                                                      "Phone: ${controller.saleHistoryDetailsResponseModel!.data.business.phone}"),
+                                                      "Phone: ${controller.supplierPaymentInvoiceDetailsResponseModel!.data.business.phone}"),
+                                                  addH(8),
+                                                  Text(
+                                                    "Address: ${data.business.address}",
+                                                    // maxLines: 2,
+                                                    overflow: TextOverflow.visible,
+                                                  ),
                                                 ],
                                               ),
                                             ),
@@ -105,12 +116,6 @@ class _SupplierPaymentInvoiceDetailsViewWidgetState extends State<SupplierPaymen
                                               ))),
                                     ],
                                   ),
-                                  addH(8),
-                                  Text(
-                                    "Address: ${data.business.address}",
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
                                 ],
                               ),
                               addH(
@@ -121,13 +126,13 @@ class _SupplierPaymentInvoiceDetailsViewWidgetState extends State<SupplierPaymen
                               ),
                               Row(
                                 children: [
-                                  Expanded(flex: 2, child: Text(data.orderNo)),
+                                  Expanded(flex: 2, child: Text(data.slNo)),
                                   addW(8),
                                   const Expanded(
                                       flex: 3,
                                       child: Text(
                                         textAlign: TextAlign.center,
-                                        'RETURN',
+                                        'DUE PAYMENT INVOICE',
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 16),
@@ -136,7 +141,7 @@ class _SupplierPaymentInvoiceDetailsViewWidgetState extends State<SupplierPaymen
                                   Expanded(
                                     flex: 2,
                                     child: Text(
-                                      data.dateTime,
+                                      data.date,
                                       textAlign: TextAlign.end,
                                     ),
                                   ),
@@ -154,18 +159,18 @@ class _SupplierPaymentInvoiceDetailsViewWidgetState extends State<SupplierPaymen
                                       mainAxisSize: MainAxisSize.min,
                                       mainAxisAlignment: MainAxisAlignment.start,
                                       children: [
-                                        Text("Customer Name: ${data.customer.name}",
+                                        Text("Supplier Name: ${data.supplier.name}",
                                             style: const TextStyle(
                                                 fontWeight: FontWeight.bold)),
-                                        Text("Phone: ${data.customer.phone}"),
-                                        Text("Address: ${data.customer.address}"),
+                                        Text("Phone: ${data.supplier.phone}"),
+                                        Text("Address: ${data.supplier.address}"),
                                       ],
                                     ),
                                   ),
                                   addW(20),
                                   SvgPicture.string(Barcode.code128(
                                       useCode128B: false, useCode128C: false)
-                                      .toSvg(data.orderNo,
+                                      .toSvg(data.slNo,
                                       height: 60, width: context.width / 3)),
                                 ],
                               ),
@@ -177,8 +182,6 @@ class _SupplierPaymentInvoiceDetailsViewWidgetState extends State<SupplierPaymen
                                   0: FixedColumnWidth(40.w),
                                   1: FlexColumnWidth(),
                                   2: FixedColumnWidth(60.w),
-                                  3: FixedColumnWidth(40.w),
-                                  4: FixedColumnWidth(60.w),
                                 },
                                 children: [
                                   TableRow(
@@ -193,25 +196,15 @@ class _SupplierPaymentInvoiceDetailsViewWidgetState extends State<SupplierPaymen
                                       Padding(
                                           padding: EdgeInsets.symmetric(
                                               horizontal: 4, vertical: 8),
-                                          child: AutoSizeText("Product Name")),
+                                          child: AutoSizeText("Payment Method")),
                                       Padding(
                                           padding: EdgeInsets.symmetric(
                                               horizontal: 4, vertical: 8),
-                                          child: AutoSizeText("Price",
-                                              textAlign: TextAlign.center)),
-                                      Padding(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 4, vertical: 8),
-                                          child: AutoSizeText("QTY",
-                                              textAlign: TextAlign.center)),
-                                      Padding(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 4, vertical: 8),
-                                          child: AutoSizeText("Total",
+                                          child: AutoSizeText("Amount",
                                               textAlign: TextAlign.center)),
                                     ],
                                   ),
-                                  ...data.details.map((product) {
+                                  ...data.details.map((payment) {
                                     return TableRow(
                                       children: [
                                         Padding(
@@ -222,65 +215,12 @@ class _SupplierPaymentInvoiceDetailsViewWidgetState extends State<SupplierPaymen
                                         Padding(
                                             padding: const EdgeInsets.symmetric(
                                                 horizontal: 4, vertical: 8),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                              children: [
-                                                AutoSizeText(product.name),
-                                                addH(4),
-                                                if (product.snNo != null)
-                                                  Wrap(
-                                                    spacing: 4,
-                                                    runSpacing: 4,
-                                                    children: product.snNo!
-                                                        .map((e) => Container(
-                                                      padding:
-                                                      const EdgeInsets
-                                                          .symmetric(
-                                                          horizontal:
-                                                          12,
-                                                          vertical: 4),
-                                                      decoration:
-                                                      const BoxDecoration(
-                                                        borderRadius:
-                                                        BorderRadius
-                                                            .all(Radius
-                                                            .circular(
-                                                            8)),
-                                                        color: Colors.black,
-                                                      ),
-                                                      child: AutoSizeText(
-                                                        e.serialNo,
-                                                        style:
-                                                        const TextStyle(
-                                                            color: Colors
-                                                                .white),
-                                                      ),
-                                                    ))
-                                                        .toList(),
-                                                  )
-                                              ],
-                                            )),
+                                            child: AutoSizeText(payment.paymentMethod.name)),
                                         Padding(
                                             padding: const EdgeInsets.symmetric(
                                                 horizontal: 4, vertical: 8),
                                             child: AutoSizeText(
-                                                Methods.getFormattedNumber(
-                                                    product.unitPrice.toDouble()),
-                                                textAlign: TextAlign.center)),
-                                        Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 4, vertical: 8),
-                                            child: AutoSizeText(
-                                                Methods.getFormattedNumber(
-                                                    product.quantity.toDouble()),
-                                                textAlign: TextAlign.center)),
-                                        Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 4, vertical: 8),
-                                            child: AutoSizeText(
-                                                Methods.getFormattedNumber(
-                                                    product.totalPrice.toDouble()),
+                                                Methods.getFormattedNumber(payment.amount),
                                                 textAlign: TextAlign.center)),
                                       ],
                                     );
@@ -295,7 +235,7 @@ class _SupplierPaymentInvoiceDetailsViewWidgetState extends State<SupplierPaymen
                                       TextStyle(fontWeight: FontWeight.bold)),
                                   Expanded(
                                       child: Text(
-                                        _convertToWords(data.payable),
+                                        _convertToWords(amount),
                                         style: TextStyle(fontWeight: FontWeight.bold),
                                       )),
                                 ],
@@ -309,31 +249,9 @@ class _SupplierPaymentInvoiceDetailsViewWidgetState extends State<SupplierPaymen
                                   children: [
                                     TitleWithValue(
                                       title: "Sub Total",
-                                      value: data.subTotal,
+                                      value: amount,
                                       isTitleBold: true,
                                       isValueBold: true,
-                                    ),
-                                    TitleWithValue(
-                                      title: "Vat",
-                                      value: data.vat,
-                                    ),
-                                    TitleWithValue(
-                                      title: "Deduction",
-                                      value: data.discount,
-                                    ),
-                                    const Divider(color: Colors.black),
-                                    TitleWithValue(
-                                      title: "Returnable Amount",
-                                      value: data.payable,
-                                      isTitleBold: true,
-                                      isValueBold: true,
-                                    ),
-                                    Text("Paid By "),
-                                    ...data.paymentDetails.map(
-                                          (e) => TitleWithValue(
-                                        title: e.bank != null ? e.bank!.name : e.name,
-                                        value: e.amount,
-                                      ),
                                     ),
                                     // TitleWithValue(
                                     //   title: "Change Amount",
@@ -347,12 +265,7 @@ class _SupplierPaymentInvoiceDetailsViewWidgetState extends State<SupplierPaymen
                               const SizedBox(height: 40),
                               Align(
                                 alignment: Alignment.centerRight,
-                                child: Text("Prepared by: ${data.soldBy}",
-                                    style: TextStyle(fontWeight: FontWeight.bold)),
-                              ),
-                              if(data.serviceBy != null) Align(
-                                alignment: Alignment.centerRight,
-                                child: Text("Assist by: ${data.serviceBy?.name}",
+                                child: Text("Prepared by: ${data.creator.name}",
                                     style: TextStyle(fontWeight: FontWeight.bold)),
                               ),
                             ],
@@ -369,10 +282,10 @@ class _SupplierPaymentInvoiceDetailsViewWidgetState extends State<SupplierPaymen
             ),
           ),
         ),
-        bottomNavigationBar: GetBuilder<ReturnController>(
+        bottomNavigationBar: GetBuilder<SupplierPaymentController>(
             id: 'download_print_buttons',
             builder: (controller){
-              if(controller.saleHistoryDetailsResponseModel != null){
+              if(controller.supplierPaymentInvoiceDetailsResponseModel != null){
                 return Padding(
                   padding: const EdgeInsets.all(20),
                   child: Row(
@@ -383,8 +296,7 @@ class _SupplierPaymentInvoiceDetailsViewWidgetState extends State<SupplierPaymen
                           color: Color(0xff03346E),
                           radius: 8,
                           onTap: () {
-                            controller.downloadReturnHistory(
-                                isPdf: true, id: orderId, orderNo: orderNo);
+                            controller.downloadPaymentReceipt(receiptId: orderId, slNo: orderNo);
                           },
                         ),
                       ),
@@ -395,8 +307,7 @@ class _SupplierPaymentInvoiceDetailsViewWidgetState extends State<SupplierPaymen
                           radius: 8,
                           color: Color(0xffFF9000),
                           onTap: () {
-                            controller.downloadReturnHistory(
-                                isPdf: true, id: orderId, orderNo: orderNo, shouldPrint: true);
+                            controller.downloadPaymentReceipt(receiptId: orderId, slNo: orderNo,shouldPrint: true);
                           },
                         ),
                       ),

@@ -1,13 +1,9 @@
 import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
-import 'package:amar_pos/features/accounting/data/models/client_ledger/client_ledger_list_response_model.dart';
-import 'package:amar_pos/features/accounting/data/models/client_ledger/client_ledger_statement_response_model.dart';
-import 'package:amar_pos/features/accounting/data/models/due_collection/due_collection_list_response_model.dart';
-import 'package:amar_pos/features/accounting/data/models/expense_voucher/expense_voucher_response_model.dart';
 import 'package:amar_pos/features/accounting/data/models/expense_voucher/expense_payment_methods_response_model.dart';
 import 'package:amar_pos/features/accounting/data/models/supplier_ledger/supplier_ledger_list_response_model.dart';
 import 'package:amar_pos/features/accounting/data/models/supplier_ledger/supplier_ledger_statement_response_model.dart';
+import 'package:amar_pos/features/accounting/data/models/supplier_payment/supplier_payment_invoice_details_response_model.dart';
 import 'package:amar_pos/features/accounting/data/models/supplier_payment/supplier_payment_list_response_model.dart';
-import 'package:amar_pos/features/accounting/data/services/due_collection_service.dart';
 import 'package:amar_pos/features/accounting/data/services/expense_voucher_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -224,7 +220,6 @@ class SupplierPaymentController extends GetxController{
       isAddCategoryLoading = false;
       update(['supplier_payment_list']);
     }
-    update(["supplier_payment_list"]);
     RandomLottieLoader.hide();
   }
 
@@ -260,7 +255,6 @@ class SupplierPaymentController extends GetxController{
       isAddCategoryLoading = false;
       update(['supplier_payment_list']);
     }
-    update(["supplier_payment_list"]);
     RandomLottieLoader.hide();
   }
 
@@ -448,12 +442,31 @@ class SupplierPaymentController extends GetxController{
     }
   }
 
+  Future<void> downloadPaymentReceipt({required int receiptId,required String slNo, bool? shouldPrint}) async {
+    hasError.value = false;
+
+    String fileName = "Due payment invoice($slNo)'.pdf";
+    try {
+      var response = await SupplierPaymentService.downloadPaymentReceipt(
+        usrToken: loginData!.token,
+        receiptId: receiptId,
+        fileName: fileName,
+        shouldPrint: true,
+      );
+    } catch (e) {
+      logger.e(e);
+    } finally {
+
+    }
+  }
+
 
   bool detailsLoading = false;
+  SupplierPaymentInvoiceDetailsResponseModel? supplierPaymentInvoiceDetailsResponseModel;
 
   Future<void> getSupplierPaymentDetail(int orderId) async {
     detailsLoading = true;
-    saleHistoryDetailsResponseModel = null;
+    supplierPaymentInvoiceDetailsResponseModel = null;
     update(['sold_history_details','download_print_buttons']);
     try {
       var response = await SupplierPaymentService.getSupplierPaymentDetail(
@@ -463,8 +476,8 @@ class SupplierPaymentController extends GetxController{
 
       logger.i(response);
       if (response != null) {
-        saleHistoryDetailsResponseModel =
-            ReturnHistoryDetailsResponseModel.fromJson(response);
+        supplierPaymentInvoiceDetailsResponseModel =
+            SupplierPaymentInvoiceDetailsResponseModel.fromJson(response);
       }
     } catch (e) {
     } finally {

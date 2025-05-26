@@ -44,7 +44,7 @@ Map<String, dynamic> _$SupplierInfoToJson(SupplierInfo instance) =>
       'phone': instance.phone,
       'address': instance.address,
       'opening_balance': instance.openingBalance,
-      'previous_due': instance.due,
+      'due': instance.due,
       'photo': instance.photo,
       'status': instance.status,
     };

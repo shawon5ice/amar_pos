@@ -11,6 +11,7 @@ import 'package:amar_pos/core/widgets/reusable/supplier_dd/supplier_dropdown_wid
 import 'package:amar_pos/features/accounting/data/models/supplier_payment/supplier_payment_list_response_model.dart';
 import 'package:amar_pos/features/accounting/presentation/views/due_collection/due_collection_controller.dart';
 import 'package:amar_pos/features/accounting/presentation/views/supplier_payment/supplier_payment_controller.dart';
+import 'package:amar_pos/features/accounting/presentation/views/widgets/supplier_payment_invoice_details_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -44,7 +45,7 @@ class __MakeSupplierPaymentBottomSheetState
   }
 
   ChartOfAccountPaymentMethod? chartOfAccountPaymentMethod;
-  
+
   @override
   void initState() {
     Get.put<SupplierDDController>(SupplierDDController());
@@ -57,7 +58,7 @@ class __MakeSupplierPaymentBottomSheetState
     _textEditingController.text =
         widget.supplierPayment?.amount.toString() ?? '';
     if (widget.supplierPayment != null) {
-      chartOfAccountPaymentMethod =  widget.supplierPayment?.paymentMethod;
+      chartOfAccountPaymentMethod = widget.supplierPayment?.paymentMethod;
       SupplierData supplierData = widget.supplierPayment!.supplier!;
       selectedSupplier = SupplierInfo(
           id: supplierData.id,
@@ -68,7 +69,7 @@ class __MakeSupplierPaymentBottomSheetState
           openingBalance: supplierData.openingBalance,
           address: supplierData.address,
           photo: supplierData.photo,
-          due:  supplierData.due,
+          due: supplierData.due,
           status: supplierData.status);
       selectedSupplierId = widget.supplierPayment!.supplier?.id;
       selectedPaymentMethod = widget.supplierPayment?.paymentMethod;
@@ -171,8 +172,7 @@ class __MakeSupplierPaymentBottomSheetState
                                       TitleValueStatusWidget(
                                         title: "Previous Due: ",
                                         value: Methods.getFormatedPrice(
-                                            selectedSupplier!.due
-                                                .toDouble()),
+                                            selectedSupplier!.due.toDouble()),
                                       ),
                                     ],
                                   ),

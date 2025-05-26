@@ -278,4 +278,15 @@ class SupplierPaymentService {
         api: "due_payment/get-details/$id",);
     return response;
   }
+
+  static Future<void> downloadPaymentReceipt({required int receiptId,required String fileName, bool? shouldPrint,
+    required String usrToken,
+  }) async {
+
+    FileDownloader().downloadFile(
+      url: "${NetWorkStrings.baseUrl}/due_payment/download-receipt/$receiptId",
+      token: usrToken,
+      shouldPrint: shouldPrint,
+      fileName: fileName,);
+  }
 }

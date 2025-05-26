@@ -47,7 +47,7 @@ ClientLedgerData _$ClientLedgerDataFromJson(Map<String, dynamic> json) =>
       address: json['address'] as String,
       due: json['due'] as num,
       clientNo: json['client_no'] as String,
-      lastPaymentDate: json['last_payment_date'] ?? 'N/A',
+      lastPaymentDate: json['last_payment_date'] as String? ?? 'N/A',
     );
 
 Map<String, dynamic> _$ClientLedgerDataToJson(ClientLedgerData instance) =>
