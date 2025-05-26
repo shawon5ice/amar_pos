@@ -256,7 +256,7 @@ class _MoneyTransferBottomSheetState extends State<MoneyTransferBottomSheet> {
                             );
                           }),
                       addH(8),
-                      const RichFieldTitle(text: "Amount"),
+                      const RichFieldTitle(text: "Transfer Amount"),
                       addH(4),
                       CustomTextField(
                         inputType: TextInputType.number,
@@ -281,7 +281,7 @@ class _MoneyTransferBottomSheetState extends State<MoneyTransferBottomSheet> {
                 ),
                 const SizedBox(height: 20),
                 CustomButton(
-                  text: widget.moneyTransferData != null ? "Update" : "Add Now",
+                  text: widget.moneyTransferData != null ? "Update" : "Transfer Now",
                   onTap: widget.moneyTransferData != null
                       ? () {
                           if (formKey.currentState!.validate()) {

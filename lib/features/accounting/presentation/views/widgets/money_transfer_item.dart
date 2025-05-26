@@ -60,11 +60,12 @@ class MoneyTransferItem extends StatelessWidget {
               ),
               Spacer(),
               addW(8),
-              CustomSvgSmallIconButton(
+               CustomSvgSmallIconButton(
                 borderColor: Color(0xff03346E),
                 bgColor: const Color(0xffE1F2FF),
                 onTap: () {
                   _controller.downloadMoneyTransferInvoice(
+                      creatorId: moneyTransferData.creator!.id,
                       isPdf: true, invoiceID: moneyTransferData.id, invoiceNo: moneyTransferData.slNo);
                 },
                 assetPath: AppAssets.downloadIcon,
@@ -75,6 +76,7 @@ class MoneyTransferItem extends StatelessWidget {
                 bgColor: const Color(0xffFFFCF8),
                 onTap: () {
                   _controller.downloadMoneyTransferInvoice(
+                    creatorId: moneyTransferData.creator!.id,
                       isPdf: true, invoiceID: moneyTransferData.id, invoiceNo: moneyTransferData.slNo, shouldPrint: true);
                 },
                 assetPath: AppAssets.printIcon,
@@ -135,14 +137,14 @@ class MoneyTransferItem extends StatelessWidget {
                 //   title: "Purpose",
                 //   value: moneyTransferData..name,
                 // ),
-                StatementItemTitleValueWidget(
-                  title: "From Outlet",
-                  value: moneyTransferData.fromStore?.name?? '--',
-                ),
-                StatementItemTitleValueWidget(
-                  title: "To Outlet",
-                  value: moneyTransferData.toStore?.name ?? '--',
-                ),
+                // StatementItemTitleValueWidget(
+                //   title: "From Outlet",
+                //   value: moneyTransferData.fromStore?.name?? '--',
+                // ),
+                // StatementItemTitleValueWidget(
+                //   title: "To Outlet",
+                //   value: moneyTransferData.toStore?.name ?? '--',
+                // ),
                 StatementItemTitleValueWidget(
                   title: "From Account",
                   value: moneyTransferData.fromAccount?.name?? '--',
@@ -159,10 +161,10 @@ class MoneyTransferItem extends StatelessWidget {
                   title: "Status",
                   value: moneyTransferData.status ?? '--',
                 ),
-                StatementItemTitleValueWidget(
-                  title: "Remarks",
-                  value: moneyTransferData.remarks ?? '--',
-                ),
+                // StatementItemTitleValueWidget(
+                //   title: "Remarks",
+                //   value: moneyTransferData.remarks ?? '--',
+                // ),
               ],
             ),
           )

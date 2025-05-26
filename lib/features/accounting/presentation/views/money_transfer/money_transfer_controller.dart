@@ -11,6 +11,7 @@ import 'package:get/get_rx/get_rx.dart';
 import '../../../../../core/constants/logger/logger.dart';
 import '../../../../../core/core.dart';
 import '../../../../../core/network/base_client.dart';
+import '../../../../../core/network/helpers/error_extractor.dart';
 import '../../../../../core/widgets/reusable/payment_dd/expense_payment_methods_response_model.dart';
 import '../../../../auth/data/model/hive/login_data.dart';
 import '../../../../auth/data/model/hive/login_data_helper.dart';
@@ -225,6 +226,10 @@ class MoneyTransferController extends GetxController{
   Future<void> downloadList({required bool isPdf, bool? shouldPrint}) async {
     hasError.value = false;
 
+    if(moneyTransferList.isEmpty){
+      ErrorExtractor.showSingleErrorDialog(Get.context!, "File should not be downloaded with empty data");
+      return;
+    }
     String fileName = "Money Adjustment-${loginData?.business.name}-${DateTime
         .now()
         .microsecondsSinceEpoch
@@ -246,7 +251,10 @@ class MoneyTransferController extends GetxController{
     }
   }
 
-  Future<void> downloadMoneyTransferInvoice({required bool isPdf, required int invoiceID, required String invoiceNo, bool? shouldPrint}) async {
+  Future<void> downloadMoneyTransferInvoice({
+    required int creatorId,
+    required bool isPdf, required int invoiceID, required String invoiceNo, bool? shouldPrint}) async {
+
     hasError.value = false;
 
     String fileName = "$invoiceNo${isPdf ? ".pdf" : ".xlsx"}";
