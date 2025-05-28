@@ -58,6 +58,7 @@ class MoneyTransferService {
     required DateTime? endDate,
     required String? search,
     required bool? shouldPrint,
+    required int type,
   }) async {
     // logger.d("PDF: $isPdf");
 
@@ -65,14 +66,15 @@ class MoneyTransferService {
       "start_date": startDate,
       "end_date": endDate,
       "search": search,
+      "type": type,
     };
 
     String downloadUrl = "";
 
     if(isPdf){
-      downloadUrl = "${NetWorkStrings.baseUrl}/money_transfer/download-pdf-money-transfer-list";
+      downloadUrl = "${NetWorkStrings.baseUrl}/money_adjustment/download-pdf-money-adjustment-list";
     }else{
-      downloadUrl = "${NetWorkStrings.baseUrl}/money_transfer/download-excel-money-transfer-list";
+      downloadUrl = "${NetWorkStrings.baseUrl}/money_adjustment/download-excel-money-adjustment-list";
     }
 
 
@@ -289,13 +291,27 @@ class MoneyTransferService {
   }
 
 
+  static Future<dynamic> getCABalance({
+    required String usrToken,
+    required int caID,
+  }) async {
+
+    var response = await BaseClient.getData(
+        token: usrToken,
+        parameter: {
+          "ca_id": caID
+        },
+        api: "chart_of_accounts_opening/get-balance-of-account",);
+    return response;
+  }
+
   static Future<dynamic> getOutletForMoneyTransferList({
     required String usrToken,
   }) async {
 
     var response = await BaseClient.getData(
-        token: usrToken,
-        api: "money_transfer/get-outlets-for-money-transfer",);
+      token: usrToken,
+      api: "money_transfer/get-outlets-for-money-transfer",);
     return response;
   }
 }

@@ -61,6 +61,8 @@ MoneyTransferData _$MoneyTransferDataFromJson(Map<String, dynamic> json) =>
           : Business.fromJson(json['business'] as Map<String, dynamic>),
       remarks: json['remarks'] as String?,
       status: json['status'] as String?,
+      isApprovable: json['isApprovable'] as bool,
+      isCreator: json['isCreator'] as bool,
     );
 
 Map<String, dynamic> _$MoneyTransferDataToJson(MoneyTransferData instance) =>
@@ -77,6 +79,8 @@ Map<String, dynamic> _$MoneyTransferDataToJson(MoneyTransferData instance) =>
       'amount': instance.amount,
       'remarks': instance.remarks,
       'status': instance.status,
+      'isCreator': instance.isCreator,
+      'isApprovable': instance.isApprovable,
     };
 
 Creator _$CreatorFromJson(Map<String, dynamic> json) => Creator(

@@ -72,9 +72,9 @@ class MoneyAdjustmentService {
     String downloadUrl = "";
 
     if(isPdf){
-      downloadUrl = "${NetWorkStrings.baseUrl}/money_adjustment/download-pdf-money-transfer-list";
+      downloadUrl = "${NetWorkStrings.baseUrl}/money_transfer/download-pdf-money-transfer-list";
     }else{
-      downloadUrl = "${NetWorkStrings.baseUrl}/money_adjustment/download-excel-money-transfer-list";
+      downloadUrl = "${NetWorkStrings.baseUrl}/money_transfer/download-excel-money-transfer-list";
     }
 
 

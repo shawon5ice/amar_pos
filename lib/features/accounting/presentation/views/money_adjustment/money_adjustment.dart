@@ -51,7 +51,7 @@ class _MoneyAdjustmentState extends State<MoneyAdjustment> with SingleTickerProv
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(title: const Text("Money Transfer"),centerTitle: true,
+        appBar: AppBar(title: const Text("Money Adjustment"),centerTitle: true,
           actions: [
             IconButton(
               onPressed: () async {
@@ -129,7 +129,7 @@ class _MoneyAdjustmentState extends State<MoneyAdjustment> with SingleTickerProv
                   CustomSvgIconButton(
                     bgColor: const Color(0xffEBFFDF),
                     onTap: () {
-                      controller.downloadList(isPdf: false,);
+                      controller.downloadList(isPdf: false,type: _tabController.index+1);
                     },
                     assetPath: AppAssets.excelIcon,
                   ),
@@ -137,7 +137,7 @@ class _MoneyAdjustmentState extends State<MoneyAdjustment> with SingleTickerProv
                   CustomSvgIconButton(
                     bgColor: const Color(0xffE1F2FF),
                     onTap: () {
-                      controller.downloadList(isPdf: true,);
+                      controller.downloadList(isPdf: true,type: _tabController.index+1);
                     },
                     assetPath: AppAssets.downloadIcon,
                   ),
@@ -145,7 +145,7 @@ class _MoneyAdjustmentState extends State<MoneyAdjustment> with SingleTickerProv
                   CustomSvgIconButton(
                     bgColor: const Color(0xffFFFCF8),
                     onTap: () {
-                      controller.downloadList(isPdf: true, shouldPrint: true);
+                      controller.downloadList(isPdf: true, shouldPrint: true,type: _tabController.index+1);
                     },
                     assetPath: AppAssets.printIcon,
                   )

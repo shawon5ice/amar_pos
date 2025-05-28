@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-class MoneyTransferActionMenu extends StatelessWidget {
+class MoneyAdjustmentActionMenu extends StatelessWidget {
   final Function(String) onSelected;
-  final bool isApproveAble;
+  final int status;
 
-  const MoneyTransferActionMenu({super.key, required this.onSelected, required this.isApproveAble});
+  const MoneyAdjustmentActionMenu({super.key, required this.onSelected, required this.status});
 
   @override
   Widget build(BuildContext context) {
@@ -23,16 +23,7 @@ class MoneyTransferActionMenu extends StatelessWidget {
         onSelected: onSelected,
         itemBuilder: (BuildContext context) {
           return [
-            isApproveAble ? const PopupMenuItem<String>(
-            value: 'approve',
-            child: Row(
-              children: [
-                Icon(Icons.check_circle_outline_outlined, color: Colors.green),
-                SizedBox(width: 8),
-                Text("Approve"),
-              ],
-            ),
-          ) : const PopupMenuItem<String>(
+            const PopupMenuItem<String>(
               value: 'edit',
               child: Row(
                 children: [

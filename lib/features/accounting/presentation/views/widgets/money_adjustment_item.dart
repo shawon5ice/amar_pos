@@ -3,6 +3,7 @@ import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/features/accounting/data/models/money_transfer/money_transfer_list_response_model.dart';
 import 'package:amar_pos/features/accounting/presentation/views/money_adjustment/money_adjustment_controller.dart';
 import 'package:amar_pos/features/accounting/presentation/views/money_transfer/money_transfer_controller.dart';
+import 'package:amar_pos/features/accounting/presentation/views/widgets/money_adjustment_action_menu.dart';
 import 'package:amar_pos/features/accounting/presentation/views/widgets/money_adjustment_bottom_sheet.dart';
 import 'package:amar_pos/features/accounting/presentation/views/widgets/money_transfer_action_menu.dart';
 import 'package:amar_pos/features/accounting/presentation/views/widgets/money_transfer_bottom_sheet.dart';
@@ -83,7 +84,7 @@ class MoneyAdjustmentItem extends StatelessWidget {
                 assetPath: AppAssets.printIcon,
               ),
               // addW(8),
-              MoneyTransferActionMenu(
+              MoneyAdjustmentActionMenu(
                 status: 1,
                 onSelected: (value) {
                   switch (value) {

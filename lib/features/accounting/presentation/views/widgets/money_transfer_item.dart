@@ -82,8 +82,8 @@ class MoneyTransferItem extends StatelessWidget {
                 assetPath: AppAssets.printIcon,
               ),
               // addW(8),
-              MoneyTransferActionMenu(
-                status: 1,
+              if(moneyTransferData.isCreator && moneyTransferData.status == "Pending")MoneyTransferActionMenu(
+                isApproveAble: moneyTransferData.isApprovable,
                 onSelected: (value) {
                   switch (value) {
                     case "edit":

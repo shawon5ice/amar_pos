@@ -80,6 +80,11 @@ class _MoneyTransferBottomSheetState extends State<MoneyTransferBottomSheet> {
         selectedPaymentMethodID = widget.moneyTransferData!.toAccount!.id;
         logger.i(selectedPaymentMethodID);
         _controller.update(['outlet_list_for_money_transfer']);
+      }else{
+        if(!_controller.loginData!.businessOwner){
+          selectedFromOutlet = _controller.outletListForMoneyTransferResponseModel!.data!.fromStores!.first;
+          selectedFromAccount = _controller.outletListForMoneyTransferResponseModel!.data!.fromAccounts!.first;
+        }
       }
     });
 
@@ -180,6 +185,9 @@ class _MoneyTransferBottomSheetState extends State<MoneyTransferBottomSheet> {
                               value: selectedFromAccount,
                               onChanged: (value) {
                                 selectedFromAccount = value;
+                                if(selectedFromAccount != null){
+                                  controller.getCABalance(selectedFromAccount!.id);
+                                }
                               },
                               hintText: controller.outletListLoading
                                   ? "Loading..."
@@ -195,6 +203,32 @@ class _MoneyTransferBottomSheetState extends State<MoneyTransferBottomSheet> {
                               validator: (value) => FieldValidator.nonNullableFieldValidator(
                                   value?.name, "From account"),
                             ),
+                            addH(8),
+                            FieldTitle("Current Balance"),
+                            addH(4),
+                            GetBuilder<MoneyTransferController>(
+                                id: 'balance',
+                                builder: (controller) {
+                                  return CustomTextField(
+                                    readOnly: true,
+                                    inputType: TextInputType.number,
+                                    textCon: TextEditingController(
+                                        text: controller.balanceLoading
+                                            ? "Loading..."
+                                            : selectedFromAccount == null
+                                                ? "Select from account first"
+                                                : controller.balance == null
+                                                    ? "Something went wrong"
+                                                    : Methods
+                                                        .getFormattedNumber(
+                                                            controller.balance!
+                                                                .toDouble())),
+                                    hintText: "Type amount",
+                                    validator: (value) => FieldValidator
+                                        .nonNullableFieldValidator(
+                                            value, "Amount"),
+                                  );
+                                }),
                             addH(8),
                             CustomDropdownWithSearchWidget<OutletForMoneyTransferData>(
                               items: controller.outletListLoading ||

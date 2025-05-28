@@ -51,6 +51,8 @@ class MoneyTransferData {
   final double amount;
   final String? remarks;
   final String? status;
+  final bool isCreator;
+  final bool isApprovable;
 
   MoneyTransferData({
     required this.id,
@@ -63,6 +65,8 @@ class MoneyTransferData {
     required this.toStore,
     required this.fromAccount,
     required this.business,
+    required this.isApprovable,
+    required this.isCreator,
     this.remarks,
     this.status,
   });

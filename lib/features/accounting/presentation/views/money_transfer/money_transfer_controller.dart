@@ -230,7 +230,7 @@ class MoneyTransferController extends GetxController{
       ErrorExtractor.showSingleErrorDialog(Get.context!, "File should not be downloaded with empty data");
       return;
     }
-    String fileName = "Money Adjustment-${loginData?.business.name}-${DateTime
+    String fileName = "Money Transfer-${loginData?.business.name}-${DateTime
         .now()
         .microsecondsSinceEpoch
         .toString()}${isPdf ? ".pdf" : ".xlsx"}";
@@ -289,6 +289,12 @@ class MoneyTransferController extends GetxController{
       if (response != null) {
         outletListForMoneyTransferResponseModel =
             OutletListForMoneyTransferResponseModel.fromJson(response);
+
+        if(!loginData!.businessOwner){
+          logger.i("----->");
+          outletListForMoneyTransferResponseModel!.data!.fromStores?.removeWhere((e) => e.id != loginData!.store.id);
+          outletListForMoneyTransferResponseModel!.data!.fromAccounts?.removeWhere((e) => e.storeId != loginData!.store.id);
+        }
       } else {
         moneyTransferList.clear();
       }
@@ -335,4 +341,32 @@ class MoneyTransferController extends GetxController{
     paymentListLoading = false;
     update(['ca_payment_dd']); // Update the UI after loading
   }
+
+
+  bool balanceLoading = false;
+  num? balance;
+  Future<void> getCABalance(int caID) async {
+    balanceLoading = true;
+    hasError.value = false;
+    balance = null;
+    update(['balance']);
+
+    try {
+      var response = await MoneyTransferService.getCABalance(
+        usrToken: loginData!.token,
+        caID: caID,
+      );
+
+      if (response != null) {
+        balance = response['balance'];
+      }
+    } catch (e) {
+      hasError.value = true;
+      logger.e(e);
+    } finally {
+      balanceLoading = false;
+      update(['balance']);
+    }
+  }
+
 }

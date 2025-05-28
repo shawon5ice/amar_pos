@@ -11,6 +11,7 @@ import 'package:get/get_rx/get_rx.dart';
 import '../../../../../core/constants/logger/logger.dart';
 import '../../../../../core/core.dart';
 import '../../../../../core/network/base_client.dart';
+import '../../../../../core/network/helpers/error_extractor.dart';
 import '../../../../../core/widgets/reusable/payment_dd/expense_payment_methods_response_model.dart';
 import '../../../../auth/data/model/hive/login_data.dart';
 import '../../../../auth/data/model/hive/login_data_helper.dart';
@@ -215,10 +216,15 @@ class MoneyAdjustmentController extends GetxController{
     RandomLottieLoader.hide();
   }
 
-  Future<void> downloadList({required bool isPdf, bool? shouldPrint}) async {
+  Future<void> downloadList({required bool isPdf, bool? shouldPrint, required int type}) async {
     hasError.value = false;
 
-    String fileName = "Money Transfer-${loginData?.business.name}-${DateTime
+    if(moneyAdjustmentList.isEmpty){
+      ErrorExtractor.showSingleErrorDialog(Get.context!, "File should not be downloaded with empty data");
+      return;
+    }
+
+    String fileName = "Money ${type == 1 ? "Add":"Withdraw"} List-${loginData?.business.name}-${DateTime
         .now()
         .microsecondsSinceEpoch
         .toString()}${isPdf ? ".pdf" : ".xlsx"}";
@@ -231,6 +237,7 @@ class MoneyAdjustmentController extends GetxController{
         endDate: selectedDateTimeRange.value?.end,
         fileName: fileName,
         shouldPrint: shouldPrint,
+        type: type,
       );
     } catch (e) {
       logger.e(e);
