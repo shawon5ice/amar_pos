@@ -48,7 +48,7 @@ OutletForMoneyTransferData _$OutletForMoneyTransferDataFromJson(
     OutletForMoneyTransferData(
       id: (json['id'] as num).toInt(),
       name: json['name'] as String,
-      storeId: json['store_id'] as int?,
+      storeId: (json['store_id'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$OutletForMoneyTransferDataToJson(

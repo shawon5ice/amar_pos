@@ -65,7 +65,7 @@ class LoginDataAdapter extends TypeAdapter<LoginData> {
       ..writeByte(12)
       ..write(obj.businessOwner)
       ..writeByte(13)
-    ..write(obj.id);
+      ..write(obj.id);
   }
 
   @override

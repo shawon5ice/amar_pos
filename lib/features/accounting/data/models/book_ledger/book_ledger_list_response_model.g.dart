@@ -11,8 +11,9 @@ BookLedgerListResponseModel _$BookLedgerListResponseModelFromJson(
     BookLedgerListResponseModel(
       success: json['success'] as bool,
       data: (json['data'] as List<dynamic>?)
-          ?.map((e) => DataWrapper.fromJson(e as Map<String, dynamic>))
-          .toList(),
+              ?.map((e) => DataWrapper.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
     );
 
 Map<String, dynamic> _$BookLedgerListResponseModelToJson(
@@ -23,9 +24,10 @@ Map<String, dynamic> _$BookLedgerListResponseModelToJson(
     };
 
 DataWrapper _$DataWrapperFromJson(Map<String, dynamic> json) => DataWrapper(
-      data: json['data'] == null
-          ? null
-          : BookLedgerList.fromJson(json['data'] as Map<String, dynamic>),
+      data: (json['data'] as List<dynamic>?)
+              ?.map((e) => LedgerData.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
       debit: json['debit'] == null ? 0 : dynamicNumberFromJson(json['debit']),
       credit:
           json['credit'] == null ? 0 : dynamicNumberFromJson(json['credit']),
@@ -43,29 +45,13 @@ Map<String, dynamic> _$DataWrapperToJson(DataWrapper instance) =>
       'balance': dynamicNumberToJson(instance.balance),
     };
 
-BookLedgerList _$BookLedgerListFromJson(Map<String, dynamic> json) =>
-    BookLedgerList(
-      data: (json['data'] as List<dynamic>?)
-              ?.map((e) => LedgerData.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          [],
-      total: (json['total'] as num?)?.toInt() ?? 0,
-      lastPage: (json['last_page'] as num?)?.toInt() ?? 0,
-    );
-
-Map<String, dynamic> _$BookLedgerListToJson(BookLedgerList instance) =>
-    <String, dynamic>{
-      'data': instance.data,
-      'total': instance.total,
-      'last_page': instance.lastPage,
-    };
-
 LedgerData _$LedgerDataFromJson(Map<String, dynamic> json) => LedgerData(
       date: json['date'] as String,
       slNo: json['sl_no'] as String,
       accountName: json['account_name'] as String?,
       fullNarration: json['full_narration'] as String?,
-      balance: json['balance'] as num?,
+      balance:
+          json['balance'] == null ? 0 : dynamicNumberFromJson(json['balance']),
       type: json['type'] as String?,
       debit: json['debit'] == null ? 0 : dynamicNumberFromJson(json['debit']),
       credit:
@@ -78,7 +64,7 @@ Map<String, dynamic> _$LedgerDataToJson(LedgerData instance) =>
       'sl_no': instance.slNo,
       'account_name': instance.accountName,
       'full_narration': instance.fullNarration,
-      'balance': instance.balance,
+      'balance': dynamicNumberToJson(instance.balance),
       'debit': dynamicNumberToJson(instance.debit),
       'type': instance.type,
       'credit': dynamicNumberToJson(instance.credit),

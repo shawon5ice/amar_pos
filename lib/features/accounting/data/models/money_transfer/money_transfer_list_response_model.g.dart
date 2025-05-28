@@ -59,10 +59,10 @@ MoneyTransferData _$MoneyTransferDataFromJson(Map<String, dynamic> json) =>
       business: json['business'] == null
           ? null
           : Business.fromJson(json['business'] as Map<String, dynamic>),
-      remarks: json['remarks'] as String?,
-      status: json['status'] as String?,
       isApprovable: json['isApprovable'] as bool,
       isCreator: json['isCreator'] as bool,
+      remarks: json['remarks'] as String?,
+      status: json['status'] as String?,
     );
 
 Map<String, dynamic> _$MoneyTransferDataToJson(MoneyTransferData instance) =>

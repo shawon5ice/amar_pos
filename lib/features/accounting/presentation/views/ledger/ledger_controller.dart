@@ -82,14 +82,10 @@ class LedgerController extends GetxController{
         logger.e(response);
         bookLedgerListResponseModel =
             BookLedgerListResponseModel.fromJson(response);
-        logger.i(bookLedgerListResponseModel?.data?.first.debit);
 
-        if (bookLedgerListResponseModel != null && bookLedgerListResponseModel!.data != null && bookLedgerListResponseModel!.data!.first.data != null) {
-          ledgerList.addAll(bookLedgerListResponseModel!.data!.first.data!.data);
+        if (bookLedgerListResponseModel != null) {
+          ledgerList.addAll(bookLedgerListResponseModel!.data.expand((wrapper) => wrapper.data).toList());
           logger.i(ledgerList.length);
-          // if (currentSearchList.isNotEmpty) {
-          //   lastFoundList.value = currentSearchList; // Update last found list
-          // }
         } else {
           ledgerList.clear(); // No results
         }
@@ -121,6 +117,10 @@ class LedgerController extends GetxController{
   bool downloadLoading = false;
 
   Future<void> downloadList({required ChartOfAccountPaymentMethod? ca,required bool isPdf, bool? shouldPrint}) async {
+    if(ledgerList.isEmpty){
+      ErrorExtractor.showSingleErrorDialog(Get.context!, "File should not be downloaded with empty data");
+      return;
+    }
     if(downloadLoading){
       return;
     }

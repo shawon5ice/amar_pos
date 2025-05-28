@@ -219,6 +219,19 @@ class _CustomDropdownWithSearchWidgetState<T>
                               .contains(searchValue.toLowerCase());
                         },
                       ),
+                      selectedItemBuilder: (BuildContext context) {
+                        return widget.items.map((item) {
+                          return Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              widget.itemLabel(item),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                          );
+                        }).toList();
+                      },
                       onMenuStateChange: (isOpen) {
                         if (!isOpen) _textEditingController.clear();
                       },
