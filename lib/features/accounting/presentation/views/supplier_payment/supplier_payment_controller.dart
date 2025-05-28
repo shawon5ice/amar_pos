@@ -468,6 +468,8 @@ class SupplierPaymentController extends GetxController{
     detailsLoading = true;
     supplierPaymentInvoiceDetailsResponseModel = null;
     update(['sold_history_details','download_print_buttons']);
+
+    logger.d(loginData!.photo);
     try {
       var response = await SupplierPaymentService.getSupplierPaymentDetail(
         usrToken: loginData!.token,

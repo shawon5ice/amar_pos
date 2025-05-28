@@ -13,7 +13,6 @@ class TrialBalanceService {
     required String usrToken,
     required int page,
     required String? search,
-    required String? startDate,
     required String? endDate,
   }) async {
     logger.d("Page: $page");
@@ -21,7 +20,6 @@ class TrialBalanceService {
     Map<String, dynamic> query = {
       "page": page,
       "search": search,
-      "start_date": startDate,
       "end_date": endDate,
     };
     logger.i(query);
@@ -53,7 +51,6 @@ class TrialBalanceService {
 
   static Future<void> downloadList({required bool isPdf, required String fileName,
     required String usrToken,
-    required DateTime? startDate,
     required DateTime? endDate,
     required String? search,
     required bool? shouldPrint,
@@ -61,7 +58,6 @@ class TrialBalanceService {
     // logger.d("PDF: $isPdf");
 
     Map<String, dynamic> query = {
-      "start_date": startDate,
       "end_date": endDate,
       "search": search,
     };

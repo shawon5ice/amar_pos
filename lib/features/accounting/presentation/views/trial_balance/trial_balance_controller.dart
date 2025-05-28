@@ -29,7 +29,7 @@ class TrialBalanceController extends GetxController{
   TextEditingController searchController = TextEditingController();
 
   int? selectedOutletId;
-  Rx<DateTimeRange?> selectedDateTimeRange = Rx<DateTimeRange?>(null);
+  Rx<DateTime?> selectedDateTime = Rx<DateTime?>(null);
 
   // List<MoneyAdjustmentData> trialBalanceList = [];
   // MoneyAdjustmentListResponseModel? MoneyAdjustmentListResponseModel;
@@ -49,14 +49,14 @@ class TrialBalanceController extends GetxController{
   }
 
 
-  void setSelectedDateRange(DateTimeRange? range) {
-    selectedDateTimeRange.value = range;
+  void setSelectedDateRange(DateTime? date) {
+    selectedDateTime.value = date;
     update(['selection_status']);
   }
 
   void clearFilter(){
     searchController.clear();
-    selectedDateTimeRange.value = null;
+    selectedDateTime.value = null;
     update(['selection_status']);
   }
 
@@ -76,8 +76,7 @@ class TrialBalanceController extends GetxController{
         usrToken: loginData!.token,
         page: page,
         search: searchController.text,
-        startDate: selectedDateTimeRange.value?.start.toString(),
-        endDate: selectedDateTimeRange.value?.end.toString(),
+        endDate: selectedDateTime.value?.toString(),
       );
 
       if (response != null) {
@@ -122,6 +121,10 @@ class TrialBalanceController extends GetxController{
   bool downloadLoading = false;
 
   Future<void> downloadList({required bool isPdf, bool? shouldPrint}) async {
+    if(trialBalanceList.isEmpty){
+      ErrorExtractor.showSingleErrorDialog(Get.context!, "File should not be ${shouldPrint != null ? 'printed': 'downloaded'} with empty data");
+      return;
+    }
     if(downloadLoading){
       return;
     }
@@ -138,8 +141,7 @@ class TrialBalanceController extends GetxController{
         isPdf: isPdf,
         usrToken: loginData!.token,
         search: searchController.text,
-        startDate: selectedDateTimeRange.value?.start,
-        endDate: selectedDateTimeRange.value?.end,
+        endDate: selectedDateTime.value,
         fileName: fileName,
         shouldPrint: shouldPrint,
       );

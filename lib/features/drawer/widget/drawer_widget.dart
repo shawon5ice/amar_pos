@@ -86,7 +86,8 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                           child: ValueListenableBuilder<Box>(
                             valueListenable: controller.manager.listenable,
                             builder: (context, box, _) {
-                              final loginData = box.get(LoginDataBoxManager.logInBoxName) as LoginData?;
+                              final loginData = LoginDataBoxManager().loginData;
+
                               return Row(
                                 children: [
                                   (loginData?.photo != null && loginData!.photo!.contains('http')) ?ClipOval(child: CachedNetworkImage(imageUrl:loginData.photo!, fit: BoxFit.cover,width: 50,height: 50,)): const Icon(Icons.broken_image),

@@ -150,6 +150,9 @@ class _SplashScreenState extends State<SplashScreen> {
     //   context.theme.appBarTheme.systemOverlayStyle,
     // );
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: AppColors.scaffoldBackground,
+      ),
       body: SafeArea(
         child: Stack(
           children: [

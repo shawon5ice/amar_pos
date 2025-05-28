@@ -37,13 +37,13 @@ class _TrialBalanceScreenState extends State<TrialBalanceScreen>
         actions: [
           IconButton(
             onPressed: () async {
-              DateTimeRange? selectedDate = await showDateRangePicker(
+              DateTime? selectedDate = await showDatePicker(
                 context: context,
                 firstDate: DateTime.now().subtract(const Duration(days: 1000)),
                 lastDate: DateTime.now().add(const Duration(days: 1000)),
-                initialDateRange: controller.selectedDateTimeRange.value,
+                initialDate: controller.selectedDateTime.value,
               );
-              controller.selectedDateTimeRange.value = selectedDate;
+              controller.selectedDateTime.value = selectedDate;
               if (selectedDate != null) {
                 controller.update(['date_status']);
                 controller.getBookLedger();
@@ -55,7 +55,7 @@ class _TrialBalanceScreenState extends State<TrialBalanceScreen>
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.only(left: 20,right: 20, bottom: 20),
           child: Column(
             children: [
               addH(12),
@@ -71,14 +71,14 @@ class _TrialBalanceScreenState extends State<TrialBalanceScreen>
                   child: Row(
                     children: [
                       Text(
-                        'Date : ${controller.selectedDateTimeRange.value != null ? formatDate(controller.selectedDateTimeRange.value!.start) + ' - ' + formatDate(controller.selectedDateTimeRange.value!.end) : formatDate(DateTime.now())}',
+                        'Date : ${controller.selectedDateTime.value != null ? formatDate(controller.selectedDateTime.value!) : formatDate(DateTime.now())}',
                         style: TextStyle(color: Color(0xff7C7C7C)),
                       ),
-                      if(controller.selectedDateTimeRange.value != null) ...[
+                      if(controller.selectedDateTime.value != null) ...[
                         addW(12),
                         GestureDetector(
                           onTap: () {
-                            controller.selectedDateTimeRange.value = null;
+                            controller.selectedDateTime.value = null;
                             controller.update(['date_status']);
                             controller.getBookLedger();
                           },
@@ -190,6 +190,7 @@ class _TrialBalanceScreenState extends State<TrialBalanceScreen>
                           fixedWidth: 40,
                         ),
                         DataColumn2(
+                          size: ColumnSize.L,
                           label: Center(
                               child: Text(
                             'Account Title',
@@ -202,15 +203,15 @@ class _TrialBalanceScreenState extends State<TrialBalanceScreen>
                               'Debit',
                               textAlign: TextAlign.center,
                             )),
-                          fixedWidth: 100,
+                          size: ColumnSize.S
                         ),
                         DataColumn2(
+                          size: ColumnSize.S,
                           label: Center(
                               child: Text(
                             'Credit',
                             textAlign: TextAlign.center,
                           )),
-                          fixedWidth: 100,
                           numeric: true,
                         ),
                       ],
@@ -225,7 +226,7 @@ class _TrialBalanceScreenState extends State<TrialBalanceScreen>
                                     Colors.yellow.withOpacity(.03)),
                             cells: [
                               _buildDataCell((index+1).toString()),
-                              _buildDataCell(e.name??'N/A', maxLines: 2),
+                              _buildDataCell(e.name??'N/A', maxLines: 3),
                               _buildDataCell(
                                   Methods.getFormattedNumber(
                                     e.debit?.toDouble() ?? 0,
