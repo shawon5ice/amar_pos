@@ -25,7 +25,6 @@ class _ProfitOrLossScreenState extends State<ProfitOrLossScreen>
     with SingleTickerProviderStateMixin {
   ProfitOrLossController controller = Get.find();
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,7 +52,7 @@ class _ProfitOrLossScreenState extends State<ProfitOrLossScreen>
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
           child: Column(
             children: [
               addH(12),
@@ -67,20 +66,29 @@ class _ProfitOrLossScreenState extends State<ProfitOrLossScreen>
                     borderRadius: BorderRadius.circular(20.r),
                   ),
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        'Date : ${controller.selectedDateTimeRange.value != null ? formatDate(controller.selectedDateTimeRange.value!.start) + ' - ' + formatDate(controller.selectedDateTimeRange.value!.end) : formatDate(DateTime.now())}',
-                        style: TextStyle(color: Color(0xff7C7C7C)),
+                      Expanded(
+                        child: Text(
+                          textAlign: TextAlign.center,
+                          controller.selectedDateTimeRange.value != null ? '${formatDate(controller.selectedDateTimeRange.value!.start)} \nto \n${formatDate(controller.selectedDateTimeRange.value!.end)}' : '${formatDate(DateTime.now())} \nto \n${formatDate(DateTime.now())}',
+                          style: const TextStyle(fontSize: 14),
+                          overflow: TextOverflow.ellipsis,
+                          softWrap: false,
+                        ),
                       ),
-                      if(controller.selectedDateTimeRange.value != null) ...[
+                      ...[
                         addW(12),
                         GestureDetector(
-                          onTap: () {
+                          onTap: controller.selectedDateTimeRange.value == null ? null : () {
                             controller.selectedDateTimeRange.value = null;
                             controller.update(['date_status']);
                             controller.getBookLedger();
                           },
-                          child: Icon(Icons.close, color: AppColors.error, size: 16,),
+                          child: CircleAvatar(
+                              radius: 16,
+                              backgroundColor: controller.selectedDateTimeRange.value != null ? Colors.red : Colors.transparent,
+                              child: controller.selectedDateTimeRange.value != null ? Icon(Icons.close, color: Colors.white, size: 16,) : null),
                         ),
                       ],
                       Spacer(),
@@ -123,7 +131,8 @@ class _ProfitOrLossScreenState extends State<ProfitOrLossScreen>
                   builder: (controller) {
                     if (controller.profitOrLossListLoading) {
                       return const Center(child: CircularProgressIndicator());
-                    } else if (controller.profitOrLossListResponseModel == null ) {
+                    } else if (controller.profitOrLossListResponseModel ==
+                        null) {
                       return const Center(child: Text("Something went wrong"));
                     } else if (controller.profitOrLossList.isEmpty) {
                       return const Center(child: Text("No data found"));
@@ -154,11 +163,11 @@ class _ProfitOrLossScreenState extends State<ProfitOrLossScreen>
                           )),
                         ),
                         DataColumn2(
-                            label: Center(
-                                child: Text(
-                              'Debit',
-                              textAlign: TextAlign.center,
-                            )),
+                          label: Center(
+                              child: Text(
+                            'Debit',
+                            textAlign: TextAlign.center,
+                          )),
                           numeric: true,
                           fixedWidth: 120,
                         ),
@@ -182,14 +191,27 @@ class _ProfitOrLossScreenState extends State<ProfitOrLossScreen>
                                 : WidgetStatePropertyAll(
                                     Colors.yellow.withOpacity(.03)),
                             cells: [
-                              _buildDataCell(isNumber: false ,e.name??'N/A', maxLines: 2, alignLeft: e.align?.toLowerCase() == "left", alignRight: e.align?.toLowerCase() == "right", isMinus: e.isMinus == 1),
-                              _buildDataCell(Methods.getFormattedNumber(
-                              e.debit?.toDouble() ?? 0,
-                              ), maxLines: 2, isMinus: e.isMinus == 1, isNumber: true),
-
-                              _buildDataCell(Methods.getFormattedNumber(
-                                e.credit?.toDouble() ?? 0,
-                              ), maxLines: 2, isMinus: e.isMinus == 1,isNumber: true),
+                              _buildDataCell(
+                                  isNumber: false,
+                                  e.name ?? 'N/A',
+                                  maxLines: 2,
+                                  alignLeft: e.align?.toLowerCase() == "left",
+                                  alignRight: e.align?.toLowerCase() == "right",
+                                  isMinus: e.isMinus == 1),
+                              _buildDataCell(
+                                  Methods.getFormattedNumber(
+                                    e.debit?.toDouble() ?? 0,
+                                  ),
+                                  maxLines: 2,
+                                  isMinus: e.isMinus == 1,
+                                  isNumber: true),
+                              _buildDataCell(
+                                  Methods.getFormattedNumber(
+                                    e.credit?.toDouble() ?? 0,
+                                  ),
+                                  maxLines: 2,
+                                  isMinus: e.isMinus == 1,
+                                  isNumber: true),
                             ],
                           );
                         })
@@ -205,38 +227,53 @@ class _ProfitOrLossScreenState extends State<ProfitOrLossScreen>
     );
   }
 
-  DataCell _buildDataCell(String data, {int maxLines = 1, bool? alignLeft, bool? isMinus, bool? alignRight,required bool isNumber}) {
-
-    return isNumber && data == "0" ?  DataCell(SizedBox.shrink()) :  DataCell(
-        Align(
-        alignment: alignLeft == true ? Alignment.centerLeft : alignRight == true?  Alignment.centerRight : Alignment.center,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if(isMinus != null && isMinus == true && isNumber == false)AutoSizeText(
-              minFontSize: 5,
-              maxFontSize: 10,
-              maxLines: maxLines,
-              "(-) ",
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: AppColors.error,
-              ),
+  DataCell _buildDataCell(String data,
+      {int maxLines = 1,
+      bool? alignLeft,
+      bool? isMinus,
+      bool? alignRight,
+      required bool isNumber}) {
+    return isNumber && data == "0"
+        ? DataCell(SizedBox.shrink())
+        : DataCell(Align(
+            alignment: alignLeft == true
+                ? Alignment.centerLeft
+                : alignRight == true
+                    ? Alignment.centerRight
+                    : Alignment.center,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (isMinus != null && isMinus == true && isNumber == false)
+                  AutoSizeText(
+                    minFontSize: 5,
+                    maxFontSize: 10,
+                    maxLines: maxLines,
+                    "(-) ",
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: AppColors.error,
+                    ),
+                  ),
+                AutoSizeText(
+                  minFontSize: 5,
+                  maxFontSize: 10,
+                  maxLines: maxLines,
+                  data,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: isMinus == true && isNumber
+                        ? AppColors.error
+                        : alignLeft == true
+                            ? Color(0xff7C7C7C)
+                            : Colors.black,
+                    fontWeight: alignRight == true || isNumber
+                        ? FontWeight.bold
+                        : FontWeight.normal,
+                  ),
+                ),
+              ],
             ),
-            AutoSizeText(
-              minFontSize: 5,
-              maxFontSize: 10,
-              maxLines: maxLines,
-              data,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: isMinus == true && isNumber ? AppColors.error : alignLeft == true? Color(0xff7C7C7C) : Colors.black,
-                fontWeight: alignRight == true || isNumber ? FontWeight.bold : FontWeight.normal,
-              ),
-            ),
-          ],
-        ),
-      )
-    );
+          ));
   }
 }
