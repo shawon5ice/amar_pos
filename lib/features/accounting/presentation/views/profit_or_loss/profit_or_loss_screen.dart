@@ -73,12 +73,12 @@ class _ProfitOrLossScreenState extends State<ProfitOrLossScreen>
                           textAlign: TextAlign.center,
                           controller.selectedDateTimeRange.value != null ? '${formatDate(controller.selectedDateTimeRange.value!.start)} \nto \n${formatDate(controller.selectedDateTimeRange.value!.end)}' : '${formatDate(DateTime.now())} \nto \n${formatDate(DateTime.now())}',
                           style: const TextStyle(fontSize: 14),
-                          overflow: TextOverflow.ellipsis,
+                          overflow: TextOverflow.visible,
                           softWrap: false,
                         ),
                       ),
                       ...[
-                        addW(12),
+                        addW(32),
                         GestureDetector(
                           onTap: controller.selectedDateTimeRange.value == null ? null : () {
                             controller.selectedDateTimeRange.value = null;
@@ -161,23 +161,24 @@ class _ProfitOrLossScreenState extends State<ProfitOrLossScreen>
                             'Account Title',
                             textAlign: TextAlign.center,
                           )),
+                          size: ColumnSize.L,
                         ),
                         DataColumn2(
                           label: Center(
                               child: Text(
-                            'Debit',
+                            'Amount',
                             textAlign: TextAlign.center,
                           )),
                           numeric: true,
-                          fixedWidth: 120,
+                          size: ColumnSize.S,
                         ),
                         DataColumn2(
                           label: Center(
                               child: Text(
-                            'Credit',
+                            'Amount',
                             textAlign: TextAlign.center,
                           )),
-                          fixedWidth: 100,
+                          size: ColumnSize.S,
                           numeric: true,
                         ),
                       ],
@@ -194,7 +195,7 @@ class _ProfitOrLossScreenState extends State<ProfitOrLossScreen>
                               _buildDataCell(
                                   isNumber: false,
                                   e.name ?? 'N/A',
-                                  maxLines: 2,
+                                  maxLines: 3,
                                   alignLeft: e.align?.toLowerCase() == "left",
                                   alignRight: e.align?.toLowerCase() == "right",
                                   isMinus: e.isMinus == 1),

@@ -26,7 +26,7 @@ class SoldHistoryDetailsData {
   final Customer customer;
   @JsonKey(name: 'sold_by')
   final String soldBy;
-  @JsonKey(name: 'service_by')
+  @JsonKey(name: 'service_by', fromJson: serviceByFromJson, toJson: serviceByToJson)
   final ServiceBy? serviceBy;
   @JsonKey(name: 'sub_total')
   final double subTotal;
@@ -99,6 +99,18 @@ class ServiceBy {
 
   factory ServiceBy.fromJson(Map<String, dynamic> json) => _$ServiceByFromJson(json);
   Map<String, dynamic> toJson() => _$ServiceByToJson(this);
+}
+
+ServiceBy? serviceByFromJson(dynamic json) {
+  if (json is Map<String, dynamic>) {
+    return ServiceBy.fromJson(json);
+  }
+  return null;
+}
+
+dynamic serviceByToJson(ServiceBy? value) {
+  if (value == null) return [];
+  return value.toJson();
 }
 
 

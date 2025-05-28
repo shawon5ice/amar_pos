@@ -6,6 +6,7 @@ import 'package:amar_pos/features/accounting/data/models/money_transfer/outlet_l
 import 'package:amar_pos/features/accounting/data/models/trial_balance/trial_balance_list_response_model.dart';
 import 'package:amar_pos/features/accounting/data/services/balance_sheet_service.dart';
 import 'package:amar_pos/features/accounting/data/services/book_ledger_service.dart';
+import 'package:amar_pos/features/accounting/data/services/chart_of_account_list.dart';
 import 'package:amar_pos/features/accounting/data/services/due_collection_service.dart';
 import 'package:amar_pos/features/accounting/data/services/money_adjustment_service.dart';
 import 'package:amar_pos/features/accounting/data/services/money_transfer_service.dart';
@@ -20,10 +21,11 @@ import '../../../../../core/network/base_client.dart';
 import '../../../../../core/widgets/reusable/payment_dd/expense_payment_methods_response_model.dart';
 import '../../../../auth/data/model/hive/login_data.dart';
 import '../../../../auth/data/model/hive/login_data_helper.dart';
+import '../../../data/models/chart_of_account/chart_of_account_list_response_model.dart';
 import '../../../data/models/profit_or_loss/profit_or_loss_list_response_model.dart';
 import '../../../data/services/trial_balance_service.dart';
 
-class BalanceSheetController extends GetxController{
+class ChartOfAccountController extends GetxController{
 
   bool profitOrLossListLoading = false;
   bool isLoadingMore = false;
@@ -46,7 +48,7 @@ class BalanceSheetController extends GetxController{
   @override
   void onReady() {
     super.onReady();
-    getBalanceSheet();
+    getChartOfAccountList();
   }
 
 
@@ -55,19 +57,23 @@ class BalanceSheetController extends GetxController{
     update(['selection_status']);
   }
 
-  Future<void> getBalanceSheet(
+  bool isChartOfAccountListLoading = false;
+  ChartOfAccountListResponseModel? chartOfAccountListResponseModel;
+  List<ChartOfAccountItem> chartOfAccountList = [];
+
+  Future<void> getChartOfAccountList(
       {int page = 1,}) async {
-    profitOrLossListLoading = page == 1; // Mark initial loading state
+    isChartOfAccountListLoading = page == 1; // Mark initial loading state
     if(page == 1){
-      balanceSheetList.clear();
+      chartOfAccountList.clear();
     }
     isLoadingMore = page > 1;
 
     hasError.value = false;
-    update(['total_widget','balance_sheet_list']);
+    update(['total_widget','chart_of_account_list']);
 
     try {
-      var response = await BalanceSheetService.getBalanceSheet(
+      var response = await ChartOfAccountService.getChartOfAccountList(
         usrToken: loginData!.token,
         page: page,
         search: searchController.text,
@@ -76,30 +82,27 @@ class BalanceSheetController extends GetxController{
 
       if (response != null) {
         logger.i(response);
-        balanceSheetListResponseModel =
-            BalanceSheetListResponseModel.fromJson(response);
+        chartOfAccountListResponseModel =
+            ChartOfAccountListResponseModel.fromJson(response);
 
-        if (balanceSheetListResponseModel != null && balanceSheetListResponseModel!.data != null) {
-          balanceSheetList.addAll(balanceSheetListResponseModel!.data!);
-          logger.i(balanceSheetList.length);
-          // if (currentSearchList.isNotEmpty) {
-          //   lastFoundList.value = currentSearchList; // Update last found list
-          // }
+        if (chartOfAccountListResponseModel != null && chartOfAccountListResponseModel!.data.data.isNotEmpty) {
+          chartOfAccountList.addAll(chartOfAccountListResponseModel!.data.data);
+          logger.i(chartOfAccountList.length);
         } else {
-          balanceSheetList.clear(); // No results
+          chartOfAccountList.clear(); // No results
         }
       } else {
         // hasError.value = true; // Error in response
-        balanceSheetList.clear();
+        chartOfAccountList.clear();
       }
     } catch (e) {
       hasError.value = true; // Handle exceptions
-      balanceSheetList.clear();
+      chartOfAccountList.clear();
       logger.e(e);
     } finally {
-      profitOrLossListLoading = false;
+      isChartOfAccountListLoading = false;
       isLoadingMore = false;
-      update(['total_widget','balance_sheet_list']);
+      update(['total_widget','chart_of_account_list']);
     }
   }
 

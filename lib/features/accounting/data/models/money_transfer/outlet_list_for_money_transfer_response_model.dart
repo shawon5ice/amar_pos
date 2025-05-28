@@ -39,12 +39,15 @@ class OutletForMoneyTransferData {
   final String name;
   @JsonKey(name: 'store_id')
   final int? storeId;
+  @JsonKey(name: 'is_main_store')
+  final int? isMainStore;
 
 
   OutletForMoneyTransferData({
     required this.id,
     required this.name,
-    this.storeId
+    this.storeId,
+    this.isMainStore,
   });
 
   factory OutletForMoneyTransferData.fromJson(Map<String, dynamic> json) => _$OutletForMoneyTransferDataFromJson(json);

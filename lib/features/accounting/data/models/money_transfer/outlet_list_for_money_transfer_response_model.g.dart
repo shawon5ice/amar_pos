@@ -49,6 +49,7 @@ OutletForMoneyTransferData _$OutletForMoneyTransferDataFromJson(
       id: (json['id'] as num).toInt(),
       name: json['name'] as String,
       storeId: (json['store_id'] as num?)?.toInt(),
+      isMainStore: (json['is_main_store'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$OutletForMoneyTransferDataToJson(
@@ -57,4 +58,5 @@ Map<String, dynamic> _$OutletForMoneyTransferDataToJson(
       'id': instance.id,
       'name': instance.name,
       'store_id': instance.storeId,
+      'is_main_store': instance.isMainStore,
     };

@@ -242,6 +242,9 @@ class _MoneyTransferBottomSheetState extends State<MoneyTransferBottomSheet> {
                               value: selectedToOutlet,
                               onChanged: (value) {
                                 selectedToOutlet = value;
+                                if(selectedToOutlet != null && selectedToOutlet!.isMainStore != 1){
+                                  selectedFromAccount;
+                                }
                               },
                               hintText: controller.outletListLoading
                                   ? "Loading..."

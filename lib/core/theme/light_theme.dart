@@ -13,7 +13,7 @@ class LightTheme {
       cardColor: AppColors.card,
       textTheme: TextThemeFactory.getTextTheme(Brightness.light, context),
       appBarTheme: AppBarTheme(
-        color: AppColors.appBarBgColor,
+        color: AppColors.scaffoldBackground,
         titleTextStyle:
         LightTextTheme.textTheme(context).titleLarge!.copyWith(
             color: Colors.black, fontSize: 24.px),

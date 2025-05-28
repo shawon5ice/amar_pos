@@ -1,5 +1,6 @@
 import 'package:amar_pos/core/routes/bindings.dart';
 import 'package:amar_pos/features/accounting/presentation/views/balance_sheet/balance_sheet_screen.dart';
+import 'package:amar_pos/features/accounting/presentation/views/chart_of_account/chart_of_account.dart';
 import 'package:amar_pos/features/accounting/presentation/views/daily_statement/daily_statement.dart';
 import 'package:amar_pos/features/accounting/presentation/views/due_collection/due_collection.dart';
 import 'package:amar_pos/features/accounting/presentation/views/due_collection/pages/client_ledger_statement.dart';
@@ -177,6 +178,12 @@ class AppRoutes {
       name: BalanceSheetScreen.routeName,
       page: () => const BalanceSheetScreen(),
       binding: BalanceSheetScreenBindings(),
+    ),
+
+    GetPage(
+      name: ChartOfAccountScreen.routeName,
+      page: () => const ChartOfAccountScreen(),
+      binding: ChartOfAccountScreenBindings(),
     ),
 
     GetPage(

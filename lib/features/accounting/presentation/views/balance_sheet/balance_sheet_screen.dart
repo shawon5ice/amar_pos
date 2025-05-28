@@ -34,13 +34,13 @@ class _BalanceSheetScreenState extends State<BalanceSheetScreen>
         actions: [
           IconButton(
             onPressed: () async {
-              DateTimeRange? selectedDate = await showDateRangePicker(
+              DateTime? selectedDate = await showDatePicker(
                 context: context,
                 firstDate: DateTime.now().subtract(const Duration(days: 1000)),
                 lastDate: DateTime.now().add(const Duration(days: 1000)),
-                initialDateRange: controller.selectedDateTimeRange.value,
+                initialDate: controller.selectedDateTime.value,
               );
-              controller.selectedDateTimeRange.value = selectedDate;
+              controller.selectedDateTime.value = selectedDate;
               if (selectedDate != null) {
                 controller.update(['date_status']);
                 controller.getBalanceSheet();
@@ -52,7 +52,7 @@ class _BalanceSheetScreenState extends State<BalanceSheetScreen>
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.only(left: 20,right: 20, bottom: 20),
           child: Column(
             children: [
               addH(12),
@@ -68,14 +68,14 @@ class _BalanceSheetScreenState extends State<BalanceSheetScreen>
                   child: Row(
                     children: [
                       Text(
-                        'Date : ${controller.selectedDateTimeRange.value != null ? formatDate(controller.selectedDateTimeRange.value!.start) + ' - ' + formatDate(controller.selectedDateTimeRange.value!.end) : formatDate(DateTime.now())}',
+                        'Date : ${controller.selectedDateTime.value != null ? formatDate(controller.selectedDateTime.value!) : formatDate(DateTime.now())}',
                         style: TextStyle(color: Color(0xff7C7C7C)),
                       ),
-                      if(controller.selectedDateTimeRange.value != null) ...[
+                      if(controller.selectedDateTime.value != null) ...[
                         addW(12),
                         GestureDetector(
                           onTap: () {
-                            controller.selectedDateTimeRange.value = null;
+                            controller.selectedDateTime.value = null;
                             controller.update(['date_status']);
                             controller.getBalanceSheet();
                           },
@@ -133,7 +133,6 @@ class _BalanceSheetScreenState extends State<BalanceSheetScreen>
                       // fixedLeftColumns: 1,
                       columnSpacing: 12,
                       horizontalMargin: 12,
-                      minWidth: 800,
                       empty: const Center(
                         child: Text("No Data Found"),
                       ),
@@ -151,24 +150,24 @@ class _BalanceSheetScreenState extends State<BalanceSheetScreen>
                             'Account Title',
                             textAlign: TextAlign.center,
                           )),
-                          fixedWidth: context.width/2.5,
+                          size: ColumnSize.L
                         ),
                         DataColumn2(
                             label: Center(
                                 child: Text(
-                              'Debit',
+                              'Amount',
                               textAlign: TextAlign.center,
                             )),
                           numeric: true,
-                          fixedWidth: 100,
+                          size: ColumnSize.S,
                         ),
                         DataColumn2(
                           label: Center(
                               child: Text(
-                            'Credit',
+                            'Amount',
                             textAlign: TextAlign.center,
                           )),
-                          fixedWidth: 100,
+                          size: ColumnSize.S,
                           numeric: true,
                         ),
                       ],

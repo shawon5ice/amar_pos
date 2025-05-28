@@ -3,8 +3,8 @@ import '../../../../core/network/base_client.dart';
 import '../../../../core/network/download/file_downloader.dart';
 import '../../../../core/network/network_strings.dart';
 
-class BalanceSheetService {
-  static Future<dynamic> getBalanceSheet({
+class ChartOfAccountService {
+  static Future<dynamic> getChartOfAccountList({
     required String usrToken,
     required int page,
     required String? search,
@@ -21,7 +21,7 @@ class BalanceSheetService {
 
     var response = await BaseClient.getData(
         token: usrToken,
-        api: "accounting/report/get-balance-sheet-report",
+        api: "chart_of_accounts/get-all-accounts-list",
         parameter: query);
     return response;
   }

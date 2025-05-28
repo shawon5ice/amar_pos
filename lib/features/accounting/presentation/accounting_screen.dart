@@ -1,4 +1,5 @@
 import 'package:amar_pos/features/accounting/presentation/views/balance_sheet/balance_sheet_screen.dart';
+import 'package:amar_pos/features/accounting/presentation/views/chart_of_account/chart_of_account.dart';
 import 'package:amar_pos/features/accounting/presentation/views/profit_or_loss/profit_or_loss_screen.dart';
 import 'package:amar_pos/features/accounting/presentation/views/trial_balance/trial_balance_screen.dart';
 import 'package:flutter/material.dart';
@@ -51,6 +52,9 @@ class _AccountingScreenState extends State<AccountingScreen> {
     }),
     AccountingMenuItem(title: "Balance Sheet", onPress: (){
       Get.toNamed(BalanceSheetScreen.routeName);
+    }),
+    AccountingMenuItem(title: "Chart Of Account", onPress: (){
+      Get.toNamed(ChartOfAccountScreen.routeName);
     }),
   ];
 
