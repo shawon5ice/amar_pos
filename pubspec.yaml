@@ -71,7 +71,8 @@ dependencies:
   bluetooth_print_plus:
   screenshot:
   esc_pos_utils_plus:
-  awesome_notifications: 
+  awesome_notifications:
+  animated_tree_view:
 
 dev_dependencies:
   flutter_test:

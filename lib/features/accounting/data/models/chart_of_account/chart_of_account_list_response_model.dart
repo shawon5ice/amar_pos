@@ -39,8 +39,14 @@ class ChartOfAccountData {
 @JsonSerializable()
 class ChartOfAccountItem {
   final int id;
-  final List<dynamic> business;
-  final List<dynamic> store;
+  final int? parentId;
+
+  @JsonKey(fromJson: _parseBusiness, toJson: _businessToJson)
+  final Business? business;
+
+  @JsonKey(fromJson: _parseStore, toJson: _storeToJson)
+  final Store? store;
+
   final String? code;
   final String name;
 
@@ -55,8 +61,9 @@ class ChartOfAccountItem {
 
   ChartOfAccountItem({
     required this.id,
-    required this.business,
-    required this.store,
+    this.business,
+    this.parentId,
+    this.store,
     this.code,
     required this.name,
     this.root,
@@ -73,6 +80,54 @@ class ChartOfAccountItem {
 }
 
 @JsonSerializable()
+class Business {
+  final int id;
+  final String name;
+  final String phone;
+  final String? email;
+  final String logo;
+  final String address;
+
+  @JsonKey(name: 'photo_url')
+  final String photoUrl;
+
+  Business({
+    required this.id,
+    required this.name,
+    required this.phone,
+    this.email,
+    required this.logo,
+    required this.address,
+    required this.photoUrl,
+  });
+
+  factory Business.fromJson(Map<String, dynamic> json) =>
+      _$BusinessFromJson(json);
+
+  Map<String, dynamic> toJson() => _$BusinessToJson(this);
+}
+
+@JsonSerializable()
+class Store {
+  final int id;
+  final String name;
+  final String phone;
+  final String address;
+
+  Store({
+    required this.id,
+    required this.name,
+    required this.phone,
+    required this.address,
+  });
+
+  factory Store.fromJson(Map<String, dynamic> json) =>
+      _$StoreFromJson(json);
+
+  Map<String, dynamic> toJson() => _$StoreToJson(this);
+}
+
+@JsonSerializable()
 class ChartOfAccountRoot {
   final int id;
   final String name;
@@ -85,15 +140,13 @@ class ChartOfAccountRoot {
   factory ChartOfAccountRoot.fromJson(Map<String, dynamic> json) =>
       _$ChartOfAccountRootFromJson(json);
 
-  Map<String, dynamic> toJson() =>
-      _$ChartOfAccountRootToJson(this);
+  Map<String, dynamic> toJson() => _$ChartOfAccountRootToJson(this);
 }
 
 @JsonSerializable()
 class Meta {
   @JsonKey(name: 'last_page')
   final int lastPage;
-
   final int total;
 
   Meta({
@@ -101,12 +154,30 @@ class Meta {
     required this.total,
   });
 
-  factory Meta.fromJson(Map<String, dynamic> json) =>
-      _$MetaFromJson(json);
+  factory Meta.fromJson(Map<String, dynamic> json) => _$MetaFromJson(json);
 
   Map<String, dynamic> toJson() => _$MetaToJson(this);
 }
 
+// ==== Custom converters ====
+
+Business? _parseBusiness(dynamic json) {
+  if (json is Map<String, dynamic>) {
+    return Business.fromJson(json);
+  }
+  return null;
+}
+
+dynamic _businessToJson(Business? business) => business?.toJson();
+
+Store? _parseStore(dynamic json) {
+  if (json is Map<String, dynamic>) {
+    return Store.fromJson(json);
+  }
+  return null;
+}
+
+dynamic _storeToJson(Store? store) => store?.toJson();
 
 ChartOfAccountRoot? chartRootFromJson(dynamic json) {
   if (json is Map<String, dynamic>) {
@@ -115,6 +186,4 @@ ChartOfAccountRoot? chartRootFromJson(dynamic json) {
   return null;
 }
 
-dynamic chartRootToJson(ChartOfAccountRoot? root) {
-  return root?.toJson();
-}
+dynamic chartRootToJson(ChartOfAccountRoot? root) => root?.toJson();

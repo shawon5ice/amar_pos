@@ -1,3 +1,4 @@
+import 'package:amar_pos/core/constants/app_colors.dart';
 import 'package:flutter/material.dart';
 
 import 'chart_node.dart';
@@ -44,6 +45,14 @@ class _ChartTreeViewState extends State<ChartTreeView> {
     final isExpanded = _expanded[node.data.id] ?? false;
     final hasChildren = node.children.isNotEmpty;
 
+    int multiLineCount =  0;
+
+    siblings.forEach((e){
+      if(e.data.business != null){
+        multiLineCount++;
+      }
+    });
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -89,23 +98,49 @@ class _ChartTreeViewState extends State<ChartTreeView> {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             decoration: hasChildren && isExpanded
                 ? BoxDecoration(
-              color: const Color(0xFF2C4E42),
+              color: AppColors.darkGreen,
               borderRadius: BorderRadius.circular(12),
             )
                 : null,
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(
-                  hasChildren ? Icons.folder : Icons.insert_drive_file,
-                  color: hasChildren && isExpanded ? Colors.orange : Colors.white,
+                Icon( hasChildren && ! isExpanded ? Icons.folder  : hasChildren && isExpanded ? Icons.folder_open : Icons.insert_drive_file,
+                  color: hasChildren && isExpanded ? Colors.white : Colors.orange.shade200,
                   size: 18,
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  node.data.name,
-                  style: TextStyle(
-                    color: hasChildren && isExpanded ? Colors.orange : Colors.white,
-                    fontWeight: FontWeight.w600,
+                Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        node.data.name,
+                        style: TextStyle(
+                          color: hasChildren && isExpanded ? Colors.white : Colors.grey.shade700,
+                          fontWeight: hasChildren ? FontWeight.bold : FontWeight.w500,
+                        ),
+                      ),
+                      if(node.data.business != null )Row(
+                        children: [
+                          Text(
+                            node.data.business!.name,
+                            style: TextStyle(
+                              color: hasChildren && isExpanded ? Colors.white : Colors.grey.shade700,
+                              fontWeight: hasChildren ? FontWeight.bold : FontWeight.w500,
+                            ),
+                          ),
+                          if(node.data.store != null)Text(
+                            "(${node.data.store!.name})",
+                            style: TextStyle(
+                              color: hasChildren && isExpanded ? Colors.white : Colors.grey.shade700,
+                              fontWeight: hasChildren ? FontWeight.bold : FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -127,7 +162,7 @@ class _ChartTreeViewState extends State<ChartTreeView> {
                   top: 0,
                   bottom: 0,
                   child: Container(
-                    margin: const EdgeInsets.only(bottom: 20),
+                    margin: EdgeInsets.only(bottom: 20),
                     width: 2,
                     color: Colors.orange,
                   ),
@@ -140,12 +175,12 @@ class _ChartTreeViewState extends State<ChartTreeView> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SizedBox(
-                          width: 24,
+                          width: 36,
                           child: Align(
                             alignment: Alignment.centerRight,
                             child: Container(
                               margin: const EdgeInsets.only(top: 24),
-                              width: 12,
+                              width: 24,
                               height: 2,
                               color: Colors.orange,
                             ),

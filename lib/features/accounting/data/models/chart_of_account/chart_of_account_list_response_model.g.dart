@@ -37,8 +37,9 @@ Map<String, dynamic> _$ChartOfAccountDataToJson(ChartOfAccountData instance) =>
 ChartOfAccountItem _$ChartOfAccountItemFromJson(Map<String, dynamic> json) =>
     ChartOfAccountItem(
       id: (json['id'] as num).toInt(),
-      business: json['business'] as List<dynamic>,
-      store: json['store'] as List<dynamic>,
+      parentId: null,
+      business: _parseBusiness(json['business']),
+      store: _parseStore(json['store']),
       code: json['code'] as String?,
       name: json['name'] as String,
       root: chartRootFromJson(json['root']),
@@ -50,14 +51,49 @@ ChartOfAccountItem _$ChartOfAccountItemFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$ChartOfAccountItemToJson(ChartOfAccountItem instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'business': instance.business,
-      'store': instance.store,
+      'parent_id': instance.parentId,
+      'business': _businessToJson(instance.business),
+      'store': _storeToJson(instance.store),
       'code': instance.code,
       'name': instance.name,
       'root': chartRootToJson(instance.root),
       'type': instance.type,
       'remarks': instance.remarks,
       'is_actionable': instance.isActionable,
+    };
+
+Business _$BusinessFromJson(Map<String, dynamic> json) => Business(
+      id: (json['id'] as num).toInt(),
+      name: json['name'] as String,
+      phone: json['phone'] as String,
+      email: json['email'] as String?,
+      logo: json['logo'] as String,
+      address: json['address'] as String,
+      photoUrl: json['photo_url'] as String,
+    );
+
+Map<String, dynamic> _$BusinessToJson(Business instance) => <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
+      'phone': instance.phone,
+      'email': instance.email,
+      'logo': instance.logo,
+      'address': instance.address,
+      'photo_url': instance.photoUrl,
+    };
+
+Store _$StoreFromJson(Map<String, dynamic> json) => Store(
+      id: (json['id'] as num).toInt(),
+      name: json['name'] as String,
+      phone: json['phone'] as String,
+      address: json['address'] as String,
+    );
+
+Map<String, dynamic> _$StoreToJson(Store instance) => <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
+      'phone': instance.phone,
+      'address': instance.address,
     };
 
 ChartOfAccountRoot _$ChartOfAccountRootFromJson(Map<String, dynamic> json) =>

@@ -1,4 +1,5 @@
 import 'package:amar_pos/core/core.dart';
+import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:amar_pos/features/accounting/presentation/views/chart_of_account/chart_of_account_controller.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:data_table_2/data_table_2.dart';
@@ -30,7 +31,6 @@ class _ChartOfAccountScreenState extends State<ChartOfAccountScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.darkPrimary,
       appBar: AppBar(
         title: const Text("Chart Of Account"),
         centerTitle: true,
@@ -60,7 +60,7 @@ class _ChartOfAccountScreenState extends State<ChartOfAccountScreen>
             id: 'chart_of_account_list',
             builder: (controller) {
               if (controller.isChartOfAccountListLoading) {
-                return const Center(child: CircularProgressIndicator());
+                return Center(child: RandomLottieLoader.lottieLoader(),);
               } else if (controller.chartOfAccountListResponseModel == null ) {
                 return const Center(child: Text("Something went wrong"));
               } else if (controller.chartOfAccountList.isEmpty) {

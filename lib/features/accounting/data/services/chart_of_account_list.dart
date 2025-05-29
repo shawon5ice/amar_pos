@@ -13,8 +13,8 @@ class ChartOfAccountService {
     logger.d("Page: $page");
 
     Map<String, dynamic> query = {
-      "page": page,
-      "search": search,
+      "page": 1,
+      "search": "expense",
       "end_date": endDate,
     };
     logger.i(query);
