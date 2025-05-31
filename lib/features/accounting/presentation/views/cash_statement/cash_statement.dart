@@ -1,11 +1,22 @@
 import 'package:amar_pos/core/constants/logger/logger.dart';
+import 'package:amar_pos/core/responsive/pixel_perfect.dart';
+import 'package:amar_pos/features/accounting/data/models/cash_statement/cash_statement_report_list_reponse_model.dart';
 import 'package:amar_pos/features/accounting/presentation/views/cash_statement/cash_statement_controller.dart';
 import 'package:amar_pos/features/accounting/presentation/views/chart_of_account/chart_of_account_controller.dart';
+import 'package:amar_pos/features/accounting/presentation/views/widgets/cash_statement_report_item_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 
+import '../../../../../core/constants/app_assets.dart';
+import '../../../../../core/widgets/custom_text_field.dart';
+import '../../../../../core/widgets/loading/random_lottie_loader.dart';
 import '../../../../../core/widgets/methods/field_validator.dart';
+import '../../../../../core/widgets/methods/helper_methods.dart';
+import '../../../../../core/widgets/pager_list_view.dart';
+import '../../../../../core/widgets/reusable/custom_svg_icon_widget.dart';
 import '../../../../../core/widgets/reusable/payment_dd/expense_payment_methods_response_model.dart';
+import '../../../../../core/widgets/reusable/status/total_status_widget.dart';
 import '../../../../inventory/presentation/products/widgets/custom_drop_down_widget.dart';
 import '../../../data/models/money_transfer/outlet_list_for_money_transfer_response_model.dart';
 
@@ -22,24 +33,35 @@ class _CashStatementState extends State<CashStatement> {
   final CashStatementController controller = Get.find();
 
   ChartOfAccountPaymentMethod? selectedPaymentMethod;
-  OutletForMoneyTransferData? selectedToAccount;
+  OutletForMoneyTransferData? selectedAccount;
 
   @override
   void initState() {
-    controller.getAccounts().then((value) {
+    initialize();
+    super.initState();
+  }
+
+  int? selectedCaId;
+
+  Future<void> initialize() async {
+    await controller.getAccounts().then((value) {
       if (controller.loginData!.businessOwner) {
         selectedPaymentMethod = controller.moneyTransferController.paymentList
             .singleWhere((e) => e.name.toLowerCase().contains('cash'));
+        selectedCaId = selectedPaymentMethod!.id;
       } else {
-        controller.moneyTransferController.toAccounts.forEach((e){
+        for (var e in controller.moneyTransferController.toAccounts) {
           logger.e(e.storeId);
-        });
+        }
         logger.e(controller.loginData!.store.id);
-        selectedToAccount = controller.moneyTransferController.toAccounts.singleWhere((e) => e.storeId == controller.loginData!.store.id);
+        selectedAccount = controller.moneyTransferController.toAccounts.singleWhere((e) => e.storeId == controller.loginData!.store.id);
+
+        selectedCaId = selectedAccount!.id;
+        logger.e(selectedAccount?.id);
       }
+      controller.getCashStatementEntryList(caId: selectedCaId!);
       controller.update(['account']);
     });
-    super.initState();
   }
 
   @override
@@ -48,6 +70,23 @@ class _CashStatementState extends State<CashStatement> {
       appBar: AppBar(
         title: Text("Cash Statement"),
         centerTitle: true,
+        actions: [
+          IconButton(
+            onPressed: () async {
+              DateTimeRange? selectedDate = await showDateRangePicker(
+                context: context,
+                firstDate:
+                DateTime.now().subtract(const Duration(days: 1000)),
+                lastDate: DateTime.now().add(const Duration(days: 1000)),
+                initialDateRange: controller.selectedDateTimeRange.value,
+              );
+              controller.selectedDateTimeRange.value = selectedDate;
+              controller.update(['date_status']);
+              controller.getCashStatementEntryList(caId: selectedCaId!);
+            },
+            icon: SvgPicture.asset(AppAssets.calenderIcon),
+          )
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -84,12 +123,12 @@ class _CashStatementState extends State<CashStatement> {
                 } else {
                   return CustomDropdownWithSearchWidget<
                       OutletForMoneyTransferData>(
-                    items: selectedToAccount == null ? [] : [selectedToAccount!],
+                    items: selectedAccount == null ? [] : [selectedAccount!],
                     isMandatory: true,
                     title: "To Account",
                     noTitle: true,
                     itemLabel: (value) => value.name,
-                    value: selectedToAccount,
+                    value: selectedAccount,
                     onChanged: (value) {
                       // selectedFromAccount = value;
                       // if(selectedFromAccount != null){
@@ -118,7 +157,143 @@ class _CashStatementState extends State<CashStatement> {
                   );
                 }
               },
-            )
+            ),
+            addH(8),
+            Row(
+              children: [
+                Expanded(
+                  child: CustomTextField(
+                    textCon: controller.searchController,
+                    hintText: "Search...",
+                    brdrClr: Colors.transparent,
+                    txtSize: 12,
+                    debounceDuration: const Duration(
+                      milliseconds: 500,
+                    ),
+                    // noInputBorder: true,
+                    brdrRadius: 40,
+                    prefixWidget: Icon(Icons.search),
+                    onChanged: (value){
+                      controller.getCashStatementEntryList(caId: selectedCaId!,);
+                    },
+                  ),
+                ),
+                addW(8),
+                CustomSvgIconButton(
+                  bgColor: const Color(0xffEBFFDF),
+                  onTap: () {
+                    controller.downloadList(isPdf: false,caId: selectedCaId!);
+                  },
+                  assetPath: AppAssets.excelIcon,
+                ),
+                addW(4),
+                CustomSvgIconButton(
+                  bgColor: const Color(0xffE1F2FF),
+                  onTap: () {
+                    controller.downloadList(isPdf: true,caId: selectedCaId!);
+                  },
+                  assetPath: AppAssets.downloadIcon,
+                ),
+                addW(4),
+                CustomSvgIconButton(
+                  bgColor: const Color(0xffFFFCF8),
+                  onTap: () {
+                    controller.downloadList(isPdf: true, caId: selectedCaId!, shouldPrint: true);
+                  },
+                  assetPath: AppAssets.printIcon,
+                )
+              ],
+            ),
+            addH(8),
+            GetBuilder<CashStatementController>(
+              id: 'total_widget',
+              builder: (controller) => Row(
+                children: [
+                  TotalStatusWidget(
+                    flex: 3,
+                    isLoading: controller.isCashStatementReportLoading,
+                    title: 'Debit',
+                    value: controller.isCashStatementReportLoading ? "Loading...":
+                    controller.cashStatementEntryListResponseModel == null ? "--" :
+                    Methods.getFormattedNumber(controller.cashStatementEntryListResponseModel!.data.first.debit.toDouble()),
+                    asset: AppAssets.cashIn,
+                  ),
+                  addW(12),
+                  TotalStatusWidget(
+                    flex: 4,
+                    isLoading: controller.isCashStatementReportLoading,
+                    title: 'Credit',
+                    value: controller.isCashStatementReportLoading ? "Loading...":
+                    controller.cashStatementEntryListResponseModel == null ? "--" :Methods.getFormattedNumber(controller.cashStatementEntryListResponseModel!.data.first.credit.toDouble()),
+                    asset: AppAssets.cashOut,
+                  ),
+                  addW(12),
+                  TotalStatusWidget(
+                    flex: 4,
+                    isLoading: controller.isCashStatementReportLoading,
+                    title: 'Balance',
+                    value: controller.isCashStatementReportLoading ? "Loading...":
+                    controller.cashStatementEntryListResponseModel == null ? "--" :Methods.getFormattedNumber(controller.cashStatementEntryListResponseModel!.data.first.balance.toDouble()),
+                    asset: AppAssets.cash,
+                  ),
+                ],
+              ),
+            ),
+            addH(8),
+        
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: () async{
+                  await controller.getCashStatementEntryList(
+                      caId: selectedCaId!,);
+                },
+                child: GetBuilder<CashStatementController>(
+                  id: 'cash_statement_report_list',
+                  builder: (controller) {
+                    if (controller
+                        .isCashStatementReportLoading) {
+                      return Center(
+                        child: RandomLottieLoader.lottieLoader(),
+                      );
+                    } else if (controller
+                        .cashStatementEntryListResponseModel ==
+                        null) {
+                      return const Center(
+                          child: Text("Something went wrong"));
+                    } else if (controller
+                        .cashStatementEntryList.isEmpty) {
+                      return const Center(child: Text("No data found"));
+                    }
+                    return PagerListView<CashStatementEntry>(
+                      // scrollController: _scrollController,
+                      items: controller.cashStatementEntryList,
+                      itemBuilder: (_, item) {
+                        return CashStatementReportItemWidget(
+                          cashStatementReport: item,
+                        );
+                      },
+                      isLoading: controller.isLoadingMore,
+                      hasError: controller.hasError.value,
+                      onNewLoad: (int nextPage) async {
+                        await controller.getCashStatementEntryList(
+                            caId: selectedCaId!,
+                            page: nextPage);
+                      },
+                      totalPage: controller
+                          .cashStatementEntryListResponseModel
+                          ?.data.first.data
+                          .lastPage ??
+                          0,
+                      totalSize: controller.cashStatementEntryListResponseModel
+                          ?.data.first.data
+                          .total ??
+                          0,
+                      itemPerPage: 10,
+                    );
+                  },
+                ),
+              ),
+            ),
           ],
         ),
       ),

@@ -346,20 +346,16 @@ class MoneyTransferController extends GetxController{
 
   Future<void> getAllPaymentMethods({ChartOfAccountPaymentMethod? account, int? id}) async {
     paymentListLoading = true;
-    logger.e("GETTING PAYMENTS");
     update(['ca_payment_dd']); // Update the UI for loading state
     var response = await BaseClient.getData(
       token: loginData!.token,
       api: "chart_of_accounts/get-payment-methods",
     );
 
-    logger.d(response);
-
     if (response != null) {
       ChartOfAccountPaymentMethodsResponseModel chartOfAccountPaymentMethodsResponseModel =
       ChartOfAccountPaymentMethodsResponseModel.fromJson(response);
       paymentList = chartOfAccountPaymentMethodsResponseModel.paymentMethods;
-      logger.d(id);
       // if(account != null){
       //   selectedCAPaymentMethod = paymentList.singleWhere((e) => e.id == account.id);
       // }

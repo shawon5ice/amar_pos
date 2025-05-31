@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../../../core/constants/logger/logger.dart';
+import '../../../../../core/network/helpers/error_extractor.dart';
 import '../../../../auth/data/model/hive/login_data.dart';
 import '../../../../auth/data/model/hive/login_data_helper.dart';
 import '../../../data/models/chart_of_account/chart_of_account_list_response_model.dart';
@@ -157,6 +158,10 @@ class ChartOfAccountController extends GetxController{
 
   Future<void> downloadList({required bool isPdf, bool? shouldPrint}) async {
     if(downloadLoading){
+      return;
+    }
+    if(chartOfAccountOpeningEntryList.isEmpty){
+      ErrorExtractor.showSingleErrorDialog(Get.context!, "File should not be ${shouldPrint != null? "printed": "downloaded"} with empty data.");
       return;
     }
     downloadLoading = true;
