@@ -215,6 +215,35 @@ class MoneyTransferController extends GetxController{
     RandomLottieLoader.hide();
   }
 
+  void approveMoneyTransfer({
+    required int id,
+  }) async {
+    isAddOrUpdateLoading = true;
+    update(["money_transfer_list"]);
+    RandomLottieLoader.show();
+    try{
+      var response = await MoneyTransferService.approveMoneyTransfer(
+        id: id,
+        token: loginData!.token,
+      );
+      if (response != null) {
+
+        if(response['success']){
+          moneyTransferList.clear();
+          getMoneyTransferList(page: 1);
+        }
+        Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true: null );
+      }
+    }catch(e){
+      logger.e(e);
+    }finally{
+      isAddOrUpdateLoading = false;
+      update(['money_transfer_list']);
+    }
+    update(["money_transfer_list"]);
+    RandomLottieLoader.hide();
+  }
+
 
   //Client Ledger
 
@@ -235,7 +264,7 @@ class MoneyTransferController extends GetxController{
         .microsecondsSinceEpoch
         .toString()}${isPdf ? ".pdf" : ".xlsx"}";
     try {
-      var response = await MoneyAdjustmentService.downloadList(
+      var response = await MoneyTransferService.downloadList(
         isPdf: isPdf,
         usrToken: loginData!.token,
         search: searchController.text,
@@ -259,7 +288,7 @@ class MoneyTransferController extends GetxController{
 
     String fileName = "$invoiceNo${isPdf ? ".pdf" : ".xlsx"}";
     try {
-      var response = await MoneyAdjustmentService.downloadMoneyAdjustmentInvoice(
+      var response = await MoneyTransferService.downloadMoneyAdjustmentInvoice(
         invoiceID: invoiceID,
         isPdf: isPdf,
         usrToken: loginData!.token,
@@ -275,6 +304,7 @@ class MoneyTransferController extends GetxController{
 
   bool outletListLoading = false;
   OutletListForMoneyTransferResponseModel? outletListForMoneyTransferResponseModel;
+  List<OutletForMoneyTransferData> toAccounts = [];
 
   Future<void> getOutletForMoneyTransferList() async {
     outletListLoading = true;
@@ -290,6 +320,7 @@ class MoneyTransferController extends GetxController{
         outletListForMoneyTransferResponseModel =
             OutletListForMoneyTransferResponseModel.fromJson(response);
 
+        toAccounts = outletListForMoneyTransferResponseModel!.data!.fromAccounts!;
         if(!loginData!.businessOwner){
           logger.i("----->");
           outletListForMoneyTransferResponseModel!.data!.fromStores?.removeWhere((e) => e.id != loginData!.store.id);

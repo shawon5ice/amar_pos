@@ -1,6 +1,9 @@
 import 'package:amar_pos/core/routes/bindings.dart';
 import 'package:amar_pos/features/accounting/presentation/views/balance_sheet/balance_sheet_screen.dart';
+import 'package:amar_pos/features/accounting/presentation/views/cash_statement/cash_statement.dart';
 import 'package:amar_pos/features/accounting/presentation/views/chart_of_account/chart_of_account.dart';
+import 'package:amar_pos/features/accounting/presentation/views/chart_of_account/pages/account_opening.dart';
+import 'package:amar_pos/features/accounting/presentation/views/chart_of_account/pages/co_account_entry_form.dart';
 import 'package:amar_pos/features/accounting/presentation/views/daily_statement/daily_statement.dart';
 import 'package:amar_pos/features/accounting/presentation/views/due_collection/due_collection.dart';
 import 'package:amar_pos/features/accounting/presentation/views/due_collection/pages/client_ledger_statement.dart';
@@ -24,7 +27,6 @@ import 'package:amar_pos/features/return/presentation/page/return_summary.dart';
 import 'package:amar_pos/features/sales/presentation/sales_screen.dart';
 import 'package:amar_pos/features/splash/splash_screen.dart';
 import 'package:get/get.dart';
-
 import '../../features/accounting/presentation/views/money_transfer/money_transfer.dart';
 import '../../features/auth/presentation/ui/forget_password/forgot_password.dart';
 
@@ -114,6 +116,13 @@ class AppRoutes {
     ),
 
     GetPage(
+      name: CashStatement.routeName,
+      page: () => const CashStatement(),
+      binding: CashStatementBinding(),
+    ),
+
+
+    GetPage(
       name: ExpenseVoucher.routeName,
       page: () => const ExpenseVoucher(),
       binding: ExpenseVoucherBindings(),
@@ -184,6 +193,19 @@ class AppRoutes {
       name: ChartOfAccountScreen.routeName,
       page: () => const ChartOfAccountScreen(),
       binding: ChartOfAccountScreenBindings(),
+    ),
+
+    GetPage(
+      name: AccountOpening.routeName,
+      page: () => const AccountOpening(),
+      binding: ChartOfAccountScreenBindings(),
+    ),
+
+    GetPage(
+      name: AccountEntryForm.routeName,
+      page: () => const AccountEntryForm(),
+      binding: ChartOfAccountScreenBindings(),
+      transition: Transition.rightToLeft
     ),
 
     GetPage(

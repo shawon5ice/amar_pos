@@ -56,6 +56,7 @@ class PagerListView<T> extends StatelessWidget {
         Flexible(
           flex: 1,
           child: ListView.builder(
+            physics: AlwaysScrollableScrollPhysics(),
             key: const PageStorageKey<String>('dashboard'),
             controller: _scrollController,
             itemCount: items.length,

@@ -1,5 +1,7 @@
 import 'package:amar_pos/features/accounting/presentation/views/balance_sheet/balance_sheet_screen.dart';
+import 'package:amar_pos/features/accounting/presentation/views/cash_statement/cash_statement.dart';
 import 'package:amar_pos/features/accounting/presentation/views/chart_of_account/chart_of_account.dart';
+import 'package:amar_pos/features/accounting/presentation/views/chart_of_account/pages/account_opening.dart';
 import 'package:amar_pos/features/accounting/presentation/views/profit_or_loss/profit_or_loss_screen.dart';
 import 'package:amar_pos/features/accounting/presentation/views/trial_balance/trial_balance_screen.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +27,9 @@ class _AccountingScreenState extends State<AccountingScreen> {
   List<AccountingMenuItem> accounting = [
     AccountingMenuItem(title: "Daily Statement", onPress: (){
       Get.toNamed(DailyStatement.routeName);
+    }),
+    AccountingMenuItem(title: "Cash Statement", onPress: (){
+      Get.toNamed(CashStatement.routeName);
     }),
     AccountingMenuItem(title: "Expense Voucher", onPress: (){
       Get.toNamed(ExpenseVoucher.routeName);
@@ -55,6 +60,9 @@ class _AccountingScreenState extends State<AccountingScreen> {
     }),
     AccountingMenuItem(title: "Chart Of Account", onPress: (){
       Get.toNamed(ChartOfAccountScreen.routeName);
+    }),
+    AccountingMenuItem(title: "Account Opening History", onPress: (){
+      Get.toNamed(AccountOpening.routeName);
     }),
   ];
 

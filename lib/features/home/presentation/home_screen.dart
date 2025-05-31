@@ -12,6 +12,7 @@ import 'package:amar_pos/features/inventory/presentation/products/products_scree
 import 'package:amar_pos/features/sales/presentation/sales_screen.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 
 import '../../../permission_manager.dart';
@@ -74,14 +75,15 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         title: Text(LoginDataBoxManager().loginData!.business.name),
         centerTitle: true,
         actions: [
-          IconButton(
-              onPressed: () {
-                drawerMenuController.selectMenuItem(MenuSelection(parent: DrawerItems.returnAndExchange,child: 'Return'));
-                // drawerMenuController.selectMenuItem(DrawerItems.overview)
-                // Get.changeThemeMode(
-                //     Get.isDarkMode ? ThemeMode.light : ThemeMode.dark);
-              },
-              icon: Get.isDarkMode ? Icon(Icons.sunny) : Icon(Icons.nightlight)),
+          IconButton(onPressed: (){}, icon: SvgPicture.asset("assets/icon/notification_bell.svg"))
+          // IconButton(
+          //     onPressed: () {
+          //       drawerMenuController.selectMenuItem(MenuSelection(parent: DrawerItems.returnAndExchange,child: 'Return'));
+          //       // drawerMenuController.selectMenuItem(DrawerItems.overview)
+          //       // Get.changeThemeMode(
+          //       //     Get.isDarkMode ? ThemeMode.light : ThemeMode.dark);
+          //     },
+          //     icon: Get.isDarkMode ? Icon(Icons.sunny) : Icon(Icons.nightlight)),
         ],
       ),
       body: GetBuilder<HomeScreenController>(

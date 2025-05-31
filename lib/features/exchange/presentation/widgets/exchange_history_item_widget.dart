@@ -68,27 +68,6 @@ class ExchangeHistoryItemWidget extends StatelessWidget {
                           ),
                         ),
                       ),
-                      addW(8.w),
-                      Container(
-                        padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                        decoration: BoxDecoration(
-                            color: const Color(0xffF2E8FF),
-                            border: Border.all(
-                              color: const Color(0xff500DA0),
-                              width: .5,
-                            ),
-                            borderRadius: BorderRadius.circular(20)),
-                        child: AutoSizeText(
-                          exchangeOrderInfo.saleType,
-                          minFontSize: 8,
-                          maxFontSize: 10,
-                          style: const TextStyle(
-                            color: Color(0xff500DA0),
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
                     ],
                   ),
                 ),
@@ -168,6 +147,29 @@ class ExchangeHistoryItemWidget extends StatelessWidget {
                   ExchangeHistoryItemTitleValueWidget(
                     title: "Paid Amount",
                     value: Methods.getFormatedPrice(exchangeOrderInfo.paidAmount.toDouble()),
+                  ),
+                  Align(
+                    alignment: Alignment.bottomRight,
+                    child: Container(
+                      padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                          color: const Color(0xffF2E8FF),
+                          border: Border.all(
+                            color: const Color(0xff500DA0),
+                            width: .5,
+                          ),
+                          borderRadius: BorderRadius.circular(20)),
+                      child: AutoSizeText(
+                        exchangeOrderInfo.saleType,
+                        minFontSize: 8,
+                        maxFontSize: 10,
+                        style: const TextStyle(
+                          color: Color(0xff500DA0),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),

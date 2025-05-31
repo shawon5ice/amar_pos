@@ -66,27 +66,6 @@ class ReturnHistoryItemWidget extends StatelessWidget {
                           ),
                         ),
                       ),
-                      addW(8),
-                      Container(
-                        padding:
-                        EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                        decoration: BoxDecoration(
-                            color: Color(0xffF2E8FF),
-                            border: Border.all(
-                              color: Color(0xff500DA0),
-                              width: .5,
-                            ),
-                            borderRadius: BorderRadius.circular(20)),
-                        child: AutoSizeText(
-                          returnHistory.saleType,
-                          minFontSize: 8,
-                          maxFontSize: 10,
-                          style: TextStyle(
-                            color: Color(0xff500DA0),
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
                     ],
                   ),
                 ),
@@ -161,6 +140,29 @@ class ReturnHistoryItemWidget extends StatelessWidget {
                   SaleHistoryItemTitleValueWidget(
                     title: "Amount",
                     value: Methods.getFormatedPrice(returnHistory.amount),
+                  ),
+                  Align(
+                    alignment: Alignment.bottomRight,
+                    child: Container(
+                      padding:
+                      EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                          color: Color(0xffF2E8FF),
+                          border: Border.all(
+                            color: Color(0xff500DA0),
+                            width: .5,
+                          ),
+                          borderRadius: BorderRadius.circular(20)),
+                      child: AutoSizeText(
+                        returnHistory.saleType,
+                        minFontSize: 8,
+                        maxFontSize: 10,
+                        style: TextStyle(
+                          color: Color(0xff500DA0),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),

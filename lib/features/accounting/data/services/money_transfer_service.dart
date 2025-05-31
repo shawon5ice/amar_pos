@@ -58,7 +58,6 @@ class MoneyTransferService {
     required DateTime? endDate,
     required String? search,
     required bool? shouldPrint,
-    required int type,
   }) async {
     // logger.d("PDF: $isPdf");
 
@@ -66,15 +65,14 @@ class MoneyTransferService {
       "start_date": startDate,
       "end_date": endDate,
       "search": search,
-      "type": type,
     };
 
     String downloadUrl = "";
 
     if(isPdf){
-      downloadUrl = "${NetWorkStrings.baseUrl}/money_adjustment/download-pdf-money-adjustment-list";
+      downloadUrl = "${NetWorkStrings.baseUrl}/money_transfer/download-pdf-money-transfer-list";
     }else{
-      downloadUrl = "${NetWorkStrings.baseUrl}/money_adjustment/download-excel-money-adjustment-list";
+      downloadUrl = "${NetWorkStrings.baseUrl}/money_transfer/download-excel-money-transfer-list";
     }
 
 
@@ -205,6 +203,18 @@ class MoneyTransferService {
     return response;
   }
 
+  static Future<dynamic> approveMoneyTransfer({
+    required int id,
+    required String token,
+  }) async {
+
+    var response = await BaseClient.getData(
+      token: token,
+      api: "money_transfer/approve/$id",
+    );
+    return response;
+  }
+
 
   static Future<dynamic> storeCategory({
     required String categoryName,
@@ -313,5 +323,21 @@ class MoneyTransferService {
       token: usrToken,
       api: "money_transfer/get-outlets-for-money-transfer",);
     return response;
+  }
+
+  static Future<void> downloadMoneyAdjustmentInvoice({required bool isPdf, required int invoiceID,
+    required String usrToken,
+    required String fileName,
+    required bool? shouldPrint
+  }) async {
+
+    String downloadUrl = "${NetWorkStrings.baseUrl}/money_transfer/download-invoice/$invoiceID";
+
+    FileDownloader().downloadFile(
+      url: downloadUrl,
+      token: usrToken,
+      fileName: fileName,
+      shouldPrint: shouldPrint,
+    );
   }
 }

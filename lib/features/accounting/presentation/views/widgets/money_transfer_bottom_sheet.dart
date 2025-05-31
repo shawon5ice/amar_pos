@@ -11,6 +11,7 @@ import 'package:amar_pos/core/widgets/reusable/payment_dd/ca_payment_method_drop
 import 'package:amar_pos/core/widgets/reusable/payment_dd/expense_payment_methods_response_model.dart';
 import 'package:amar_pos/features/accounting/data/models/money_transfer/outlet_list_for_money_transfer_response_model.dart';
 import 'package:amar_pos/features/inventory/presentation/products/widgets/custom_drop_down_widget.dart';
+import 'package:amar_pos/features/inventory/presentation/products/widgets/custom_dropdown_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -48,6 +49,7 @@ class _MoneyTransferBottomSheetState extends State<MoneyTransferBottomSheet> {
   OutletForMoneyTransferData? selectedFromOutlet;
   OutletForMoneyTransferData? selectedToOutlet;
   OutletForMoneyTransferData? selectedFromAccount;
+  OutletForMoneyTransferData? selectedToAccount;
 
   @override
   void initState() {
@@ -76,8 +78,17 @@ class _MoneyTransferBottomSheetState extends State<MoneyTransferBottomSheet> {
       if(widget.moneyTransferData != null){
         selectedFromAccount = _controller.outletListForMoneyTransferResponseModel!.data!.fromAccounts!.singleWhere((e) => e.id == widget.moneyTransferData!.fromAccount!.id);
         selectedFromOutlet = _controller.outletListForMoneyTransferResponseModel!.data!.fromStores!.singleWhere((e) => e.id == widget.moneyTransferData!.fromStore!.id);
+        _controller.getCABalance(selectedFromAccount!.id);
         selectedToOutlet = _controller.outletListForMoneyTransferResponseModel!.data!.toStores!.singleWhere((e) => e.id == widget.moneyTransferData!.toStore!.id);
-        selectedPaymentMethodID = widget.moneyTransferData!.toAccount!.id;
+        if(selectedToOutlet != null && selectedToOutlet!.isMainStore != 1){
+          selectedToAccount =  _controller.toAccounts.singleWhere((e) {
+            logger.d(e.storeId == selectedToOutlet!.id);
+            return e.storeId == selectedToOutlet!.id;
+          });
+
+        }else{
+          selectedPaymentMethodID = widget.moneyTransferData!.toAccount!.id;
+        }
         logger.i(selectedPaymentMethodID);
         _controller.update(['outlet_list_for_money_transfer']);
       }else{
@@ -88,10 +99,10 @@ class _MoneyTransferBottomSheetState extends State<MoneyTransferBottomSheet> {
       }
     });
 
-   await _controller.getAllPaymentMethods(account: selectedPaymentMethod, id: selectedPaymentMethodID).then((e){
-     selectedPaymentMethod = _controller.paymentList.singleWhere((e) => e.id == selectedPaymentMethodID);
-     _controller.update(['ca_payment_dd']);
-   });
+   // await _controller.getAllPaymentMethods(account: selectedPaymentMethod, id: selectedPaymentMethodID).then((e){
+   //   selectedPaymentMethod = _controller.paymentList.singleWhere((e) => e.id == selectedPaymentMethodID);
+   //   _controller.update(['ca_payment_dd']);
+   // });
 
   }
 
@@ -204,32 +215,6 @@ class _MoneyTransferBottomSheetState extends State<MoneyTransferBottomSheet> {
                                   value?.name, "From account"),
                             ),
                             addH(8),
-                            FieldTitle("Current Balance"),
-                            addH(4),
-                            GetBuilder<MoneyTransferController>(
-                                id: 'balance',
-                                builder: (controller) {
-                                  return CustomTextField(
-                                    readOnly: true,
-                                    inputType: TextInputType.number,
-                                    textCon: TextEditingController(
-                                        text: controller.balanceLoading
-                                            ? "Loading..."
-                                            : selectedFromAccount == null
-                                                ? "Select from account first"
-                                                : controller.balance == null
-                                                    ? "Something went wrong"
-                                                    : Methods
-                                                        .getFormattedNumber(
-                                                            controller.balance!
-                                                                .toDouble())),
-                                    hintText: "Type amount",
-                                    validator: (value) => FieldValidator
-                                        .nonNullableFieldValidator(
-                                            value, "Amount"),
-                                  );
-                                }),
-                            addH(8),
                             CustomDropdownWithSearchWidget<OutletForMoneyTransferData>(
                               items: controller.outletListLoading ||
                                   controller.outletListForMoneyTransferResponseModel == null
@@ -243,8 +228,14 @@ class _MoneyTransferBottomSheetState extends State<MoneyTransferBottomSheet> {
                               onChanged: (value) {
                                 selectedToOutlet = value;
                                 if(selectedToOutlet != null && selectedToOutlet!.isMainStore != 1){
-                                  selectedFromAccount;
+                                  selectedToAccount =  controller.toAccounts.singleWhere((e) {
+                                    logger.d(e.storeId == selectedToOutlet!.id);
+                                    return e.storeId == selectedToOutlet!.id;
+                                  });
                                 }
+                                setState(() {
+
+                                });
                               },
                               hintText: controller.outletListLoading
                                   ? "Loading..."
@@ -260,36 +251,88 @@ class _MoneyTransferBottomSheetState extends State<MoneyTransferBottomSheet> {
                               validator: (value) => FieldValidator.nonNullableFieldValidator(
                                   value?.name, "To outlet"),
                             ),
-                            addH(8)
-                          ],
-                        ),
-                      ),
-                      GetBuilder<MoneyTransferController>(
-                          id: 'ca_payment_dd',
-                          builder: (controller) {
-                            return CustomDropdownWithSearchWidget<
-                                ChartOfAccountPaymentMethod>(
-                              items: controller.paymentList,
+                            addH(8),
+                            selectedToOutlet != null && selectedToOutlet!.isMainStore == 1 ? GetBuilder<MoneyTransferController>(
+                                id: 'ca_payment_dd',
+                                builder: (controller) {
+                                  return CustomDropdownWithSearchWidget<
+                                      ChartOfAccountPaymentMethod>(
+                                    items: controller.paymentList,
+                                    isMandatory: true,
+                                    title: "To Account",
+                                    // noTitle: true,
+                                    itemLabel: (value) => value.name,
+                                    value: selectedPaymentMethod,
+                                    onChanged: (value) {
+                                      selectedPaymentMethod = value;
+                                      controller.update([
+                                        'ca_payment_dd'
+                                      ]); // Notify UI of the change
+                                    },
+                                    hintText: controller.paymentListLoading
+                                        ? "Loading..."
+                                        : controller.paymentList.isEmpty
+                                        ? "No payment method found..."
+                                        : "Select ao account",
+                                    searchHintText: "Search a payment method",
+                                    validator: (value) =>
+                                        FieldValidator.nonNullableFieldValidator(
+                                            value?.name, "To Account"),
+                                  );
+                                }) : CustomDropdownWithSearchWidget<OutletForMoneyTransferData>(
+                              items: selectedToOutlet == null ? [] : [selectedToAccount!],
                               isMandatory: true,
                               title: "To Account",
                               // noTitle: true,
                               itemLabel: (value) => value.name,
-                              value: selectedPaymentMethod,
+                              value: selectedToAccount,
                               onChanged: (value) {
-                                selectedPaymentMethod = value;
-                                controller.update([
-                                  'ca_payment_dd'
-                                ]); // Notify UI of the change
+                                // selectedFromAccount = value;
+                                // if(selectedFromAccount != null){
+                                //   controller.getCABalance(selectedFromAccount!.id);
+                                // }
                               },
-                              hintText: controller.paymentListLoading
+                              searchHintText: "Search account",
+                              hintText: controller.outletListLoading
                                   ? "Loading..."
-                                  : controller.paymentList.isEmpty
-                                  ? "No payment method found..."
-                                  : "Select ao account",
-                              searchHintText: "Search a payment method",
-                              validator: (value) =>
-                                  FieldValidator.nonNullableFieldValidator(
-                                      value?.name, "To Account"),
+                                  : controller.outletListForMoneyTransferResponseModel == null ||
+                                  (controller.outletListForMoneyTransferResponseModel !=
+                                      null &&
+                                      controller.outletListForMoneyTransferResponseModel!
+                                          .data ==
+                                          null)
+                                  ? "No account found"
+                                  : "Select account",
+                              validator: (value) => FieldValidator.nonNullableFieldValidator(
+                                  value?.name, "From account"),
+                            ),
+                          ],
+                        ),
+                      ),
+                      addH(8),
+                      FieldTitle("Current Balance"),
+                      addH(4),
+                      GetBuilder<MoneyTransferController>(
+                          id: 'balance',
+                          builder: (controller) {
+                            return CustomTextField(
+                              readOnly: true,
+                              inputType: TextInputType.number,
+                              textCon: TextEditingController(
+                                  text: controller.balanceLoading
+                                      ? "Loading..."
+                                      : selectedFromAccount == null
+                                      ? "Select from account first"
+                                      : controller.balance == null
+                                      ? "--"
+                                      : Methods
+                                      .getFormattedNumber(
+                                      controller.balance!
+                                          .toDouble())),
+                              hintText: "Type amount",
+                              validator: (value) => FieldValidator
+                                  .nonNullableFieldValidator(
+                                  value, "Amount"),
                             );
                           }),
                       addH(8),
@@ -328,7 +371,7 @@ class _MoneyTransferBottomSheetState extends State<MoneyTransferBottomSheet> {
                               id: widget.moneyTransferData!.id,
                               fromStoreID: selectedFromOutlet!.id,
                               toStoreID: selectedToOutlet!.id,
-                              toAccountID: selectedPaymentMethod!.id,
+                              toAccountID: selectedToAccount != null ? selectedToAccount!.id : selectedPaymentMethod!.id,
                               fromAccountID: selectedFromAccount!.id,
                               amount: num.parse(_textEditingController.text),
                               remarks: _remarksEditingController.text,
@@ -341,7 +384,7 @@ class _MoneyTransferBottomSheetState extends State<MoneyTransferBottomSheet> {
                             _controller.storeNewMoneyTransfer(
                               fromStoreID: selectedFromOutlet!.id,
                               toStoreID: selectedToOutlet!.id,
-                              toAccountID: selectedPaymentMethod!.id,
+                              toAccountID: selectedToAccount != null ? selectedToAccount!.id : selectedPaymentMethod!.id,
                               fromAccountID: selectedFromAccount!.id,
                               amount: num.parse(_textEditingController.text),
                               remarks: _remarksEditingController.text,

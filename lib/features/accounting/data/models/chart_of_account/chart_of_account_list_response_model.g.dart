@@ -37,8 +37,8 @@ Map<String, dynamic> _$ChartOfAccountDataToJson(ChartOfAccountData instance) =>
 ChartOfAccountItem _$ChartOfAccountItemFromJson(Map<String, dynamic> json) =>
     ChartOfAccountItem(
       id: (json['id'] as num).toInt(),
-      parentId: null,
       business: _parseBusiness(json['business']),
+      parentId: (json['parentId'] as num?)?.toInt(),
       store: _parseStore(json['store']),
       code: json['code'] as String?,
       name: json['name'] as String,
@@ -51,7 +51,7 @@ ChartOfAccountItem _$ChartOfAccountItemFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$ChartOfAccountItemToJson(ChartOfAccountItem instance) =>
     <String, dynamic>{
       'id': instance.id,
-      'parent_id': instance.parentId,
+      'parentId': instance.parentId,
       'business': _businessToJson(instance.business),
       'store': _storeToJson(instance.store),
       'code': instance.code,

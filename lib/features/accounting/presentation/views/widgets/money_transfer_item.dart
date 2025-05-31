@@ -102,13 +102,26 @@ class MoneyTransferItem extends StatelessWidget {
                       );
                       // Get.toNamed(AddProductScreen.routeName, arguments: productInfo);
                       break;
+                    case "approve":
+                      AwesomeDialog(
+                          context: context,
+                          dialogType: DialogType.info,
+                          title: "Are you sure?",
+                          desc:
+                          "You are going to approve money transfer with \ninvoice no. ${moneyTransferData.slNo}",
+                          btnOkOnPress: () {
+                            _controller.deleteMoneyTransferItem(id: moneyTransferData.id);
+                          },
+                          btnCancelOnPress: () {})
+                          .show();
+                      break;
                     case "delete":
                       AwesomeDialog(
                           context: context,
                           dialogType: DialogType.error,
                           title: "Are you sure?",
                           desc:
-                          "You are going to delete your collection with invoice no. ${moneyTransferData.slNo}",
+                          "You are going to delete money transfer with \ninvoice no. ${moneyTransferData.slNo}",
                           btnOkOnPress: () {
                             _controller.deleteMoneyTransferItem(id: moneyTransferData.id);
                           },

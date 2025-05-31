@@ -1,4 +1,5 @@
 import 'package:amar_pos/core/core.dart';
+import 'package:amar_pos/core/widgets/field_title.dart';
 import 'package:amar_pos/core/widgets/reusable/payment_dd/ca_payment_method_dropdown_widget.dart';
 import 'package:amar_pos/core/widgets/reusable/payment_dd/expense_payment_methods_response_model.dart';
 import 'package:amar_pos/features/accounting/presentation/views/ledger/ledger_controller.dart';
@@ -124,20 +125,7 @@ class _LedgerScreenState extends State<LedgerScreen>
                         id: 'selection_status',
                         builder: (controller) {
                           return selectedAccount != null
-                              ? RichText(
-                                  text: TextSpan(
-                                  text: "Book Ledger report: ",
-                                  style: const TextStyle(color: Colors.grey),
-                                  children: [
-                                    TextSpan(
-                                      text: selectedAccount!.name,
-                                      style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black),
-                                    ),
-                                  ],
-                                ))
+                              ? Align(alignment: Alignment.center,child: Text(selectedAccount!.name, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),))
                               : const SizedBox.shrink();
                           // Text("Book Ledger report for ${selectedAccount!.name}", style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold,),maxLines: 2,): SizedBox.shrink();
                         }),

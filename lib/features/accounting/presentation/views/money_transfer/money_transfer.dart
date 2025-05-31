@@ -35,8 +35,9 @@ class _MoneyTransferState extends State<MoneyTransfer> with SingleTickerProvider
   @override
   Widget build(BuildContext context) {
     return SafeArea(
+      top: false,
       child: Scaffold(
-        appBar: AppBar(title: const Text("Money Transfer"),centerTitle: true,
+        appBar: AppBar(title: const Text("Money Transfer",),centerTitle: true,
           actions: [
             IconButton(
               onPressed: () async {
@@ -53,145 +54,147 @@ class _MoneyTransferState extends State<MoneyTransfer> with SingleTickerProvider
             )
           ],
         ),
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            children: [
-              // GetBuilder<DueCollectionController>(
-              //   id: 'total_widget',
-              //   builder: (controller) => Row(
-              //     children: [
-              //       TotalStatusWidget(
-              //         flex: 3,
-              //         isLoading: controller.isDueCollectionListLoading,
-              //         title: 'Collected From',
-              //         value: controller.dueCollectionListResponseModel != null
-              //             ? Methods.getFormattedNumber(controller
-              //             .dueCollectionListResponseModel!.countTotal
-              //             .toDouble())
-              //             : null,
-              //         asset: AppAssets.person,
-              //       ),
-              //       addW(12),
-              //       TotalStatusWidget(
-              //         flex: 4,
-              //         isLoading: controller.isDueCollectionListLoading,
-              //         title: 'Collection Amount',
-              //         value: controller.dueCollectionListResponseModel != null
-              //             ? Methods.getFormatedPrice(controller
-              //             .dueCollectionListResponseModel!.amountTotal
-              //             .toDouble())
-              //             : null,
-              //         asset: AppAssets.amount,
-              //       ),
-              //     ],
-              //   ),
-              // ),
-              addH(8),
-              Row(
-                children: [
-                  Expanded(
-                    child: CustomTextField(
-                      textCon: controller.searchController,
-                      hintText: "Search...",
-                      brdrClr: Colors.transparent,
-                      txtSize: 12,
-                      debounceDuration: const Duration(
-                        milliseconds: 300,
-                      ),
-                      // noInputBorder: true,
-                      brdrRadius: 40,
-                      prefixWidget: Icon(Icons.search),
-                      onChanged: (value){
-                        controller.getMoneyTransferList();
-                      },
-                    ),
-                  ),
-                  addW(8),
-                  CustomSvgIconButton(
-                    bgColor: const Color(0xffEBFFDF),
-                    onTap: () {
-                      controller.downloadList(isPdf: false,);
-                    },
-                    assetPath: AppAssets.excelIcon,
-                  ),
-                  addW(4),
-                  CustomSvgIconButton(
-                    bgColor: const Color(0xffE1F2FF),
-                    onTap: () {
-                      controller.downloadList(isPdf: true,);
-                    },
-                    assetPath: AppAssets.downloadIcon,
-                  ),
-                  addW(4),
-                  CustomSvgIconButton(
-                    bgColor: const Color(0xffFFFCF8),
-                    onTap: () {
-                      controller.downloadList(isPdf: true, shouldPrint: true);
-                    },
-                    assetPath: AppAssets.printIcon,
-                  )
-                ],
-              ),
-              // addH(8),
-              Obx(() {
-                return controller.selectedDateTimeRange.value == null ? addH(8) : Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              children: [
+                // GetBuilder<DueCollectionController>(
+                //   id: 'total_widget',
+                //   builder: (controller) => Row(
+                //     children: [
+                //       TotalStatusWidget(
+                //         flex: 3,
+                //         isLoading: controller.isDueCollectionListLoading,
+                //         title: 'Collected From',
+                //         value: controller.dueCollectionListResponseModel != null
+                //             ? Methods.getFormattedNumber(controller
+                //             .dueCollectionListResponseModel!.countTotal
+                //             .toDouble())
+                //             : null,
+                //         asset: AppAssets.person,
+                //       ),
+                //       addW(12),
+                //       TotalStatusWidget(
+                //         flex: 4,
+                //         isLoading: controller.isDueCollectionListLoading,
+                //         title: 'Collection Amount',
+                //         value: controller.dueCollectionListResponseModel != null
+                //             ? Methods.getFormatedPrice(controller
+                //             .dueCollectionListResponseModel!.amountTotal
+                //             .toDouble())
+                //             : null,
+                //         asset: AppAssets.amount,
+                //       ),
+                //     ],
+                //   ),
+                // ),
+                addH(8),
+                Row(
                   children: [
-                    Text("${formatDate(controller.selectedDateTimeRange.value!.start)} - ${formatDate(controller.selectedDateTimeRange.value!.end)}", style:const TextStyle(fontSize: 14, color: AppColors.error),),
-                    addW(16),
-                    IconButton(onPressed: (){
-                      controller.selectedDateTimeRange.value = null;
-                      controller.getMoneyTransferList();
-                    }, icon: const Icon(Icons.cancel_outlined, size: 18, color: AppColors.error,))
-                  ],
-                );
-              }),
-              Expanded(
-                child: GetBuilder<MoneyTransferController>(
-                  id: 'money_transfer_list',
-                  builder: (controller) {
-                    if (controller.ismoneyTransferListLoading) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    }else if(controller.moneyTransferListResponseModel == null){
-                      return Center(
-                        child: Text("Something went wrong", style: context.textTheme.titleLarge,),
-                      );
-                    }else if(controller.moneyTransferList.isEmpty){
-                      return Center(
-                        child: Text("No data found", style: context.textTheme.titleLarge,),
-                      );
-                    }
-                    return RefreshIndicator(
-                      onRefresh: () async {
-                        controller.getMoneyTransferList(page: 1);
-                      },
-                      child: PagerListView<MoneyTransferData>(
-                        // scrollController: _scrollController,
-                        items: controller.moneyTransferList,
-                        itemBuilder: (_, item) {
-                          return MoneyTransferItem(moneyTransferData: item,);
+                    Expanded(
+                      child: CustomTextField(
+                        textCon: controller.searchController,
+                        hintText: "Search...",
+                        brdrClr: Colors.transparent,
+                        txtSize: 12,
+                        debounceDuration: const Duration(
+                          milliseconds: 300,
+                        ),
+                        // noInputBorder: true,
+                        brdrRadius: 40,
+                        prefixWidget: Icon(Icons.search),
+                        onChanged: (value){
+                          controller.getMoneyTransferList();
                         },
-                        isLoading: controller.isLoadingMore,
-                        hasError: controller.hasError.value,
-                        onNewLoad: (int nextPage) async {
-                          await controller.getMoneyTransferList(page: nextPage);
-                        },
-                        totalPage: controller
-                            .moneyTransferListResponseModel?.data?.meta?.lastPage ?? 0,
-                        totalSize:
-                        controller
-                            .moneyTransferListResponseModel?.data?.meta?.total ??
-                            0,
-                        itemPerPage: 20,
                       ),
-                    );
-                  },
+                    ),
+                    addW(8),
+                    CustomSvgIconButton(
+                      bgColor: const Color(0xffEBFFDF),
+                      onTap: () {
+                        controller.downloadList(isPdf: false,);
+                      },
+                      assetPath: AppAssets.excelIcon,
+                    ),
+                    addW(4),
+                    CustomSvgIconButton(
+                      bgColor: const Color(0xffE1F2FF),
+                      onTap: () {
+                        controller.downloadList(isPdf: true,);
+                      },
+                      assetPath: AppAssets.downloadIcon,
+                    ),
+                    addW(4),
+                    CustomSvgIconButton(
+                      bgColor: const Color(0xffFFFCF8),
+                      onTap: () {
+                        controller.downloadList(isPdf: true, shouldPrint: true);
+                      },
+                      assetPath: AppAssets.printIcon,
+                    )
+                  ],
                 ),
-              ),
-            ],
+                // addH(8),
+                Obx(() {
+                  return controller.selectedDateTimeRange.value == null ? addH(8) : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("${formatDate(controller.selectedDateTimeRange.value!.start)} - ${formatDate(controller.selectedDateTimeRange.value!.end)}", style:const TextStyle(fontSize: 14, color: AppColors.error),),
+                      addW(16),
+                      IconButton(onPressed: (){
+                        controller.selectedDateTimeRange.value = null;
+                        controller.getMoneyTransferList();
+                      }, icon: const Icon(Icons.cancel_outlined, size: 18, color: AppColors.error,))
+                    ],
+                  );
+                }),
+                Expanded(
+                  child: GetBuilder<MoneyTransferController>(
+                    id: 'money_transfer_list',
+                    builder: (controller) {
+                      if (controller.ismoneyTransferListLoading) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }else if(controller.moneyTransferListResponseModel == null){
+                        return Center(
+                          child: Text("Something went wrong", style: context.textTheme.titleLarge,),
+                        );
+                      }else if(controller.moneyTransferList.isEmpty){
+                        return Center(
+                          child: Text("No data found", style: context.textTheme.titleLarge,),
+                        );
+                      }
+                      return RefreshIndicator(
+                        onRefresh: () async {
+                          controller.getMoneyTransferList(page: 1);
+                        },
+                        child: PagerListView<MoneyTransferData>(
+                          // scrollController: _scrollController,
+                          items: controller.moneyTransferList,
+                          itemBuilder: (_, item) {
+                            return MoneyTransferItem(moneyTransferData: item,);
+                          },
+                          isLoading: controller.isLoadingMore,
+                          hasError: controller.hasError.value,
+                          onNewLoad: (int nextPage) async {
+                            await controller.getMoneyTransferList(page: nextPage);
+                          },
+                          totalPage: controller
+                              .moneyTransferListResponseModel?.data?.meta?.lastPage ?? 0,
+                          totalSize:
+                          controller
+                              .moneyTransferListResponseModel?.data?.meta?.total ??
+                              0,
+                          itemPerPage: 20,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
         bottomNavigationBar: Padding(

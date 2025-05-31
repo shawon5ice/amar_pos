@@ -162,85 +162,97 @@ class _TrialBalanceScreenState extends State<TrialBalanceScreen>
                     } else if (controller.trialBalanceList.isEmpty) {
                       return const Center(child: Text("No data found"));
                     }
-                    return DataTable2(
-                      fixedColumnsColor: const Color(0xffEFEFEF),
-                      // sortColumnIndex: 1,
-                      fixedLeftColumns: 1,
-                      columnSpacing: 12,
-                      horizontalMargin: 12,
-                      // minWidth: 800,
-                      empty: const Center(
-                        child: Text("No Data Found"),
-                      ),
-                      headingRowColor:
-                          const WidgetStatePropertyAll(Color(0xffEFEFEF)),
-                      dividerThickness: .5,
-                      headingRowHeight: 40,
-                      headingTextStyle: const TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.black),
-                      border: TableBorder.all(color: Colors.black, width: .5),
-                      columns: const [
-                        DataColumn2(
-                          label: Center(
-                              child: Text(
-                            'SL',
-                            textAlign: TextAlign.center,
-                          )),
-                          size: ColumnSize.S,
-                          fixedWidth: 40,
+                    return ClipRRect(
+                      borderRadius: BorderRadius.only(topLeft: Radius.circular(8), topRight: Radius.circular(8)),
+                      child: DataTable2(
+                        fixedColumnsColor: const Color(0xffEFEFEF),
+                        // sortColumnIndex: 1,
+                        fixedLeftColumns: 1,
+                        columnSpacing: 12,
+                        horizontalMargin: 12,
+                        // minWidth: 800,
+                        empty: const Center(
+                          child: Text("No Data Found"),
                         ),
-                        DataColumn2(
-                          size: ColumnSize.L,
-                          label: Center(
-                              child: Text(
-                            'Account Title',
-                            textAlign: TextAlign.center,
-                          )),
+                        headingRowColor: WidgetStatePropertyAll(AppColors.primary),
+                        dividerThickness: .5,
+                        headingRowHeight: 40,
+                      
+                        headingTextStyle: const TextStyle(
+                            fontWeight: FontWeight.bold, color: Colors.white),
+                        border: TableBorder(
+                          horizontalInside: BorderSide(
+                            color: Colors.grey.shade200, // Color between rows
+                            width: .5,
+                          ),
+                          verticalInside: BorderSide(
+                            color: Colors.grey,
+                            width: .5,
+                          ),
                         ),
-                        DataColumn2(
+                        columns: const [
+                          DataColumn2(
                             label: Center(
                                 child: Text(
-                              'Debit',
+                              'SL',
                               textAlign: TextAlign.center,
                             )),
-                          size: ColumnSize.S
-                        ),
-                        DataColumn2(
-                          size: ColumnSize.S,
-                          label: Center(
-                              child: Text(
-                            'Credit',
-                            textAlign: TextAlign.center,
-                          )),
-                          numeric: true,
-                        ),
-                      ],
-                      rows: [
-                        ...controller.trialBalanceList.map((e) {
-                          int index = controller.trialBalanceList.indexOf(e);
-
-                          return DataRow(
-                            color: index % 2 == 0
-                                ? const WidgetStatePropertyAll(Colors.white)
-                                : WidgetStatePropertyAll(
-                                    Colors.yellow.withOpacity(.03)),
-                            cells: [
-                              _buildDataCell((index+1).toString()),
-                              _buildDataCell(e.name??'N/A', maxLines: 3),
-                              _buildDataCell(
-                                  Methods.getFormattedNumber(
-                                    e.debit?.toDouble() ?? 0,
-                                  ),
-                                  maxLines: 2),
-                              _buildDataCell(
-                                  Methods.getFormattedNumber(
-                                    e.credit?.toDouble() ?? 0,
-                                  ),
-                                  maxLines: 2),
-                            ],
-                          );
-                        })
-                      ],
+                            size: ColumnSize.S,
+                            fixedWidth: 40,
+                          ),
+                          DataColumn2(
+                            size: ColumnSize.L,
+                            label: Center(
+                                child: Text(
+                              'Account Title',
+                              textAlign: TextAlign.center,
+                            )),
+                          ),
+                          DataColumn2(
+                              label: Center(
+                                  child: Text(
+                                'Debit',
+                                textAlign: TextAlign.center,
+                              )),
+                            size: ColumnSize.S
+                          ),
+                          DataColumn2(
+                            size: ColumnSize.S,
+                            label: Center(
+                                child: Text(
+                              'Credit',
+                              textAlign: TextAlign.center,
+                            )),
+                            numeric: true,
+                          ),
+                        ],
+                        rows: [
+                          ...controller.trialBalanceList.map((e) {
+                            int index = controller.trialBalanceList.indexOf(e);
+                      
+                            return DataRow(
+                              color: index % 2 == 0
+                                  ? const WidgetStatePropertyAll(Colors.white)
+                                  : WidgetStatePropertyAll(
+                                      Colors.yellow.withOpacity(.03)),
+                              cells: [
+                                _buildDataCell((index+1).toString()),
+                                _buildDataCell(e.name??'N/A', maxLines: 3),
+                                _buildDataCell(
+                                    Methods.getFormattedNumber(
+                                      e.debit?.toDouble() ?? 0,
+                                    ),
+                                    maxLines: 2),
+                                _buildDataCell(
+                                    Methods.getFormattedNumber(
+                                      e.credit?.toDouble() ?? 0,
+                                    ),
+                                    maxLines: 2),
+                              ],
+                            );
+                          })
+                        ],
+                      ),
                     );
                   },
                 ),

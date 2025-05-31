@@ -265,7 +265,7 @@ class _ProductsScreenState extends State<ProductsScreen>
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       floatingActionButton: CustomFloatingButton(
         onTap: () {
-          Get.to(AddProductScreen());
+          Get.to(AddProductScreen(),arguments: true);
         },
       ),
     );

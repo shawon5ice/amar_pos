@@ -60,6 +60,7 @@ class MoneyAdjustmentService {
     required DateTime? endDate,
     required String? search,
     required bool? shouldPrint,
+    required int type,
   }) async {
     // logger.d("PDF: $isPdf");
 
@@ -67,14 +68,15 @@ class MoneyAdjustmentService {
       "start_date": startDate,
       "end_date": endDate,
       "search": search,
+      "type": type,
     };
 
     String downloadUrl = "";
 
     if(isPdf){
-      downloadUrl = "${NetWorkStrings.baseUrl}/money_transfer/download-pdf-money-transfer-list";
+      downloadUrl = "${NetWorkStrings.baseUrl}/money_adjustment/download-pdf-money-adjustment-list";
     }else{
-      downloadUrl = "${NetWorkStrings.baseUrl}/money_transfer/download-excel-money-transfer-list";
+      downloadUrl = "${NetWorkStrings.baseUrl}/money_adjustment/download-excel-money-adjustment-list";
     }
 
 
@@ -93,14 +95,7 @@ class MoneyAdjustmentService {
     required bool? shouldPrint
   }) async {
 
-    String downloadUrl = "";
-
-    if(isPdf){
-      downloadUrl = "${NetWorkStrings.baseUrl}/money_adjustment/download-invoice/$invoiceID";
-    }else{
-      downloadUrl = "${NetWorkStrings.baseUrl}/money_adjustment/download-invoice/$invoiceID";
-    }
-
+    String downloadUrl = "${NetWorkStrings.baseUrl}/money_adjustment/download-invoice/$invoiceID";
 
     FileDownloader().downloadFile(
       url: downloadUrl,

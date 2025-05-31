@@ -2,6 +2,7 @@ import 'package:amar_pos/core/widgets/reusable/client_dd/client_dd_controller.da
 import 'package:amar_pos/core/widgets/reusable/outlet_dd/outlet_dd_controller.dart';
 import 'package:amar_pos/core/widgets/reusable/payment_dd/ca_payment_method_dd_controller.dart';
 import 'package:amar_pos/features/accounting/presentation/views/balance_sheet/balance_sheet_controller.dart';
+import 'package:amar_pos/features/accounting/presentation/views/cash_statement/cash_statement_controller.dart';
 import 'package:amar_pos/features/accounting/presentation/views/chart_of_account/chart_of_account_controller.dart';
 import 'package:amar_pos/features/accounting/presentation/views/daily_statement/daily_statement_controller.dart';
 import 'package:amar_pos/features/accounting/presentation/views/due_collection/due_collection_controller.dart';
@@ -71,6 +72,14 @@ class DailyStatementBinding extends Bindings{
   void dependencies() {
     Get.lazyPut(()=> DailyStatementController());
     Get.lazyPut(()=> OutletDDController());
+  }
+}
+
+class CashStatementBinding extends Bindings{
+  @override
+  void dependencies() {
+    Get.lazyPut(()=> CashStatementController());
+    Get.lazyPut(()=> MoneyTransferController());
   }
 }
 

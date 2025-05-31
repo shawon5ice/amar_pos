@@ -229,7 +229,7 @@ class MoneyAdjustmentController extends GetxController{
         .microsecondsSinceEpoch
         .toString()}${isPdf ? ".pdf" : ".xlsx"}";
     try {
-      var response = await MoneyTransferService.downloadList(
+      var response = await MoneyAdjustmentService.downloadList(
         isPdf: isPdf,
         usrToken: loginData!.token,
         search: searchController.text,
