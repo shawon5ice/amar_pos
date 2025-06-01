@@ -9,6 +9,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 
 import '../../../../../core/constants/app_assets.dart';
+import '../../../../../core/methods/helper_methods.dart';
 import '../../../../../core/widgets/custom_text_field.dart';
 import '../../../../../core/widgets/loading/random_lottie_loader.dart';
 import '../../../../../core/widgets/methods/field_validator.dart';
@@ -240,7 +241,64 @@ class _CashStatementState extends State<CashStatement> {
               ),
             ),
             addH(8),
+            GetBuilder<CashStatementController>(
+              id: 'date_status',
+              builder: (controller) {
+                if(controller.selectedDateTimeRange.value != null){
+                  return  Column(
+                    children: [
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            textAlign: TextAlign.center,
+                            '${formatDate(controller.selectedDateTimeRange.value!.start)} to ${formatDate(controller.selectedDateTimeRange.value!.end)}',
+                            style: const TextStyle(fontSize: 14),
+                            overflow: TextOverflow.visible,
+                            softWrap: false,
+                          ),
+                          ...[
+                            addW(32),
+                            GestureDetector(
+                              onTap:
+                              controller.selectedDateTimeRange.value == null
+                                  ? null
+                                  : () {
+                                controller.selectedDateTimeRange.value =
+                                null;
+                                controller.update(['date_status']);
+                                controller
+                                    .getCashStatementEntryList(caId: selectedCaId!);
+                              },
+                              child: CircleAvatar(
+                                  radius: 16,
+                                  backgroundColor:
+                                  controller.selectedDateTimeRange.value !=
+                                      null
+                                      ? Colors.red
+                                      : Colors.transparent,
+                                  child: controller.selectedDateTimeRange.value !=
+                                      null
+                                      ? Icon(
+                                    Icons.close,
+                                    color: Colors.white,
+                                    size: 16,
+                                  )
+                                      : null),
+                            ),
+                          ],
+                        ],
+                      ),
+                      addH(8),
+                    ],
+                  );
+                }else{
+                  return SizedBox.shrink();
+                }
+              },
+            ),
         
+            
             Expanded(
               child: RefreshIndicator(
                 onRefresh: () async{

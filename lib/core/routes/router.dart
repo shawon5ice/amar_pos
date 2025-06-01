@@ -9,6 +9,8 @@ import 'package:amar_pos/features/accounting/presentation/views/due_collection/d
 import 'package:amar_pos/features/accounting/presentation/views/due_collection/pages/client_ledger_statement.dart';
 import 'package:amar_pos/features/accounting/presentation/views/expense_voucher/expense_voucher.dart';
 import 'package:amar_pos/features/accounting/presentation/views/ledger/ledger_screen.dart';
+import 'package:amar_pos/features/accounting/presentation/views/manage_journal/pages/journal_entry_form.dart';
+import 'package:amar_pos/features/accounting/presentation/views/manage_journal/pages/manage_journal_screen.dart';
 import 'package:amar_pos/features/accounting/presentation/views/money_adjustment/money_adjustment.dart';
 import 'package:amar_pos/features/accounting/presentation/views/profit_or_loss/profit_or_loss_screen.dart';
 import 'package:amar_pos/features/accounting/presentation/views/supplier_payment/pages/supplier_ledger_statement.dart';
@@ -193,6 +195,19 @@ class AppRoutes {
       name: ChartOfAccountScreen.routeName,
       page: () => const ChartOfAccountScreen(),
       binding: ChartOfAccountScreenBindings(),
+    ),
+
+    GetPage(
+      name: ManageJournalScreen.routeName,
+      page: () => const ManageJournalScreen(),
+      binding: ManageJournalScreenBinding(),
+    ),
+
+    GetPage(
+        name: JournalEntryForm.routeName,
+        page: () => const JournalEntryForm(),
+        binding: ChartOfAccountScreenBindings(),
+        transition: Transition.rightToLeft
     ),
 
     GetPage(

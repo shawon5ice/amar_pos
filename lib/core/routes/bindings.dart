@@ -8,6 +8,7 @@ import 'package:amar_pos/features/accounting/presentation/views/daily_statement/
 import 'package:amar_pos/features/accounting/presentation/views/due_collection/due_collection_controller.dart';
 import 'package:amar_pos/features/accounting/presentation/views/expense_voucher/expense_voucher_controller.dart';
 import 'package:amar_pos/features/accounting/presentation/views/ledger/ledger_controller.dart';
+import 'package:amar_pos/features/accounting/presentation/views/manage_journal/manage_journal_controller.dart';
 import 'package:amar_pos/features/accounting/presentation/views/money_adjustment/money_adjustment_controller.dart';
 import 'package:amar_pos/features/accounting/presentation/views/money_transfer/money_transfer_controller.dart';
 import 'package:amar_pos/features/accounting/presentation/views/profit_or_loss/profit_or_loss_controller.dart';
@@ -177,6 +178,21 @@ class ChartOfAccountScreenBindings extends Bindings{
     Get.lazyPut(()=> ChartOfAccountController());
   }
 }
+
+class ManageJournalScreenBinding extends Bindings{
+  @override
+  void dependencies() {
+    Get.lazyPut(()=> ManageJournalController());
+  }
+}
+class JournalEntryFormBinding extends Bindings{
+  @override
+  void dependencies() {
+    Get.lazyPut(()=> ChartOfAccountController());
+    Get.lazyPut(()=> ManageJournalController());
+  }
+}
+
 
 class SalesScreenBindings extends Bindings{
   @override
