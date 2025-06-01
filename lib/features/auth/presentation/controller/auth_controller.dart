@@ -95,15 +95,20 @@ class AuthController extends GetxController{
     super.onInit();
   }
 
-  initializeRememberMe() async{
+  initializeRememberMe() async {
+    await Future.delayed(Duration(milliseconds: 100)); // slight delay may help in some edge UI race cases
     if (Preference.getRememberMeFlag()) {
-      emailController.text = Preference.getLoginEmail();
-      passwordController.text = Preference.getLoginPass();
-      logger.i(Preference.getLoginEmail());
-      rememberMeFlag = true;
-      update(['remember_me']);
+      final email = Preference.getLoginEmail();
+      final pass = Preference.getLoginPass();
+      if (email.isNotEmpty && pass.isNotEmpty) {
+        emailController.text = email;
+        passwordController.text = pass;
+        rememberMeFlag = true;
+        update(['remember_me']);
+      }
     }
   }
+
 
   @override
   void dispose() {
@@ -120,15 +125,16 @@ class AuthController extends GetxController{
     update(['remember_me']);
   }
 
-  void saveOrNot(){
-    if(rememberMeFlag){
+  void saveOrNot() {
+    if (rememberMeFlag) {
       Preference.setLoginEmail(emailController.text.trim());
       Preference.setLoginPass(passwordController.text.trim());
-    }else{
+    } else {
       Preference.setLoginEmail("");
       Preference.setLoginPass("");
     }
   }
+
 
   Future<void> selectFile({bool? ownerLogo}) async {
     final result = await FilePicker.platform.pickFiles(
@@ -150,37 +156,32 @@ class AuthController extends GetxController{
   void signIn() async {
     isLoggedIn.value = false;
     FocusManager.instance.primaryFocus?.unfocus();
-    saveOrNot();
     message.value = '';
     loading(true);
     Methods.showLoading();
+
     try {
       var response = await AuthRemoteDataService.signIn(
         email: emailController.text.trim(),
         pass: passwordController.text.trim(),
       );
-      logger.i(response);
-      if(response != null && !response['success']){
+
+      if (response != null && !response['success']) {
         message.value = response['message'];
       }
+
       if (response['success']) {
-        // signInResponse = _processData(response);
-        // userInfo = SignInResponseModel.fromJson(response).userInfo;
         isLoggedIn(true);
+        saveOrNot(); // ✅ only after success
         LoginDataBoxManager().loginData = LoginData.fromJson(response['data']);
-
         Preference.setLoggedInFlag(true);
-        // Preference.setLoginData(signInResponse!.loginData);
-
-        logger.d(LoginDataBoxManager().loginData?.permissions.length);
-      }else{
-
       }
+
     } finally {
-      if(message.isNotEmpty){
-        Methods.showSnackbar(msg: message.value, isSuccess: isLoggedIn.value?true:null);
+      if (message.isNotEmpty) {
+        Methods.showSnackbar(msg: message.value, isSuccess: isLoggedIn.value ? true : null);
       }
-      if(isLoggedIn.value){
+      if (isLoggedIn.value) {
         Get.offAllNamed(MainPage.routeName);
       }
       loading(false);
