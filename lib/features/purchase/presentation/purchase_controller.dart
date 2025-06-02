@@ -188,9 +188,7 @@ class PurchaseController extends GetxController{
   }
 
   FutureOr<List<ProductInfo>> suggestionsCallback(String search) async {
-    if(search.isEmpty){
-      return purchaseOrderProducts;
-    }
+
     // Check if the search term is in the existing items
     List<ProductInfo> exactlyFound = currentSearchList.where((item) => item.sku.toLowerCase() == search.toString().toLowerCase()).toList();
 

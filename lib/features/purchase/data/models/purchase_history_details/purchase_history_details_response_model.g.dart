@@ -82,8 +82,8 @@ Business _$BusinessFromJson(Map<String, dynamic> json) => Business(
       name: json['name'] as String,
       phone: json['phone'] as String,
       email: json['email'] as String?,
-      logo: json['logo'] as String,
-      address: json['address'] as String,
+      logo: json['logo'] as String? ?? 'N/A',
+      address: json['address'] as String? ?? 'N/A',
       photoUrl: json['photo_url'] as String,
     );
 

@@ -78,7 +78,9 @@ class Business {
   final String name;
   final String phone;
   final String? email;
+  @JsonKey(defaultValue: 'N/A')
   final String logo;
+  @JsonKey(defaultValue: 'N/A')
   final String address;
   @JsonKey(name: 'photo_url')
   final String photoUrl;
