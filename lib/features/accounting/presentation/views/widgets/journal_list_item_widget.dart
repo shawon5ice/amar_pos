@@ -1,7 +1,9 @@
 import 'package:amar_pos/core/core.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
+import 'package:amar_pos/features/accounting/data/models/manage_journal/journal_list_response_model.dart';
 import 'package:amar_pos/features/accounting/presentation/views/chart_of_account/chart_of_account_controller.dart';
 import 'package:amar_pos/features/accounting/presentation/views/chart_of_account/pages/co_account_entry_form.dart';
+import 'package:amar_pos/features/accounting/presentation/views/manage_journal/manage_journal_controller.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
@@ -9,18 +11,17 @@ import 'package:get/get.dart';
 
 import '../../../../../core/constants/app_assets.dart';
 import '../../../../../core/widgets/reusable/custom_svg_icon_widget.dart';
-import '../../../data/models/chart_of_account/chart_of_account_opening_history_list_response_model.dart';
 import 'chart_of_account_opening_history_item_action_menu.dart';
 
-class ChartOfAccountOpeningHistoryItemWidget extends StatelessWidget {
-  ChartOfAccountOpeningHistoryItemWidget({
+class JournalListItemWidget extends StatelessWidget {
+  JournalListItemWidget({
     super.key,
-    required this.chartOfAccountOpeningEntry,
+    required this.journalEntryData,
   });
 
-  final ChartOfAccountOpeningEntry chartOfAccountOpeningEntry;
+  final JournalEntryData journalEntryData;
 
-  final ChartOfAccountController _controller = Get.find();
+  final ManageJournalController _controller = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +50,7 @@ class ChartOfAccountOpeningHistoryItemWidget extends StatelessWidget {
                           ),
                           borderRadius: BorderRadius.circular(20)),
                       child: AutoSizeText(
-                        chartOfAccountOpeningEntry.openingDate,
+                        journalEntryData.date,
                         maxFontSize: 10,
                         minFontSize: 8,
                         style: const TextStyle(
@@ -67,8 +68,8 @@ class ChartOfAccountOpeningHistoryItemWidget extends StatelessWidget {
                 bgColor: const Color(0xffE1F2FF),
                 onTap: () {
                   _controller.downloadAccountOpeningHistory(
-                    slNo: chartOfAccountOpeningEntry.slNo,
-                    id: chartOfAccountOpeningEntry.id,
+                    slNo: journalEntryData.slNo,
+                    id: journalEntryData.id,
                   );
                 },
                 assetPath: AppAssets.downloadIcon,
@@ -79,9 +80,9 @@ class ChartOfAccountOpeningHistoryItemWidget extends StatelessWidget {
                 bgColor: const Color(0xffFFFCF8),
                 onTap: () {
                   _controller.downloadAccountOpeningHistory(
-                    slNo: chartOfAccountOpeningEntry.slNo,
+                    slNo: journalEntryData.slNo,
                     shouldPrint: true,
-                    id: chartOfAccountOpeningEntry.id,
+                    id: journalEntryData.id,
                   );
                 },
                 assetPath: AppAssets.printIcon,
@@ -92,20 +93,20 @@ class ChartOfAccountOpeningHistoryItemWidget extends StatelessWidget {
                   switch (value) {
                     case "edit":
                       Get.toNamed(AccountEntryForm.routeName,
-                          arguments: chartOfAccountOpeningEntry);
+                          arguments: journalEntryData);
                       break;
                     case "delete":
                       AwesomeDialog(
-                              context: context,
-                              dialogType: DialogType.error,
-                              title: "Are you sure?",
-                              desc:
-                                  "You are going to delete money transfer with \ninvoice no. ${chartOfAccountOpeningEntry.slNo}",
-                              btnOkOnPress: () {
-                                _controller.deleteAccountHistory(
-                                    chartOfAccountOpeningEntry.id);
-                              },
-                              btnCancelOnPress: () {})
+                          context: context,
+                          dialogType: DialogType.error,
+                          title: "Are you sure?",
+                          desc:
+                          "You are going to delete money transfer with \ninvoice no. ${journalEntryData.slNo}",
+                          btnOkOnPress: () {
+                            _controller.deleteAccountHistory(
+                                journalEntryData.id);
+                          },
+                          btnCancelOnPress: () {})
                           .show();
                       break;
                   }
@@ -123,27 +124,25 @@ class ChartOfAccountOpeningHistoryItemWidget extends StatelessWidget {
             child: Column(
               children: [
                 StatementItemTitleValueWidget(
-                  title: "Invoice No.",
-                  value: chartOfAccountOpeningEntry.slNo,
+                  title: "Voucher No.",
+                  value: journalEntryData.slNo,
                 ),
                 StatementItemTitleValueWidget(
                   title: "Account Name",
-                  value: chartOfAccountOpeningEntry.account?.name ?? '--',
+                  value: journalEntryData.account,
                 ),
                 StatementItemTitleValueWidget(
                   title: "Amount",
                   value: Methods.getFormatedPrice(
-                      chartOfAccountOpeningEntry.amount.toDouble()),
+                      journalEntryData.amount.toDouble()),
                 ),
                 StatementItemTitleValueWidget(
-                  title: "Transaction Type",
-                  value: chartOfAccountOpeningEntry.accountType == 1
-                      ? "Debit"
-                      : "Credit",
+                  title: "Voucher Type",
+                  value: journalEntryData.voucherType,
                 ),
                 StatementItemTitleValueWidget(
                   title: "Remarks",
-                  value: chartOfAccountOpeningEntry.remarks,
+                  value: journalEntryData.remarks ?? '',
                 ),
                 // StatementItemTitleValueWidget(
                 //   title: "Remarks",
@@ -161,11 +160,11 @@ class ChartOfAccountOpeningHistoryItemWidget extends StatelessWidget {
 class StatementItemTitleValueWidget extends StatelessWidget {
   const StatementItemTitleValueWidget(
       {super.key,
-      required this.title,
-      required this.value,
-      this.valueFontWeight,
-      this.valueColor,
-      this.valueFontSize});
+        required this.title,
+        required this.value,
+        this.valueFontWeight,
+        this.valueColor,
+        this.valueFontSize});
 
   final String title;
   final String value;

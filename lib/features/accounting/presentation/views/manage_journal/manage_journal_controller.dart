@@ -1,10 +1,9 @@
 import 'package:amar_pos/core/core.dart';
 import 'package:amar_pos/core/methods/helper_methods.dart';
 import 'package:amar_pos/features/accounting/data/models/balance_sheet/balance_sheet_list_response_model.dart';
-import 'package:amar_pos/features/accounting/data/models/chart_of_account/chart_of_account_opening_history_list_response_model.dart';
 import 'package:amar_pos/features/accounting/data/models/chart_of_account/last_level_chart_of_account_list_response_model.dart';
-import 'package:amar_pos/features/accounting/data/services/balance_sheet_service.dart';
-import 'package:amar_pos/features/accounting/data/services/chart_of_account_service.dart';
+import 'package:amar_pos/features/accounting/data/models/manage_journal/journal_list_response_model.dart';
+import 'package:amar_pos/features/accounting/data/services/manage_journal_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -59,7 +58,7 @@ class ManageJournalController extends GetxController{
     update(['total_widget','chart_of_account_list']);
 
     try {
-      var response = await ChartOfAccountService.getChartOfAccountList(
+      var response = await ManageJournalService.getChartOfAccountList(
         usrToken: loginData!.token,
         page: page,
         search: search,
@@ -93,23 +92,23 @@ class ManageJournalController extends GetxController{
   }
 
 
-  bool isChartOfAccountOpeningHistoryListLoading = false;
-  ChartOfAccountOpeningHistoryListResponseModel? chartOfAccountOpeningHistoryListResponseModel;
-  List<ChartOfAccountOpeningEntry> chartOfAccountOpeningEntryList = [];
+  bool isJournalListLoading = false;
+  JournalListResponseModel? journalListResponseModel;
+  List<JournalEntryData> journalEntryList = [];
 
-  Future<void> getChartOfAccountOpeningHistoryList(
+  Future<void> getJournalList(
       {int page = 1,String? search}) async {
-    isChartOfAccountOpeningHistoryListLoading = page == 1; // Mark initial loading state
+    isJournalListLoading = page == 1; // Mark initial loading state
     if(page == 1){
-      chartOfAccountOpeningEntryList.clear();
+      journalEntryList.clear();
     }
     isLoadingMore = page > 1;
 
     hasError.value = false;
-    update(['total_widget','chart_of_account_opening_history_list']);
+    update(['total_widget','journal_list']);
 
     try {
-      var response = await ChartOfAccountService.getChartOfAccountOpeningHistoryList(
+      var response = await ManageJournalService.getJournalEntryList(
         usrToken: loginData!.token,
         page: page,
         search: searchController.text,
@@ -119,30 +118,69 @@ class ManageJournalController extends GetxController{
 
       if (response != null) {
         logger.i(response);
-        chartOfAccountOpeningHistoryListResponseModel =
-            ChartOfAccountOpeningHistoryListResponseModel.fromJson(response);
+        journalListResponseModel =
+            JournalListResponseModel.fromJson(response);
 
-        if (chartOfAccountOpeningHistoryListResponseModel != null && chartOfAccountOpeningHistoryListResponseModel!.data != null) {
-          chartOfAccountOpeningEntryList.addAll(chartOfAccountOpeningHistoryListResponseModel!.data!.data);
-          logger.i(chartOfAccountOpeningEntryList.length);
+        if (journalListResponseModel != null && journalListResponseModel!.data != null) {
+          journalEntryList.addAll(journalListResponseModel!.data!.data);
+          logger.i(journalEntryList.length);
         } else {
-          chartOfAccountOpeningEntryList.clear(); // No results
+          journalEntryList.clear(); // No results
         }
       } else {
         // hasError.value = true; // Error in response
-        chartOfAccountOpeningEntryList.clear();
+        journalEntryList.clear();
       }
     } catch (e) {
       hasError.value = true; // Handle exceptions
-      chartOfAccountOpeningEntryList.clear();
+      journalEntryList.clear();
       logger.e(e);
     } finally {
-      isChartOfAccountOpeningHistoryListLoading = false;
+      isJournalListLoading = false;
       isLoadingMore = false;
-      update(['total_widget','chart_of_account_opening_history_list']);
+      update(['total_widget','journal_list']);
     }
   }
 
+
+  bool isPaymentMethodsLoading = false;
+  LastLevelChartOfAccountListResponseModel? paymentMethodListResponseModel;
+  List<ChartOfAccount> paymentMethodList = [];
+
+  Future<void> getPaymentMethods() async {
+    isPaymentMethodsLoading = true;
+    hasError.value = false;
+    update(['payment_method']);
+
+    try {
+      var response = await ManageJournalService.getPaymentMethods(
+        usrToken: loginData!.token,
+      );
+
+      if (response != null) {
+        logger.i(response);
+        paymentMethodListResponseModel =
+            LastLevelChartOfAccountListResponseModel.fromJson(response);
+
+        if (paymentMethodListResponseModel != null && paymentMethodListResponseModel!.data.isNotEmpty) {
+          paymentMethodList = paymentMethodListResponseModel!.data;
+          logger.i(paymentMethodList.length);
+        } else {
+          paymentMethodList.clear(); // No results
+        }
+      } else {
+        // hasError.value = true; // Error in response
+        paymentMethodList.clear();
+      }
+    } catch (e) {
+      hasError.value = true; // Handle exceptions
+      paymentMethodList.clear();
+      logger.e(e);
+    } finally {
+      isPaymentMethodsLoading = false;
+      update(['payment_method']);
+    }
+  }
 
 
   bool isAddOrUpdateLoading = false;
@@ -160,7 +198,7 @@ class ManageJournalController extends GetxController{
     if(downloadLoading){
       return;
     }
-    if(chartOfAccountOpeningEntryList.isEmpty){
+    if(journalEntryList.isEmpty){
       ErrorExtractor.showSingleErrorDialog(Get.context!, "File should not be ${shouldPrint != null? "printed": "downloaded"} with empty data.");
       return;
     }
@@ -170,7 +208,7 @@ class ManageJournalController extends GetxController{
 
     String fileName = "Chart of account opening list -${formatDate(DateTime.now())}${isPdf ? ".pdf" : ".xlsx"}";
     try {
-      var response = await ChartOfAccountService.downloadList(
+      var response = await ManageJournalService.downloadList(
         isPdf: isPdf,
         usrToken: loginData!.token,
         search: searchController.text,
@@ -196,7 +234,7 @@ class ManageJournalController extends GetxController{
     update(['last_level_chart_of_account_list']);
 
     try {
-      var response = await ChartOfAccountService.getLastLevelChartOfAccounts(
+      var response = await ManageJournalService.getLastLevelChartOfAccounts(
         usrToken: loginData!.token,
       );
 
@@ -225,12 +263,12 @@ class ManageJournalController extends GetxController{
     }
   }
 
-  bool isCreationOfAccountHistoryOngoing = false;
-  Future<void> createAccountHistory(var request) async {
-    isCreationOfAccountHistoryOngoing = true;
+  bool isCreationOfJournalOngoing = false;
+  Future<void> createJournal(var request) async {
+    isCreationOfJournalOngoing = true;
     update(['account_entry_form']);
     try {
-      var response = await ChartOfAccountService.createAccountOpeningHistory(
+      var response = await ManageJournalService.createJournal(
         usrToken: loginData!.token,
         data: request,
       );
@@ -238,7 +276,7 @@ class ManageJournalController extends GetxController{
       if (response != null) {
         logger.i(response);
         if(response['success']){
-          getChartOfAccountOpeningHistoryList();
+          getJournalList();
           Get.back();
         }
         Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true : null);
@@ -248,16 +286,16 @@ class ManageJournalController extends GetxController{
     } catch (e) {
       logger.e(e);
     } finally {
-      isCreationOfAccountHistoryOngoing = false;
+      isCreationOfJournalOngoing = false;
       update(['account_entry_form']);
     }
   }
 
   Future<void> updateAccountHistory(var request, int id) async {
-    isCreationOfAccountHistoryOngoing = true;
+    isCreationOfJournalOngoing = true;
     update(['account_entry_form']);
     try {
-      var response = await ChartOfAccountService.updateAccountOpeningHistory(
+      var response = await ManageJournalService.updateAccountOpeningHistory(
         usrToken: loginData!.token,
         data: request,
         id: id,
@@ -266,7 +304,7 @@ class ManageJournalController extends GetxController{
       if (response != null) {
         logger.i(response);
         if(response['success']){
-          getChartOfAccountOpeningHistoryList();
+          getJournalList();
           Get.back();
         }
         Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true : null);
@@ -276,16 +314,16 @@ class ManageJournalController extends GetxController{
     } catch (e) {
       logger.e(e);
     } finally {
-      isCreationOfAccountHistoryOngoing = false;
+      isCreationOfJournalOngoing = false;
       update(['account_entry_form']);
     }
   }
 
   Future<void> deleteAccountHistory(int id) async {
-    isCreationOfAccountHistoryOngoing = true;
+    isCreationOfJournalOngoing = true;
     update(['account_entry_form']);
     try {
-      var response = await ChartOfAccountService.deleteAccountOpeningHistory(
+      var response = await ManageJournalService.deleteAccountOpeningHistory(
         usrToken: loginData!.token,
         id: id,
       );
@@ -293,7 +331,7 @@ class ManageJournalController extends GetxController{
       if (response != null) {
         logger.i(response);
         if(response['success']){
-          getChartOfAccountOpeningHistoryList();
+          getJournalList();
         }
         Methods.showSnackbar(msg: response['message'], isSuccess: response['success'] ? true : null);
       } else {
@@ -302,7 +340,7 @@ class ManageJournalController extends GetxController{
     } catch (e) {
       logger.e(e);
     } finally {
-      isCreationOfAccountHistoryOngoing = false;
+      isCreationOfJournalOngoing = false;
       update(['account_entry_form']);
     }
   }
@@ -318,7 +356,7 @@ class ManageJournalController extends GetxController{
     String fileName = "$slNo.pdf";
 
     try {
-      var response = await ChartOfAccountService.downloadAccountOpeningHistory(
+      var response = await ManageJournalService.downloadAccountOpeningHistory(
         usrToken: loginData!.token,
         fileName: fileName,
         shouldPrint: shouldPrint,

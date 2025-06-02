@@ -3,23 +3,23 @@ import 'package:flutter/material.dart';
 
 class JournalEntry {
   int caId;
-  int accountType;
-  num amount;
-  String remarks;
+  num debit;
+  num credit;
+  String reference;
 
   JournalEntry({
     required this.caId,
-    required this.accountType,
-    required this.amount,
-    required this.remarks,
+    required this.debit,
+    required this.credit,
+    required this.reference,
   });
 
   factory JournalEntry.empty() {
     return JournalEntry(
       caId: 0,
-      accountType: 0,
-      amount: 0,
-      remarks: '',
+      debit: 0,
+      credit: 0,
+      reference: '',
     );
   }
 
@@ -27,9 +27,9 @@ class JournalEntry {
   factory JournalEntry.fromJson(Map<String, dynamic> json) {
     return JournalEntry(
       caId: json['caId'] as int,
-      accountType: json['accountType'] as int,
-      amount: json['amount'] as num,
-      remarks: json['remarks'] as String,
+      debit: json['debit'] as num,
+      credit: json['credit'] as num,
+      reference: json['reference'] as String,
     );
   }
 
@@ -37,9 +37,9 @@ class JournalEntry {
   Map<String, dynamic> toJson() {
     return {
       'ca_id': caId,
-      'account_type': accountType,
-      'amount': amount,
-      'remarks': remarks,
+      'debit': debit,
+      'credit': credit,
+      'reference': reference,
     };
   }
 }
@@ -52,6 +52,8 @@ class JournalEntryWrapper {
   final TextEditingController creditController;
   final TextEditingController referenceController;
   final TextEditingController remarksController;
+  bool disableDebit;
+  bool disableCredit;
 
   JournalEntryWrapper({
     required this.entry,
@@ -60,15 +62,19 @@ class JournalEntryWrapper {
     required this.creditController,
     required this.referenceController,
     required this.remarksController,
+    required this.disableCredit,
+    required this.disableDebit,
   });
 
-  factory JournalEntryWrapper.empty() {
+  factory JournalEntryWrapper.empty(bool disDebit, bool disCredit) {
     return JournalEntryWrapper(
       entry: JournalEntry.empty(),
       debitController: TextEditingController(),
       creditController: TextEditingController(),
       referenceController: TextEditingController(),
       remarksController: TextEditingController(),
+      disableCredit: disDebit,
+      disableDebit: disCredit
     );
   }
 }

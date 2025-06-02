@@ -1,13 +1,13 @@
 import 'package:amar_pos/core/constants/app_colors.dart';
+import 'package:amar_pos/core/constants/logger/logger.dart';
 import 'package:amar_pos/core/core.dart';
 import 'package:amar_pos/core/methods/helper_methods.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/core/widgets/custom_button.dart';
 import 'package:amar_pos/core/widgets/custom_text_field.dart';
 import 'package:amar_pos/core/widgets/field_title.dart';
-import 'package:amar_pos/features/accounting/data/models/chart_of_account/chart_of_account_entry.dart';
-import 'package:amar_pos/features/accounting/data/models/chart_of_account/chart_of_account_opening_history_list_response_model.dart';
 import 'package:amar_pos/features/accounting/data/models/chart_of_account/last_level_chart_of_account_list_response_model.dart';
+import 'package:amar_pos/features/accounting/data/models/manage_journal/journal_list_response_model.dart';
 import 'package:amar_pos/features/accounting/data/models/manage_journal/manage_journal_entry.dart';
 import 'package:amar_pos/features/accounting/presentation/views/chart_of_account/chart_of_account_controller.dart';
 import 'package:amar_pos/features/accounting/presentation/views/manage_journal/manage_journal_controller.dart';
@@ -42,11 +42,17 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
 
   final ManageJournalController controller = Get.find();
 
-  TextEditingController _textEditingController = TextEditingController();
+  ChartOfAccount? selectedPaymentMethod;
 
-  void _addEntry() {
+  TextEditingController _textEditingController = TextEditingController();
+  TextEditingController _remarksController = TextEditingController();
+
+  void _addEntry({required bool disableDebit, required bool disableCredit}) {
     setState(() {
-      entries.add(JournalEntryWrapper.empty());
+      entries.add(JournalEntryWrapper.empty(
+        disableDebit,
+        disableCredit,
+      ));
     });
   }
 
@@ -60,7 +66,10 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
     });
   }
 
-  ChartOfAccountOpeningEntry? initialChartOfAccountOpeningEntry;
+  bool shouldDisableDebit = false;
+  bool shouldDisableCredit = false;
+
+  JournalEntryData? initialChartOfAccountOpeningEntry;
 
   @override
   void initState() {
@@ -70,8 +79,9 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
   }
 
   void initializeData() async {
-    _addEntry();
+    _addEntry(disableDebit: false, disableCredit: true);
     Methods.showLoading();
+
     await controller.getLastLevelChartOfAccounts().then((value) {
       // if (initialChartOfAccountOpeningEntry != null) {
       //   selectedDate =
@@ -93,6 +103,7 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
       // }
       setState(() {});
     });
+    await controller.getPaymentMethods();
     Methods.hideLoading();
   }
 
@@ -113,152 +124,139 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
           centerTitle: true,
         ),
         backgroundColor: const Color(0xFFFAFAF5),
-        body: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              CustomTextField(
-                textCon: _textEditingController,
-                hintText: "Select Date",
-                readOnly: true,
-                validator: (value) {
-                  if (selectedDate == null) {
-                    return "Please select a date";
-                  } else {
-                    return null;
-                  }
-                },
-                suffixWidget: Icon(Icons.calendar_month),
-                onTap: () async {
-                  var dateTime = await showDatePicker(
-                    context: context,
-                    firstDate: DateTime(2020),
-                    lastDate: DateTime(2040),
-                    initialDate: selectedDate ?? DateTime.now(),
-                  );
-                  if (dateTime != null) {
-                    selectedDate = dateTime;
-                    _textEditingController.text = formatDate(dateTime!);
-                  }
-                },
-              ),
-              addH(12),
-              Align(
-                  alignment: Alignment.centerLeft,
-                  child: FieldTitle("Voucher Type")),
-              SegmentedButton<VoucherType>(
-                style: ButtonStyle(
-                  textStyle: WidgetStatePropertyAll(
-                    TextStyle(fontSize: 12,),
-                  )
-                ),
-                showSelectedIcon: false,
-                segments: const <ButtonSegment<VoucherType>>[
-                  ButtonSegment<VoucherType>(
-                    value: VoucherType.Receive,
-                    label: Text('Receive'),
-                  ),
-                  ButtonSegment<VoucherType>(
-                    value: VoucherType.Payment,
-                    label: Text('Payment'),
-                  ),
-                  ButtonSegment<VoucherType>(
-                    value: VoucherType.Journal,
-                    label: Text('Journal'),
-                  ),
-                  ButtonSegment<VoucherType>(
-                    value: VoucherType.Contra,
-                    label: Text('Contra'),
-                  ),
-                ],
-
-                selected: <VoucherType>{voucherType},
-                onSelectionChanged: (Set<VoucherType> newSelection) {
-                  setState(() {
-                    // By default there is only a single segment that can be
-                    // selected at one time, so its value is always the first
-                    // item in the selected set.
-                    voucherType = newSelection.first;
-                  });
-                },
-              ),
-              addH(12),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 12,vertical: 12),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20)
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    FieldTitle("Voucher Type"),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Form(
+              key: formKey,
+              child: Column(
+                children: [
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20)),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: CustomMinimalRadioButton<VoucherType>(
-                            value: VoucherType.Receive,
-                            groupValue: voucherType,
-                            title: "Receive Voucher",
-                            onChanged: (val) {
-                              setState(() {
-                                voucherType = val;
-                              });
-                            },
-                          ),
+                        FieldTitle("Voucher Type"),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Expanded(
+                              child: CustomMinimalRadioButton<VoucherType>(
+                                value: VoucherType.Receive,
+                                groupValue: voucherType,
+                                title: "Receive Voucher",
+                                onChanged: (val) {
+                                  setState(() {
+                                    voucherType = val;
+                                    entries.clear();
+                                    _addEntry(
+                                        disableDebit: false,
+                                        disableCredit: true);
+                                  });
+                                },
+                              ),
+                            ),
+                            Expanded(
+                              child: CustomMinimalRadioButton<VoucherType>(
+                                value: VoucherType.Payment,
+                                groupValue: voucherType,
+                                title: "Payment Voucher",
+                                onChanged: (val) {
+                                  setState(() {
+                                    voucherType = val;
+                                    entries.clear();
+                                    _addEntry(
+                                        disableDebit: true,
+                                        disableCredit: false);
+                                  });
+                                },
+                              ),
+                            ),
+                          ],
                         ),
-                        Expanded(
-                          child: CustomMinimalRadioButton<VoucherType>(
-                            value: VoucherType.Payment,
-                            groupValue: voucherType,
-                            title: "Payment Voucher",
-                            onChanged: (val) {
-                              setState(() {
-                                voucherType = val;
-                              });
-                            },
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Expanded(
+                              child: CustomMinimalRadioButton<VoucherType>(
+                                value: VoucherType.Journal,
+                                groupValue: voucherType,
+                                title: "Journal Voucher",
+                                onChanged: (val) {
+                                  setState(() {
+                                    voucherType = val;
+                                    entries.clear();
+                                    _addEntry(
+                                        disableDebit: false,
+                                        disableCredit: false);
+                                  });
+                                },
+                              ),
+                            ),
+                            Expanded(
+                              child: CustomMinimalRadioButton<VoucherType>(
+                                value: VoucherType.Contra,
+                                groupValue: voucherType,
+                                title: "Contra Voucher",
+                                onChanged: (val) {
+                                  setState(() {
+                                    voucherType = val;
+                                    entries.clear();
+                                    _addEntry(
+                                        disableDebit: false,
+                                        disableCredit: false);
+                                  });
+                                },
+                              ),
+                            ),
+                          ],
                         ),
+                        addH(8),
+                        if (voucherType == VoucherType.Receive ||
+                            voucherType == VoucherType.Payment)
+                          GetBuilder<ManageJournalController>(
+                            id: 'payment_method',
+                            builder: (controller) => CustomDropdownWithSearchWidget<ChartOfAccount>(
+                              items: controller.isPaymentMethodsLoading ||
+                                  controller
+                                      .paymentMethodListResponseModel ==
+                                      null
+                                  ? []
+                                  : controller.paymentMethodList,
+                              isMandatory: true,
+                              title: "Payment method",
+                              noTitle: true,
+                              itemLabel: (value) => value.name,
+                              value: selectedPaymentMethod,
+                              onChanged: (value) {
+                                if (value != null) {
+                                  selectedPaymentMethod = value;
+                                }
+                              },
+                              hintText: controller.isLastLevelChartOfAccounts
+                                  ? "Loading..."
+                                  : controller.lastLevelChartOfAccountListResponseModel ==
+                                  null ||
+                                  controller.lastLevelChartOfAccountList
+                                      .isEmpty
+                                  ? "No payment method"
+                                  : "Payment method",
+                              searchHintText: "Search method",
+                              validator: (value) =>
+                                  FieldValidator.nonNullableFieldValidator(
+                                      value?.name, "Payment method"),
+                            ),
+                          ),
                       ],
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Expanded(
-                          child: CustomMinimalRadioButton<VoucherType>(
-                            value: VoucherType.Journal,
-                            groupValue: voucherType,
-                            title: "Journal Voucher",
-                            onChanged: (val) {
-                              setState(() {
-                                voucherType = val;
-                              });
-                            },
-                          ),
-                        ),
-                        Expanded(
-                          child: CustomMinimalRadioButton<VoucherType>(
-                            value: VoucherType.Contra,
-                            groupValue: voucherType,
-                            title: "Contra Voucher",
-                            onChanged: (val) {
-                              setState(() {
-                                voucherType = val;
-                              });
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              addH(12),
-              Expanded(
-                child: Form(
-                  key: formKey,
-                  child: ListView.builder(
+                  ),
+                  addH(8),
+                  ListView.builder(
+                    physics: NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
                     itemCount: entries.length,
                     itemBuilder: (context, index) {
                       return Column(
@@ -282,87 +280,96 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
                                             child: GetBuilder<
                                                 ManageJournalController>(
                                               id: 'outlet_list_for_money_transfer',
-                                              builder: (controller) =>
-                                                  Column(
-                                                    crossAxisAlignment:
+                                              builder: (controller) => Column(
+                                                crossAxisAlignment:
                                                     CrossAxisAlignment.start,
-                                                    children: [
-                                                      CustomDropdownWithSearchWidget<
-                                                          ChartOfAccount>(
-                                                        items: controller
-                                                            .isLastLevelChartOfAccounts ||
+                                                children: [
+                                                  CustomDropdownWithSearchWidget<
+                                                      ChartOfAccount>(
+                                                    items: controller
+                                                                .isLastLevelChartOfAccounts ||
                                                             controller
-                                                                .lastLevelChartOfAccountListResponseModel ==
+                                                                    .lastLevelChartOfAccountListResponseModel ==
                                                                 null
-                                                            ? []
-                                                            : controller
+                                                        ? []
+                                                        : controller
                                                             .lastLevelChartOfAccountList,
-                                                        isMandatory: true,
-                                                        title: "Select Account",
-                                                        noTitle: true,
-                                                        itemLabel: (value) =>
+                                                    isMandatory: true,
+                                                    title: "Select Account",
+                                                    noTitle: true,
+                                                    itemLabel: (value) =>
                                                         value.name,
-                                                        value: entries[index]
-                                                            .chartOfAccount,
-                                                        onChanged: (value) {
-                                                          if (value != null) {
-                                                            entries[index]
-                                                                .entry
-                                                                .caId =
-                                                                value.id;
-                                                          }
-                                                        },
-                                                        hintText: controller
+                                                    value: entries[index]
+                                                        .chartOfAccount,
+                                                    onChanged: (value) {
+                                                      if (value != null) {
+                                                        entries[index]
+                                                            .entry
+                                                            .caId = value.id;
+                                                      }
+                                                    },
+                                                    hintText: controller
                                                             .isLastLevelChartOfAccounts
-                                                            ? "Loading..."
-                                                            : controller
-                                                            .lastLevelChartOfAccountListResponseModel ==
-                                                            null ||
-                                                            controller
-                                                                .lastLevelChartOfAccountList
-                                                                .isEmpty
+                                                        ? "Loading..."
+                                                        : controller.lastLevelChartOfAccountListResponseModel ==
+                                                                    null ||
+                                                                controller
+                                                                    .lastLevelChartOfAccountList
+                                                                    .isEmpty
                                                             ? "No account found"
                                                             : "Select an account",
-                                                        searchHintText:
+                                                    searchHintText:
                                                         "Search an account",
-                                                        validator: (value) =>
-                                                            FieldValidator
-                                                                .nonNullableFieldValidator(
+                                                    validator: (value) =>
+                                                        FieldValidator
+                                                            .nonNullableFieldValidator(
                                                                 value?.name,
                                                                 "Account"),
-                                                      ),
-                                                    ],
                                                   ),
+                                                ],
+                                              ),
                                             ),
                                           ),
-                                          addW(12),
-
                                         ],
                                       ),
                                       const SizedBox(height: 12),
                                       Row(
                                         children: [
                                           Expanded(
-                                            flex: voucherType == VoucherType.Receive ? 1 : 3,
                                             child: CustomTextField(
                                               textCon: entries[index]
                                                   .debitController,
                                               hintText: "Debit",
-                                              enabledFlag: voucherType != VoucherType.Receive,
+                                              enabledFlag:
+                                                  !entries[index].disableDebit,
                                               inputType: TextInputType.number,
                                               onChanged: (val) {
-                                                entries[index].entry.amount =
+                                                setState(() {
+                                                  if (val.isNotEmpty &&
+                                                      voucherType !=
+                                                          VoucherType.Receive &&
+                                                      voucherType !=
+                                                          VoucherType.Payment) {
+                                                    entries[index]
+                                                        .disableCredit = true;
+                                                    entries[index]
+                                                        .disableDebit = false;
+                                                  }
+                                                });
+                                                entries[index].entry.debit =
                                                     num.tryParse(val) ?? 0;
                                               },
                                               validator: (value) {
+                                                if (entries[index]
+                                                    .disableDebit) {
+                                                  return null;
+                                                }
                                                 if (value == null ||
-                                                    value
-                                                        .trim()
-                                                        .isEmpty) {
+                                                    value.trim().isEmpty) {
                                                   return "Please insert an amount";
                                                 }
                                                 final parsed =
-                                                num.tryParse(value);
+                                                    num.tryParse(value);
                                                 if (parsed == null) {
                                                   return "Please insert a valid amount";
                                                 }
@@ -372,26 +379,40 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
                                           ),
                                           const SizedBox(width: 12),
                                           Expanded(
-                                            flex:  voucherType == VoucherType.Payment ? 1 : 3,
                                             child: CustomTextField(
                                               textCon: entries[index]
                                                   .creditController,
                                               hintText: "Credit",
-                                              enabledFlag: voucherType != VoucherType.Payment,
+                                              enabledFlag:
+                                                  !entries[index].disableCredit,
                                               inputType: TextInputType.number,
                                               onChanged: (val) {
-                                                entries[index].entry.amount =
+                                                setState(() {
+                                                  if (val.isNotEmpty &&
+                                                      voucherType !=
+                                                          VoucherType.Receive &&
+                                                      voucherType !=
+                                                          VoucherType.Payment) {
+                                                    entries[index]
+                                                        .disableDebit = true;
+                                                    entries[index]
+                                                        .disableCredit = false;
+                                                  }
+                                                });
+                                                entries[index].entry.credit =
                                                     num.tryParse(val) ?? 0;
                                               },
                                               validator: (value) {
+                                                if (entries[index]
+                                                    .disableCredit) {
+                                                  return null;
+                                                }
                                                 if (value == null ||
-                                                    value
-                                                        .trim()
-                                                        .isEmpty) {
+                                                    value.trim().isEmpty) {
                                                   return "Please insert an amount";
                                                 }
                                                 final parsed =
-                                                num.tryParse(value);
+                                                    num.tryParse(value);
                                                 if (parsed == null) {
                                                   return "Please insert a valid amount";
                                                 }
@@ -400,6 +421,16 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
                                             ),
                                           ),
                                         ],
+                                      ),
+                                      addH(8),
+                                      CustomTextField(
+                                        textCon:
+                                            entries[index].referenceController,
+                                        hintText: "Enter Reference No",
+                                        inputType: TextInputType.text,
+                                        onChanged: (val) {
+                                          entries[index].entry.reference = val;
+                                        },
                                       ),
                                     ],
                                   ),
@@ -418,7 +449,7 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
                             ),
                           ),
                           if (index == entries.length - 1 &&
-                              initialChartOfAccountOpeningEntry == null)
+                              initialChartOfAccountOpeningEntry == null) ...[
                             ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.blue.shade100,
@@ -430,18 +461,39 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
                                   side: const BorderSide(color: Colors.blue),
                                 ),
                               ),
-                              onPressed: _addEntry,
+                              onPressed: () {
+                                bool debit = voucherType == VoucherType.Receive;
+                                bool credit =
+                                    voucherType == VoucherType.Payment;
+                                if (voucherType != VoucherType.Receive &&
+                                    voucherType != VoucherType.Payment) {
+                                  _addEntry(
+                                      disableDebit: false,
+                                      disableCredit: false);
+                                } else {
+                                  _addEntry(
+                                      disableDebit: !debit,
+                                      disableCredit: !credit);
+                                }
+                              },
                               child: const Text("Add More",
                                   style:
-                                  TextStyle(fontWeight: FontWeight.bold)),
-                            )
+                                      TextStyle(fontWeight: FontWeight.bold)),
+                            ),
+                            addH(8),
+                            CustomTextField(
+                              textCon: _remarksController,
+                              hintText: "Remarks",
+                              inputType: TextInputType.text,
+                            ),
+                          ]
                         ],
                       );
                     },
                   ),
-                ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
         bottomNavigationBar: Padding(
@@ -456,22 +508,19 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
                 if (initialChartOfAccountOpeningEntry != null) {
                   var request = {
                     ...entries.first.entry.toJson(),
-                    "opening_date": selectedDate
-                        .toString()
-                        .split(" ")
-                        .first,
+                    "voucher_type": getVoucherType(),
+                    "paymentMethod": selectedPaymentMethod?.id,
                   };
                   controller.updateAccountHistory(
                       request, initialChartOfAccountOpeningEntry!.id);
                 } else {
                   var request = {
-                    "opening_date": selectedDate
-                        .toString()
-                        .split(" ")
-                        .first,
-                    "data": data,
+                    "voucher_type": getVoucherType(),
+                    "paymentMethod": selectedPaymentMethod?.id,
+                    "rows": data,
                   };
-                  controller.createAccountHistory(request);
+                  logger.d(request);
+                  controller.createJournal(request);
                 }
               }
             },
@@ -479,5 +528,15 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
         ),
       ),
     );
+  }
+
+  int getVoucherType() {
+    return voucherType == VoucherType.Receive
+        ? 1
+        : voucherType == VoucherType.Payment
+            ? 2
+            : voucherType == VoucherType.Journal
+                ? 3
+                : 4;
   }
 }

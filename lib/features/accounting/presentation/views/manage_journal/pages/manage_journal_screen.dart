@@ -1,8 +1,7 @@
 import 'package:amar_pos/core/constants/app_colors.dart';
 import 'package:amar_pos/core/constants/logger/logger.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
-import 'package:amar_pos/features/accounting/data/models/chart_of_account/chart_of_account_opening_history_list_response_model.dart';
-import 'package:amar_pos/features/accounting/presentation/views/chart_of_account/pages/co_account_entry_form.dart';
+import 'package:amar_pos/features/accounting/data/models/manage_journal/journal_list_response_model.dart';
 import 'package:amar_pos/features/accounting/presentation/views/manage_journal/manage_journal_controller.dart';
 import 'package:amar_pos/features/accounting/presentation/views/manage_journal/pages/journal_entry_form.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +15,7 @@ import '../../../../../../core/widgets/loading/random_lottie_loader.dart';
 import '../../../../../../core/widgets/pager_list_view.dart';
 import '../../../../../../core/widgets/reusable/custom_svg_icon_widget.dart';
 import '../../widgets/account_opening_history_item_widget.dart';
+import '../../widgets/journal_list_item_widget.dart';
 
 class ManageJournalScreen extends StatefulWidget {
   static const routeName = '/accounting/manage-journal';
@@ -31,7 +31,7 @@ class _ManageJournalScreenState extends State<ManageJournalScreen> {
 
   @override
   void initState() {
-    controller.getChartOfAccountOpeningHistoryList();
+    controller.getJournalList();
     super.initState();
   }
 
@@ -58,7 +58,7 @@ class _ManageJournalScreenState extends State<ManageJournalScreen> {
                 );
                 controller.selectedDateTimeRange.value = selectedDate;
                 controller.update(['date_status']);
-                controller.getChartOfAccountOpeningHistoryList();
+                controller.getJournalList();
               },
               icon: SvgPicture.asset(AppAssets.calenderIcon),
             )
@@ -69,7 +69,7 @@ class _ManageJournalScreenState extends State<ManageJournalScreen> {
           padding: const EdgeInsets.all(16),
           child: RefreshIndicator(
             onRefresh: () async {
-              controller.getChartOfAccountOpeningHistoryList();
+              controller.getJournalList();
             },
             child: Column(
               children: [
@@ -88,7 +88,7 @@ class _ManageJournalScreenState extends State<ManageJournalScreen> {
                         brdrRadius: 40,
                         prefixWidget: const Icon(Icons.search),
                         onChanged: (value) {
-                          controller.getChartOfAccountOpeningHistoryList();
+                          controller.getJournalList();
                         },
                       ),
                     ),
@@ -150,7 +150,7 @@ class _ManageJournalScreenState extends State<ManageJournalScreen> {
                                     null;
                                     controller.update(['date_status']);
                                     controller
-                                        .getChartOfAccountOpeningHistoryList();
+                                        .getJournalList();
                                   },
                                   child: CircleAvatar(
                                       radius: 16,
@@ -181,45 +181,42 @@ class _ManageJournalScreenState extends State<ManageJournalScreen> {
                 ),
                 Expanded(
                   child: GetBuilder<ManageJournalController>(
-                    id: 'chart_of_account_opening_history_list',
+                    id: 'journal_list',
                     builder: (controller) {
                       if (controller
-                          .isChartOfAccountOpeningHistoryListLoading) {
+                          .isJournalListLoading) {
                         return Center(
                           child: RandomLottieLoader.lottieLoader(),
                         );
                       } else if (controller
-                              .chartOfAccountOpeningHistoryListResponseModel ==
+                              .journalListResponseModel ==
                           null) {
                         return const Center(
                             child: Text("Something went wrong"));
                       } else if (controller
-                          .chartOfAccountOpeningEntryList.isEmpty) {
+                          .journalEntryList.isEmpty) {
                         return const Center(child: Text("No data found"));
                       }
-                      return PagerListView<ChartOfAccountOpeningEntry>(
+                      return PagerListView<JournalEntryData>(
                         // scrollController: _scrollController,
-                        items: controller.chartOfAccountOpeningEntryList,
+                        items: controller.journalEntryList,
                         itemBuilder: (_, item) {
-                          return Text(item.slNo);
-                          // return ChartOfAccountOpeningHistoryItemWidget(
-                          //   chartOfAccountOpeningEntry: item,
-                          // );
+                          return JournalListItemWidget(journalEntryData: item,);
                         },
                         isLoading: controller.isLoadingMore,
                         hasError: controller.hasError.value,
                         onNewLoad: (int nextPage) async {
-                          await controller.getChartOfAccountOpeningHistoryList(
+                          await controller.getJournalList(
                               page: nextPage);
                         },
                         totalPage: controller
-                                .chartOfAccountOpeningHistoryListResponseModel
+                                .journalListResponseModel
                                 ?.data
                                 ?.meta
                                 .lastPage ??
                             0,
                         totalSize: controller
-                                .chartOfAccountOpeningHistoryListResponseModel
+                                .journalListResponseModel
                                 ?.data
                                 ?.meta
                                 .total ??
