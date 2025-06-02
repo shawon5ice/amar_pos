@@ -8,6 +8,7 @@ import 'package:amar_pos/core/widgets/field_title.dart';
 import 'package:amar_pos/features/accounting/data/models/chart_of_account/chart_of_account_entry.dart';
 import 'package:amar_pos/features/accounting/data/models/chart_of_account/chart_of_account_opening_history_list_response_model.dart';
 import 'package:amar_pos/features/accounting/data/models/chart_of_account/last_level_chart_of_account_list_response_model.dart';
+import 'package:amar_pos/features/accounting/data/models/manage_journal/manage_journal_entry.dart';
 import 'package:amar_pos/features/accounting/presentation/views/chart_of_account/chart_of_account_controller.dart';
 import 'package:amar_pos/features/accounting/presentation/views/manage_journal/manage_journal_controller.dart';
 import 'package:amar_pos/features/inventory/presentation/products/widgets/custom_dropdown_widget.dart';
@@ -37,7 +38,7 @@ class JournalEntryForm extends StatefulWidget {
 }
 
 class _JournalEntryFormState extends State<JournalEntryForm> {
-  List<AccountEntryWrapper> entries = [];
+  List<JournalEntryWrapper> entries = [];
 
   final ManageJournalController controller = Get.find();
 
@@ -45,13 +46,15 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
 
   void _addEntry() {
     setState(() {
-      entries.add(AccountEntryWrapper.empty());
+      entries.add(JournalEntryWrapper.empty());
     });
   }
 
   void _removeEntry(int index) {
     setState(() {
-      entries[index].amountController.dispose();
+      entries[index].debitController.dispose();
+      entries[index].creditController.dispose();
+      entries[index].referenceController.dispose();
       entries[index].remarksController.dispose();
       entries.removeAt(index);
     });
@@ -70,24 +73,24 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
     _addEntry();
     Methods.showLoading();
     await controller.getLastLevelChartOfAccounts().then((value) {
-      if (initialChartOfAccountOpeningEntry != null) {
-        selectedDate =
-            DateTime.tryParse(initialChartOfAccountOpeningEntry!.openingDate);
-        _textEditingController.text = formatDate(selectedDate!);
-        entries.first.entry.amount = initialChartOfAccountOpeningEntry!.amount;
-        entries.first.amountController.text =
-            initialChartOfAccountOpeningEntry!.amount.toString();
-        entries.first.remarksController.text =
-            initialChartOfAccountOpeningEntry!.remarks.toString();
-        entries.first.entry.remarks =
-            initialChartOfAccountOpeningEntry!.remarks;
-        entries.first.entry.accountType =
-            initialChartOfAccountOpeningEntry!.accountType;
-        entries.first.chartOfAccount =
-            controller.lastLevelChartOfAccountList.singleWhere((e) =>
-            e.id ==
-                initialChartOfAccountOpeningEntry!.account?.id);
-      }
+      // if (initialChartOfAccountOpeningEntry != null) {
+      //   selectedDate =
+      //       DateTime.tryParse(initialChartOfAccountOpeningEntry!.openingDate);
+      //   _textEditingController.text = formatDate(selectedDate!);
+      //   entries.first.entry.amount = initialChartOfAccountOpeningEntry!.amount;
+      //   entries.first.debitController.text =
+      //       initialChartOfAccountOpeningEntry!.amount.toString();
+      //   entries.first.remarksController.text =
+      //       initialChartOfAccountOpeningEntry!.remarks.toString();
+      //   entries.first.entry.remarks =
+      //       initialChartOfAccountOpeningEntry!.remarks;
+      //   entries.first.entry.accountType =
+      //       initialChartOfAccountOpeningEntry!.accountType;
+      //   entries.first.chartOfAccount =
+      //       controller.lastLevelChartOfAccountList.singleWhere((e) =>
+      //       e.id ==
+      //           initialChartOfAccountOpeningEntry!.account?.id);
+      // }
       setState(() {});
     });
     Methods.hideLoading();
@@ -277,7 +280,7 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
                                           Expanded(
                                             flex: 3,
                                             child: GetBuilder<
-                                                ChartOfAccountController>(
+                                                ManageJournalController>(
                                               id: 'outlet_list_for_money_transfer',
                                               builder: (controller) =>
                                                   Column(
@@ -333,50 +336,19 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
                                             ),
                                           ),
                                           addW(12),
-                                          Expanded(
-                                            flex: 2,
-                                            child: CustomDropdown<String>(
-                                              items: const ["Debit", "Credit"],
-                                              isMandatory: true,
-                                              title: "Account Type",
-                                              noTitle: true,
-                                              itemLabel: (value) => value,
-                                              value: switch (entries[index]
-                                                  .entry
-                                                  .accountType) {
-                                                1 => "Debit",
-                                                2 => "Credit",
-                                                _ => null,
-                                              },
-                                              onChanged: (value) {
-                                                entries[index]
-                                                    .entry
-                                                    .accountType =
-                                                switch (
-                                                value?.toLowerCase()) {
-                                                  "debit" => 1,
-                                                  "credit" => 2,
-                                                  _ => 0,
-                                                };
-                                              },
-                                              hintText: "Account type",
-                                              validator: (value) =>
-                                              value ==
-                                                  null
-                                                  ? "Please select account type"
-                                                  : null,
-                                            ),
-                                          )
+
                                         ],
                                       ),
                                       const SizedBox(height: 12),
                                       Row(
                                         children: [
                                           Expanded(
+                                            flex: voucherType == VoucherType.Receive ? 1 : 3,
                                             child: CustomTextField(
                                               textCon: entries[index]
-                                                  .amountController,
-                                              hintText: "Enter amount",
+                                                  .debitController,
+                                              hintText: "Debit",
+                                              enabledFlag: voucherType != VoucherType.Receive,
                                               inputType: TextInputType.number,
                                               onChanged: (val) {
                                                 entries[index].entry.amount =
@@ -400,13 +372,30 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
                                           ),
                                           const SizedBox(width: 12),
                                           Expanded(
+                                            flex:  voucherType == VoucherType.Payment ? 1 : 3,
                                             child: CustomTextField(
                                               textCon: entries[index]
-                                                  .remarksController,
-                                              hintText: "Remarks",
+                                                  .creditController,
+                                              hintText: "Credit",
+                                              enabledFlag: voucherType != VoucherType.Payment,
+                                              inputType: TextInputType.number,
                                               onChanged: (val) {
-                                                entries[index].entry.remarks =
-                                                    val;
+                                                entries[index].entry.amount =
+                                                    num.tryParse(val) ?? 0;
+                                              },
+                                              validator: (value) {
+                                                if (value == null ||
+                                                    value
+                                                        .trim()
+                                                        .isEmpty) {
+                                                  return "Please insert an amount";
+                                                }
+                                                final parsed =
+                                                num.tryParse(value);
+                                                if (parsed == null) {
+                                                  return "Please insert a valid amount";
+                                                }
+                                                return null;
                                               },
                                             ),
                                           ),
