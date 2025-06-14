@@ -39,6 +39,7 @@ class _StockTransferScreenState extends State<StockTransferScreen>
         controller.category = null;
         controller.selectedDateTimeRange.value = null;
         controller.searchProductController.clear();
+        controller.clearEditing();
         FocusScope.of(context).unfocus();
         controller.update(['action_icon']);
       }

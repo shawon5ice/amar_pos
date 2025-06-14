@@ -145,9 +145,14 @@ class _PurchaseScreenState extends State<PurchaseScreen>
               actions: [
                 GetBuilder<PurchaseController>(
                   id: 'action_icon',
-                  builder: (controller) => _tabController.index == 0 && controller.purchaseCreateAccess ? GestureDetector(
-                    child: SvgPicture.asset(AppAssets.pauseBillingIcon),
-                  ): _tabController.index == 2 && controller.productAccess ? IconButton(
+                  builder: (controller) =>
+
+                  _tabController.index == 0 && controller.purchaseCreateAccess ? SizedBox.shrink()
+                  // GestureDetector(
+                  //   child: SvgPicture.asset(AppAssets.pauseBillingIcon),
+                  // )
+                      :
+                  _tabController.index == 2 && controller.productAccess ? IconButton(
                     onPressed: () async {
                       showModalBottomSheet(context: context, builder: (context) => SimpleFilterBottomSheetWidget(
                         selectedBrand: controller.brand,

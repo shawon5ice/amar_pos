@@ -21,6 +21,7 @@ class StockTransferHistoryDetailsData {
   final String orderNo;
   final int quantity;
   final int type;
+  @JsonKey(defaultValue: 'N/A')
   final String? remarks;
   final Business business;
   @JsonKey(name: 'from_store')

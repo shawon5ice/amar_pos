@@ -596,6 +596,10 @@ class _BillingSummaryState extends State<BillingSummary> {
                     controller.serviceStuffInfo!.id;
       
                 controller.createOrderModel.payments.clear();
+                if(controller.paidAmount > controller.totalPaid){
+                  Methods.showSnackbar(msg: "Paid  amount must be greater then equal to payable amount.");
+                  return;
+                }
                 for (var e in controller.paymentMethodTracker) {
                   if (e.paymentMethod == null) {
                     Methods.showSnackbar(

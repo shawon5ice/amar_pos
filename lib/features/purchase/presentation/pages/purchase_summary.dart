@@ -410,17 +410,17 @@ class _PurchaseSummaryState extends State<PurchaseSummary> {
           padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 10),
           child: Row(
             children: [
-              CircleAvatar(
-                radius: 30,
-                backgroundColor: AppColors.accent,
-                child: GestureDetector(
-                  child: SvgPicture.asset(
-                    AppAssets.pauseBillingIcon,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              addW(12),
+              // CircleAvatar(
+              //   radius: 30,
+              //   backgroundColor: AppColors.accent,
+              //   child: GestureDetector(
+              //     child: SvgPicture.asset(
+              //       AppAssets.pauseBillingIcon,
+              //       color: Colors.white,
+              //     ),
+              //   ),
+              // ),
+              addW(0),
               Expanded(
                 child: CustomButton(
                   onTap: () {

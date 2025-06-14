@@ -184,7 +184,7 @@ class StockTransferService {
       "start_date": startDate,
       "end_date": endDate,
       "search": search,
-      'type': type,
+      'status': type,
     };
 
     String downloadUrl = "";

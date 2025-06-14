@@ -123,6 +123,7 @@ class PurchaseHistoryItemWidget extends StatelessWidget {
                     switch (value) {
                       case "edit":
                         bool hasPermission = controller.checkPurchasePermissions("update");
+                        if(!hasPermission) return;
                         await controller.processEdit(purchaseOrderInfo: purchaseHistory, context: context);
                         onChange(0);
                         break;

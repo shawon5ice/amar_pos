@@ -29,7 +29,7 @@ StockTransferHistoryDetailsData _$StockTransferHistoryDetailsDataFromJson(
       date: json['date'] as String,
       orderNo: json['order_no'] as String,
       type: (json['type'] as num).toInt(),
-      remarks: json['remarks'] as String?,
+      remarks: json['remarks'] as String? ?? 'N/A',
       quantity: (json['quantity'] as num).toInt(),
       details: (json['order_details'] as List<dynamic>)
           .map((e) => OrderDetail.fromJson(e as Map<String, dynamic>))

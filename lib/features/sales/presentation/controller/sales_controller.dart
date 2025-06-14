@@ -48,6 +48,12 @@ class SalesController extends GetxController {
   TextEditingController searchProductController = TextEditingController();
   ProductsListResponseModel? productsListResponseModel;
 
+  @override
+  void onReady() {
+    changeSellingParties(true);
+    super.onReady();
+  }
+
   void clearEditing(){
     isEditing = false;
     retailSale = false;
