@@ -80,9 +80,9 @@ class _ExchangeScreenState extends State<ExchangeScreen> with SingleTickerProvid
           _tabController.animateTo(newIndex);
         }
       }else if(_tabController.index == 2){
-        controller.getExchangeProducts(
-          productType: 3,
-        );
+        // controller.getExchangeProducts(
+        //   productType: 3,
+        // );
       }
       controller.clearFilter();
       controller.update(['action_icon']);
@@ -106,135 +106,140 @@ class _ExchangeScreenState extends State<ExchangeScreen> with SingleTickerProvid
       },
       child: PopScope(
         canPop: false,
-        child: SafeArea(
-          child: Scaffold(
-            appBar:  AppBar(
-              centerTitle: true,
-              leading: DrawerButton(
-                onPressed: () async {
-          
-                  if ((controller.returnOrderProducts.isNotEmpty || controller.exchangeProducts.isNotEmpty) && _tabController.previousIndex == 0) {
-                    bool discard = await showDiscardDialog(context);
-                    logger.d(discard);
-                    if(discard){
-                      drawerMenuController.openDrawer();
-                    }
-                  }else{
-                    drawerMenuController.openDrawer();
-                  }
-                  // if(controller.isEditing){
-                  //   bool openDrawer = await showDiscardDialog(context);
-                  //   if(openDrawer){
-                  //     controller.clearEditing();
-                  //     drawerMenuController.openDrawer();
-                  //   }
-                  // }else{
-                  //   drawerMenuController.openDrawer();
-                  // }
-                },
-              ),
-              title: const Text("Exchange"),
-              actions: [
-                GetBuilder<ExchangeController>(
-                  id: 'action_icon',
-                  builder: (controller) => _tabController.index == 0? const SizedBox(): _tabController.index == 2? GestureDetector(
-                    onTap: (){
-                      showModalBottomSheet(context: context, builder: (context) => SimpleFilterBottomSheetWidget(
-                        selectedBrand: controller.brand,
-                        disableOutlet: true,
-                        selectedCategory: controller.category,
-                        selectedDateTimeRange: controller.selectedDateTimeRange.value,
-                        onSubmit: (FilterItem? brand,FilterItem? category,DateTimeRange? dateTimeRange, OutletModel? outlet){
-                          controller.update(['action_icon']);
-                          controller.brand = brand;
-                          controller.category = category;
-                          controller.selectedDateTimeRange.value = dateTimeRange;
-                          // controller.selectedDateTimeRange.value = dateTimeRange;
-                          logger.i(controller.brand);
-                          logger.i(controller.category?.id);
-                          // logger.i(controller.selectedDateTimeRange.value);
-                          Get.back();
-                          controller.getExchangeProducts();
-                        },
-                      ));
-                    },
-                    child: SvgPicture.asset(AppAssets.funnelFilter),
-                  ) : GestureDetector(
-                    onTap: () async {
-                      DateTimeRange? selectedDate =
-                      await showDateRangePicker(
-                        context: context,
-                        firstDate: DateTime.now()
-                            .subtract(const Duration(days: 1000)),
-                        lastDate: DateTime.now()
-                            .add(const Duration(days: 1000)),
-                        initialDateRange:
-                        controller.selectedDateTimeRange.value,
-                      );
-                      if (selectedDate != null) {
-                        controller.selectedDateTimeRange.value =
-                            selectedDate;
-                        controller.getExchangeHistory();
+        child:GetBuilder<ExchangeController>(
+            id: 'permission_handler_builder',
+            builder: (controller) {
+            return SafeArea(
+              child: Scaffold(
+                appBar:  AppBar(
+                  centerTitle: true,
+                  leading: DrawerButton(
+                    onPressed: () async {
+
+                      if ((controller.returnOrderProducts.isNotEmpty || controller.exchangeProducts.isNotEmpty) && _tabController.previousIndex == 0) {
+                        bool discard = await showDiscardDialog(context);
+                        logger.d(discard);
+                        if(discard){
+                          drawerMenuController.openDrawer();
+                        }
+                      }else{
+                        drawerMenuController.openDrawer();
                       }
+                      // if(controller.isEditing){
+                      //   bool openDrawer = await showDiscardDialog(context);
+                      //   if(openDrawer){
+                      //     controller.clearEditing();
+                      //     drawerMenuController.openDrawer();
+                      //   }
+                      // }else{
+                      //   drawerMenuController.openDrawer();
+                      // }
                     },
-                    child: SvgPicture.asset(AppAssets.calenderIcon),
                   ),
-                ),
-                addW(12),
-              ],
-            ),
-            body: Column(
-              children: [
-                Container(
-                  margin: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                  height: 40.h,
-                  padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
-                  ),
-                  child: TabBar(
-                    dividerHeight: 0,
-                    controller: _tabController,
-                    indicatorSize: TabBarIndicatorSize.tab,
-                    labelStyle:
-                    TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp),
-                    indicator: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    unselectedLabelStyle:
-                    const TextStyle(fontWeight: FontWeight.normal),
-                    labelColor: Colors.white,
-                    splashBorderRadius: BorderRadius.circular(20),
-                    unselectedLabelColor: Colors.black,
-                    tabs: const [
-                      Tab(
-                        text: 'Exchange',
+                  title: const Text("Exchange"),
+                  actions: [
+                    GetBuilder<ExchangeController>(
+                      id: 'action_icon',
+                      builder: (controller) => _tabController.index == 0? const SizedBox(): _tabController.index == 2? GestureDetector(
+                        onTap: (){
+                          showModalBottomSheet(context: context, builder: (context) => SimpleFilterBottomSheetWidget(
+                            selectedBrand: controller.brand,
+                            disableOutlet: true,
+                            selectedCategory: controller.category,
+                            selectedDateTimeRange: controller.selectedDateTimeRange.value,
+                            onSubmit: (FilterItem? brand,FilterItem? category,DateTimeRange? dateTimeRange, OutletModel? outlet){
+                              controller.update(['action_icon']);
+                              controller.brand = brand;
+                              controller.category = category;
+                              controller.selectedDateTimeRange.value = dateTimeRange;
+                              // controller.selectedDateTimeRange.value = dateTimeRange;
+                              logger.i(controller.brand);
+                              logger.i(controller.category?.id);
+                              // logger.i(controller.selectedDateTimeRange.value);
+                              Get.back();
+                              controller.getExchangeProducts();
+                            },
+                          ));
+                        },
+                        child: SvgPicture.asset(AppAssets.funnelFilter),
+                      ) : GestureDetector(
+                        onTap: () async {
+                          DateTimeRange? selectedDate =
+                          await showDateRangePicker(
+                            context: context,
+                            firstDate: DateTime.now()
+                                .subtract(const Duration(days: 1000)),
+                            lastDate: DateTime.now()
+                                .add(const Duration(days: 1000)),
+                            initialDateRange:
+                            controller.selectedDateTimeRange.value,
+                          );
+                          if (selectedDate != null) {
+                            controller.selectedDateTimeRange.value =
+                                selectedDate;
+                            controller.getExchangeHistory();
+                          }
+                        },
+                        child: SvgPicture.asset(AppAssets.calenderIcon),
                       ),
-                      Tab(text: 'History'),
-                      Tab(text: 'Products'),
-                    ],
-                  ),
-                ),
-                addH(4),
-                Expanded(
-                  child: TabBarView(
-                    physics: NeverScrollableScrollPhysics(),
-                      controller: _tabController,
-                      children: [
-                    ExchangeView(),
-                    ExchangeHistoryScreen(
-                      onChange: (value){
-                        _tabController.animateTo(value);
-                      },
                     ),
-                    ExchangeProducts()
-                  ]),
-                )
-              ],
-            ),
-          ),
+                    addW(12),
+                  ],
+                ),
+                body: Column(
+                  children: [
+                    Container(
+                      margin: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                      height: 40.h,
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                      ),
+                      child: TabBar(
+                        dividerHeight: 0,
+                        controller: _tabController,
+                        indicatorSize: TabBarIndicatorSize.tab,
+                        labelStyle:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp),
+                        indicator: BoxDecoration(
+                          color: AppColors.primary,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        unselectedLabelStyle:
+                        const TextStyle(fontWeight: FontWeight.normal),
+                        labelColor: Colors.white,
+                        splashBorderRadius: BorderRadius.circular(20),
+                        unselectedLabelColor: Colors.black,
+                        tabs: const [
+                          Tab(
+                            text: 'Exchange',
+                          ),
+                          Tab(text: 'History'),
+                          Tab(text: 'Products'),
+                        ],
+                      ),
+                    ),
+                    addH(4),
+                    Expanded(
+                      child: TabBarView(
+                        physics: NeverScrollableScrollPhysics(),
+                          controller: _tabController,
+                          children: [
+                        ExchangeView(),
+                        ExchangeHistoryScreen(
+                          onChange: (value){
+                            _tabController.animateTo(value);
+                          },
+                        ),
+                        ExchangeProducts()
+                      ]),
+                    )
+                  ],
+                ),
+              ),
+            );
+          }
         ),
       ),
     );

@@ -11,6 +11,7 @@ import '../../../../core/responsive/pixel_perfect.dart';
 import '../../../../core/widgets/custom_text_field.dart';
 import '../../../../core/widgets/pager_list_view.dart';
 import '../../../core/widgets/methods/helper_methods.dart';
+import '../../../core/widgets/reusable/forbidden_access_full_screen_widget.dart';
 import '../../../core/widgets/reusable/status/total_status_widget.dart';
 import '../../inventory/presentation/stock_report/widget/custom_svg_icon_widget.dart';
 import '../exchange_controller.dart';
@@ -28,9 +29,11 @@ class _SoldHistoryState extends State<ExchangeProducts> {
 
   @override
   void initState() {
-    controller.getExchangeProducts(
-      productType: _selected.first == 'exchange' ? 3 : 2,
-    );
+    if(controller.productAccess){
+      controller.getExchangeProducts(
+        productType: _selected.first == 'exchange' ? 3 : 2,
+      );
+    }
     super.initState();
   }
 
@@ -48,7 +51,7 @@ class _SoldHistoryState extends State<ExchangeProducts> {
       child: Scaffold(
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
+          child: !controller.productAccess ? const ForbiddenAccessFullScreenWidget()  : Column(
             children: [
               SegmentedButton(
                 segments: const [
@@ -91,7 +94,7 @@ class _SoldHistoryState extends State<ExchangeProducts> {
                   CustomSvgIconButton(
                     bgColor: const Color(0xffEBFFDF),
                     onTap: () {
-                      controller.downloadList(isPdf: false, returnHistory: false);
+                      controller.downloadList(isPdf: false, exchangeHistory: false);
                     },
                     assetPath: AppAssets.excelIcon,
                   ),
@@ -99,7 +102,7 @@ class _SoldHistoryState extends State<ExchangeProducts> {
                   CustomSvgIconButton(
                     bgColor: const Color(0xffE1F2FF),
                     onTap: () {
-                      controller.downloadList(isPdf: true, returnHistory: false);
+                      controller.downloadList(isPdf: true, exchangeHistory: false);
                     },
                     assetPath: AppAssets.downloadIcon,
                   ),
@@ -176,10 +179,10 @@ class _SoldHistoryState extends State<ExchangeProducts> {
                           await controller.getExchangeProducts(page: nextPage);
                         },
                         totalPage: controller
-                            .exchangeProductResponseModel?.data.meta.lastPage ??
+                            .exchangeProductResponseModel?.data.meta?.lastPage ??
                             0,
                         totalSize:
-                        controller.exchangeProductResponseModel?.data.meta.total ??
+                        controller.exchangeProductResponseModel?.data.meta?.total ??
                             0,
                         itemPerPage: 10,
                       ),

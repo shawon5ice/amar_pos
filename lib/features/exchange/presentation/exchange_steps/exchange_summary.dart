@@ -40,6 +40,10 @@ class _ExchangeSummaryState extends State<ExchangeSummary> {
     customerPayableAmountEditingController = TextEditingController();
     customerChangeAmountEditingController = TextEditingController();
 
+
+    if(!controller.isEditing && controller.serviceStuffList.isEmpty){
+      controller.getAllServiceStuff();
+    }
     // if(!controller.isEditing){
     //   controller.clearPaymentAndOtherIssues();
     //   controller.getPaymentMethods();

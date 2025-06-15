@@ -11,6 +11,7 @@ import 'package:amar_pos/features/return/data/service/return_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/constants/logger/logger.dart';
+import '../../../../permission_manager.dart';
 import '../../../auth/data/model/hive/login_data.dart';
 import '../../../auth/data/model/hive/login_data_helper.dart';
 import '../../../inventory/data/products/product_list_response_model.dart';
@@ -93,10 +94,26 @@ class ReturnController extends GetxController {
   bool isReturnProductListLoading = false;
   bool isReturnProductsLoadingMore = false;
 
+
+  //Permissions
+  bool historyAccess = true;
+  bool productAccess = true;
+  bool returnCreateAccess = true;
+
   @override
   void onInit() {
     searchProductController = TextEditingController();
     super.onInit();
+  }
+
+  @override
+  void onReady() {
+    historyAccess = PermissionManager.hasPermission("OrderReturn.getAllReturnList");
+    productAccess = PermissionManager.hasPermission("OrderReturn.getReturnProductList");
+    returnCreateAccess =  PermissionManager.hasPermission("OrderReturn.store");
+
+    update(['permission_handler_builder']);
+    super.onReady();
   }
 
   void clearFilter(){
@@ -301,7 +318,7 @@ class ReturnController extends GetxController {
     totalQTY = totalQ;
     paidAmount = totalAmount  + additionalExpense - totalDiscount + totalVat;
 
-    if (firstTime != null && !isEditing) {
+    if (firstTime != null && !isEditing && paymentMethodTracker.isEmpty) {
       addPaymentMethod();
     }else{
       totalDeu = totalPaid - paidAmount;
@@ -687,7 +704,14 @@ class ReturnController extends GetxController {
   }
 
   Future<void> downloadList({required bool isPdf,required bool returnHistory,bool? shouldPrint}) async {
-    
+    bool hasPermission = true;
+    if(returnHistory){
+      hasPermission = checkReturnPermissions(isPdf ? "exportToPdfReturnList": "exportToExcelReturnList");
+    }else{
+      hasPermission = checkReturnPermissions(isPdf ? "exportToPdfReturnProductList": "exportToExcelReturnProductList");
+    }
+    if(!hasPermission) return;
+
     if(returnHistory && returnHistoryList.isEmpty){
       ErrorExtractor.showSingleErrorDialog(Get.context!, "File should not be ${shouldPrint != null? "printed": "downloaded"} with empty data.");
       return;
@@ -878,5 +902,13 @@ class ReturnController extends GetxController {
         .where((item) => item.phone.toLowerCase().contains(search.toLowerCase()) || (item.name.toLowerCase().contains(search.toLowerCase())))
         .toList();
     return filteredItems;
+  }
+
+  bool checkReturnPermissions(String permission) {
+    if(!PermissionManager.hasPermission("OrderReturn.$permission")){
+      ErrorExtractor.showSingleErrorDialog(Get.context!, "Forbidden access. You don't have Permission");
+      return false;
+    }
+    return true;
   }
 }

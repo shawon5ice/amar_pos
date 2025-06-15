@@ -15,6 +15,7 @@ import 'package:lottie/lottie.dart';
 import '../../../../core/constants/app_assets.dart';
 import '../../../../core/responsive/pixel_perfect.dart';
 import '../../../../core/widgets/pager_list_view.dart';
+import '../../../../core/widgets/reusable/forbidden_access_full_screen_widget.dart';
 import '../../../inventory/presentation/stock_report/widget/custom_svg_icon_widget.dart';
 import '../../data/models/return_history/return_history_response_model.dart';
 
@@ -31,7 +32,9 @@ class _ReturnHistoryScreenState extends State<ReturnHistoryScreen> {
 
   @override
   void initState() {
-    controller.getReturnHistory();
+    if(controller.historyAccess) {
+      controller.getReturnHistory();
+    }
     super.initState();
   }
 
@@ -43,7 +46,7 @@ class _ReturnHistoryScreenState extends State<ReturnHistoryScreen> {
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
-        body: Column(
+        body: !controller.historyAccess ? const ForbiddenAccessFullScreenWidget()  : Column(
           children: [
             Row(
               children: [

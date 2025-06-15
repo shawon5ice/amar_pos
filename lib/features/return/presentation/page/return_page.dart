@@ -22,6 +22,7 @@ import '../../../../core/widgets/custom_text_field.dart';
 import '../../../../core/widgets/dashed_line.dart';
 import '../../../../core/widgets/methods/helper_methods.dart';
 import '../../../../core/widgets/qr_code_scanner.dart';
+import '../../../../core/widgets/reusable/forbidden_access_full_screen_widget.dart';
 import '../../../inventory/data/products/product_list_response_model.dart';
 import '../../../inventory/presentation/products/add_product_screen.dart';
 import '../../../sales/presentation/widgets/sn_dialog_widget.dart';
@@ -123,7 +124,7 @@ class _ReturnPageState extends State<ReturnPage> {
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
-        body: Column(
+        body: !controller.returnCreateAccess && !controller.isEditing ? ForbiddenAccessFullScreenWidget() : Column(
           children: [
             GetBuilder<ReturnController>(
               id: "selling_party_selection",

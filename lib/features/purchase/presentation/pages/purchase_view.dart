@@ -101,7 +101,7 @@ class _PurchaseViewState extends State<PurchaseView> {
       },
       child: SafeArea(
         child: Scaffold(
-          body: !controller.purchaseCreateAccess ? ForbiddenAccessFullScreenWidget() : Column(
+          body: !controller.purchaseCreateAccess && !controller.isEditing ? ForbiddenAccessFullScreenWidget() : Column(
             children: [
               Row(
                 children: [

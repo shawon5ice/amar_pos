@@ -12,6 +12,7 @@ import '../../../core/responsive/pixel_perfect.dart';
 import '../../../core/widgets/custom_text_field.dart';
 import '../../../core/widgets/methods/helper_methods.dart';
 import '../../../core/widgets/pager_list_view.dart';
+import '../../../core/widgets/reusable/forbidden_access_full_screen_widget.dart';
 import '../../../core/widgets/reusable/status/total_status_widget.dart';
 import '../../inventory/presentation/stock_report/widget/custom_svg_icon_widget.dart';
 import 'widgets/exchange_history_item_widget.dart';
@@ -29,7 +30,9 @@ class _ExchangeHistoryScreenState extends State<ExchangeHistoryScreen> {
 
   @override
   void initState() {
-    controller.getExchangeHistory();
+    if(controller.historyAccess){
+      controller.getExchangeHistory();
+    }
     super.initState();
   }
 
@@ -44,7 +47,7 @@ class _ExchangeHistoryScreenState extends State<ExchangeHistoryScreen> {
       child: Scaffold(
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
+          child: !controller.historyAccess ? const ForbiddenAccessFullScreenWidget()  : Column(
             children: [
               Row(
                 children: [
@@ -69,7 +72,7 @@ class _ExchangeHistoryScreenState extends State<ExchangeHistoryScreen> {
                   CustomSvgIconButton(
                     bgColor: const Color(0xffEBFFDF),
                     onTap: () {
-                      controller.downloadList(isPdf: false, returnHistory: true);
+                      controller.downloadList(isPdf: false, exchangeHistory: true);
                       // controller.downloadStockLedgerReport(
                       //     isPdf: false, context: context);
                     },
@@ -79,7 +82,7 @@ class _ExchangeHistoryScreenState extends State<ExchangeHistoryScreen> {
                   CustomSvgIconButton(
                     bgColor: const Color(0xffE1F2FF),
                     onTap: () {
-                      controller.downloadList(isPdf: true, returnHistory: true);
+                      controller.downloadList(isPdf: true, exchangeHistory: true);
                     },
                     assetPath: AppAssets.downloadIcon,
                   ),
@@ -87,7 +90,7 @@ class _ExchangeHistoryScreenState extends State<ExchangeHistoryScreen> {
                   CustomSvgIconButton(
                     bgColor: const Color(0xffFFFCF8),
                     onTap: () {
-                      controller.downloadList(isPdf: true, returnHistory: true,shouldPrint: true);
+                      controller.downloadList(isPdf: true, exchangeHistory: true,shouldPrint: true);
                     },
                     assetPath: AppAssets.printIcon,
                   )
@@ -166,7 +169,7 @@ class _ExchangeHistoryScreenState extends State<ExchangeHistoryScreen> {
                             widget.onChange(value);
                           },);
                         },
-                        isLoading: controller.isReturnHistoryLoadingMore,
+                        isLoading: controller.isExchangeHistoryLoadingMore,
                         hasError: controller.hasError.value,
                         onNewLoad: (int nextPage) async {
                           await controller.getExchangeHistory(page: nextPage);

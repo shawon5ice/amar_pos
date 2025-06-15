@@ -12,6 +12,7 @@ import '../../core/constants/logger/logger.dart';
 import '../../core/widgets/loading/random_lottie_loader.dart';
 import '../../core/widgets/methods/helper_methods.dart';
 import '../../core/widgets/reusable/filter_bottom_sheet/product_brand_category_warranty_unit_response_model.dart';
+import '../../permission_manager.dart';
 import '../auth/data/model/hive/login_data.dart';
 import '../auth/data/model/hive/login_data_helper.dart';
 import '../inventory/data/products/product_list_response_model.dart';
@@ -87,6 +88,21 @@ class ExchangeController extends GetxController {
 
   //controlling exchange views
   int currentStep = 0;
+
+  //Permissions
+  bool historyAccess = true;
+  bool productAccess = true;
+  bool exchangeCreateAccess = true;
+
+  @override
+  void onReady() {
+    historyAccess = PermissionManager.hasPermission("OrderExchange.getAllReturnExchangeList");
+    productAccess = PermissionManager.hasPermission("OrderExchange.getReturnExchangeProductList");
+    exchangeCreateAccess =  PermissionManager.hasPermission("OrderExchange.store");
+
+    update(['permission_handler_builder']);
+    super.onReady();
+  }
 
   void onStepContinue() {
     if (currentStep == 0) {
@@ -244,7 +260,7 @@ class ExchangeController extends GetxController {
   ExchangeHistoryResponseModel? exchangeHistoryResponseModel;
   List<ExchangeOrderInfo> exchangeHistoryList = [];
   bool isExchangeHistoryListLoading = false;
-  bool isReturnHistoryLoadingMore = false;
+  bool isExchangeHistoryLoadingMore = false;
 
   //
   Rx<DateTimeRange?> selectedDateTimeRange = Rx<DateTimeRange?>(null);
@@ -264,12 +280,6 @@ class ExchangeController extends GetxController {
     super.onInit();
   }
 
-  @override
-  void onReady() {
-    getAllProducts(search: '', page: 1);
-    getAllServiceStuff();
-    super.onReady();
-  }
 
   void clearFilter() {
     searchProductController.clear();
@@ -731,7 +741,7 @@ class ExchangeController extends GetxController {
   //
   Future<void> getExchangeHistory({int page = 1}) async {
     isExchangeHistoryListLoading = page == 1;
-    isReturnHistoryLoadingMore = page > 1;
+    isExchangeHistoryLoadingMore = page > 1;
 
     if (page == 1) {
       exchangeHistoryResponseModel = null;
@@ -756,7 +766,7 @@ class ExchangeController extends GetxController {
         exchangeHistoryResponseModel =
             ExchangeHistoryResponseModel.fromJson(response);
 
-        if (exchangeHistoryResponseModel != null) {
+        if (exchangeHistoryResponseModel != null && exchangeHistoryResponseModel!.data != null) {
           exchangeHistoryList
               .addAll(exchangeHistoryResponseModel!.data!.exchangeHistoryList);
         }
@@ -771,7 +781,7 @@ class ExchangeController extends GetxController {
       logger.e(e);
     } finally {
       isExchangeHistoryListLoading = false;
-      isReturnHistoryLoadingMore = false;
+      isExchangeHistoryLoadingMore = false;
       update(['return_history_list', 'total_widget']);
     }
   }
@@ -878,17 +888,25 @@ class ExchangeController extends GetxController {
   }
 
   Future<void> downloadList(
-      {required bool isPdf, required bool returnHistory,bool? shouldPrint}) async {
+      {required bool isPdf, required bool exchangeHistory,bool? shouldPrint}) async {
     hasError.value = false;
-    if(returnHistory && exchangeHistoryList.isEmpty || exchangeProductList.isEmpty){
+    bool hasPermission = true;
+    if(exchangeHistory){
+      hasPermission = checkExchangePermissions(isPdf ? "exportToPdfReturnExchangeList": "exportToExcelReturnExchangeList");
+    }else{
+      hasPermission = checkExchangePermissions(isPdf ? "exportToPdfReturnExchangeProductList": "exportToExcelReturnExchangeProductList");
+    }
+    if(!hasPermission) return;
+    logger.i(exchangeHistoryList.isEmpty);
+    if(exchangeHistory && exchangeHistoryList.isEmpty || (exchangeProductList.isEmpty && !exchangeHistory)){
       ErrorExtractor.showSingleErrorDialog(Get.context!, "File should not be downloaded with empty data");
       return;
     }
     String fileName =
-        "${returnHistory ? "Exchange Order history" : "Exchange Product History"}-${selectedDateTimeRange.value != null ? "${selectedDateTimeRange.value!.start.toIso8601String().split("T")[0]}-${selectedDateTimeRange.value!.end.toIso8601String().split("T")[0]}" : DateTime.now().toIso8601String().split("T")[0].toString()}${isPdf ? ".pdf" : ".xlsx"}";
+        "${exchangeHistory ? "Exchange Order history" : "Exchange Product History"}-${selectedDateTimeRange.value != null ? "${selectedDateTimeRange.value!.start.toIso8601String().split("T")[0]}-${selectedDateTimeRange.value!.end.toIso8601String().split("T")[0]}" : DateTime.now().toIso8601String().split("T")[0].toString()}${isPdf ? ".pdf" : ".xlsx"}";
     try {
       var response = await ExchangeService.downloadList(
-        returnHistory: returnHistory,
+          exchangeHistory: exchangeHistory,
         usrToken: loginData!.token,
         isPdf: isPdf,
         search: searchProductController.text,
@@ -904,7 +922,7 @@ class ExchangeController extends GetxController {
 
   bool isEditing = false;
   bool detailsLoading = false;
-  bool editReturnHistoryItemLoading = true;
+  bool editExchangeHistoryItemLoading = true;
 
   //
   ExchangeOrderDetailsResponseModel? exchangeOrderDetailsResponseModel;
@@ -914,7 +932,7 @@ class ExchangeController extends GetxController {
   Future<void> processEdit(
       {required ExchangeOrderInfo exchangeOrderInfo,
       required BuildContext context}) async {
-    editReturnHistoryItemLoading = true;
+    editExchangeHistoryItemLoading = true;
     isEditing = true;
     isProcessing = true;
     RandomLottieLoader.show();
@@ -1011,7 +1029,7 @@ class ExchangeController extends GetxController {
       hasError.value = true;
     } finally {
       isProcessing = false;
-      editReturnHistoryItemLoading = false;
+      editExchangeHistoryItemLoading = false;
       update(['edit_sold_history_item']);
       // Methods.hideLoading();
       RandomLottieLoader.hide();
@@ -1038,5 +1056,13 @@ class ExchangeController extends GetxController {
       detailsLoading = false;
       update(['sold_history_details', 'download_print_buttons']);
     }
+  }
+
+  bool checkExchangePermissions(String permission) {
+    if(!PermissionManager.hasPermission("OrderExchange.$permission")){
+      ErrorExtractor.showSingleErrorDialog(Get.context!, "Forbidden access. You don't have Permission");
+      return false;
+    }
+    return true;
   }
 }

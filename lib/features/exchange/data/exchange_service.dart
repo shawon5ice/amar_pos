@@ -143,7 +143,7 @@ class ExchangeService{
   }
 
 
-  static Future<void> downloadList({required bool isPdf,required bool returnHistory, required String fileName,
+  static Future<void> downloadList({required bool isPdf,required bool exchangeHistory, required String fileName,
     required String usrToken,
     required DateTime? startDate,
     required DateTime? endDate,
@@ -161,7 +161,7 @@ class ExchangeService{
 
     String downloadUrl = "";
 
-    if(returnHistory){
+    if(exchangeHistory){
       if(isPdf){
         downloadUrl = "${NetWorkStrings.baseUrl}/exchange/download-pdf-exchange-list";
       }else{

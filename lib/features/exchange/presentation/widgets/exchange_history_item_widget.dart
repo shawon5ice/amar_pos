@@ -96,11 +96,15 @@ class ExchangeHistoryItemWidget extends StatelessWidget {
                   onSelected: (value) {
                     switch (value) {
                       case "edit":
+                        bool hasPermission = controller.checkExchangePermissions("update");
+                        if(!hasPermission) return;
                         controller.processEdit(exchangeOrderInfo: exchangeOrderInfo, context: context).then((value){
                           onChange(0);
                         });
                         break;
                       case "delete":
+                        bool hasPermission = controller.checkExchangePermissions("destroy");
+                        if(!hasPermission) return;
                         AwesomeDialog(
                             context: context,
                             dialogType: DialogType.error,

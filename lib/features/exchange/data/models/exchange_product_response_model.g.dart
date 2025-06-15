@@ -10,7 +10,7 @@ ExchangeProductResponseModel _$ExchangeProductResponseModelFromJson(
         Map<String, dynamic> json) =>
     ExchangeProductResponseModel(
       success: json['success'] as bool,
-      data: Data.fromJson(json['data'] as Map<String, dynamic>),
+      data: const DataConverter().fromJson(json['data']),
       countTotal: json['count_total'] as num? ?? 0,
       amountTotal: json['amount_total'] as num? ?? 0,
     );
@@ -19,19 +19,25 @@ Map<String, dynamic> _$ExchangeProductResponseModelToJson(
         ExchangeProductResponseModel instance) =>
     <String, dynamic>{
       'success': instance.success,
-      'data': instance.data,
+      'data': const DataConverter().toJson(instance.data),
       'amount_total': instance.amountTotal,
       'count_total': instance.countTotal,
     };
 
-Data _$DataFromJson(Map<String, dynamic> json) => Data(
+ExchangeProductListDataModel _$ExchangeProductListDataModelFromJson(
+        Map<String, dynamic> json) =>
+    ExchangeProductListDataModel(
       exchangeProducts: (json['data'] as List<dynamic>)
           .map((e) => ExchangeProduct.fromJson(e as Map<String, dynamic>))
           .toList(),
-      meta: Meta.fromJson(json['meta'] as Map<String, dynamic>),
+      meta: json['meta'] == null
+          ? null
+          : Meta.fromJson(json['meta'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$DataToJson(Data instance) => <String, dynamic>{
+Map<String, dynamic> _$ExchangeProductListDataModelToJson(
+        ExchangeProductListDataModel instance) =>
+    <String, dynamic>{
       'data': instance.exchangeProducts,
       'meta': instance.meta,
     };

@@ -7,7 +7,8 @@ part 'exchange_product_response_model.g.dart'; // This is the generated file.
 @JsonSerializable()
 class ExchangeProductResponseModel {
   final bool success;
-  final Data data;
+  @DataConverter()
+  final ExchangeProductListDataModel data;
   @JsonKey(name: 'amount_total',defaultValue: 0)
   final num amountTotal;
   @JsonKey(name: 'count_total',defaultValue: 0)
@@ -27,19 +28,19 @@ class ExchangeProductResponseModel {
 }
 
 @JsonSerializable()
-class Data {
+class ExchangeProductListDataModel {
   @JsonKey(name: 'data')
   final List<ExchangeProduct> exchangeProducts; // Fixed type to match the intended model.
-  final Meta meta;
+  final Meta? meta;
 
-  Data({
+  ExchangeProductListDataModel({
     required this.exchangeProducts,
     required this.meta,
   });
 
-  factory Data.fromJson(Map<String, dynamic> json) => _$DataFromJson(json);
+  factory ExchangeProductListDataModel.fromJson(Map<String, dynamic> json) => _$ExchangeProductListDataModelFromJson(json);
 
-  Map<String, dynamic> toJson() => _$DataToJson(this);
+  Map<String, dynamic> toJson() => _$ExchangeProductListDataModelToJson(this);
 }
 
 @JsonSerializable()
@@ -82,4 +83,23 @@ class Meta {
   factory Meta.fromJson(Map<String, dynamic> json) => _$MetaFromJson(json);
 
   Map<String, dynamic> toJson() => _$MetaToJson(this);
+}
+
+
+class DataConverter implements JsonConverter<ExchangeProductListDataModel, dynamic> {
+  const DataConverter();
+
+  @override
+  ExchangeProductListDataModel fromJson(dynamic json) {
+    if (json is List) {
+      return ExchangeProductListDataModel(exchangeProducts: [], meta: null);
+    } else if (json is Map<String, dynamic>) {
+      return ExchangeProductListDataModel.fromJson(json);
+    } else {
+      throw Exception('Unexpected type for data: ${json.runtimeType}');
+    }
+  }
+
+  @override
+  dynamic toJson(ExchangeProductListDataModel object) => object.toJson();
 }

@@ -94,10 +94,14 @@ class ReturnHistoryItemWidget extends StatelessWidget {
                   onSelected: (value)async {
                     switch (value)  {
                       case "edit":
+                        bool hasPermission = controller.checkReturnPermissions("update");
+                        if(!hasPermission) return;
                         await controller.processEdit(returnHistory: returnHistory, context: context);
                         onChange(0);
                         break;
                       case "delete":
+                        bool hasPermission = controller.checkReturnPermissions("destroy");
+                        if(!hasPermission) return;
                         AwesomeDialog(
                             context: context,
                             dialogType: DialogType.error,

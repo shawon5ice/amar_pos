@@ -8,6 +8,8 @@ import 'package:amar_pos/features/exchange/presentation/exchange_steps/return_pr
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../../core/widgets/reusable/forbidden_access_full_screen_widget.dart';
+
 class ExchangeView extends StatefulWidget {
   const ExchangeView({super.key});
 
@@ -27,7 +29,7 @@ class _ExchangeViewState extends State<ExchangeView> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      body: Theme(
+      body: !controller.exchangeCreateAccess && !controller.isEditing ? ForbiddenAccessFullScreenWidget() :  Theme(
         data: ThemeData(
           canvasColor: AppColors.lightGreen.withOpacity(.2),
           // primaryColor: AppColors.primary,
@@ -111,7 +113,7 @@ class _ExchangeViewState extends State<ExchangeView> {
           },
         ),
       ),
-      bottomNavigationBar: _buildCustomButtons(controlsDetails),
+      bottomNavigationBar:!controller.exchangeCreateAccess && !controller.isEditing ? null :  _buildCustomButtons(controlsDetails),
     );
   }
 

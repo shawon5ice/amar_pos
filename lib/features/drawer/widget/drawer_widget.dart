@@ -166,9 +166,9 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                           //   onParentTap: () => onParentTap(DrawerItems.sales),
                           //   onChildTap: (child) => onChildTap(DrawerItems.sales, child),
                           // ),
-                          ExpandableDrawerWidget(
+                          if(controller.returnAndExchangeModule.isNotEmpty)ExpandableDrawerWidget(
                             item: DrawerItems.returnAndExchange,
-                            children: const ["Return", "Exchange",],
+                            children: controller.returnAndExchangeModule.toList(),
                             expanded: (bool isExpanded) {
                               setState(() {
                                 if (isExpanded) controller.selectedParentItem = DrawerItems.returnAndExchange;

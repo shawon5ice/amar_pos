@@ -38,6 +38,7 @@ class DrawerMenuController extends GetxController {
   LoginData? loginData = LoginDataBoxManager().loginData;
   //Menus to active
   Set<String> purchaseModule = Set();
+  Set<String> returnAndExchangeModule = Set();
   Set<String> inventoryModule = Set();
   bool salesModule = false;
 
@@ -48,11 +49,13 @@ class DrawerMenuController extends GetxController {
   }
 
   Future<void> loadModules() async {
-    // purchaseModule.clear();
-    // inventoryModule.clear();
+    purchaseModule.clear();
+    inventoryModule.clear();
+    returnAndExchangeModule.clear();
     print("--->");
     loadSaleModule();
     loadPurchaseModule();
+    loadReturnAndExchangeModule();
     loadInventoryModule();
     update(['drawer_menu']);
   }
@@ -67,6 +70,7 @@ class DrawerMenuController extends GetxController {
   }
 
   void loadInventoryModule(){
+
     if(PermissionManager.hasParentPermission('Inventory')){
       inventoryModule.add("Product List");
     }else{
@@ -93,6 +97,19 @@ class DrawerMenuController extends GetxController {
       purchaseModule.add("Purchase Return");
     }else{
       purchaseModule.remove("Purchase Return");
+    }
+  }
+
+  void loadReturnAndExchangeModule(){
+    if(PermissionManager.hasParentPermission('OrderReturn')){
+      returnAndExchangeModule.add("Return");
+    }else{
+      returnAndExchangeModule.remove("Return");
+    }
+    if(PermissionManager.hasParentPermission('OrderExchange')){
+      returnAndExchangeModule.add("Exchange");
+    }else{
+      returnAndExchangeModule.remove("Exchange");
     }
   }
 

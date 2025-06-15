@@ -95,97 +95,102 @@ class _SalesScreenState extends State<ReturnScreen>
     final DrawerMenuController drawerMenuController = Get.find();
     return PopScope(
       canPop: false,
-      child: Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          leading: DrawerButton(
-            onPressed: () async {
-              if(controller.isEditing){
-                bool openDrawer = await showDiscardDialog(context);
-                if(openDrawer){
-                  controller.clearEditing();
-                  drawerMenuController.openDrawer();
-                }
-              }else{
-                drawerMenuController.openDrawer();
-              }
-            },
-          ),
-          title: const Text("Return"),
-          actions: [
-            GetBuilder<ReturnController>(
-              id: 'action_icon',
-              builder: (controller) => _tabController.index == 0? SizedBox(): GestureDetector(
-                onTap: (){
-                  showModalBottomSheet(
-                      isScrollControlled: true,
-                      context: context, builder:(context) => ReturnHistoryFilterBottomSheet(
-                    returnHistory: _tabController.index == 1,
-                    selectedBrand: controller.brand,
-                    selectedCategory: controller.category,
-                  ));
+      child: GetBuilder<ReturnController>(
+          id: 'permission_handler_builder',
+          builder: (controller) {
+          return Scaffold(
+            appBar: AppBar(
+              centerTitle: true,
+              leading: DrawerButton(
+                onPressed: () async {
+                  if(controller.isEditing){
+                    bool openDrawer = await showDiscardDialog(context);
+                    if(openDrawer){
+                      controller.clearEditing();
+                      drawerMenuController.openDrawer();
+                    }
+                  }else{
+                    drawerMenuController.openDrawer();
+                  }
                 },
-                child: SvgPicture.asset(AppAssets.funnelFilter),
               ),
-            ),
-            addW(12),
-          ],
-        ),
-        body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            child: Column(
-              children: [
-                Container(
-                  height: 40,
-                  padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
-                  ),
-                  child: TabBar(
-                    dividerHeight: 0,
-                    controller: _tabController,
-                    indicatorSize: TabBarIndicatorSize.tab,
-                    labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                    indicator: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    unselectedLabelStyle:
-                        const TextStyle(fontWeight: FontWeight.normal),
-                    labelColor: Colors.white,
-                    splashBorderRadius: BorderRadius.circular(20),
-                    unselectedLabelColor: Colors.black,
-                    tabs: const [
-                      Tab(
-                        text: 'Return',
-                      ),
-                      Tab(text: 'History'),
-                      Tab(text: 'Products'),
-                    ],
+              title: const Text("Return"),
+              actions: [
+                GetBuilder<ReturnController>(
+                  id: 'action_icon',
+                  builder: (controller) => _tabController.index == 0? SizedBox(): GestureDetector(
+                    onTap: (){
+                      showModalBottomSheet(
+                          isScrollControlled: true,
+                          context: context, builder:(context) => ReturnHistoryFilterBottomSheet(
+                        returnHistory: _tabController.index == 1,
+                        selectedBrand: controller.brand,
+                        selectedCategory: controller.category,
+                      ));
+                    },
+                    child: SvgPicture.asset(AppAssets.funnelFilter),
                   ),
                 ),
-                addH(12),
-                Expanded(
-                  child: TabBarView(
-                    physics: const NeverScrollableScrollPhysics(),
-                    controller: _tabController,
-                    children: [
-                      ReturnPage(),
-                      ReturnHistoryScreen(
-                        onChange: (value){
-                          _tabController.index = value;
-                        },
-                      ),
-                      ReturnProducts(),
-                    ],
-                  ),
-                )
+                addW(12),
               ],
             ),
-          ),
-        ),
+            body: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: Column(
+                  children: [
+                    Container(
+                      height: 40,
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                      ),
+                      child: TabBar(
+                        dividerHeight: 0,
+                        controller: _tabController,
+                        indicatorSize: TabBarIndicatorSize.tab,
+                        labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                        indicator: BoxDecoration(
+                          color: AppColors.primary,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        unselectedLabelStyle:
+                            const TextStyle(fontWeight: FontWeight.normal),
+                        labelColor: Colors.white,
+                        splashBorderRadius: BorderRadius.circular(20),
+                        unselectedLabelColor: Colors.black,
+                        tabs: const [
+                          Tab(
+                            text: 'Return',
+                          ),
+                          Tab(text: 'History'),
+                          Tab(text: 'Products'),
+                        ],
+                      ),
+                    ),
+                    addH(12),
+                    Expanded(
+                      child: TabBarView(
+                        physics: const NeverScrollableScrollPhysics(),
+                        controller: _tabController,
+                        children: [
+                          ReturnPage(),
+                          ReturnHistoryScreen(
+                            onChange: (value){
+                              _tabController.index = value;
+                            },
+                          ),
+                          ReturnProducts(),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          );
+        }
       ),
     );
   }
