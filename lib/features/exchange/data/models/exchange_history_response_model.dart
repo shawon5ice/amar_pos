@@ -5,7 +5,9 @@ part 'exchange_history_response_model.g.dart';
 @JsonSerializable()
 class ExchangeHistoryResponseModel {
   final bool success;
-  final ExchangeHistoryData data;
+  @DataConverter()
+  @JsonKey(name: 'data')
+  ExchangeHistoryData? data;
   @JsonKey(name: "count_total")
   final num countTotal;
   @JsonKey(name: "amount_total")
@@ -13,7 +15,7 @@ class ExchangeHistoryResponseModel {
 
   ExchangeHistoryResponseModel({
     required this.success,
-    required this.data,
+    this.data,
     required this.amountTotal,
     required this.countTotal
   });
@@ -164,4 +166,41 @@ class PageLink {
       _$PageLinkFromJson(json);
 
   Map<String, dynamic> toJson() => _$PageLinkToJson(this);
+}
+
+class DataConverter implements JsonConverter<ExchangeHistoryData?, dynamic> {
+  const DataConverter();
+
+  @override
+  ExchangeHistoryData? fromJson(dynamic json) {
+    if (json is List) {
+      // Return empty ExchangeHistoryData when array is received
+      return ExchangeHistoryData(
+        exchangeHistoryList: [],
+        links: Links(
+          first: '',
+          last: '',
+          prev: null,
+          next: null,
+        ),
+        meta: Meta(
+          currentPage: 0,
+          from: 0,
+          lastPage: 0,
+          links: [],
+          path: '',
+          perPage: 0,
+          to: 0,
+          total: 0,
+        ),
+      );
+    } else if (json is Map<String, dynamic>) {
+      return ExchangeHistoryData.fromJson(json);
+    } else {
+      throw Exception('Unexpected type for data: ${json.runtimeType}');
+    }
+  }
+
+  @override
+  dynamic toJson(ExchangeHistoryData? object) => object?.toJson();
 }

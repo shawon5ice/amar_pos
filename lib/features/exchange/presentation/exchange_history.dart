@@ -104,7 +104,7 @@ class _ExchangeHistoryScreenState extends State<ExchangeHistoryScreen> {
                       title: 'Invoice',
                       value: controller.exchangeHistoryResponseModel != null
                           ? Methods.getFormattedNumber(controller
-                          .exchangeHistoryResponseModel!.data.exchangeHistoryList.length
+                          .exchangeHistoryResponseModel!.data!.exchangeHistoryList.length
                           .toDouble())
                           : null,
                       asset: AppAssets.invoice,
@@ -172,10 +172,10 @@ class _ExchangeHistoryScreenState extends State<ExchangeHistoryScreen> {
                           await controller.getExchangeHistory(page: nextPage);
                         },
                         totalPage: controller
-                            .exchangeHistoryResponseModel?.data.meta.lastPage ??
+                            .exchangeHistoryResponseModel?.data!.meta.lastPage ??
                             0,
                         totalSize:
-                        controller.exchangeHistoryResponseModel?.data.meta.total ??
+                        controller.exchangeHistoryResponseModel?.data!.meta.total ??
                             0,
                         itemPerPage: 10,
                       ),

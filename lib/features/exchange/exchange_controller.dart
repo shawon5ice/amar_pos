@@ -758,7 +758,7 @@ class ExchangeController extends GetxController {
 
         if (exchangeHistoryResponseModel != null) {
           exchangeHistoryList
-              .addAll(exchangeHistoryResponseModel!.data.exchangeHistoryList);
+              .addAll(exchangeHistoryResponseModel!.data!.exchangeHistoryList);
         }
       } else {
         if (page != 1) {
