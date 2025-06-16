@@ -20,78 +20,91 @@ import 'views/trial_balance/trial_balance_screen.dart';
 
 class AccountingController extends GetxController {
   bool dailyStatementAccess = true;
+  bool cashStatementAccess = true;
+  bool journalAccess = true;
+  bool expenseVoucherAccess = true;
+  bool dueCollectionAccess = true;
+  bool duePaymentAccess = true;
+  bool moneyTransferAccess = true;
+  bool moneyAdjustmentAccess = true;
+  bool ledgerAccess = true;
+  bool trialBalanceAccess = true;
+  bool profitOrLossAccess = true;
+  bool balanceSheetAccess = true;
+  bool chartOfAccountAccess = true;
+  bool accountOpeningHistoryAccess = true;
+
 
   List<AccountingMenuItem> accounting = [];
 
   void prepareAccountingMenuItems() {
-    logger.d("----<>");
     accounting.addIf(dailyStatementAccess,AccountingMenuItem(
         title: "Daily Statement",
         onPress: () {
           Get.toNamed(DailyStatement.routeName);
         }));
 
-    accounting.add(AccountingMenuItem(
+    accounting.addIf(cashStatementAccess,AccountingMenuItem(
         title: "Cash Statement",
         onPress: () {
           Get.toNamed(CashStatement.routeName);
         }));
-    accounting.add(AccountingMenuItem(
+    accounting.addIf(journalAccess,AccountingMenuItem(
         title: "Manage Journal",
         onPress: () {
           Get.toNamed(ManageJournalScreen.routeName);
         }));
-    accounting.add(AccountingMenuItem(
+    accounting.addIf(expenseVoucherAccess,AccountingMenuItem(
         title: "Expense Voucher",
         onPress: () {
           Get.toNamed(ExpenseVoucher.routeName);
         }));
-    accounting.add(AccountingMenuItem(
+    accounting.addIf(dueCollectionAccess,AccountingMenuItem(
         title: "Due Collection",
         onPress: () {
           Get.toNamed(DueCollection.routeName);
         }));
-    accounting.add(AccountingMenuItem(
+    accounting.addIf(duePaymentAccess,AccountingMenuItem(
         title: "Due Payment",
         onPress: () {
           Get.toNamed(SupplierPayment.routeName);
         }));
-    accounting.add(AccountingMenuItem(
+    accounting.addIf(moneyTransferAccess, AccountingMenuItem(
         title: "Money Transfer",
         onPress: () {
           Get.toNamed(MoneyTransfer.routeName);
         }));
-    accounting.add(AccountingMenuItem(
+    accounting.addIf(moneyAdjustmentAccess,AccountingMenuItem(
         title: "Money Adjustment",
         onPress: () {
           Get.toNamed(MoneyAdjustment.routeName);
         }));
-    accounting.add(AccountingMenuItem(
+    accounting.addIf(ledgerAccess,AccountingMenuItem(
         title: "Ledger",
         onPress: () {
           Get.toNamed(LedgerScreen.routeName);
         }));
-    accounting.add(AccountingMenuItem(
+    accounting.addIf(trialBalanceAccess,AccountingMenuItem(
         title: "Trial Balance",
         onPress: () {
           Get.toNamed(TrialBalanceScreen.routeName);
         }));
-    accounting.add(AccountingMenuItem(
+    accounting.addIf(profitOrLossAccess,AccountingMenuItem(
         title: "Profit or Loss",
         onPress: () {
           Get.toNamed(ProfitOrLossScreen.routeName);
         }));
-    accounting.add(AccountingMenuItem(
+    accounting.addIf(balanceSheetAccess,AccountingMenuItem(
         title: "Balance Sheet",
         onPress: () {
           Get.toNamed(BalanceSheetScreen.routeName);
         }));
-    accounting.add(AccountingMenuItem(
+    accounting.addIf(chartOfAccountAccess, AccountingMenuItem(
         title: "Chart Of Account",
         onPress: () {
           Get.toNamed(ChartOfAccountScreen.routeName);
         }));
-    accounting.add(AccountingMenuItem(
+    accounting.addIf(accountOpeningHistoryAccess,AccountingMenuItem(
         title: "Account Opening History",
         onPress: () {
           Get.toNamed(AccountOpening.routeName);
@@ -100,8 +113,35 @@ class AccountingController extends GetxController {
 
   @override
   void onReady() {
-    dailyStatementAccess =
-        PermissionManager.hasPermission("Journal.getDailyStatementReport");
+    dailyStatementAccess = PermissionManager.hasPermission("Journal.getDailyStatementReport");
+    cashStatementAccess = PermissionManager.hasPermission("Journal.getCashStatementReport");
+    ledgerAccess = PermissionManager.hasPermission("Journal.getBookLedgerReport");
+    trialBalanceAccess = PermissionManager.hasPermission("Journal.getTrialBalanceReport");
+    profitOrLossAccess = PermissionManager.hasPermission("Journal.getProfitAndLossReportNew");
+    balanceSheetAccess = PermissionManager.hasPermission("Journal.getBalanceSheetReport");
+    journalAccess = PermissionManager.hasAnyPermission([
+      "Journal.getAllJournalList",
+      "Journal.store",
+      "Journal.update",
+      "Journal.delete",
+    ]);
+    expenseVoucherAccess = PermissionManager.hasAnyPermission([
+      "Journal.getAllExpenseVoucher",
+      "Journal.storeExpenseVoucher",
+      "Journal.updateExpenseVoucher"
+    ]);
+    dueCollectionAccess = PermissionManager.hasParentPermission("MoneyReceipt");
+
+    chartOfAccountAccess = PermissionManager.hasParentPermission("ChartOfAccounts");
+
+    accountOpeningHistoryAccess = PermissionManager.hasParentPermission("ChartOfAccountOpening");
+    duePaymentAccess = PermissionManager.hasParentPermission("PaymentReceipt");
+    moneyTransferAccess = PermissionManager.hasParentPermission("BalanceTransfer");
+    moneyAdjustmentAccess = PermissionManager.hasParentPermission("BalanceAdjustment");
+
+
+
+    logger.i(dailyStatementAccess);
     prepareAccountingMenuItems();
     update(['permission_handler_builder']);
     super.onReady();

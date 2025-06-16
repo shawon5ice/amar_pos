@@ -1,3 +1,4 @@
+import 'package:amar_pos/core/widgets/reusable/forbidden_access_full_screen_widget.dart';
 import 'package:amar_pos/features/accounting/presentation/accounting_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -12,9 +13,19 @@ class AccountingScreen extends StatefulWidget {
 
 class _AccountingScreenState extends State<AccountingScreen> {
 
-  final AccountingController _controller = Get.put(AccountingController());
+  late final AccountingController _controller;
 
 
+  @override
+  void initState() {
+    _controller = Get.put(AccountingController());
+    super.initState();
+  }
+  @override
+  void dispose() {
+    Get.delete<AccountingController>();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +45,9 @@ class _AccountingScreenState extends State<AccountingScreen> {
       body: GetBuilder<AccountingController>(
           id: 'permission_handler_builder',
           builder: (controller) {
+            if(controller.accounting.isEmpty){
+              return const ForbiddenAccessFullScreenWidget();
+            }
           return GridView.count(
             primary: false,
             padding: const EdgeInsets.all(20),
@@ -49,7 +63,7 @@ class _AccountingScreenState extends State<AccountingScreen> {
                       borderRadius: const BorderRadius.all(Radius.circular(10)),
                       border: Border.all(color: const Color(0xffFF9000), width: .5)
                     ),
-                    child: Center(child: Text(e.title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),))),
+                    child: Center(child: Text(e.title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),))),
               ),)
             ],
           );
