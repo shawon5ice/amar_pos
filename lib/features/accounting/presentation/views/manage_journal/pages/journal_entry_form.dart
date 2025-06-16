@@ -69,11 +69,11 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
   bool shouldDisableDebit = false;
   bool shouldDisableCredit = false;
 
-  JournalEntryData? initialChartOfAccountOpeningEntry;
+  JournalEntryData? initialJournalEntry;
 
   @override
   void initState() {
-    initialChartOfAccountOpeningEntry = Get.arguments;
+    initialJournalEntry = Get.arguments;
     initializeData();
     super.initState();
   }
@@ -83,23 +83,23 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
     Methods.showLoading();
 
     await controller.getLastLevelChartOfAccounts().then((value) {
-      // if (initialChartOfAccountOpeningEntry != null) {
+      // if (initialJournalEntry != null) {
       //   selectedDate =
-      //       DateTime.tryParse(initialChartOfAccountOpeningEntry!.openingDate);
+      //       DateTime.tryParse(initialJournalEntry!.openingDate);
       //   _textEditingController.text = formatDate(selectedDate!);
-      //   entries.first.entry.amount = initialChartOfAccountOpeningEntry!.amount;
+      //   entries.first.entry.amount = initialJournalEntry!.amount;
       //   entries.first.debitController.text =
-      //       initialChartOfAccountOpeningEntry!.amount.toString();
+      //       initialJournalEntry!.amount.toString();
       //   entries.first.remarksController.text =
-      //       initialChartOfAccountOpeningEntry!.remarks.toString();
+      //       initialJournalEntry!.remarks.toString();
       //   entries.first.entry.remarks =
-      //       initialChartOfAccountOpeningEntry!.remarks;
+      //       initialJournalEntry!.remarks;
       //   entries.first.entry.accountType =
-      //       initialChartOfAccountOpeningEntry!.accountType;
+      //       initialJournalEntry!.accountType;
       //   entries.first.chartOfAccount =
       //       controller.lastLevelChartOfAccountList.singleWhere((e) =>
       //       e.id ==
-      //           initialChartOfAccountOpeningEntry!.account?.id);
+      //           initialJournalEntry!.account?.id);
       // }
       setState(() {});
     });
@@ -120,7 +120,7 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
       top: false,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Chart Of Account"),
+          title: const Text("Create Voucher"),
           centerTitle: true,
         ),
         backgroundColor: const Color(0xFFFAFAF5),
@@ -449,7 +449,7 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
                             ),
                           ),
                           if (index == entries.length - 1 &&
-                              initialChartOfAccountOpeningEntry == null) ...[
+                              initialJournalEntry == null) ...[
                             ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.blue.shade100,
@@ -499,20 +499,20 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
         bottomNavigationBar: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           child: CustomButton(
-            text: initialChartOfAccountOpeningEntry != null
+            text: initialJournalEntry != null
                 ? "Update Now"
                 : "Submit Now",
             onTap: () {
               if (formKey.currentState!.validate()) {
                 var data = entries.map((e) => e.entry.toJson()).toList();
-                if (initialChartOfAccountOpeningEntry != null) {
+                if (initialJournalEntry != null) {
                   var request = {
                     ...entries.first.entry.toJson(),
                     "voucher_type": getVoucherType(),
                     "paymentMethod": selectedPaymentMethod?.id,
                   };
                   controller.updateAccountHistory(
-                      request, initialChartOfAccountOpeningEntry!.id);
+                      request, initialJournalEntry!.id);
                 } else {
                   var request = {
                     "voucher_type": getVoucherType(),

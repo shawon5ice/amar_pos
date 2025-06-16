@@ -4,6 +4,7 @@ import 'package:amar_pos/features/accounting/data/models/manage_journal/journal_
 import 'package:amar_pos/features/accounting/presentation/views/chart_of_account/chart_of_account_controller.dart';
 import 'package:amar_pos/features/accounting/presentation/views/chart_of_account/pages/co_account_entry_form.dart';
 import 'package:amar_pos/features/accounting/presentation/views/manage_journal/manage_journal_controller.dart';
+import 'package:amar_pos/features/accounting/presentation/views/manage_journal/pages/journal_entry_form.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
@@ -88,14 +89,20 @@ class JournalListItemWidget extends StatelessWidget {
                 assetPath: AppAssets.printIcon,
               ),
               addW(8),
-              ChartOfAccountOpeningHistoryItemActionMenu(
+              if(_controller.journalEditAccess || _controller.journalDeleteAccess)ChartOfAccountOpeningHistoryItemActionMenu(
+                editAccess: _controller.journalEditAccess,
+                deleteAccess: _controller.journalDeleteAccess,
                 onSelected: (value) {
                   switch (value) {
                     case "edit":
-                      Get.toNamed(AccountEntryForm.routeName,
+                      bool hasPermission = _controller.checkJournalPermissions("update");
+                      if(!hasPermission) return;
+                      Get.toNamed(JournalEntryForm.routeName,
                           arguments: journalEntryData);
                       break;
                     case "delete":
+                      bool hasPermission = _controller.checkJournalPermissions("delete");
+                      if(!hasPermission) return;
                       AwesomeDialog(
                           context: context,
                           dialogType: DialogType.error,

@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 
 import '../../../../../core/constants/logger/logger.dart';
 import '../../../../../core/network/helpers/error_extractor.dart';
+import '../../../../../permission_manager.dart';
 import '../../../../auth/data/model/hive/login_data.dart';
 import '../../../../auth/data/model/hive/login_data_helper.dart';
 import '../../../data/models/chart_of_account/chart_of_account_list_response_model.dart';
@@ -32,6 +33,23 @@ class ManageJournalController extends GetxController{
   BalanceSheetListResponseModel? balanceSheetListResponseModel;
 
 
+  //Permissions
+  bool journalListAccess = false;
+  bool journalCreateAccess = false;
+  bool journalEditAccess = false;
+  bool journalDeleteAccess = false;
+
+
+  @override
+  void onReady() {
+    journalListAccess = PermissionManager.hasPermission("Journal.getAllJournalList");
+    journalCreateAccess = PermissionManager.hasPermission("Journal.store");
+    logger.i(journalCreateAccess);
+    journalEditAccess = PermissionManager.hasPermission("Journal.update");
+    journalDeleteAccess = PermissionManager.hasPermission("Journal.delete");
+    update(['permission_handler_builder']);
+    super.onReady();
+  }
 
 
   LoginData? loginData = LoginDataBoxManager().loginData;
@@ -367,5 +385,13 @@ class ManageJournalController extends GetxController{
     } finally {
       downloadLoading = false;
     }
+  }
+
+  bool checkJournalPermissions(String permission) {
+    if(!PermissionManager.hasPermission("Journal.$permission")){
+      ErrorExtractor.showSingleErrorDialog(Get.context!, "Forbidden access. You don't have Permission");
+      return false;
+    }
+    return true;
   }
 }

@@ -61,6 +61,7 @@ class DailyStatementController extends GetxController{
         endDate: selectedDateTimeRange.value?.end.toString(),
       );
 
+      logger.i(response);
       if (response != null && response['success']) {
         logger.e(response);
         dailyStatementReportResponseModel =

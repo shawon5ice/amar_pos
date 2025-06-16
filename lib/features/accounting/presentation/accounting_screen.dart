@@ -1,3 +1,4 @@
+import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:amar_pos/core/widgets/reusable/forbidden_access_full_screen_widget.dart';
 import 'package:amar_pos/features/accounting/presentation/accounting_controller.dart';
 import 'package:flutter/material.dart';
@@ -45,7 +46,10 @@ class _AccountingScreenState extends State<AccountingScreen> {
       body: GetBuilder<AccountingController>(
           id: 'permission_handler_builder',
           builder: (controller) {
-            if(controller.accounting.isEmpty){
+            if(controller.isAccountingLoading){
+              return RandomLottieLoader.lottieLoader();
+            }
+            if(controller.accounting.isEmpty ){
               return const ForbiddenAccessFullScreenWidget();
             }
           return GridView.count(

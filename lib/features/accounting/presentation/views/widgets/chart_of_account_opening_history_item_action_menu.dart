@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 
 class ChartOfAccountOpeningHistoryItemActionMenu extends StatelessWidget {
   final Function(String) onSelected;
+  final bool editAccess;
+  final bool deleteAccess;
 
-  const ChartOfAccountOpeningHistoryItemActionMenu({super.key, required this.onSelected,});
+  const ChartOfAccountOpeningHistoryItemActionMenu({super.key, required this.onSelected,this.editAccess = true,this.deleteAccess = true});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +24,7 @@ class ChartOfAccountOpeningHistoryItemActionMenu extends StatelessWidget {
         onSelected: onSelected,
         itemBuilder: (BuildContext context) {
           return [
-            const PopupMenuItem<String>(
+            if(editAccess)const PopupMenuItem<String>(
               value: 'edit',
               child: Row(
                 children: [
@@ -32,7 +34,7 @@ class ChartOfAccountOpeningHistoryItemActionMenu extends StatelessWidget {
                 ],
               ),
             ),
-            const PopupMenuItem<String>(
+            if(deleteAccess)const PopupMenuItem<String>(
               value: 'delete',
               child: Row(
                 children: [

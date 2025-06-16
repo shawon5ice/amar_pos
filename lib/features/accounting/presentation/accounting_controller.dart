@@ -36,8 +36,10 @@ class AccountingController extends GetxController {
 
 
   List<AccountingMenuItem> accounting = [];
+  bool isAccountingLoading = false;
 
   void prepareAccountingMenuItems() {
+    isAccountingLoading = true;
     accounting.addIf(dailyStatementAccess,AccountingMenuItem(
         title: "Daily Statement",
         onPress: () {
@@ -113,6 +115,8 @@ class AccountingController extends GetxController {
 
   @override
   void onReady() {
+    isAccountingLoading = true;
+    update(['permission_handler_builder']);
     dailyStatementAccess = PermissionManager.hasPermission("Journal.getDailyStatementReport");
     cashStatementAccess = PermissionManager.hasPermission("Journal.getCashStatementReport");
     ledgerAccess = PermissionManager.hasPermission("Journal.getBookLedgerReport");
@@ -143,6 +147,8 @@ class AccountingController extends GetxController {
 
     logger.i(dailyStatementAccess);
     prepareAccountingMenuItems();
+
+    isAccountingLoading = false;
     update(['permission_handler_builder']);
     super.onReady();
   }

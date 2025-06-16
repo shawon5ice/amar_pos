@@ -14,6 +14,7 @@ import '../../../../../../core/widgets/custom_text_field.dart';
 import '../../../../../../core/widgets/loading/random_lottie_loader.dart';
 import '../../../../../../core/widgets/pager_list_view.dart';
 import '../../../../../../core/widgets/reusable/custom_svg_icon_widget.dart';
+import '../../../../../../core/widgets/reusable/forbidden_access_full_screen_widget.dart';
 import '../../widgets/account_opening_history_item_widget.dart';
 import '../../widgets/journal_list_item_widget.dart';
 
@@ -42,199 +43,209 @@ class _ManageJournalScreenState extends State<ManageJournalScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: const Text("Manage Journal"),
-          centerTitle: true,
-          actions: [
-            IconButton(
-              onPressed: () async {
-                DateTimeRange? selectedDate = await showDateRangePicker(
-                  context: context,
-                  firstDate:
-                      DateTime.now().subtract(const Duration(days: 1000)),
-                  lastDate: DateTime.now().add(const Duration(days: 1000)),
-                  initialDateRange: controller.selectedDateTimeRange.value,
-                );
-                controller.selectedDateTimeRange.value = selectedDate;
-                controller.update(['date_status']);
-                controller.getJournalList();
-              },
-              icon: SvgPicture.asset(AppAssets.calenderIcon),
-            )
-          ],
-        ),
-        backgroundColor: const Color(0xFFFAFAF5),
-        body: Padding(
-          padding: const EdgeInsets.all(16),
-          child: RefreshIndicator(
-            onRefresh: () async {
-              controller.getJournalList();
-            },
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: CustomTextField(
-                        textCon: controller.searchController,
-                        hintText: "Search...",
-                        brdrClr: Colors.transparent,
-                        txtSize: 12,
-                        debounceDuration: const Duration(
-                          milliseconds: 500,
-                        ),
-                        // noInputBorder: true,
-                        brdrRadius: 40,
-                        prefixWidget: const Icon(Icons.search),
-                        onChanged: (value) {
-                          controller.getJournalList();
-                        },
-                      ),
-                    ),
-                    addW(8),
-                    CustomSvgIconButton(
-                      bgColor: const Color(0xffEBFFDF),
-                      onTap: () {
-                        controller.downloadList(
-                          isPdf: false,
-                        );
-                      },
-                      assetPath: AppAssets.excelIcon,
-                    ),
-                    addW(4),
-                    CustomSvgIconButton(
-                      bgColor: const Color(0xffE1F2FF),
-                      onTap: () {
-                        controller.downloadList(
-                          isPdf: true,
-                        );
-                      },
-                      assetPath: AppAssets.downloadIcon,
-                    ),
-                    addW(4),
-                    CustomSvgIconButton(
-                      bgColor: const Color(0xffFFFCF8),
-                      onTap: () {
-                        controller.downloadList(isPdf: true, shouldPrint: true);
-                      },
-                      assetPath: AppAssets.printIcon,
-                    )
-                  ],
-                ),
-                addH(8),
-                GetBuilder<ManageJournalController>(
-                  id: 'date_status',
-                  builder: (controller) {
-                    if(controller.selectedDateTimeRange.value != null){
-                      return  Column(
-                        children: [
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                textAlign: TextAlign.center,
-                                '${formatDate(controller.selectedDateTimeRange.value!.start)} to ${formatDate(controller.selectedDateTimeRange.value!.end)}',
-                                style: const TextStyle(fontSize: 14),
-                                overflow: TextOverflow.visible,
-                                softWrap: false,
-                              ),
-                              ...[
-                                addW(32),
-                                GestureDetector(
-                                  onTap:
-                                  controller.selectedDateTimeRange.value == null
-                                      ? null
-                                      : () {
-                                    controller.selectedDateTimeRange.value =
-                                    null;
-                                    controller.update(['date_status']);
-                                    controller
-                                        .getJournalList();
-                                  },
-                                  child: CircleAvatar(
-                                      radius: 16,
-                                      backgroundColor:
-                                      controller.selectedDateTimeRange.value !=
-                                          null
-                                          ? Colors.red
-                                          : Colors.transparent,
-                                      child: controller.selectedDateTimeRange.value !=
-                                          null
-                                          ? Icon(
-                                        Icons.close,
-                                        color: Colors.white,
-                                        size: 16,
-                                      )
-                                          : null),
-                                ),
-                              ],
-                            ],
-                          ),
-                          addH(8),
-                        ],
-                      );
-                    }else{
-                      return SizedBox.shrink();
-                    }
+    return GetBuilder<ManageJournalController>(
+        id: 'permission_handler_builder',
+        builder: (controller) {
+        return Scaffold(
+            appBar: AppBar(
+              title: const Text("Manage Journal"),
+              centerTitle: true,
+              actions: [
+                IconButton(
+                  onPressed: () async {
+                    DateTimeRange? selectedDate = await showDateRangePicker(
+                      context: context,
+                      firstDate:
+                          DateTime.now().subtract(const Duration(days: 1000)),
+                      lastDate: DateTime.now().add(const Duration(days: 1000)),
+                      initialDateRange: controller.selectedDateTimeRange.value,
+                    );
+                    controller.selectedDateTimeRange.value = selectedDate;
+                    controller.update(['date_status']);
+                    controller.getJournalList();
                   },
-                ),
-                Expanded(
-                  child: GetBuilder<ManageJournalController>(
-                    id: 'journal_list',
-                    builder: (controller) {
-                      if (controller
-                          .isJournalListLoading) {
-                        return Center(
-                          child: RandomLottieLoader.lottieLoader(),
-                        );
-                      } else if (controller
-                              .journalListResponseModel ==
-                          null) {
-                        return const Center(
-                            child: Text("Something went wrong"));
-                      } else if (controller
-                          .journalEntryList.isEmpty) {
-                        return const Center(child: Text("No data found"));
-                      }
-                      return PagerListView<JournalEntryData>(
-                        // scrollController: _scrollController,
-                        items: controller.journalEntryList,
-                        itemBuilder: (_, item) {
-                          return JournalListItemWidget(journalEntryData: item,);
-                        },
-                        isLoading: controller.isLoadingMore,
-                        hasError: controller.hasError.value,
-                        onNewLoad: (int nextPage) async {
-                          await controller.getJournalList(
-                              page: nextPage);
-                        },
-                        totalPage: controller
-                                .journalListResponseModel
-                                ?.data
-                                ?.meta
-                                .lastPage ??
-                            0,
-                        totalSize: controller
-                                .journalListResponseModel
-                                ?.data
-                                ?.meta
-                                .total ??
-                            0,
-                        itemPerPage: 10,
-                      );
-                    },
-                  ),
-                ),
+                  icon: SvgPicture.asset(AppAssets.calenderIcon),
+                )
               ],
             ),
-          ),
-        ),
-        floatingActionButton: CustomFloatingActionButton(
-          onTap: () {
-            Get.toNamed(JournalEntryForm.routeName);
-          },
-        ));
+            backgroundColor: const Color(0xFFFAFAF5),
+            body: GetBuilder<ManageJournalController>(
+                id: 'permission_handler_builder',
+                builder: (controller) {
+                return !controller.journalListAccess ?const ForbiddenAccessFullScreenWidget() : Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: RefreshIndicator(
+                    onRefresh: () async {
+                      controller.getJournalList();
+                    },
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: CustomTextField(
+                                textCon: controller.searchController,
+                                hintText: "Search...",
+                                brdrClr: Colors.transparent,
+                                txtSize: 12,
+                                debounceDuration: const Duration(
+                                  milliseconds: 500,
+                                ),
+                                // noInputBorder: true,
+                                brdrRadius: 40,
+                                prefixWidget: const Icon(Icons.search),
+                                onChanged: (value) {
+                                  controller.getJournalList();
+                                },
+                              ),
+                            ),
+                            addW(8),
+                            CustomSvgIconButton(
+                              bgColor: const Color(0xffEBFFDF),
+                              onTap: () {
+                                controller.downloadList(
+                                  isPdf: false,
+                                );
+                              },
+                              assetPath: AppAssets.excelIcon,
+                            ),
+                            addW(4),
+                            CustomSvgIconButton(
+                              bgColor: const Color(0xffE1F2FF),
+                              onTap: () {
+                                controller.downloadList(
+                                  isPdf: true,
+                                );
+                              },
+                              assetPath: AppAssets.downloadIcon,
+                            ),
+                            addW(4),
+                            CustomSvgIconButton(
+                              bgColor: const Color(0xffFFFCF8),
+                              onTap: () {
+                                controller.downloadList(isPdf: true, shouldPrint: true);
+                              },
+                              assetPath: AppAssets.printIcon,
+                            )
+                          ],
+                        ),
+                        addH(8),
+                        GetBuilder<ManageJournalController>(
+                          id: 'date_status',
+                          builder: (controller) {
+                            if(controller.selectedDateTimeRange.value != null){
+                              return  Column(
+                                children: [
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        textAlign: TextAlign.center,
+                                        '${formatDate(controller.selectedDateTimeRange.value!.start)} to ${formatDate(controller.selectedDateTimeRange.value!.end)}',
+                                        style: const TextStyle(fontSize: 14),
+                                        overflow: TextOverflow.visible,
+                                        softWrap: false,
+                                      ),
+                                      ...[
+                                        addW(32),
+                                        GestureDetector(
+                                          onTap:
+                                          controller.selectedDateTimeRange.value == null
+                                              ? null
+                                              : () {
+                                            controller.selectedDateTimeRange.value =
+                                            null;
+                                            controller.update(['date_status']);
+                                            controller
+                                                .getJournalList();
+                                          },
+                                          child: CircleAvatar(
+                                              radius: 16,
+                                              backgroundColor:
+                                              controller.selectedDateTimeRange.value !=
+                                                  null
+                                                  ? Colors.red
+                                                  : Colors.transparent,
+                                              child: controller.selectedDateTimeRange.value !=
+                                                  null
+                                                  ? Icon(
+                                                Icons.close,
+                                                color: Colors.white,
+                                                size: 16,
+                                              )
+                                                  : null),
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                  addH(8),
+                                ],
+                              );
+                            }else{
+                              return SizedBox.shrink();
+                            }
+                          },
+                        ),
+                        Expanded(
+                          child: GetBuilder<ManageJournalController>(
+                            id: 'journal_list',
+                            builder: (controller) {
+                              if (controller
+                                  .isJournalListLoading) {
+                                return Center(
+                                  child: RandomLottieLoader.lottieLoader(),
+                                );
+                              } else if (controller
+                                      .journalListResponseModel ==
+                                  null) {
+                                return const Center(
+                                    child: Text("Something went wrong"));
+                              } else if (controller
+                                  .journalEntryList.isEmpty) {
+                                return const Center(child: Text("No data found"));
+                              }
+                              return PagerListView<JournalEntryData>(
+                                // scrollController: _scrollController,
+                                items: controller.journalEntryList,
+                                itemBuilder: (_, item) {
+                                  return JournalListItemWidget(journalEntryData: item,);
+                                },
+                                isLoading: controller.isLoadingMore,
+                                hasError: controller.hasError.value,
+                                onNewLoad: (int nextPage) async {
+                                  await controller.getJournalList(
+                                      page: nextPage);
+                                },
+                                totalPage: controller
+                                        .journalListResponseModel
+                                        ?.data
+                                        ?.meta
+                                        .lastPage ??
+                                    0,
+                                totalSize: controller
+                                        .journalListResponseModel
+                                        ?.data
+                                        ?.meta
+                                        .total ??
+                                    0,
+                                itemPerPage: 10,
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
+            ),
+            floatingActionButton: !controller.journalCreateAccess ? null : CustomFloatingActionButton(
+              onTap: () {
+                Get.toNamed(JournalEntryForm.routeName);
+              },
+            ));
+      }
+    );
   }
 }
 

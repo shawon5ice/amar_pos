@@ -29,6 +29,15 @@ class _DailyStatementState extends State<DailyStatement> {
   DailyStatementController controller = Get.put(DailyStatementController());
 
   @override
+  void initState() {
+    controller.selectedDateTimeRange.value = null;
+    if(!controller.loginData!.businessOwner){
+      controller.getDailyStatement(caId: controller.loginData!.store.id);
+    }
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Daily Statement"),centerTitle: true,
@@ -63,16 +72,19 @@ class _DailyStatementState extends State<DailyStatement> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const FieldTitle("Select Outlet"),
-                  addH(4),
+                  if(controller.loginData!.businessOwner)
+                    ...[
+                      const FieldTitle("Select Outlet"),
+                      addH(4),
+                    ],
                   Row(children: [
-                    Expanded(
-                          child: OutletDropDownWidget(
-                            isTransitional: false,
-                        onOutletSelection: (OutletModel? outlet) {
-                          controller.getDailyStatement(caId: outlet?.id);
-                        },
-                      )),
+                    controller.loginData!.businessOwner? Expanded(
+                        child: OutletDropDownWidget(
+                          isTransitional: false,
+                          onOutletSelection: (OutletModel? outlet) {
+                            controller.getDailyStatement(caId: outlet?.id);
+                          },
+                        )): Expanded(child: Text(controller.loginData!.store.name, style: context.textTheme.titleMedium,)),
                       addW(8),
                     CustomSvgIconButton(
                       bgColor: const Color(0xffEBFFDF),
@@ -100,15 +112,27 @@ class _DailyStatementState extends State<DailyStatement> {
                   ],),
                   // addH(8),
                   Obx(() {
-                    return controller.selectedDateTimeRange.value == null ? addH(20): Row(
+                    return controller.selectedDateTimeRange.value == null ? Center(
+                      child: Column(
+                        children: [
+                          addH(8),
+                          Text("On ${formatDate(DateTime.now())}"
+                            , style:const TextStyle(fontSize: 14, color: AppColors.error),),
+                          addH(8),
+                        ],
+                      ),
+                    ): Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text("${formatDate(controller.selectedDateTimeRange.value!.start)} - ${formatDate(controller.selectedDateTimeRange.value!.end)}", style:const TextStyle(fontSize: 14, color: AppColors.error),),
+                    Text(controller.selectedDateTimeRange.value!.start.toIso8601String() == controller.selectedDateTimeRange.value!.end.toIso8601String() ?
+                    "On ${formatDate(controller.selectedDateTimeRange.value!.start)}":
+                    "${formatDate(controller.selectedDateTimeRange.value!.start)} - ${formatDate(controller.selectedDateTimeRange.value!.end)}"
+                    , style:const TextStyle(fontSize: 14, color: AppColors.error),),
                         addW(16),
                         IconButton(onPressed: (){
                           controller.selectedDateTimeRange.value = null;
                           controller.getDailyStatement();
-                        }, icon: Icon(Icons.cancel_outlined, size: 18, color: AppColors.error,))
+                        }, icon: const Icon(Icons.cancel_outlined, size: 18, color: AppColors.error,))
                       ],
                     );
                   })
