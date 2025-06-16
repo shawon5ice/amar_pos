@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:amar_pos/core/constants/app_colors.dart';
 import 'package:amar_pos/core/constants/logger/logger.dart';
 import 'package:amar_pos/core/core.dart';
@@ -47,12 +49,35 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
   TextEditingController _textEditingController = TextEditingController();
   TextEditingController _remarksController = TextEditingController();
 
-  void _addEntry({required bool disableDebit, required bool disableCredit}) {
-    setState(() {
+  void _addEntry({bool? disableDebit, bool? disableCredit}) {
+
+    switch(voucherType){
+      case VoucherType.Receive:
+        entries.add(JournalEntryWrapper.empty(
+          false,
+          true,
+        ));
+        break;
+      case VoucherType.Payment:
+        entries.add(JournalEntryWrapper.empty(
+          true,
+          false,
+        ));
+        break;
+      case VoucherType.Contra:
+      case VoucherType.Journal:
       entries.add(JournalEntryWrapper.empty(
-        disableDebit,
-        disableCredit,
+        disableDebit?? false,
+        disableCredit?? false,
       ));
+      break;
+      default:
+        entries.add(JournalEntryWrapper.empty(
+          disableDebit?? false,
+          disableCredit?? false,
+        ));
+    }
+    setState(() {
     });
   }
 
@@ -79,10 +104,37 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
   }
 
   void initializeData() async {
-    _addEntry(disableDebit: false, disableCredit: true);
     Methods.showLoading();
 
+    if(initialJournalEntry != null){
+      await controller.getJournalDetails(initialJournalEntry!.id);
+      if(controller.journalVoucherResponseModel!.data!.details.isNotEmpty){
+        voucherType = getVoucherTypeEnum(controller.journalVoucherResponseModel!.data!.voucherType);
+        logger.i(controller.journalVoucherResponseModel!.data!.details.first.debit );
+        if(controller.journalVoucherResponseModel!.data!.details.first.debit == 0.0.toDouble()){
+          _addEntry(disableDebit: false, disableCredit: true);
+        }else{
+          _addEntry(disableDebit: true, disableCredit: false);
+        }
+        entries.first.debitController.text = controller.journalVoucherResponseModel!.data!.details.first.debit.toString();
+        entries.first.creditController.text = controller.journalVoucherResponseModel!.data!.details.first.credit.toString();
+        entries.first.referenceController.text = controller.journalVoucherResponseModel!.data!.details.first.refNo ?? '';
+      }
+      _remarksController.text = initialJournalEntry?.remarks ?? '';
+    }else{
+      _addEntry();
+    }
     await controller.getLastLevelChartOfAccounts().then((value) {
+      // if(initialJournalEntry != null && controller.journalVoucherResponseModel != null){
+      //   logger.d(controller.journalVoucherResponseModel!.data!.details.first.account.id);
+      //   entries.first.chartOfAccount = controller.lastLevelChartOfAccountList.singleWhere((e) {
+      //     logger.i(e.id);
+      //
+      //     return e.id ==
+      //   controller.journalVoucherResponseModel!.data!.details.first.account.id;
+      //   });
+      // }
+
       // if (initialJournalEntry != null) {
       //   selectedDate =
       //       DateTime.tryParse(initialJournalEntry!.openingDate);
@@ -152,9 +204,7 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
                                   setState(() {
                                     voucherType = val;
                                     entries.clear();
-                                    _addEntry(
-                                        disableDebit: false,
-                                        disableCredit: true);
+                                    _addEntry();
                                   });
                                 },
                               ),
@@ -168,9 +218,7 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
                                   setState(() {
                                     voucherType = val;
                                     entries.clear();
-                                    _addEntry(
-                                        disableDebit: true,
-                                        disableCredit: false);
+                                    _addEntry();
                                   });
                                 },
                               ),
@@ -189,9 +237,7 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
                                   setState(() {
                                     voucherType = val;
                                     entries.clear();
-                                    _addEntry(
-                                        disableDebit: false,
-                                        disableCredit: false);
+                                    _addEntry();
                                   });
                                 },
                               ),
@@ -205,9 +251,7 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
                                   setState(() {
                                     voucherType = val;
                                     entries.clear();
-                                    _addEntry(
-                                        disableDebit: false,
-                                        disableCredit: false);
+                                    _addEntry();
                                   });
                                 },
                               ),
@@ -462,19 +506,16 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
                                 ),
                               ),
                               onPressed: () {
-                                bool debit = voucherType == VoucherType.Receive;
-                                bool credit =
-                                    voucherType == VoucherType.Payment;
-                                if (voucherType != VoucherType.Receive &&
-                                    voucherType != VoucherType.Payment) {
-                                  _addEntry(
-                                      disableDebit: false,
-                                      disableCredit: false);
-                                } else {
-                                  _addEntry(
-                                      disableDebit: !debit,
-                                      disableCredit: !credit);
-                                }
+                                _addEntry();
+                                // bool debit = voucherType == VoucherType.Receive;
+                                // bool credit =
+                                //     voucherType == VoucherType.Payment;
+                                // if (voucherType != VoucherType.Receive &&
+                                //     voucherType != VoucherType.Payment) {
+                                //   _addEntry();
+                                // } else {
+                                //   _addEntry();
+                                // }
                               },
                               child: const Text("Add More",
                                   style:
@@ -538,5 +579,19 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
             : voucherType == VoucherType.Journal
                 ? 3
                 : 4;
+  }
+
+  VoucherType getVoucherTypeEnum(int voucherType) {
+    switch(voucherType){
+      case 1:
+        return VoucherType.Receive;
+      case 2:
+        return VoucherType.Payment;
+      case 3:
+        return VoucherType.Journal;
+      case 4:
+        return VoucherType.Contra;
+    }
+    return VoucherType.Receive;
   }
 }

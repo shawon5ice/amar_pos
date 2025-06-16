@@ -161,5 +161,14 @@ class ManageJournalService {
 
 
 
+  static Future<dynamic> getJournalDetails({
+    required String usrToken,
+    required int journalId,
+  }) async {
+    var response = await BaseClient.getData(
+      token: usrToken,
+      api: "journal/get-details-for-edit/$journalId",);
+    return response;
+  }
 
 }

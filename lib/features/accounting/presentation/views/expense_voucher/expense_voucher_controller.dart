@@ -9,6 +9,7 @@ import 'package:get/get_rx/get_rx.dart';
 
 import '../../../../../core/constants/logger/logger.dart';
 import '../../../../../core/core.dart';
+import '../../../../../permission_manager.dart';
 import '../../../../auth/data/model/hive/login_data.dart';
 import '../../../../auth/data/model/hive/login_data_helper.dart';
 import '../../../data/models/expense_voucher/expense_categories_response_model.dart';
@@ -37,9 +38,28 @@ class ExpenseVoucherController extends GetxController{
 
   LoginData? loginData = LoginDataBoxManager().loginData;
 
+  //Permissions
+  bool expenseVoucherListAccess = false;
+  bool expenseCategoriesListAccess = false;
+  bool expenseVoucherCreateAccess = false;
+  bool expenseCategoryCreateAccess = false;
+  bool journalEditAccess = false;
+  bool journalDeleteAccess = false;
+
   @override
   onInit(){
     super.onInit();
+  }
+
+
+  @override
+  void onReady() {
+    expenseVoucherListAccess = PermissionManager.hasPermission("Journal.getAllExpenseVoucher");
+    expenseVoucherCreateAccess = PermissionManager.hasPermission("Journal.storeExpenseVoucher");
+    expenseCategoriesListAccess = PermissionManager.hasPermission("ChartOfAccounts.getAllExpenseCategoryList");
+    expenseCategoryCreateAccess = PermissionManager.hasPermission("ChartOfAccounts.store");
+    update(['permission_handler_builder']);
+    super.onReady();
   }
 
 

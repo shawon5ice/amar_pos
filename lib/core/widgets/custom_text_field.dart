@@ -11,6 +11,7 @@ class CustomTextField extends StatefulWidget {
   final TextEditingController textCon;
   final TextInputAction? textInputAction;
   final String? prefixIcon;
+  final String? initialValue;
   final Widget? suffixWidget;
   final String hintText;
   final Widget? prefixWidget;
@@ -39,6 +40,7 @@ class CustomTextField extends StatefulWidget {
 
   const CustomTextField({
     super.key,
+    this.initialValue,
     required this.textCon,
     this.textInputAction,
     this.contentPadding = 15,
@@ -91,6 +93,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
   @override
   void dispose() {
     _debounce?.cancel();
+
     super.dispose();
   }
 

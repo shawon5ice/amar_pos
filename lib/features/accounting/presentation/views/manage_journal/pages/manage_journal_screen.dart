@@ -44,35 +44,34 @@ class _ManageJournalScreenState extends State<ManageJournalScreen> {
   @override
   Widget build(BuildContext context) {
     return GetBuilder<ManageJournalController>(
-        id: 'permission_handler_builder',
-        builder: (controller) {
+      id: 'permission_handler_builder',
+      builder: (controller) {
         return Scaffold(
-            appBar: AppBar(
-              title: const Text("Manage Journal"),
-              centerTitle: true,
-              actions: [
-                IconButton(
-                  onPressed: () async {
-                    DateTimeRange? selectedDate = await showDateRangePicker(
-                      context: context,
-                      firstDate:
-                          DateTime.now().subtract(const Duration(days: 1000)),
-                      lastDate: DateTime.now().add(const Duration(days: 1000)),
-                      initialDateRange: controller.selectedDateTimeRange.value,
-                    );
-                    controller.selectedDateTimeRange.value = selectedDate;
-                    controller.update(['date_status']);
-                    controller.getJournalList();
-                  },
-                  icon: SvgPicture.asset(AppAssets.calenderIcon),
-                )
-              ],
-            ),
-            backgroundColor: const Color(0xFFFAFAF5),
-            body: GetBuilder<ManageJournalController>(
-                id: 'permission_handler_builder',
-                builder: (controller) {
-                return !controller.journalListAccess ?const ForbiddenAccessFullScreenWidget() : Padding(
+          appBar: AppBar(
+            title: const Text("Manage Journal"),
+            centerTitle: true,
+            actions: [
+              IconButton(
+                onPressed: () async {
+                  DateTimeRange? selectedDate = await showDateRangePicker(
+                    context: context,
+                    firstDate:
+                        DateTime.now().subtract(const Duration(days: 1000)),
+                    lastDate: DateTime.now().add(const Duration(days: 1000)),
+                    initialDateRange: controller.selectedDateTimeRange.value,
+                  );
+                  controller.selectedDateTimeRange.value = selectedDate;
+                  controller.update(['date_status']);
+                  controller.getJournalList();
+                },
+                icon: SvgPicture.asset(AppAssets.calenderIcon),
+              )
+            ],
+          ),
+          backgroundColor: const Color(0xFFFAFAF5),
+          body: !controller.journalListAccess
+              ? const ForbiddenAccessFullScreenWidget()
+              : Padding(
                   padding: const EdgeInsets.all(16),
                   child: RefreshIndicator(
                     onRefresh: () async {
@@ -123,7 +122,8 @@ class _ManageJournalScreenState extends State<ManageJournalScreen> {
                             CustomSvgIconButton(
                               bgColor: const Color(0xffFFFCF8),
                               onTap: () {
-                                controller.downloadList(isPdf: true, shouldPrint: true);
+                                controller.downloadList(
+                                    isPdf: true, shouldPrint: true);
                               },
                               assetPath: AppAssets.printIcon,
                             )
@@ -133,8 +133,9 @@ class _ManageJournalScreenState extends State<ManageJournalScreen> {
                         GetBuilder<ManageJournalController>(
                           id: 'date_status',
                           builder: (controller) {
-                            if(controller.selectedDateTimeRange.value != null){
-                              return  Column(
+                            if (controller.selectedDateTimeRange.value !=
+                                null) {
+                              return Column(
                                 children: [
                                   Row(
                                     mainAxisSize: MainAxisSize.min,
@@ -149,30 +150,36 @@ class _ManageJournalScreenState extends State<ManageJournalScreen> {
                                       ...[
                                         addW(32),
                                         GestureDetector(
-                                          onTap:
-                                          controller.selectedDateTimeRange.value == null
+                                          onTap: controller
+                                                      .selectedDateTimeRange
+                                                      .value ==
+                                                  null
                                               ? null
                                               : () {
-                                            controller.selectedDateTimeRange.value =
-                                            null;
-                                            controller.update(['date_status']);
-                                            controller
-                                                .getJournalList();
-                                          },
+                                                  controller
+                                                      .selectedDateTimeRange
+                                                      .value = null;
+                                                  controller
+                                                      .update(['date_status']);
+                                                  controller.getJournalList();
+                                                },
                                           child: CircleAvatar(
                                               radius: 16,
-                                              backgroundColor:
-                                              controller.selectedDateTimeRange.value !=
-                                                  null
+                                              backgroundColor: controller
+                                                          .selectedDateTimeRange
+                                                          .value !=
+                                                      null
                                                   ? Colors.red
                                                   : Colors.transparent,
-                                              child: controller.selectedDateTimeRange.value !=
-                                                  null
+                                              child: controller
+                                                          .selectedDateTimeRange
+                                                          .value !=
+                                                      null
                                                   ? Icon(
-                                                Icons.close,
-                                                color: Colors.white,
-                                                size: 16,
-                                              )
+                                                      Icons.close,
+                                                      color: Colors.white,
+                                                      size: 16,
+                                                    )
                                                   : null),
                                         ),
                                       ],
@@ -181,7 +188,7 @@ class _ManageJournalScreenState extends State<ManageJournalScreen> {
                                   addH(8),
                                 ],
                               );
-                            }else{
+                            } else {
                               return SizedBox.shrink();
                             }
                           },
@@ -190,25 +197,25 @@ class _ManageJournalScreenState extends State<ManageJournalScreen> {
                           child: GetBuilder<ManageJournalController>(
                             id: 'journal_list',
                             builder: (controller) {
-                              if (controller
-                                  .isJournalListLoading) {
+                              if (controller.isJournalListLoading) {
                                 return Center(
                                   child: RandomLottieLoader.lottieLoader(),
                                 );
-                              } else if (controller
-                                      .journalListResponseModel ==
+                              } else if (controller.journalListResponseModel ==
                                   null) {
                                 return const Center(
                                     child: Text("Something went wrong"));
-                              } else if (controller
-                                  .journalEntryList.isEmpty) {
-                                return const Center(child: Text("No data found"));
+                              } else if (controller.journalEntryList.isEmpty) {
+                                return const Center(
+                                    child: Text("No data found"));
                               }
                               return PagerListView<JournalEntryData>(
                                 // scrollController: _scrollController,
                                 items: controller.journalEntryList,
                                 itemBuilder: (_, item) {
-                                  return JournalListItemWidget(journalEntryData: item,);
+                                  return JournalListItemWidget(
+                                    journalEntryData: item,
+                                  );
                                 },
                                 isLoading: controller.isLoadingMore,
                                 hasError: controller.hasError.value,
@@ -216,17 +223,11 @@ class _ManageJournalScreenState extends State<ManageJournalScreen> {
                                   await controller.getJournalList(
                                       page: nextPage);
                                 },
-                                totalPage: controller
-                                        .journalListResponseModel
-                                        ?.data
-                                        ?.meta
-                                        .lastPage ??
+                                totalPage: controller.journalListResponseModel
+                                        ?.data?.meta.lastPage ??
                                     0,
-                                totalSize: controller
-                                        .journalListResponseModel
-                                        ?.data
-                                        ?.meta
-                                        .total ??
+                                totalSize: controller.journalListResponseModel
+                                        ?.data?.meta.total ??
                                     0,
                                 itemPerPage: 10,
                               );
@@ -236,15 +237,16 @@ class _ManageJournalScreenState extends State<ManageJournalScreen> {
                       ],
                     ),
                   ),
-                );
-              }
-            ),
-            floatingActionButton: !controller.journalCreateAccess ? null : CustomFloatingActionButton(
-              onTap: () {
-                Get.toNamed(JournalEntryForm.routeName);
-              },
-            ));
-      }
+                ),
+          floatingActionButton: !controller.journalCreateAccess
+              ? null
+              : CustomFloatingActionButton(
+                  onTap: () {
+                    Get.toNamed(JournalEntryForm.routeName);
+                  },
+                ),
+        );
+      },
     );
   }
 }

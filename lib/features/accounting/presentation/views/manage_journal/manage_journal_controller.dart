@@ -3,6 +3,7 @@ import 'package:amar_pos/core/methods/helper_methods.dart';
 import 'package:amar_pos/features/accounting/data/models/balance_sheet/balance_sheet_list_response_model.dart';
 import 'package:amar_pos/features/accounting/data/models/chart_of_account/last_level_chart_of_account_list_response_model.dart';
 import 'package:amar_pos/features/accounting/data/models/manage_journal/journal_list_response_model.dart';
+import 'package:amar_pos/features/accounting/data/models/manage_journal/journal_voucher_response_model.dart';
 import 'package:amar_pos/features/accounting/data/services/manage_journal_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -393,5 +394,31 @@ class ManageJournalController extends GetxController{
       return false;
     }
     return true;
+  }
+
+  //Details
+  bool isJournalDetailsLoading = false;
+  JournalVoucherResponseModel? journalVoucherResponseModel;
+
+  Future<void> getJournalDetails(int journalId) async {
+    isJournalDetailsLoading = true;
+    hasError.value = false;
+
+    try {
+      var response = await ManageJournalService.getJournalDetails(
+        usrToken: loginData!.token,
+        journalId: journalId,
+      );
+
+      if (response != null) {
+        logger.i(response);
+        journalVoucherResponseModel = JournalVoucherResponseModel.fromJson(response);
+      }
+    } catch (e) {
+      hasError.value = true; // Handle exceptions
+      logger.e(e);
+    } finally {
+      isJournalDetailsLoading = false;
+    }
   }
 }

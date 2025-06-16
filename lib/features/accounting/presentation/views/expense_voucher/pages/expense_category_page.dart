@@ -2,6 +2,7 @@ import 'package:amar_pos/core/constants/logger/logger.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/core/widgets/custom_button.dart';
 import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
+import 'package:amar_pos/core/widgets/reusable/forbidden_access_full_screen_widget.dart';
 import 'package:amar_pos/core/widgets/search_widget.dart';
 import 'package:amar_pos/features/accounting/data/models/expense_voucher/expense_categories_response_model.dart';
 import 'package:amar_pos/features/accounting/presentation/views/expense_voucher/expense_voucher_controller.dart';
@@ -30,7 +31,10 @@ class _ExpenseCategoryPageState extends State<ExpenseCategoryPage> {
   @override
   void initState() {
     search = null;
-    controller.getExpenseCategories();
+    if(controller.expenseCategoriesListAccess){
+      controller.getExpenseCategories();
+    }
+
     super.initState();
   }
 
@@ -40,7 +44,7 @@ class _ExpenseCategoryPageState extends State<ExpenseCategoryPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: Column(
+        body: !controller.expenseCategoriesListAccess ? ForbiddenAccessFullScreenWidget() : Column(
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -179,7 +183,7 @@ class _ExpenseCategoryPageState extends State<ExpenseCategoryPage> {
             ),
           ],
         ),
-        bottomNavigationBar: Padding(
+        bottomNavigationBar:!controller.expenseCategoryCreateAccess ? ForbiddenAccessFullScreenWidget() : Padding(
           padding: const EdgeInsets.only(left: 20,right: 20,bottom: 10, top: 10),
           child: CustomButton(
             text: "Add New Category",
