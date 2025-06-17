@@ -3,6 +3,7 @@ import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:amar_pos/features/accounting/data/models/supplier_ledger/supplier_ledger_list_response_model.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -196,6 +197,128 @@ class _ClientLedgerStatementScreenState
                         ),
                       );
                     }
+                    final statement = controller.supplierLedgerStatementResponseModel!.data!.data;
+
+                    return ClipRRect(
+                      borderRadius: BorderRadius.only(topLeft: Radius.circular(8), topRight: Radius.circular(8)),
+                      child: DataTable2(
+                        fixedColumnsColor: const Color(0xffEFEFEF),
+                        // sortColumnIndex: 1,
+                        fixedLeftColumns: 1,
+                        columnSpacing: 12,
+                        horizontalMargin: 12,
+                        // minWidth: 800,
+                        empty: const Center(
+                          child: Text("No Data Found"),
+                        ),
+                        headingRowColor: WidgetStatePropertyAll(AppColors.primary),
+                        dividerThickness: .5,
+                        headingRowHeight: 40,
+
+                        headingTextStyle: const TextStyle(
+                            fontWeight: FontWeight.bold, color: Colors.white,fontSize: 12),
+                        border: TableBorder(
+                          horizontalInside: BorderSide(
+                            color: Colors.grey.shade200, // Color between rows
+                            width: .5,
+                          ),
+                          verticalInside: BorderSide(
+                            color: Colors.grey,
+                            width: .5,
+                          ),
+                        ),
+                        columns: const [
+                          DataColumn2(
+                            label: _HeaderCell("SL"),
+                            size: ColumnSize.S,
+                            fixedWidth: 32,
+                          ),
+                          DataColumn2(
+                            size: ColumnSize.M,
+                            label: _HeaderCell("Date"),
+                          ),
+                          DataColumn2(
+                              label: _HeaderCell("Invoice No."),
+                              size: ColumnSize.M,
+                          ),
+                          DataColumn2(
+                            size: ColumnSize.S,
+                            label: _HeaderCell("Debit"),
+                            numeric: true,
+                          ),
+                          DataColumn2(
+                            size: ColumnSize.S,
+                            label: _HeaderCell("Credit"),
+                            numeric: true,
+                          ),
+                          DataColumn2(
+                            size: ColumnSize.S,
+                            label: _HeaderCell("Balance"),
+                            numeric: true,
+                          ),
+                        ],
+                        rows: [
+                          ...controller.supplierLedgerStatementResponseModel!.data!.data!.map((e) {
+                            int index = controller.supplierLedgerStatementResponseModel!.data!.data!.indexOf(e);
+
+                            return DataRow(
+                              color: index % 2 == 0
+                                  ? const WidgetStatePropertyAll(Colors.white)
+                                  : WidgetStatePropertyAll(
+                                  Colors.yellow.withOpacity(.03)),
+                              cells: [
+                                _buildDataCell((index+1).toString()),
+                                _buildDataCell(e.date, maxLines: 3),
+                                _buildDataCell(
+                                    e.slNo,
+                                    maxLines: 2),
+                                _buildDataCell(
+                                    Methods.getFormattedNumber(
+                                      e.debit.toDouble() ?? 0,
+                                    ),
+                                    maxLines: 2),
+                                _buildDataCell(
+                                    Methods.getFormattedNumber(
+                                      e.credit.toDouble() ?? 0,
+                                    ),
+                                    maxLines: 2),
+                                _buildDataCell(
+                                    Methods.getFormattedNumber(
+                                      e.balance.toDouble() ?? 0,
+                                    ),
+                                    maxLines: 2),
+                              ],
+                            );
+                          }),
+                          DataRow(
+                            color: WidgetStatePropertyAll(Color(0xffEFEFEF)),
+                            cells: [
+                              _buildDataCell(""),
+                              _buildDataCell(""),
+                              _buildDataCell("Total",isBold: true),
+                              _buildDataCell(
+                                  Methods.getFormattedNumber(
+                                    controller.supplierLedgerStatementResponseModel!.data!.debit!.toDouble(),
+                                  ),
+                                  isBold: true,
+                                  maxLines: 2),
+                              _buildDataCell(
+                                  Methods.getFormattedNumber(
+                                    controller.supplierLedgerStatementResponseModel!.data!.credit!.toDouble(),
+                                  ),
+                                  isBold: true,
+                                  maxLines: 2),
+                              _buildDataCell(
+                                  Methods.getFormattedNumber(
+                                    controller.supplierLedgerStatementResponseModel!.data!.balance!.toDouble(),
+                                  ),
+                                  isBold: true,
+                                  maxLines: 2),
+                            ],
+                          )
+                        ],
+                      ),
+                    );
                     return Column(
                       children: [
                         // Fixed Header
@@ -225,35 +348,31 @@ class _ClientLedgerStatementScreenState
                         ),
 
                         // Scrollable Middle Rows
-                        Expanded(
-                          child: SingleChildScrollView(
-                            child: Table(
-                              border: TableBorder.all(color: Colors.grey),
-                              columnWidths: {
-                                0: FixedColumnWidth(40.w),
-                                1: FlexColumnWidth(80.w),
-                                2: FlexColumnWidth(80.w),
-                                3: FixedColumnWidth(60.w),
-                                4: FixedColumnWidth(60.w),
-                                5: FixedColumnWidth(60.w),
-                              },
-                              children: List.generate(
-                                controller.supplierLedgerStatementResponseModel!.data!.data!.length,
-                                    (index) {
-                                  final statement = controller.supplierLedgerStatementResponseModel!.data!.data![index];
-                                  return TableRow(
-                                    children: [
-                                      _Cell("${index + 1}"),
-                                      _Cell("${statement.date}",maxLine: 2,),
-                                      _Cell("${statement.slNo}"),
-                                      _Cell("${Methods.getFormattedNumber(statement.debit.toDouble())}"),
-                                      _Cell("${Methods.getFormattedNumber(statement.credit.toDouble())}"),
-                                      _Cell("${Methods.getFormattedNumber(statement.balance.toDouble())}"),
-                                    ],
-                                  );
-                                },
-                              ),
-                            ),
+                        Table(
+                          border: TableBorder.all(color: Colors.grey),
+                          columnWidths: {
+                            0: FixedColumnWidth(40.w),
+                            1: FlexColumnWidth(80.w),
+                            2: FlexColumnWidth(80.w),
+                            3: FixedColumnWidth(60.w),
+                            4: FixedColumnWidth(60.w),
+                            5: FixedColumnWidth(60.w),
+                          },
+                          children: List.generate(
+                            controller.supplierLedgerStatementResponseModel!.data!.data!.length,
+                                (index) {
+                              final statement = controller.supplierLedgerStatementResponseModel!.data!.data![index];
+                              return TableRow(
+                                children: [
+                                  _Cell("${index + 1}"),
+                                  _Cell("${statement.date}",maxLine: 2,),
+                                  _Cell("${statement.slNo}"),
+                                  _Cell("${Methods.getFormattedNumber(statement.debit.toDouble())}"),
+                                  _Cell("${Methods.getFormattedNumber(statement.credit.toDouble())}"),
+                                  _Cell("${Methods.getFormattedNumber(statement.balance.toDouble())}"),
+                                ],
+                              );
+                            },
                           ),
                         ),
 
@@ -293,6 +412,23 @@ class _ClientLedgerStatementScreenState
       ),
     );
   }
+
+  DataCell _buildDataCell(String data, {int maxLines = 1,bool? isBold}) {
+    return DataCell(
+      Center(
+        child: AutoSizeText(
+          minFontSize: 5,
+          maxFontSize: 10,
+          maxLines: maxLines,
+          data,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontWeight: isBold != null ? FontWeight.bold : FontWeight.normal
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _HeaderCell extends StatelessWidget {
@@ -301,8 +437,7 @@ class _HeaderCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8),
+    return Center(
       child: AutoSizeText(
         text,
         maxLines: 1,
@@ -333,6 +468,7 @@ class _Cell extends StatelessWidget {
       ),
     );
   }
+
 }
 
 class _FooterCell extends StatelessWidget {

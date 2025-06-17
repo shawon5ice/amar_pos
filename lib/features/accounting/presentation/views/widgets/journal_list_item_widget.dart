@@ -26,139 +26,144 @@ class JournalListItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 5.h),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.all(Radius.circular(20.r))),
-      child: Column(
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Flexible(
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 5),
-                      decoration: BoxDecoration(
-                          color: const Color(0xffF6FFF6),
-                          border: Border.all(
-                            color: const Color(0xff94DB8C),
-                            width: .5,
+    return GestureDetector(
+      onTap: (){
+
+      },
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical: 5.h),
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.all(Radius.circular(20.r))),
+        child: Column(
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Flexible(
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                            color: const Color(0xffF6FFF6),
+                            border: Border.all(
+                              color: const Color(0xff94DB8C),
+                              width: .5,
+                            ),
+                            borderRadius: BorderRadius.circular(20)),
+                        child: AutoSizeText(
+                          journalEntryData.date,
+                          maxFontSize: 10,
+                          minFontSize: 8,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w500,
                           ),
-                          borderRadius: BorderRadius.circular(20)),
-                      child: AutoSizeText(
-                        journalEntryData.date,
-                        maxFontSize: 10,
-                        minFontSize: 8,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w500,
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              Spacer(),
-              addW(8),
-              CustomSvgSmallIconButton(
-                borderColor: Color(0xff03346E),
-                bgColor: const Color(0xffE1F2FF),
-                onTap: () {
-                  _controller.downloadAccountOpeningHistory(
-                    slNo: journalEntryData.slNo,
-                    id: journalEntryData.id,
-                  );
-                },
-                assetPath: AppAssets.downloadIcon,
-              ),
-              addW(8),
-              CustomSvgSmallIconButton(
-                borderColor: const Color(0xffFF9000),
-                bgColor: const Color(0xffFFFCF8),
-                onTap: () {
-                  _controller.downloadAccountOpeningHistory(
-                    slNo: journalEntryData.slNo,
-                    shouldPrint: true,
-                    id: journalEntryData.id,
-                  );
-                },
-                assetPath: AppAssets.printIcon,
-              ),
-              addW(8),
-              if(_controller.journalEditAccess || _controller.journalDeleteAccess)ChartOfAccountOpeningHistoryItemActionMenu(
-                editAccess: journalEntryData.isAutoJournal == 2,
-                // deleteAccess: _controller.journalDeleteAccess,
-                onSelected: (value) {
-                  switch (value) {
-                    case "edit":
-                      bool hasPermission = _controller.checkJournalPermissions("update");
-                      if(!hasPermission) return;
-                      Get.toNamed(JournalEntryForm.routeName,
-                          arguments: journalEntryData);
-                      break;
-                    case "delete":
-                      bool hasPermission = _controller.checkJournalPermissions("delete");
-                      if(!hasPermission) return;
-                      AwesomeDialog(
-                          context: context,
-                          dialogType: DialogType.error,
-                          title: "Are you sure?",
-                          desc:
-                          "You are going to delete money transfer with \ninvoice no. ${journalEntryData.slNo}",
-                          btnOkOnPress: () {
-                            _controller.deleteAccountHistory(
-                                journalEntryData.id);
-                          },
-                          btnCancelOnPress: () {})
-                          .show();
-                      break;
-                  }
-                },
-              ),
-            ],
-          ),
-          addH(12),
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: const BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(10)),
-              color: Color(0xffF8F7F2),
-            ),
-            child: Column(
-              children: [
-                StatementItemTitleValueWidget(
-                  title: "Voucher No.",
-                  value: journalEntryData.slNo,
+                Spacer(),
+                addW(8),
+                CustomSvgSmallIconButton(
+                  borderColor: Color(0xff03346E),
+                  bgColor: const Color(0xffE1F2FF),
+                  onTap: () {
+                    _controller.downloadAccountOpeningHistory(
+                      slNo: journalEntryData.slNo,
+                      id: journalEntryData.id,
+                    );
+                  },
+                  assetPath: AppAssets.downloadIcon,
                 ),
-                StatementItemTitleValueWidget(
-                  title: "Account Name",
-                  value: journalEntryData.account,
+                addW(8),
+                CustomSvgSmallIconButton(
+                  borderColor: const Color(0xffFF9000),
+                  bgColor: const Color(0xffFFFCF8),
+                  onTap: () {
+                    _controller.downloadAccountOpeningHistory(
+                      slNo: journalEntryData.slNo,
+                      shouldPrint: true,
+                      id: journalEntryData.id,
+                    );
+                  },
+                  assetPath: AppAssets.printIcon,
                 ),
-                StatementItemTitleValueWidget(
-                  title: "Amount",
-                  value: Methods.getFormatedPrice(
-                      journalEntryData.amount.toDouble()),
+                addW(8),
+                if(_controller.journalEditAccess || _controller.journalDeleteAccess)ChartOfAccountOpeningHistoryItemActionMenu(
+                  editAccess: journalEntryData.isAutoJournal == 2,
+                  // deleteAccess: _controller.journalDeleteAccess,
+                  onSelected: (value) {
+                    switch (value) {
+                      case "edit":
+                        bool hasPermission = _controller.checkJournalPermissions("update");
+                        if(!hasPermission) return;
+                        Get.toNamed(JournalEntryForm.routeName,
+                            arguments: journalEntryData);
+                        break;
+                      case "delete":
+                        bool hasPermission = _controller.checkJournalPermissions("delete");
+                        if(!hasPermission) return;
+                        AwesomeDialog(
+                            context: context,
+                            dialogType: DialogType.error,
+                            title: "Are you sure?",
+                            desc:
+                            "You are going to delete money transfer with \ninvoice no. ${journalEntryData.slNo}",
+                            btnOkOnPress: () {
+                              _controller.deleteAccountHistory(
+                                  journalEntryData.id);
+                            },
+                            btnCancelOnPress: () {})
+                            .show();
+                        break;
+                    }
+                  },
                 ),
-                StatementItemTitleValueWidget(
-                  title: "Voucher Type",
-                  value: journalEntryData.voucherType,
-                ),
-                StatementItemTitleValueWidget(
-                  title: "Remarks",
-                  value: journalEntryData.remarks ?? '',
-                ),
-                // StatementItemTitleValueWidget(
-                //   title: "Remarks",
-                //   value: moneyTransferData.remarks ?? '--',
-                // ),
               ],
             ),
-          )
-        ],
+            addH(12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: const BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                color: Color(0xffF8F7F2),
+              ),
+              child: Column(
+                children: [
+                  StatementItemTitleValueWidget(
+                    title: "Voucher No.",
+                    value: journalEntryData.slNo,
+                  ),
+                  StatementItemTitleValueWidget(
+                    title: "Account Name",
+                    value: journalEntryData.account,
+                  ),
+                  StatementItemTitleValueWidget(
+                    title: "Amount",
+                    value: Methods.getFormatedPrice(
+                        journalEntryData.amount.toDouble()),
+                  ),
+                  StatementItemTitleValueWidget(
+                    title: "Voucher Type",
+                    value: journalEntryData.voucherType,
+                  ),
+                  StatementItemTitleValueWidget(
+                    title: "Remarks",
+                    value: journalEntryData.remarks ?? '',
+                  ),
+                  // StatementItemTitleValueWidget(
+                  //   title: "Remarks",
+                  //   value: moneyTransferData.remarks ?? '--',
+                  // ),
+                ],
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

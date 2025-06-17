@@ -36,7 +36,7 @@ class SupplierLedgerItem extends StatelessWidget {
       },
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 5.h),
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.all(Radius.circular(20.r))),
@@ -79,7 +79,7 @@ class SupplierLedgerItem extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: const BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(10)),
+                borderRadius: BorderRadius.all(Radius.circular(12)),
                 color: Color(0xffF8F7F2),
               ),
               child: Column(
@@ -144,7 +144,7 @@ class StatementItemTitleValueWidget extends StatelessWidget {
             flex: 2,
             child: Text(
               title,
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: Color(0xff7C7C7C)),
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: Color(0xff7C7C7C)),
             )),
         const Text(" : "),
         Expanded(

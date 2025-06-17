@@ -73,6 +73,7 @@ class _StockReportScreenState extends State<StockReportScreen>
                   selectedCategory: controller.category,
                   selectedDateTimeRange: null,
                   disableDateTime: true,
+                  disableOutlet: !controller.loginData!.businessOwner,
                   onSubmit: (FilterItem? brand,FilterItem? category,DateTimeRange? dateTimeRange, OutletModel? outlet){
                     controller.brand = brand;
                     controller.category = category;

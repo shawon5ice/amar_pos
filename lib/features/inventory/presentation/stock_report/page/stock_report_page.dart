@@ -80,6 +80,11 @@ class _StockReportPageState extends State<StockReportPage> {
           ],
         ),
         addH(8),
+        if(!controller.loginData!.businessOwner)
+          ...[
+            Text(controller.loginData!.store.name, style: context.textTheme.titleMedium,),
+            addH(8),
+          ],
         GetBuilder<StockReportController>(
           id: 'total_widget',
           builder: (controller) => Row(

@@ -89,7 +89,7 @@ class StockReportController extends GetxController {
         brandId: brand?.id,
         categoryId: category?.id,
         search: searchEditingController.text,
-        storeId: outlet?.id,
+        storeId: !loginData!.businessOwner ? loginData?.store.id :  outlet?.id,
       );
 
       if (response != null) {

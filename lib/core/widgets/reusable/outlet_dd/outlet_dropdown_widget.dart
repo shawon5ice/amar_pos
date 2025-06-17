@@ -44,7 +44,7 @@ class _OutletDropDownWidgetState extends State<OutletDropDownWidget> {
   @override
   void initState() {
     controller.getAllOutlet(widget.isTransitional);
-    controller.resetOutletSelection();
+    // controller.resetOutletSelection();
     controller.selectedOutlet = widget.initialOutletModel;
     super.initState();
   }

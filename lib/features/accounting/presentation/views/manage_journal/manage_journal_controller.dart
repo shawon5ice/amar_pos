@@ -307,11 +307,11 @@ class ManageJournalController extends GetxController{
     }
   }
 
-  Future<void> updateAccountHistory(var request, int id) async {
+  Future<void> updateJournal(var request, int id) async {
     isCreationOfJournalOngoing = true;
     update(['account_entry_form']);
     try {
-      var response = await ManageJournalService.updateAccountOpeningHistory(
+      var response = await ManageJournalService.updateJournal(
         usrToken: loginData!.token,
         data: request,
         id: id,

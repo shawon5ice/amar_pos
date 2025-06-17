@@ -110,6 +110,7 @@ class _ProductListFilterBottomSheetState
                                   onOutletSelection: controller.setSelectedOutlet,
                                   initialOutletModel: controller.selectedOutlet.value,
                                   isMandatory: true,
+                                  isTransitional: true,
                                 ),
                               ),
                               addW(10),

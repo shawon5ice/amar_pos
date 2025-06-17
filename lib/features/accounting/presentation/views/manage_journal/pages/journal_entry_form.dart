@@ -121,7 +121,7 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
           entries[index].creditController.text = e.credit.toString();
           entries[index].referenceController.text = e.refNo ?? '';
           entries[index].entry.caId = e.account.id ?? 0;
-          entries[index].chartOfAccount = controller.lastLevelChartOfAccountList.singleWhere((element) => element.id == e.account.id);
+          entries[index].chartOfAccount = ChartOfAccount(id: e.account.id, name: e.account.name);
           index++;
         }
       }
@@ -559,11 +559,11 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
                 var data = entries.map((e) => e.entry.toJson()).toList();
                 if (initialJournalEntry != null) {
                   var request = {
-                    ...entries.first.entry.toJson(),
+                    "rows": data,
                     "voucher_type": getVoucherType(),
                     "paymentMethod": selectedPaymentMethod?.id,
                   };
-                  controller.updateAccountHistory(
+                  controller.updateJournal(
                       request, initialJournalEntry!.id);
                 } else {
                   var request = {

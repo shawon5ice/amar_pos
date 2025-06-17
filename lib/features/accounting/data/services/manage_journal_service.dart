@@ -134,7 +134,7 @@ class ManageJournalService {
     return response;
   }
 
-  static Future<dynamic> updateAccountOpeningHistory({
+  static Future<dynamic> updateJournal({
     required String usrToken,
     required data,
     required int id,
@@ -142,7 +142,7 @@ class ManageJournalService {
     logger.i(data);
     var response = await BaseClient.postData(
       token: usrToken,
-      api: "chart_of_accounts_opening/update/$id",
+      api: "journal/update/$id",
       body: data,
     );
     return response;
