@@ -9,6 +9,7 @@ import 'package:get/get_rx/get_rx.dart';
 
 import '../../../../../core/constants/logger/logger.dart';
 import '../../../../../core/core.dart';
+import '../../../../../core/network/helpers/error_extractor.dart';
 import '../../../../../permission_manager.dart';
 import '../../../../auth/data/model/hive/login_data.dart';
 import '../../../../auth/data/model/hive/login_data_helper.dart';
@@ -46,15 +47,12 @@ class ExpenseVoucherController extends GetxController{
   bool journalEditAccess = false;
   bool journalDeleteAccess = false;
 
-  @override
-  onInit(){
-    super.onInit();
-  }
 
 
   @override
   void onReady() {
     expenseVoucherListAccess = PermissionManager.hasPermission("Journal.getAllExpenseVoucher");
+    logger.i(expenseVoucherListAccess);
     expenseVoucherCreateAccess = PermissionManager.hasPermission("Journal.storeExpenseVoucher");
     expenseCategoriesListAccess = PermissionManager.hasPermission("ChartOfAccounts.getAllExpenseCategoryList");
     expenseCategoryCreateAccess = PermissionManager.hasPermission("ChartOfAccounts.store");
@@ -393,5 +391,13 @@ class ExpenseVoucherController extends GetxController{
     }
     update(["expense_vouchers_list"]);
     RandomLottieLoader.hide();
+  }
+
+  bool checkExpenseVoucherPermissions(String permission) {
+    if(!PermissionManager.hasPermission("ChartOfAccounts.$permission")){
+      ErrorExtractor.showSingleErrorDialog(Get.context!, "Forbidden access. You don't have Permission");
+      return false;
+    }
+    return true;
   }
 }

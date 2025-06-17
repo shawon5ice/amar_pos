@@ -108,17 +108,28 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
 
     if(initialJournalEntry != null){
       await controller.getJournalDetails(initialJournalEntry!.id);
+      voucherType = getVoucherTypeEnum(controller.journalVoucherResponseModel!.data!.voucherType);
+      int index =  0;
       if(controller.journalVoucherResponseModel!.data!.details.isNotEmpty){
-        voucherType = getVoucherTypeEnum(controller.journalVoucherResponseModel!.data!.voucherType);
-        logger.i(controller.journalVoucherResponseModel!.data!.details.first.debit );
-        if(controller.journalVoucherResponseModel!.data!.details.first.debit == 0.0.toDouble()){
-          _addEntry(disableDebit: false, disableCredit: true);
-        }else{
-          _addEntry(disableDebit: true, disableCredit: false);
+        for (var e in controller.journalVoucherResponseModel!.data!.details) {
+          if(e.debit == 0.0.toDouble()){
+                _addEntry(disableDebit: false, disableCredit: true);
+          }else{
+            _addEntry(disableDebit: true, disableCredit: false);
+          }
+          entries[index].debitController.text = e.debit.toString();
+          entries[index].creditController.text = e.credit.toString();
+          entries[index].referenceController.text = e.refNo ?? '';
+          entries[index].entry.caId = e.account.id ?? 0;
+          entries[index].chartOfAccount = controller.lastLevelChartOfAccountList.singleWhere((element) => element.id == e.account.id);
+          index++;
         }
-        entries.first.debitController.text = controller.journalVoucherResponseModel!.data!.details.first.debit.toString();
-        entries.first.creditController.text = controller.journalVoucherResponseModel!.data!.details.first.credit.toString();
-        entries.first.referenceController.text = controller.journalVoucherResponseModel!.data!.details.first.refNo ?? '';
+      }
+      if(controller.journalVoucherResponseModel!.data!.paymentMethod != null && controller
+          .paymentMethodListResponseModel != null){
+        selectedPaymentMethod = controller.paymentMethodList.firstWhereOrNull(
+              (e) => e.id == controller.journalVoucherResponseModel?.data?.paymentMethod?.id,
+        );
       }
       _remarksController.text = initialJournalEntry?.remarks ?? '';
     }else{

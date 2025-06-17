@@ -177,13 +177,11 @@ class ManageJournalController extends GetxController{
       );
 
       if (response != null) {
-        logger.i(response);
         paymentMethodListResponseModel =
             LastLevelChartOfAccountListResponseModel.fromJson(response);
 
         if (paymentMethodListResponseModel != null && paymentMethodListResponseModel!.data.isNotEmpty) {
           paymentMethodList = paymentMethodListResponseModel!.data;
-          logger.i(paymentMethodList.length);
         } else {
           paymentMethodList.clear(); // No results
         }
@@ -258,7 +256,6 @@ class ManageJournalController extends GetxController{
       );
 
       if (response != null) {
-        logger.i(response);
         lastLevelChartOfAccountListResponseModel =
             LastLevelChartOfAccountListResponseModel.fromJson(response);
 

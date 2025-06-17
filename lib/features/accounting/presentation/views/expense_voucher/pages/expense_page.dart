@@ -9,6 +9,7 @@ import '../../../../../../core/responsive/pixel_perfect.dart';
 import '../../../../../../core/widgets/pager_list_view.dart';
 import '../../../../../../core/widgets/reusable/forbidden_access_full_screen_widget.dart';
 import '../../../../../../core/widgets/search_widget.dart';
+import '../../../../../../permission_manager.dart';
 import '../../../../data/models/expense_voucher/expense_voucher_response_model.dart';
 import '../../widgets/create_expense_voucher_bottom_sheet.dart';
 import '../../widgets/expense_voucher_item.dart';
@@ -26,7 +27,10 @@ class _ExpensePageState extends State<ExpensePage> {
   @override
   void initState() {
     search = null;
+    controller.expenseVoucherListAccess = PermissionManager.hasPermission("Journal.getAllExpenseVoucher");
+    logger.i(controller.expenseVoucherListAccess);
     if(controller.expenseVoucherListAccess){
+
       controller.getExpenseVouchers(page: 1);
     }
 
@@ -61,13 +65,13 @@ class _ExpensePageState extends State<ExpensePage> {
                       builder: (controller) {
                         if (controller.isExpenseVouchersListLoading) {
                           return RandomLottieLoader.lottieLoader();
-                        }else if(controller.expenseVoucherResponseModel == null){
-                          return Center(
-                            child: Text("Something went wrong", style: context.textTheme.titleLarge,),
-                          );
                         }else if(controller.expenseVouchersList.isEmpty){
                           return Center(
                             child: Text("No data found", style: context.textTheme.titleLarge,),
+                          );
+                        }else if(controller.expenseVoucherResponseModel == null){
+                          return Center(
+                            child: Text("Something went wrong", style: context.textTheme.titleLarge,),
                           );
                         }
                         return RefreshIndicator(

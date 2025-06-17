@@ -67,7 +67,8 @@ class ExpenseVoucherItem extends StatelessWidget {
                 onSelected: (value) {
                   switch (value) {
                     case "edit":
-                      // RandomLottieLoader.show();
+                      bool hasPermission = _controller.checkExpenseVoucherPermissions("update");
+                      if(!hasPermission) return;
                       showModalBottomSheet(
                         context: context,
                         isScrollControlled: true,
@@ -84,6 +85,8 @@ class ExpenseVoucherItem extends StatelessWidget {
                       // Get.toNamed(AddProductScreen.routeName, arguments: productInfo);
                       break;
                     case "delete":
+                      bool hasPermission = _controller.checkExpenseVoucherPermissions("destroy");
+                      if(!hasPermission) return;
                       AwesomeDialog(
                           context: context,
                           dialogType: DialogType.error,
