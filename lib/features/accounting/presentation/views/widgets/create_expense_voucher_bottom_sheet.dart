@@ -8,6 +8,7 @@ import 'package:amar_pos/core/widgets/reusable/payment_dd/ca_payment_method_dd_c
 import 'package:amar_pos/core/widgets/reusable/payment_dd/ca_payment_method_dropdown_widget.dart';
 import 'package:amar_pos/core/widgets/reusable/payment_dd/expense_payment_methods_response_model.dart';
 import 'package:amar_pos/features/accounting/data/models/expense_voucher/expense_categories_response_model.dart';
+import 'package:amar_pos/features/accounting/data/models/expense_voucher/expense_category_list_response_model_dd.dart';
 import 'package:amar_pos/features/accounting/data/models/expense_voucher/expense_payment_methods_response_model.dart';
 import 'package:amar_pos/features/accounting/presentation/views/expense_voucher/expense_voucher_controller.dart';
 import 'package:amar_pos/features/inventory/presentation/products/widgets/custom_drop_down_widget.dart';
@@ -31,45 +32,58 @@ class CreateExpenseVoucherBottomSheet extends StatefulWidget {
 class _CreateExpenseVoucherBottomSheetState
     extends State<CreateExpenseVoucherBottomSheet> {
   final ExpenseVoucherController _controller = Get.find();
+  late final CAPaymentMethodDDController paymentDDController;
   late TextEditingController _textEditingController;
   late TextEditingController _remarksEditingController;
-  ExpenseCategory? selectedExpenseCategory;
+  Expense? selectedExpenseCategory;
   ChartOfAccountPaymentMethod? selectedPaymentMethod;
 
   @override
   void initState() {
-    final CAPaymentMethodDDController paymentDDController = Get.put(CAPaymentMethodDDController());
-    _controller.getExpenseCategories(limit: 1000).then((value){
-      if(widget.transactionData != null){
-        selectedExpenseCategory = _controller.expenseCategoriesList.singleWhere((e) => e.id == widget.transactionData!.category.id);
-        _controller.update(['expense_category_dd']);
-      }
-    });
 
-
-
-    if(widget.transactionData != null){
-      selectedPaymentMethod = widget.transactionData!.paymentMethod;
-      logger.d(selectedPaymentMethod);
-    }
-
-
-
+    selectedPaymentMethod = widget.transactionData!.paymentMethod;
+    paymentDDController = Get.put(CAPaymentMethodDDController());
     _textEditingController = TextEditingController();
     _remarksEditingController = TextEditingController();
 
-
     _remarksEditingController.text = widget.transactionData?.remarks?? '';
     _textEditingController.text = widget.transactionData?.amount.toString()?? '';
+    initialize();
 
     super.initState();
   }
+
+  void initialize() async {
+
+    await _controller.getExpenseCategoriesForDD();
+
+
+    if (widget.transactionData != null) {
+      selectedExpenseCategory = _controller.expenseListForDD
+          .firstWhere((e) => e.id == widget.transactionData!.category.id);
+
+      // if(!paymentDDController.paymentListLoading && paymentDDController.paymentList.isEmpty){
+      //   await paymentDDController.getAllPaymentMethods(false);
+      //   paymentDDController.paymentList.singleWhere((e) {
+      //     logger.d(e.name);
+      //     return e.id == widget.transactionData!.paymentMethod.id;
+      //   });
+      // }
+
+      logger.d(widget.transactionData?.paymentMethod.name);
+    }
+
+    _controller.update(['expense_category_dd']);
+  }
+
 
   final formKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
     Get.delete<CAPaymentMethodDDController>();
+    _textEditingController.dispose();
+    _remarksEditingController.dispose();
     super.dispose();
   }
 
@@ -120,8 +134,8 @@ class _CreateExpenseVoucherBottomSheetState
                       GetBuilder<ExpenseVoucherController>(
                         id: 'expense_category_dd',
                         builder: (controller) =>
-                            CustomDropdownWithSearchWidget<ExpenseCategory>(
-                          items: controller.expenseCategoriesList,
+                            CustomDropdownWithSearchWidget<Expense>(
+                          items: controller.expenseListForDD,
                           isMandatory: true,
                           title: "Category",
                           value: selectedExpenseCategory,
@@ -130,9 +144,9 @@ class _CreateExpenseVoucherBottomSheetState
                           },
                           onChanged: (expenseCategory) {
                             selectedExpenseCategory = expenseCategory;
-                            if(selectedExpenseCategory != null){
-                              _remarksEditingController.text = selectedExpenseCategory!.remarks ?? '';
-                            }
+                            // if(selectedExpenseCategory != null){
+                            //   _remarksEditingController.text = selectedExpenseCategory!.remarks ?? '';
+                            // }
                           },
                           hintText: controller.isExpenseCategoriesListLoading? "Loading..." : "Select Expense Category",
                           searchHintText: "Search Expense Category",

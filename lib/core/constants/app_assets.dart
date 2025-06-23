@@ -89,6 +89,15 @@ class AppAssets {
   static const String clientMoney = "assets/icon/client_money.svg";
 
 
+  static const String createInvoiceQuickAccessIcon = "assets/icon/create_invoice.svg";
+  static const String createReturnQuickAccessIcon = "assets/icon/create_return.svg";
+  static const String cashTransferQuickAccessIcon = "assets/icon/cash_transfer.svg";
+
+  static const String dashBoardIcon = "assets/icon/dash_board.svg";
+  static const String daybook = "assets/icon/day_book.svg";
+  static const String stockList = "assets/icon/stock_list.svg";
+
+
   static const List<String> lottieFiles = [
     'assets/lottie/loading1.json',
     'assets/lottie/loading2.json',

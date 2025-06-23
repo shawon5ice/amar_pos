@@ -138,6 +138,7 @@ class DrawerMenuController extends GetxController {
     closeDrawer();
   }
 
+
   // String getSelectedPage() {
   //   // Return the route name or page identifier
   //   switch (selectedMenuItem.value?.parent) {

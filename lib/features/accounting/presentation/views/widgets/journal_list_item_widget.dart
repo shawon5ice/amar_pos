@@ -93,8 +93,7 @@ class JournalListItemWidget extends StatelessWidget {
                   assetPath: AppAssets.printIcon,
                 ),
                 addW(8),
-                if(_controller.journalEditAccess || _controller.journalDeleteAccess)ChartOfAccountOpeningHistoryItemActionMenu(
-                  editAccess: journalEntryData.isAutoJournal == 2,
+                if(journalEntryData.isAutoJournal != 1)ChartOfAccountOpeningHistoryItemActionMenu(
                   // deleteAccess: _controller.journalDeleteAccess,
                   onSelected: (value) {
                     switch (value) {

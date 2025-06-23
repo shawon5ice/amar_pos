@@ -345,12 +345,13 @@ class _PlaceOrderState extends State<PlaceOrder> {
                 addW(12),
                 Expanded(
                   child: CircleAvatar(
+                    radius: 24,
                     backgroundColor: AppColors.accent,
                     child: IconButton(
                       onPressed: () {
                         Get.toNamed(AddProductScreen.routeName,arguments: true);
                       },
-                      icon: const Icon(Icons.add),
+                      icon: const Icon(Icons.add,size: 24,),
                     ),
                   ),
                 )
@@ -771,17 +772,17 @@ class _PlaceOrderState extends State<PlaceOrder> {
           builder: (controller) => controller.placeOrderProducts.isNotEmpty
               ? Row(
                   children: [
-                    CircleAvatar(
-                      radius: 30,
-                      backgroundColor: AppColors.accent,
-                      child: GestureDetector(
-                        child: SvgPicture.asset(
-                          AppAssets.pauseBillingIcon,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    addW(12),
+                    // CircleAvatar(
+                    //   radius: 30,
+                    //   backgroundColor: AppColors.accent,
+                    //   child: GestureDetector(
+                    //     child: SvgPicture.asset(
+                    //       AppAssets.pauseBillingIcon,
+                    //       color: Colors.white,
+                    //     ),
+                    //   ),
+                    // ),
+                    // addW(12),
                     Expanded(
                       child: CustomButton(
                         onTap: () async {

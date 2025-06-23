@@ -1,3 +1,4 @@
+import 'package:amar_pos/core/constants/app_colors.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +31,9 @@ class TotalStatusWidget extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: context.theme.cardColor,
+            border: Border.all(
+              color: AppColors.hintTextColor,
+            ),
             borderRadius: BorderRadius.circular(12.r),
           ),
           child: Column(
@@ -89,6 +93,9 @@ class TotalStatusWidgetWithoutExpanded extends StatelessWidget {
       decoration: BoxDecoration(
         color: context.theme.cardColor,
         borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(
+          color: AppColors.hintTextColor,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -155,6 +162,9 @@ class TotalStatusWidgetLeftIcon extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: context.theme.cardColor,
+            border: Border.all(
+              color: AppColors.hintTextColor,
+            ),
             borderRadius: BorderRadius.circular(12.r),
           ),
           child: Column(

@@ -68,7 +68,7 @@ Supplier _$SupplierFromJson(Map<String, dynamic> json) => Supplier(
       id: (json['id'] as num).toInt(),
       name: json['name'] as String,
       phone: json['phone'] as String,
-      address: json['address'] as String,
+      address: json['address'] as String? ?? 'N/A',
     );
 
 Map<String, dynamic> _$SupplierToJson(Supplier instance) => <String, dynamic>{

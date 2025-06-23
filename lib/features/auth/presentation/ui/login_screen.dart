@@ -193,8 +193,8 @@ class LoginScreen extends GetView<AuthController> {
                       child: Center(
                         child: Image.asset(
                           AppAssets.motionSoftLogo,
-                          height: 66,
-                          width: 220,
+                          height: 48,
+                          width: 120,
                         ),
                       ),
                     ),

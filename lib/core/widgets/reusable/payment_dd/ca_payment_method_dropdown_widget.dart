@@ -1,3 +1,4 @@
+import 'package:amar_pos/core/constants/logger/logger.dart';
 import 'package:amar_pos/core/widgets/reusable/client_dd/client_dd_controller.dart';
 import 'package:amar_pos/core/widgets/reusable/client_dd/client_list_dd_response_model.dart';
 import 'package:amar_pos/core/widgets/reusable/outlet_dd/outlet_dd_controller.dart';
@@ -45,11 +46,11 @@ class _CAPaymentMethodsDropDownWidgetState extends State<CAPaymentMethodsDropDow
 
   @override
   void initState() {
+    logger.d(widget.initialCAPaymentMethod?.name);
     controller.getAllPaymentMethods(widget.lastLevelAccount).then((value){
       if(widget.initialCAPaymentMethod != null){
         controller.resetPaymentSelection();
         controller.selectedCAPaymentMethod = controller.paymentList.singleWhere((e) => e.id == widget.initialCAPaymentMethod?.id);
-        // controller.selectedClient = widget.initialClientInfo;
       }
       controller.update(['ca_payment_dd']);
     });

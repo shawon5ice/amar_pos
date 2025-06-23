@@ -104,7 +104,7 @@ class Supplier {
     id = json['id'];
     name = json['name'];
     phone = json['phone'];
-    address = json['address'];
+    address = json['address'] ?? 'N/A';
   }
 
   Map<String, dynamic> toJson() {

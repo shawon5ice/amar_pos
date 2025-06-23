@@ -49,7 +49,7 @@ class _AccountingScreenState extends State<AccountingScreen> {
             if(controller.isAccountingLoading){
               return RandomLottieLoader.lottieLoader();
             }
-            if(controller.accounting.isEmpty ){
+            if(controller.accounting.isEmpty && !controller.isAccountingLoading ){
               return const ForbiddenAccessFullScreenWidget();
             }
           return GridView.count(

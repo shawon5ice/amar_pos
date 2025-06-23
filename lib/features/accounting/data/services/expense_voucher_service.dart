@@ -54,6 +54,17 @@ class ExpenseVoucherService {
     return response;
   }
 
+  static Future<dynamic> getExpenseCategoriesForDD({
+    required String usrToken,
+  }) async {
+
+    var response = await BaseClient.getData(
+        token: usrToken,
+        api: "chart_of_accounts/get-expense-category-list",
+    );
+    return response;
+  }
+
 
   static Future<void> downloadList({required bool isPdf,required bool saleHistory, required String fileName,
     required String usrToken,

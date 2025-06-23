@@ -5,9 +5,16 @@ import 'package:amar_pos/permission_manager.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 
+import '../../../core/constants/app_assets.dart';
 import '../../../core/constants/logger/logger.dart';
+import '../../accounting/presentation/views/due_collection/due_collection.dart';
+import '../../accounting/presentation/views/expense_voucher/expense_voucher.dart';
+import '../../accounting/presentation/views/money_transfer/money_transfer.dart';
 import '../../auth/data/model/hive/login_data_helper.dart';
 import '../../drawer/drawer_menu_controller.dart';
+import '../../drawer/model/drawer_items.dart';
+import '../../drawer/model/menu_selection.dart';
+import '../data/models/quick_access_item_model.dart';
 
 class HomeScreenController extends GetxController{
 
@@ -29,6 +36,7 @@ class HomeScreenController extends GetxController{
       if (response != null) {
         permissionApiResponse = PermissionApiResponse.fromJsonForGroupData(response);
         await PermissionManager.loadPermissions();
+        await buildQuickAccessButtonList();
         await drawerMenuController.loadModules();
       }
     }catch(e){
@@ -63,5 +71,74 @@ class HomeScreenController extends GetxController{
       update(['dashboard_data']);
     }
 
+  }
+
+  final List<QuickAccessItemModel> quickAccessItems = [];
+
+  Future<void> buildQuickAccessButtonList() async {
+    quickAccessItems.clear();
+    PermissionManager.hasParentPermission("Order");
+    quickAccessItems.addIf( PermissionManager.hasParentPermission("Order"),QuickAccessItemModel(
+      isLoading: dashboardDataLoading,
+      title: "Create Invoice",
+      asset: AppAssets
+          .createInvoiceQuickAccessIcon,
+      onPress: (){
+        drawerMenuController.selectMenuItem(MenuSelection(parent: DrawerItems.sales,child: 'Sales'));
+      },
+    ),);
+
+    quickAccessItems.addIf( PermissionManager.hasParentPermission("OrderReturn"),QuickAccessItemModel(
+      isLoading:dashboardDataLoading,
+      title: "Create Return",
+      asset: AppAssets
+          .createReturnQuickAccessIcon,
+      onPress: (){
+        drawerMenuController.selectMenuItem(MenuSelection(parent: DrawerItems.returnAndExchange,child: 'Return'));
+      },
+    ),);
+
+    quickAccessItems.addIf( PermissionManager.hasParentPermission("BalanceTransfer"),QuickAccessItemModel(
+      isLoading:
+      dashboardDataLoading,
+      title: "Cash Transfer",
+      asset: AppAssets
+          .cashTransferQuickAccessIcon,
+      onPress: (){
+        Get.toNamed(MoneyTransfer.routeName);
+      },
+    ),);
+
+    quickAccessItems.addIf( PermissionManager.hasParentPermission("Journal"),QuickAccessItemModel(
+      isLoading:
+      dashboardDataLoading,
+      title: "Expense",
+      asset: AppAssets
+          .expense,
+      onPress: (){
+        Get.toNamed(ExpenseVoucher.routeName);
+      },
+    ),);
+
+    quickAccessItems.addIf( PermissionManager.hasParentPermission("MoneyReceipt"),
+      QuickAccessItemModel(
+        isLoading:
+        dashboardDataLoading,
+        title: "Collect Due",
+        asset: AppAssets
+            .collection,
+        onPress: (){
+          Get.toNamed(DueCollection.routeName);
+        },
+      ),);
+    update(['dashboard_data']);
+  }
+
+  List<List<QuickAccessItemModel>> chunkList(int size) {
+    List<List<QuickAccessItemModel>> chunks = [];
+    for (int i = 0; i < quickAccessItems.length; i += size) {
+      chunks.add(quickAccessItems.sublist(i, i + size > quickAccessItems.length ? quickAccessItems.length : i + size));
+    }
+    return chunks;
   }
 }

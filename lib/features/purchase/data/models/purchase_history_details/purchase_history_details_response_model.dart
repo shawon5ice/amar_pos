@@ -64,7 +64,8 @@ class Supplier {
   final int id;
   final String name;
   final String phone;
-  final String address;
+  @JsonKey(defaultValue: "N/A")
+  final String? address;
 
   Supplier({required this.id, required this.name, required this.phone, required this.address});
 

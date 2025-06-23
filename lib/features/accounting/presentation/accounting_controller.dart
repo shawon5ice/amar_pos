@@ -36,10 +36,11 @@ class AccountingController extends GetxController {
 
 
   List<AccountingMenuItem> accounting = [];
-  bool isAccountingLoading = false;
+  bool isAccountingLoading = true;
 
   void prepareAccountingMenuItems() {
     isAccountingLoading = true;
+    update(['permission_handler_builder']);
     accounting.addIf(dailyStatementAccess,AccountingMenuItem(
         title: "Daily Statement",
         onPress: () {

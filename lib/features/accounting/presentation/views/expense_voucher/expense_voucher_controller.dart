@@ -1,4 +1,5 @@
 import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
+import 'package:amar_pos/features/accounting/data/models/expense_voucher/expense_category_list_response_model_dd.dart';
 import 'package:amar_pos/features/accounting/data/models/expense_voucher/expense_voucher_response_model.dart';
 import 'package:amar_pos/features/accounting/data/models/expense_voucher/expense_payment_methods_response_model.dart';
 import 'package:amar_pos/features/accounting/data/services/expense_voucher_service.dart';
@@ -32,6 +33,9 @@ class ExpenseVoucherController extends GetxController{
 
   ExpenseCategoriesResponseModel? expenseCategoriesResponseModel;
   List<ExpenseCategory> expenseCategoriesList = [];
+
+  ExpenseCategoryListResponseModelDD? expenseCategoryListResponseModelDD;
+  List<Expense> expenseListForDD = [];
 
   ExpensePaymentMethodsResponseModel? expensePaymentMethodsResponseModel;
   List<ExpensePaymentMethod> expensePaymentMethods = [];
@@ -166,6 +170,40 @@ class ExpenseVoucherController extends GetxController{
       isExpenseCategoriesListLoading = false;
       isLoadingMore = false;
       update(['expense_vouchers_categories_list','expense_category_dd']);
+    }
+  }
+
+  Future<void> getExpenseCategoriesForDD() async {
+    isExpenseCategoriesListLoading = true;
+    hasError.value = false;
+
+    update(['expense_category_dd']);
+
+    try {
+      var response = await ExpenseVoucherService.getExpenseCategoriesForDD(
+          usrToken: loginData!.token,
+      );
+
+
+      if (response != null) {
+        expenseCategoryListResponseModelDD =
+            ExpenseCategoryListResponseModelDD.fromJson(response);
+
+        if (expenseCategoryListResponseModelDD != null) {
+          expenseListForDD = expenseCategoryListResponseModelDD!.data;
+
+        } else {
+
+        }
+      } else {
+
+      }
+    } catch (e) {
+      logger.e(e);
+    } finally {
+      isExpenseCategoriesListLoading = false;
+      isLoadingMore = false;
+      update(['expense_category_dd']);
     }
   }
 
@@ -394,10 +432,18 @@ class ExpenseVoucherController extends GetxController{
   }
 
   bool checkExpenseVoucherPermissions(String permission) {
-    if(!PermissionManager.hasPermission("ChartOfAccounts.$permission")){
+    if(!PermissionManager.hasPermission("Journal.$permission")){
       ErrorExtractor.showSingleErrorDialog(Get.context!, "Forbidden access. You don't have Permission");
       return false;
     }
     return true;
   }
+
+  // bool checkExpenseVoucherPermissions(String permission) {
+  //   if(!PermissionManager.hasPermission("ChartOfAccounts.$permission")){
+  //     ErrorExtractor.showSingleErrorDialog(Get.context!, "Forbidden access. You don't have Permission");
+  //     return false;
+  //   }
+  //   return true;
+  // }
 }

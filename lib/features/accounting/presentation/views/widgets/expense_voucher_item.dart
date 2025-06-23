@@ -67,7 +67,7 @@ class ExpenseVoucherItem extends StatelessWidget {
                 onSelected: (value) {
                   switch (value) {
                     case "edit":
-                      bool hasPermission = _controller.checkExpenseVoucherPermissions("update");
+                      bool hasPermission = _controller.checkExpenseVoucherPermissions("updateExpenseVoucher");
                       if(!hasPermission) return;
                       showModalBottomSheet(
                         context: context,
