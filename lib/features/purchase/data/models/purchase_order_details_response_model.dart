@@ -98,13 +98,13 @@ class Supplier {
   late final int id;
   late final String name;
   late final String phone;
-  late final String address;
+  late final String? address;
 
   Supplier.fromJson(Map<String, dynamic> json){
     id = json['id'];
     name = json['name'];
     phone = json['phone'];
-    address = json['address'];
+    address = json['address']??"";
   }
 
   Map<String, dynamic> toJson() {
@@ -122,7 +122,7 @@ class Business {
     required this.id,
     required this.name,
     required this.phone,
-    this.email,
+    required this.email,
     required this.logo,
     required this.address,
     required this.photoUrl,
@@ -130,19 +130,19 @@ class Business {
   late final int id;
   late final String name;
   late final String phone;
-  late final Null email;
+  late final String email;
   late final String logo;
   late final String address;
   late final String photoUrl;
 
   Business.fromJson(Map<String, dynamic> json){
     id = json['id'];
-    name = json['name'];
-    phone = json['phone'];
-    email = json['email'];
-    logo = json['logo'];
-    address = json['address'];
-    photoUrl = json['photo_url'];
+    name = json['name']??'';
+    phone = json['phone']??'';
+    email = json['email']??'';
+    logo = json['logo']??'';
+    address = json['address']??'';
+    photoUrl = json['photo_url']??'';
   }
 
   Map<String, dynamic> toJson() {

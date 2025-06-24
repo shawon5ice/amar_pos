@@ -582,8 +582,8 @@ class PurchaseController extends GetxController{
 
         if (purchaseProductResponseModel != null) {
           purchaseProducts.addAll(purchaseProductResponseModel!.data.returnProducts??[]);
-          countTotal += purchaseProductResponseModel!.countTotal;
-          purchaseAmount += purchaseProductResponseModel!.amountTotal;
+          countTotal = purchaseProductResponseModel!.countTotal;
+          purchaseAmount = purchaseProductResponseModel!.amountTotal;
         }
       } else {
         if(page != 1){

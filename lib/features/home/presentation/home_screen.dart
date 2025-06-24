@@ -124,7 +124,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 controller.getDashboardData();
               },
               child: SingleChildScrollView(
-                physics: AlwaysScrollableScrollPhysics(),
+                physics: const AlwaysScrollableScrollPhysics(),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
@@ -180,7 +180,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                 ),
                                 VerticalStatusWidget(
                                   isLoading: controller.dashboardDataLoading,
-                                  value: dashboardResponseData?.cashIn
+                                  value: dashboardResponseData?.cashOut
                                           .toDouble() ??
                                       0,
                                   title: "Cash Out",
@@ -194,7 +194,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                 ),
                                 VerticalStatusWidget(
                                   isLoading: controller.dashboardDataLoading,
-                                  value: dashboardResponseData?.cashIn
+                                  value: dashboardResponseData?.balance
                                           .toDouble() ??
                                       0,
                                   title: "Balance",
@@ -215,16 +215,17 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            FieldTitle(
+                            const FieldTitle(
                               'Today’s Expense & Collection',
                               color: AppColors.darkGreen,
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
                             ),
-                            SizedBox(height: 16),
+                            addH(16),
                             Row(
                               children: [
                                 TotalStatusWidget(
+                                  hasBorder: true,
                                   title: 'Expense',
                                   value: controller.dashboardResponseModel !=
                                           null
@@ -239,6 +240,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                                 ),
                                 addW(16),
                                 TotalStatusWidgetLeftIcon(
+                                  hasBorder: true,
                                   title: 'Collection',
                                   value: controller.dashboardResponseModel !=
                                           null
@@ -267,13 +269,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              FieldTitle(
+                              const FieldTitle(
                                 'Quick Access',
                                 color: AppColors.darkGreen,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
                               ),
-                              SizedBox(height: 16),
+                              addH(16),
                               Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: rows

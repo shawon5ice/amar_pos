@@ -44,7 +44,7 @@ class SalesSummaryCard extends StatelessWidget {
               ),
               Text(
                 isLoading ? "Loading..." : formatDate(DateTime.parse((DateTime.now()).toString())),
-                style: TextStyle(fontSize: 16,color: AppColors.darkGreen, fontWeight: FontWeight.w500),
+                style: const TextStyle(fontSize: 16,color: AppColors.darkGreen, fontWeight: FontWeight.w500),
               ),
             ],
           ),
@@ -82,7 +82,7 @@ class SalesSummaryCard extends StatelessWidget {
                                 Text("Total Sales",
                                     style: TextStyle(
                                         fontSize: 12, color: Colors.grey[700])),
-                                SizedBox(height: 4),
+                                const SizedBox(height: 4),
                                 AutoSizeText(
                                     isLoading
                                         ? "Loading..."
@@ -90,7 +90,7 @@ class SalesSummaryCard extends StatelessWidget {
                                     minFontSize: 8,
                                     maxFontSize: 16,
                                     style:
-                                        TextStyle(fontWeight: FontWeight.bold)),
+                                        const TextStyle(fontWeight: FontWeight.bold)),
                               ],
                             ),
                           ),
@@ -100,8 +100,8 @@ class SalesSummaryCard extends StatelessWidget {
               Container(
                 height: 100,
                 width: .5,
-                color: Color(0xff7c7c7c),
-                margin: EdgeInsets.symmetric(horizontal: 12),
+                color: const Color(0xff7c7c7c),
+                margin: const EdgeInsets.symmetric(horizontal: 12),
               ),
               Expanded(
                 child: Column(
@@ -114,7 +114,7 @@ class SalesSummaryCard extends StatelessWidget {
                       color: AppColors.primary,
                       isLoading: isLoading,
                     ),
-                    Padding(
+                    const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 6),
                       child: Divider(
                         height: 16,
@@ -163,19 +163,19 @@ class SalesSummaryStatusWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(title,
-                style: TextStyle(fontSize: 12, color: AppColors.hintTextColor)),
+                style: const TextStyle(fontSize: 12, color: AppColors.hintTextColor)),
 
             isLoading
                 ? const SizedBox(
                 height: 20, width: 20, child: CupertinoActivityIndicator() )
                 : Text(Methods.getFormatedPrice(value),
-                style: TextStyle(fontSize:14,color: Color(0xff333333),fontWeight: FontWeight.bold)),
+                style: const TextStyle(fontSize:14,color: Color(0xff333333),fontWeight: FontWeight.bold)),
           ],
         ),
         Container(
           decoration: BoxDecoration(
               color: color,
-              borderRadius: BorderRadius.all(Radius.circular(100))),
+              borderRadius: const BorderRadius.all(Radius.circular(100))),
           width: 4,
           height: 42,
         )
@@ -200,7 +200,7 @@ class HalfDonutChartPainter extends CustomPainter {
     const strokeWidth = 20.0;
 
     final gapRadian = radians(5); // 5 degrees gap
-    final halfCircle = pi;
+    const halfCircle = pi;
 
     final center = Offset(size.width / 2, size.height / 2);
     final rect = Rect.fromCircle(
@@ -236,22 +236,26 @@ class HalfDonutChartPainter extends CustomPainter {
       ..strokeCap = StrokeCap.butt;
 
     // Draw wholesale (starting from -π/2)
-    canvas.drawArc(
+    if(wholesale > 0) {
+      canvas.drawArc(
       rect,
       -pi / 2,
       wholesaleSweep,
       false,
       wholesalePaint,
     );
+    }
 
     // Draw retail (with gap after wholesale)
-    canvas.drawArc(
+    if(retail > 0) {
+      canvas.drawArc(
       rect,
       -pi / 2 + wholesaleSweep + gapRadian,
       retailSweep,
       false,
       retailPaint,
     );
+    }
   }
 
   double radians(double degrees) => degrees * pi / 180;

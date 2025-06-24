@@ -15,6 +15,7 @@ class TotalStatusWidget extends StatelessWidget {
     required this.isLoading,
     this.asset,
     this.flex = 1,
+    this.hasBorder,
   });
 
   final String title;
@@ -22,6 +23,7 @@ class TotalStatusWidget extends StatelessWidget {
   final bool isLoading;
   String? asset;
   final int flex;
+  bool? hasBorder;
 
   @override
   Widget build(BuildContext context) {
@@ -31,9 +33,9 @@ class TotalStatusWidget extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: context.theme.cardColor,
-            border: Border.all(
+            border: hasBorder == true ? Border.all(
               color: AppColors.hintTextColor,
-            ),
+            ): null,
             borderRadius: BorderRadius.circular(12.r),
           ),
           child: Column(
@@ -49,7 +51,7 @@ class TotalStatusWidget extends StatelessWidget {
                     ),
                   ),
                   if(asset != null)const Spacer(),
-                  if(asset != null)SvgPicture.asset(asset!)
+                  if(asset != null)SvgPicture.asset(asset!, color: hasBorder == true ? AppColors.darkPrimary: null,)
                 ],
               ),
               addH(8.h),
@@ -73,18 +75,20 @@ class TotalStatusWidget extends StatelessWidget {
 }
 
 class TotalStatusWidgetWithoutExpanded extends StatelessWidget {
-  const TotalStatusWidgetWithoutExpanded({
+  TotalStatusWidgetWithoutExpanded({
     super.key,
     required this.title,
     this.value,
     required this.isLoading,
     this.asset,
+    this.hasBorder,
   });
 
   final String title;
   final String? value;
   final bool isLoading;
   final String? asset;
+  bool? hasBorder;
 
   @override
   Widget build(BuildContext context) {
@@ -93,9 +97,9 @@ class TotalStatusWidgetWithoutExpanded extends StatelessWidget {
       decoration: BoxDecoration(
         color: context.theme.cardColor,
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(
+        border: hasBorder == true ? Border.all(
           color: AppColors.hintTextColor,
-        ),
+        ): null,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -146,11 +150,13 @@ class TotalStatusWidgetLeftIcon extends StatelessWidget {
     required this.isLoading,
     this.asset,
     this.flex = 1,
+    this.hasBorder,
   });
 
   final String title;
   final String? value;
   final bool isLoading;
+  bool? hasBorder;
   String? asset;
   final int flex;
 
@@ -162,9 +168,9 @@ class TotalStatusWidgetLeftIcon extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: context.theme.cardColor,
-            border: Border.all(
+            border: hasBorder == true ? Border.all(
               color: AppColors.hintTextColor,
-            ),
+            ): Border.all(width: 0),
             borderRadius: BorderRadius.circular(12.r),
           ),
           child: Column(
@@ -172,7 +178,7 @@ class TotalStatusWidgetLeftIcon extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  if(asset != null)SvgPicture.asset(asset!),
+                  if(asset != null)SvgPicture.asset(asset!,color: hasBorder == true ? AppColors.darkPrimary: null,),
                   if(asset != null)const Spacer(),
                   Text(
                     title,
