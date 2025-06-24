@@ -185,7 +185,7 @@ class _SplashScreenState extends State<SplashScreen> {
                       AppAssets.motionSoftLogo,
                       width: 120,
                       height: 48,
-                      fit: BoxFit.fitHeight,
+                      fit: BoxFit.fitWidth,
                     ),
                     addH(24),
                     Text(

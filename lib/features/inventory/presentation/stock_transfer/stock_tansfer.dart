@@ -34,7 +34,7 @@ class _StockTransferScreenState extends State<StockTransferScreen>
   void initState() {
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(() async {
-      if(_tabController.indexIsChanging){
+      if(_tabController.indexIsChanging && !controller.isEditing){
         controller.brand = null;
         controller.category = null;
         controller.selectedDateTimeRange.value = null;

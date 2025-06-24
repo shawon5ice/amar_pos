@@ -195,6 +195,7 @@ class LoginScreen extends GetView<AuthController> {
                           AppAssets.motionSoftLogo,
                           height: 48,
                           width: 120,
+                          fit: BoxFit.fitWidth,
                         ),
                       ),
                     ),

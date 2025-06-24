@@ -227,15 +227,26 @@ class _MoneyTransferBottomSheetState extends State<MoneyTransferBottomSheet> {
                               value: selectedToOutlet,
                               onChanged: (value) {
                                 selectedToOutlet = value;
-                                if(selectedToOutlet != null && selectedToOutlet!.isMainStore != 1){
-                                  selectedToAccount =  controller.toAccounts.singleWhere((e) {
-                                    logger.d(e.storeId == selectedToOutlet!.id);
-                                    return e.storeId == selectedToOutlet!.id;
-                                  });
-                                }
-                                setState(() {
 
-                                });
+                                if (selectedToOutlet != null && selectedToOutlet!.isMainStore != 1) {
+                                  final outletId = selectedToOutlet!.id;
+                                  final found = controller.toAccounts.firstWhereOrNull(
+                                        (e) {
+                                          return e.storeId == outletId;
+                                        },
+                                  );
+
+                                  if (found != null) {
+                                    selectedToAccount = found;
+                                  } else {
+                                    selectedToAccount = null;
+                                    logger.w("No matching account found for storeId: $outletId");
+                                  }
+                                } else {
+                                  selectedToAccount = null;
+                                }
+
+                                setState(() {}); // Refresh widget with new values
                               },
                               hintText: controller.outletListLoading
                                   ? "Loading..."
@@ -279,8 +290,13 @@ class _MoneyTransferBottomSheetState extends State<MoneyTransferBottomSheet> {
                                         FieldValidator.nonNullableFieldValidator(
                                             value?.name, "To Account"),
                                   );
-                                }) : CustomDropdownWithSearchWidget<OutletForMoneyTransferData>(
-                              items: selectedToOutlet == null ? [] : [selectedToAccount!],
+                                })
+                                :
+                            CustomDropdownWithSearchWidget<OutletForMoneyTransferData>(
+                              items: (selectedToOutlet != null && selectedToOutlet!.isMainStore != 1 && selectedToAccount != null)
+                                  ? [selectedToAccount!]
+                                  : [],
+
                               isMandatory: true,
                               title: "To Account",
                               // noTitle: true,

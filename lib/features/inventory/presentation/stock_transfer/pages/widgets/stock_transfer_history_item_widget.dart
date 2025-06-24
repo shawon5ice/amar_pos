@@ -2,6 +2,7 @@ import 'package:amar_pos/core/core.dart';
 import 'package:amar_pos/core/network/helpers/error_extractor.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/features/inventory/presentation/stock_transfer/data/models/stock_transfer_history_response_model.dart';
+import 'package:amar_pos/features/inventory/presentation/stock_transfer/pages/widgets/stock_transfer_item_action_menu.dart';
 import 'package:amar_pos/features/inventory/presentation/stock_transfer/stock_transfer_controller.dart';
 import 'package:amar_pos/features/purchase/data/models/purchase_history_response_model.dart';
 import 'package:amar_pos/features/purchase/presentation/pages/purchase_history_details_view.dart';
@@ -33,12 +34,6 @@ class StockTransferHistoryItemWidget extends StatelessWidget {
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 5.h),
         padding: const EdgeInsets.all(10),
-        foregroundDecoration: !stockTransfer.isEditable
-            ? BoxDecoration(
-          color: const Color(0xff7c7c7c).withOpacity(.3),
-          borderRadius: BorderRadius.all(Radius.circular(20.r)),
-        )
-            : null,
         decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.all(Radius.circular(20.r))),
@@ -116,18 +111,33 @@ class StockTransferHistoryItemWidget extends StatelessWidget {
                   assetPath: AppAssets.printIcon,
                 ),
                 addW(8),
-                SoldHistoryItemActionMenu(
+                StockTransferItemActionMenu(
+                  enableEdit: stockTransfer.isEditable,
+                  enableReceive: stockTransfer.isReceivable,
                   onSelected: (value) async{
-                    if(stockTransfer.isEditable == false){
-                      ErrorExtractor.showSingleErrorDialog(context, "You can't perform any action on this invoice due to changed stock Value!");
-                      return;
-                    }
                     switch (value) {
+                      case "receive":
+                        bool hasPermission =  controller.checkStockTransferPermissions("received");
+                        if(!hasPermission) return;
+                        AwesomeDialog(
+                            context: context,
+                            dialogType: DialogType.error,
+                            title: "Are you sure?",
+                            desc:
+                            "You are going to receive order no: ${stockTransfer.orderNo}",
+                            btnOkOnPress: () {
+                              controller.receiveStockTransfer(
+                                  stockTransferId: stockTransfer.id);
+                            },
+                            btnCancelOnPress: () {})
+                            .show();
+                        break;
                       case "edit":
                         bool hasPermission =  controller.checkStockTransferPermissions("update");
                         if(!hasPermission) return;
-                        await controller.processEdit(stockTransferId: stockTransfer.id, context: context);
-                        onChange(0);
+                        await controller.processEdit(stockTransferId: stockTransfer.id, context: context).then((value){
+                          onChange(0);
+                        });
                         break;
                       case "delete":
                         bool hasPermission = controller.checkStockTransferPermissions("destroy");
@@ -176,7 +186,7 @@ class StockTransferHistoryItemWidget extends StatelessWidget {
                     value: stockTransfer.quantity.toString(),
                   ),
                   SaleHistoryItemTitleValueWidget(
-                    title: "Statue",
+                    title: "Status",
                     value: stockTransfer.status.toString(),
                   ),
                 ],

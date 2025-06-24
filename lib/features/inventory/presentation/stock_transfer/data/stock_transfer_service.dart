@@ -169,6 +169,14 @@ class StockTransferService {
     return response;
   }
 
+  static Future<dynamic> receiveStockTransfer({
+    required String usrToken,
+    required int stockTransferId}) async {
+    var response = await BaseClient.postData(
+      token: usrToken,
+      api: 'inventory/stock_transfer/received/$stockTransferId',);
+    return response;
+  }
 
   static Future<void> downloadList({required bool isPdf, required String fileName,
     required String usrToken,

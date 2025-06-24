@@ -317,6 +317,7 @@ class MoneyTransferController extends GetxController{
       );
 
       if (response != null) {
+        logger.d(response);
         outletListForMoneyTransferResponseModel =
             OutletListForMoneyTransferResponseModel.fromJson(response);
 
@@ -325,6 +326,7 @@ class MoneyTransferController extends GetxController{
           logger.i("----->");
           outletListForMoneyTransferResponseModel!.data!.fromStores?.removeWhere((e) => e.id != loginData!.store.id);
           outletListForMoneyTransferResponseModel!.data!.fromAccounts?.removeWhere((e) => e.storeId != loginData!.store.id);
+          getCABalance(outletListForMoneyTransferResponseModel!.data!.fromAccounts!.first.id);
         }
       } else {
         moneyTransferList.clear();
@@ -353,6 +355,7 @@ class MoneyTransferController extends GetxController{
     );
 
     if (response != null) {
+      logger.d(response);
       ChartOfAccountPaymentMethodsResponseModel chartOfAccountPaymentMethodsResponseModel =
       ChartOfAccountPaymentMethodsResponseModel.fromJson(response);
       paymentList = chartOfAccountPaymentMethodsResponseModel.paymentMethods;

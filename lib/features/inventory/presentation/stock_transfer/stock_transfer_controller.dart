@@ -335,6 +335,7 @@ class StockTransferController extends GetxController{
       );
 
       if (response != null) {
+        logger.d(response);
         stockTransferResponse =
             StockTransferResponse.fromJson(response);
 
@@ -363,66 +364,87 @@ class StockTransferController extends GetxController{
   // PurchaseOrderDetailsResponseModel? purchaseOrderDetailsResponseModel;
   bool editStockTransferItemLoading = false;
   //
-  Future<void> processEdit({required int stockTransferId,required BuildContext context}) async{
+  Future<void> processEdit({
+    required int stockTransferId,
+    required BuildContext context,
+  }) async {
     isEditing = true;
     isProcessing = true;
     RandomLottieLoader.show();
     selectedOutlet = null;
     createStockTransferRequestModel = CreateStockTransferRequestModel.defaultConstructor();
 
-    // Methods.showLoading();
     update(['edit_purchase_history_item']);
+
     try {
-      var response = await StockTransferService.getStockTransferHistoryDetails(
-        usrToken: loginData!.token,
+      final token = loginData?.token;
+      if (token == null) {
+        throw Exception("User token is null");
+      }
+
+      final response = await StockTransferService.getStockTransferHistoryDetails(
+        usrToken: token,
         id: stockTransferId,
       );
 
-
-      if (response != null) {
-        purchaseOrderProducts.clear();
-        getAllProducts(search: '', page: 1);
-
-        stockTransferHistoryDetailsResponseModel =
-            StockTransferHistoryDetailsResponseModel.fromJson(response);
-
-        if(outlets.isEmpty){
-          await getAllOutlet();
-        }
-
-
-        //selecting products
-        for (var e in stockTransferHistoryDetailsResponseModel!.data.details) {
-          ProductInfo productInfo = productsListResponseModel!.data.productList.singleWhere((f) => f.id == e.id);
-          addPlaceOrderProduct(productInfo, quantity:  e.quantity,snNo: e.snNo?.map((e)=> e.serialNo).toList(),);
-        }
-        changeTransferType(stockTransferHistoryDetailsResponseModel!.data.type == 1);
-
-        if (stockTransferHistoryDetailsResponseModel?.data != null) {
-          if (stockTransferHistoryDetailsResponseModel!.data.type != 1) {
-            selectedOutlet = outlets.firstWhereOrNull((e) => e.id == stockTransferHistoryDetailsResponseModel!.data.fromStore.id);
-          } else {
-            selectedOutlet = outlets.firstWhereOrNull((e) => e.id == stockTransferHistoryDetailsResponseModel!.data.toStore.id);
-          }
-        }
-        if (selectedOutlet != null) {
-          print('Selected Outlet ID: ${selectedOutlet?.id}');
-        } else {
-          print('No matching outlet found.');
-        }
-        logger.e("====> ${selectedOutlet?.id}");
-        createStockTransferRequestModel.storeId = selectedOutlet?.id ?? -1;
-        remarks = stockTransferHistoryDetailsResponseModel!.data.remarks;
+      if (response == null) {
+        throw Exception("Response is null");
       }
-    } catch (e) {
+
+      stockTransferHistoryDetailsResponseModel = StockTransferHistoryDetailsResponseModel.fromJson(response);
+
+      purchaseOrderProducts.clear();
+      await getAllProducts(search: '', page: 1);
+
+      if (outlets.isEmpty) {
+        await getAllOutlet();
+      }
+
+      final data = stockTransferHistoryDetailsResponseModel?.data;
+      if (data == null) {
+        throw Exception("StockTransfer data is null");
+      }
+
+      // Selecting products
+      for (var detail in data.details) {
+        final productInfo = productsListResponseModel?.data.productList.singleWhere(
+              (f) => f.id == detail.id,
+          orElse: () => throw Exception("Product with id ${detail.id} not found"),
+        );
+        if (productInfo != null) {
+          addPlaceOrderProduct(
+            productInfo,
+            quantity: detail.quantity,
+            snNo: detail.snNo?.map((e) => e.serialNo).toList(),
+          );
+        }
+      }
+
+      // changeTransferType(data.type == 1);
+
+      // Set selected outlet
+      final storeId = data.type != 1 ? data.fromStore.id : data.toStore.id;
+      selectedOutlet = outlets.firstWhereOrNull((e) => e.id == storeId);
+
+      if (selectedOutlet != null) {
+        print('Selected Outlet ID: ${selectedOutlet!.id}');
+      } else {
+        print('No matching outlet found.');
+      }
+
+      createStockTransferRequestModel.storeId = selectedOutlet?.id ?? -1;
+      remarks = data.remarks;
+    } catch (e, stackTrace) {
       hasError.value = true;
+      print('Error in processEdit: $e');
+      print(stackTrace);
     } finally {
       isProcessing = false;
-      update(['edit_purchase_history_item','']);
-      // Methods.hideLoading();
+      update(['edit_purchase_history_item', '']);
       RandomLottieLoader.hide();
     }
   }
+
   // Future<void> processEdit({required int stockTransferId,required BuildContext context}) async{
   //   editStockTransferItemLoading = true;
   //   isEditing = true;
@@ -488,6 +510,36 @@ class StockTransferController extends GetxController{
     try {
       // Call the API
       var response = await StockTransferService.deleteStockTransfer(
+        usrToken: loginData!.token,
+        stockTransferId: stockTransferId,
+      );
+
+      // Parse the response
+      if (response != null && response['success']) {
+        getStockTransferHistory();
+        Methods.showSnackbar(msg: response['message'], isSuccess: true);
+      } else {
+        ErrorExtractor.showSingleErrorDialog(Get.context!, response['message']);
+      }
+    } catch (e) {
+      hasError.value = true;
+      logger.e(e);
+      ErrorExtractor.showSingleErrorDialog(Get.context!, 'Error: something went wrong while deleting the item');
+    } finally {
+      update(['purchase_history_list']);
+    }
+  }
+
+  Future<void> receiveStockTransfer({
+    required int stockTransferId,
+  }) async {
+
+    hasError.value = false;
+    update(['purchase_history_list']);
+
+    try {
+      // Call the API
+      var response = await StockTransferService.receiveStockTransfer(
         usrToken: loginData!.token,
         stockTransferId: stockTransferId,
       );
