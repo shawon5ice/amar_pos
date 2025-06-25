@@ -82,8 +82,9 @@ class MoneyTransferItem extends StatelessWidget {
                 assetPath: AppAssets.printIcon,
               ),
               // addW(8),
-              if(moneyTransferData.isCreator && moneyTransferData.status == "Pending")MoneyTransferActionMenu(
+              if(moneyTransferData.isCreator || moneyTransferData.isApprovable)MoneyTransferActionMenu(
                 isApproveAble: moneyTransferData.isApprovable,
+                isEditable: moneyTransferData.isCreator,
                 onSelected: (value) {
                   switch (value) {
                     case "edit":
@@ -110,7 +111,7 @@ class MoneyTransferItem extends StatelessWidget {
                           desc:
                           "You are going to approve money transfer with \ninvoice no. ${moneyTransferData.slNo}",
                           btnOkOnPress: () {
-                            _controller.deleteMoneyTransferItem(id: moneyTransferData.id);
+                            _controller.approveMoneyTransfer(id: moneyTransferData.id);
                           },
                           btnCancelOnPress: () {})
                           .show();

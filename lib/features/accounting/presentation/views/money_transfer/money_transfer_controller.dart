@@ -304,7 +304,7 @@ class MoneyTransferController extends GetxController{
 
   bool outletListLoading = false;
   OutletListForMoneyTransferResponseModel? outletListForMoneyTransferResponseModel;
-  List<OutletForMoneyTransferData> toAccounts = [];
+  List<ChartOfAccountPaymentMethod> toAccounts = [];
 
   Future<void> getOutletForMoneyTransferList() async {
     outletListLoading = true;
@@ -321,7 +321,6 @@ class MoneyTransferController extends GetxController{
         outletListForMoneyTransferResponseModel =
             OutletListForMoneyTransferResponseModel.fromJson(response);
 
-        toAccounts = outletListForMoneyTransferResponseModel!.data!.fromAccounts!;
         if(!loginData!.businessOwner){
           logger.i("----->");
           outletListForMoneyTransferResponseModel!.data!.fromStores?.removeWhere((e) => e.id != loginData!.store.id);
@@ -397,6 +396,32 @@ class MoneyTransferController extends GetxController{
       balanceLoading = false;
       update(['balance']);
     }
+  }
+
+  bool toAccountLoading = false;
+
+  Future<void> getPaymentMethodForStore({int? id}) async {
+    toAccountLoading = true;
+    update(['to_account']); // Update the UI for loading state
+    var response = await BaseClient.getData(
+      token: loginData!.token,
+      api: "money_transfer/get-payment-methods",
+      parameter: {
+        "store_id" : id,
+      }
+    );
+
+    logger.d(response);
+    if (response != null && response['success']) {
+      logger.d(response);
+      ChartOfAccountPaymentMethodsResponseModel chartOfAccountPaymentMethodsResponseModel =
+      ChartOfAccountPaymentMethodsResponseModel.fromJson(response);
+      toAccounts = chartOfAccountPaymentMethodsResponseModel.paymentMethods;
+    }else{
+      toAccounts.clear();
+    }
+    toAccountLoading = false;
+    update(['to_account']); // Update the UI after loading
   }
 
 }

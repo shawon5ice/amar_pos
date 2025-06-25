@@ -4,19 +4,13 @@ import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/core/widgets/custom_button.dart';
 import 'package:amar_pos/core/widgets/custom_text_field.dart';
 import 'package:amar_pos/core/widgets/field_title.dart';
-import 'package:amar_pos/core/widgets/reusable/client_dd/client_dd_controller.dart';
 import 'package:amar_pos/core/widgets/reusable/client_dd/client_list_dd_response_model.dart';
-import 'package:amar_pos/core/widgets/reusable/payment_dd/ca_payment_method_dd_controller.dart';
-import 'package:amar_pos/core/widgets/reusable/payment_dd/ca_payment_method_dropdown_widget.dart';
 import 'package:amar_pos/core/widgets/reusable/payment_dd/expense_payment_methods_response_model.dart';
 import 'package:amar_pos/features/accounting/data/models/money_transfer/outlet_list_for_money_transfer_response_model.dart';
 import 'package:amar_pos/features/inventory/presentation/products/widgets/custom_drop_down_widget.dart';
-import 'package:amar_pos/features/inventory/presentation/products/widgets/custom_dropdown_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-
-import '../../../../../core/widgets/methods/field_validator.dart';
 import '../../../data/models/money_transfer/money_transfer_list_response_model.dart';
 import '../money_transfer/money_transfer_controller.dart';
 
@@ -49,7 +43,6 @@ class _MoneyTransferBottomSheetState extends State<MoneyTransferBottomSheet> {
   OutletForMoneyTransferData? selectedFromOutlet;
   OutletForMoneyTransferData? selectedToOutlet;
   OutletForMoneyTransferData? selectedFromAccount;
-  OutletForMoneyTransferData? selectedToAccount;
 
   @override
   void initState() {
@@ -81,11 +74,9 @@ class _MoneyTransferBottomSheetState extends State<MoneyTransferBottomSheet> {
         _controller.getCABalance(selectedFromAccount!.id);
         selectedToOutlet = _controller.outletListForMoneyTransferResponseModel!.data!.toStores!.singleWhere((e) => e.id == widget.moneyTransferData!.toStore!.id);
         if(selectedToOutlet != null && selectedToOutlet!.isMainStore != 1){
-          selectedToAccount =  _controller.toAccounts.singleWhere((e) {
-            logger.d(e.storeId == selectedToOutlet!.id);
-            return e.storeId == selectedToOutlet!.id;
+          _controller.getPaymentMethodForStore(id: selectedToOutlet?.id).then((value){
+            selectedPaymentMethod = _controller.toAccounts.singleWhere((e)=> e.id == widget.moneyTransferData!.toAccount!.id);
           });
-
         }else{
           selectedPaymentMethodID = widget.moneyTransferData!.toAccount!.id;
         }
@@ -225,29 +216,24 @@ class _MoneyTransferBottomSheetState extends State<MoneyTransferBottomSheet> {
                               // noTitle: true,
                               itemLabel: (value) => value.name,
                               value: selectedToOutlet,
-                              onChanged: (value) {
+                              onChanged: (value) async {
                                 selectedToOutlet = value;
+                                selectedPaymentMethod = null;
+                                controller.update(['to_account']); // clear old selection in UI
 
-                                if (selectedToOutlet != null && selectedToOutlet!.isMainStore != 1) {
-                                  final outletId = selectedToOutlet!.id;
-                                  final found = controller.toAccounts.firstWhereOrNull(
-                                        (e) {
-                                          return e.storeId == outletId;
-                                        },
-                                  );
+                                logger.i("Selected Outlet ID: ${selectedToOutlet?.id}");
 
-                                  if (found != null) {
-                                    selectedToAccount = found;
-                                  } else {
-                                    selectedToAccount = null;
-                                    logger.w("No matching account found for storeId: $outletId");
-                                  }
-                                } else {
-                                  selectedToAccount = null;
+                                // Fetch payment methods
+                                await controller.getPaymentMethodForStore(id: selectedToOutlet?.id);
+
+                                logger.i(controller.toAccounts);
+                                if (controller.toAccounts.length == 1) {
+                                  selectedPaymentMethod = controller.toAccounts.first;
+                                  logger.i("Auto-selected account: ${selectedPaymentMethod?.name}");
+                                  controller.update(['to_account']); // Update dropdown with new value
                                 }
-
-                                setState(() {}); // Refresh widget with new values
                               },
+
                               hintText: controller.outletListLoading
                                   ? "Loading..."
                                   : controller.outletListForMoneyTransferResponseModel == null ||
@@ -263,12 +249,12 @@ class _MoneyTransferBottomSheetState extends State<MoneyTransferBottomSheet> {
                                   value?.name, "To outlet"),
                             ),
                             addH(8),
-                            selectedToOutlet != null && selectedToOutlet!.isMainStore == 1 ? GetBuilder<MoneyTransferController>(
-                                id: 'ca_payment_dd',
+                            GetBuilder<MoneyTransferController>(
+                                id: 'to_account',
                                 builder: (controller) {
                                   return CustomDropdownWithSearchWidget<
                                       ChartOfAccountPaymentMethod>(
-                                    items: controller.paymentList,
+                                    items: controller.toAccounts,
                                     isMandatory: true,
                                     title: "To Account",
                                     // noTitle: true,
@@ -277,51 +263,20 @@ class _MoneyTransferBottomSheetState extends State<MoneyTransferBottomSheet> {
                                     onChanged: (value) {
                                       selectedPaymentMethod = value;
                                       controller.update([
-                                        'ca_payment_dd'
+                                        'to_account'
                                       ]); // Notify UI of the change
                                     },
-                                    hintText: controller.paymentListLoading
+                                    hintText: selectedToOutlet == null ? "Select to outlet first" : controller.toAccountLoading
                                         ? "Loading..."
-                                        : controller.paymentList.isEmpty
+                                        : controller.toAccounts.isEmpty
                                         ? "No payment method found..."
-                                        : "Select ao account",
+                                        : "Select to account",
                                     searchHintText: "Search a payment method",
                                     validator: (value) =>
                                         FieldValidator.nonNullableFieldValidator(
                                             value?.name, "To Account"),
                                   );
                                 })
-                                :
-                            CustomDropdownWithSearchWidget<OutletForMoneyTransferData>(
-                              items: (selectedToOutlet != null && selectedToOutlet!.isMainStore != 1 && selectedToAccount != null)
-                                  ? [selectedToAccount!]
-                                  : [],
-
-                              isMandatory: true,
-                              title: "To Account",
-                              // noTitle: true,
-                              itemLabel: (value) => value.name,
-                              value: selectedToAccount,
-                              onChanged: (value) {
-                                // selectedFromAccount = value;
-                                // if(selectedFromAccount != null){
-                                //   controller.getCABalance(selectedFromAccount!.id);
-                                // }
-                              },
-                              searchHintText: "Search account",
-                              hintText: controller.outletListLoading
-                                  ? "Loading..."
-                                  : controller.outletListForMoneyTransferResponseModel == null ||
-                                  (controller.outletListForMoneyTransferResponseModel !=
-                                      null &&
-                                      controller.outletListForMoneyTransferResponseModel!
-                                          .data ==
-                                          null)
-                                  ? "No account found"
-                                  : "Select account",
-                              validator: (value) => FieldValidator.nonNullableFieldValidator(
-                                  value?.name, "From account"),
-                            ),
                           ],
                         ),
                       ),
@@ -387,7 +342,7 @@ class _MoneyTransferBottomSheetState extends State<MoneyTransferBottomSheet> {
                               id: widget.moneyTransferData!.id,
                               fromStoreID: selectedFromOutlet!.id,
                               toStoreID: selectedToOutlet!.id,
-                              toAccountID: selectedToAccount != null ? selectedToAccount!.id : selectedPaymentMethod!.id,
+                              toAccountID: selectedPaymentMethod!.id,
                               fromAccountID: selectedFromAccount!.id,
                               amount: num.parse(_textEditingController.text),
                               remarks: _remarksEditingController.text,
@@ -400,7 +355,7 @@ class _MoneyTransferBottomSheetState extends State<MoneyTransferBottomSheet> {
                             _controller.storeNewMoneyTransfer(
                               fromStoreID: selectedFromOutlet!.id,
                               toStoreID: selectedToOutlet!.id,
-                              toAccountID: selectedToAccount != null ? selectedToAccount!.id : selectedPaymentMethod!.id,
+                              toAccountID: selectedPaymentMethod!.id,
                               fromAccountID: selectedFromAccount!.id,
                               amount: num.parse(_textEditingController.text),
                               remarks: _remarksEditingController.text,

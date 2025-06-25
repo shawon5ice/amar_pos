@@ -210,7 +210,7 @@ class MoneyTransferService {
 
     var response = await BaseClient.getData(
       token: token,
-      api: "money_transfer/approve/$id",
+      api: "money_transfer/approved/$id",
     );
     return response;
   }

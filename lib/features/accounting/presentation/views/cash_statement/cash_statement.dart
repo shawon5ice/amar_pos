@@ -50,16 +50,16 @@ class _CashStatementState extends State<CashStatement> {
         selectedPaymentMethod = controller.moneyTransferController.paymentList
             .singleWhere((e) => e.name.toLowerCase().contains('cash'));
         selectedCaId = selectedPaymentMethod!.id;
-      } else {
-        for (var e in controller.moneyTransferController.toAccounts) {
-          logger.e(e.storeId);
-        }
-        logger.e(controller.loginData!.store.id);
-        selectedAccount = controller.moneyTransferController.toAccounts.singleWhere((e) => e.storeId == controller.loginData!.store.id);
-
-        selectedCaId = selectedAccount!.id;
-        logger.e(selectedAccount?.id);
       }
+      // else {
+      //   for (var e in controller.moneyTransferController.toAccounts) {
+      //   }
+      //   logger.e(controller.loginData!.store.id);
+      //   selectedPaymentMethod = controller.moneyTransferController.toAccounts.singleWhere((e) => e.id == controller.loginData!.store.id);
+      //
+      //   selectedCaId = selectedAccount!.id;
+      //   logger.e(selectedAccount?.id);
+      // }
       controller.getCashStatementEntryList(caId: selectedCaId!);
       controller.update(['account']);
     });

@@ -22,8 +22,25 @@ class ChartOfAccountPaymentMethod {
   final String name;
   final int? root;
 
-  ChartOfAccountPaymentMethod({required this.id, required this.name, this.root});
+  ChartOfAccountPaymentMethod({
+    required this.id,
+    required this.name,
+    this.root,
+  });
 
-  factory ChartOfAccountPaymentMethod.fromJson(Map<String, dynamic> json) => _$ChartOfAccountPaymentMethodFromJson(json);
-  Map<String, dynamic> toJson() => _$ChartOfAccountPaymentMethodToJson(this);
+  factory ChartOfAccountPaymentMethod.fromJson(Map<String, dynamic> json) =>
+      _$ChartOfAccountPaymentMethodFromJson(json);
+
+  Map<String, dynamic> toJson() =>
+      _$ChartOfAccountPaymentMethodToJson(this);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+          other is ChartOfAccountPaymentMethod &&
+              runtimeType == other.runtimeType &&
+              id == other.id;
+
+  @override
+  int get hashCode => id.hashCode;
 }

@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 class MoneyTransferActionMenu extends StatelessWidget {
   final Function(String) onSelected;
   final bool isApproveAble;
+  final bool isEditable;
 
-  const MoneyTransferActionMenu({super.key, required this.onSelected, required this.isApproveAble});
+  const MoneyTransferActionMenu({super.key, required this.onSelected, required this.isApproveAble,required this.isEditable});
 
   @override
   Widget build(BuildContext context) {
@@ -23,33 +24,36 @@ class MoneyTransferActionMenu extends StatelessWidget {
         onSelected: onSelected,
         itemBuilder: (BuildContext context) {
           return [
-            isApproveAble ? const PopupMenuItem<String>(
-            value: 'approve',
-            child: Row(
-              children: [
-                Icon(Icons.check_circle_outline_outlined, color: Colors.green),
-                SizedBox(width: 8),
-                Text("Approve"),
-              ],
-            ),
-          ) : const PopupMenuItem<String>(
-              value: 'edit',
-              child: Row(
-                children: [
-                  Icon(Icons.edit, color: Colors.black54),
-                  SizedBox(width: 8),
-                  Text("Edit"),
-                ],
+            if(isApproveAble)
+              const PopupMenuItem<String>(
+                value: 'approve',
+                child: Row(
+                  children: [
+                    Icon(Icons.check_circle_outline_outlined, color: Colors.green),
+                    SizedBox(width: 8),
+                    Text("Approve"),
+                  ],
+                ),
               ),
-            ),
+            if(isEditable)
+              const PopupMenuItem<String>(
+                value: 'edit',
+                child: Row(
+                  children: [
+                    Icon(Icons.edit, color: Colors.black54),
+                    SizedBox(width: 8),
+                    Text("Edit"),
+                  ],
+                ),
+              ),
             const PopupMenuItem<String>(
               value: 'delete',
               child: Row(
                 children: [
-                  Icon(Icons.delete_forever, color: Colors.red),
+                  Icon(Icons.cancel, color: Colors.red),
                   SizedBox(width: 8),
                   Text(
-                    "Delete",
+                    "Cancel",
                     style: TextStyle(color: Colors.red),
                   ),
                 ],
