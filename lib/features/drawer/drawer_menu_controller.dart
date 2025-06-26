@@ -13,6 +13,7 @@ import 'package:amar_pos/features/profile/presentation/profile_screen.dart';
 import 'package:amar_pos/features/purchase/presentation/purchase_screen.dart';
 import 'package:amar_pos/features/purchase_return/presentation/purchase_return_screen.dart';
 import 'package:amar_pos/features/return/presentation/return_screen.dart';
+import 'package:amar_pos/features/subscription/presentation/subscription_screen.dart';
 import 'package:get/get.dart';
 import 'package:amar_pos/features/home/presentation/home_screen.dart';
 import 'package:amar_pos/features/config/presentation/configuration_screen.dart';
@@ -160,7 +161,10 @@ class DrawerMenuController extends GetxController {
         return const ProfileScreen();
       case DrawerItems.overview:
         currentScreen.value = HomeScreen.routeName;
-        return const HomeScreen(); // Default to HomeScreen
+        return const HomeScreen();
+      case DrawerItems.subscription:
+        currentScreen.value = SubscriptionScreen.routeName;
+        return const SubscriptionScreen();
       case DrawerItems.inventory:
         if(selectedMenuItem.value?.child == "Product List"){
           return const ProductsScreen();

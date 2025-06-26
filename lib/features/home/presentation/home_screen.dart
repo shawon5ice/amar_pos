@@ -9,6 +9,7 @@ import 'package:amar_pos/features/home/data/models/quick_access_item_model.dart'
 import 'package:amar_pos/features/home/presentation/home_screen_controller.dart';
 import 'package:amar_pos/features/inventory/data/stock_report/stock_report_list_response_model.dart';
 import 'package:amar_pos/features/profile/presentation/profile_screen.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -450,39 +451,44 @@ class VerticalStatusWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        CircleAvatar(
-          radius: 20,
-          child: asset != null
-              ? SvgPicture.asset(
-                  asset!,
-                  height: 24,
-                  color: Colors.white,
-                )
-              : Icon(
-                  iconData,
-                  size: 24,
+    return Expanded(
+      child: Column(
+        children: [
+          CircleAvatar(
+            radius: 20,
+            child: asset != null
+                ? SvgPicture.asset(
+                    asset!,
+                    height: 24,
+                    color: Colors.white,
+                  )
+                : Icon(
+                    iconData,
+                    size: 24,
+                  ),
+          ),
+          addH(8),
+          isLoading
+              ? const SizedBox(height: 20, child: CupertinoActivityIndicator())
+              : AutoSizeText(
+                maxLines: 1,
+                  maxFontSize: 14,
+                  minFontSize: 8,
+                  overflow: TextOverflow.visible,
+                  Methods.getFormatedPrice(value),
+                  style: const TextStyle(
+                      color: Color(0xff333333),
+                      fontWeight: FontWeight.w500,),
                 ),
-        ),
-        addH(8),
-        isLoading
-            ? const SizedBox(height: 20, child: CupertinoActivityIndicator())
-            : Text(
-                Methods.getFormatedPrice(value),
-                style: const TextStyle(
-                    color: Color(0xff333333),
-                    fontWeight: FontWeight.w500,
-                    fontSize: 14),
-              ),
-        Text(
-          title,
-          style: const TextStyle(
-              fontWeight: FontWeight.w400,
-              color: Color(0xff666666),
-              fontSize: 12),
-        )
-      ],
+          Text(
+            title,
+            style: const TextStyle(
+                fontWeight: FontWeight.w400,
+                color: Color(0xff666666),
+                fontSize: 12),
+          )
+        ],
+      ),
     );
   }
 }
@@ -508,28 +514,30 @@ class QuickAccessWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: item.onPress,
-      child: Column(
-        children: [
-          CircleAvatar(
-            radius: 24,
-            backgroundColor: Color(0xffF8FAF9),
-            child: SvgPicture.asset(
-              item.asset,
-              height: 24,
-              color: AppColors.primary,
+    return Expanded(
+      child: GestureDetector(
+        onTap: item.onPress,
+        child: Column(
+          children: [
+            CircleAvatar(
+              radius: 24,
+              backgroundColor: Color(0xffF8FAF9),
+              child: SvgPicture.asset(
+                item.asset,
+                height: 24,
+                color: AppColors.primary,
+              ),
             ),
-          ),
-          addH(8),
-          Text(
-            item.title,
-            style: const TextStyle(
-                fontWeight: FontWeight.w400,
-                color: Color(0xff666666),
-                fontSize: 12),
-          )
-        ],
+            addH(8),
+            Text(
+              item.title,
+              style: const TextStyle(
+                  fontWeight: FontWeight.w400,
+                  color: Color(0xff666666),
+                  fontSize: 12),
+            )
+          ],
+        ),
       ),
     );
   }
