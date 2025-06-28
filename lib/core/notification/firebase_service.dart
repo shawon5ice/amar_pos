@@ -8,6 +8,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter/widgets.dart';
 import '../constants/app_colors.dart';
 import '../constants/logger/logger.dart';
+import '../../features/notification/data/services/awesome_notification_service.dart';
 
 @pragma('vm:entry-point')
 Future<void> handleBackgroundMessage(RemoteMessage message) async {
@@ -15,6 +16,9 @@ Future<void> handleBackgroundMessage(RemoteMessage message) async {
   WidgetsFlutterBinding.ensureInitialized();
   // Process the background notification message
   logger.d('Handling background message: ${message.data}');
+  
+  // Handle the message with AwesomeNotificationService
+  await AwesomeNotificationService().handleFirebaseMessage(message);
 }
 
 @pragma('vm:entry-point')

@@ -3,6 +3,7 @@ import 'package:amar_pos/core/constants/logger/logger.dart';
 import 'package:amar_pos/core/network/base_client.dart';
 import 'package:amar_pos/core/notification/firebase_service.dart';
 import 'package:amar_pos/core/notification/notification_service.dart';
+import 'package:amar_pos/features/notification/data/services/awesome_notification_service.dart';
 import 'package:amar_pos/features/auth/data/model/hive/login_data_helper.dart';
 import 'package:device_preview_plus/device_preview_plus.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -44,6 +45,7 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.android);
   NotificationService().initNotification();
   FirebaseService().initNotification();
+  await AwesomeNotificationService().initialize();
   final directory = await getApplicationDocumentsDirectory();
   Hive.init(directory.path);
 
@@ -60,8 +62,22 @@ void main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    // Listen to foreground messages
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      AwesomeNotificationService().handleFirebaseMessage(message);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

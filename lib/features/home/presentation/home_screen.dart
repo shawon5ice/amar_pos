@@ -8,6 +8,7 @@ import 'package:amar_pos/features/drawer/drawer_menu_controller.dart';
 import 'package:amar_pos/features/home/data/models/quick_access_item_model.dart';
 import 'package:amar_pos/features/home/presentation/home_screen_controller.dart';
 import 'package:amar_pos/features/profile/presentation/profile_screen.dart';
+import 'package:amar_pos/features/notification/presentation/notification_screen.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -98,7 +99,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         centerTitle: true,
         actions: [
           IconButton(
-              onPressed: () {},
+              onPressed: () => Get.to(() => NotificationScreen()),
               icon: SvgPicture.asset("assets/icon/notification_bell.svg"))
           // IconButton(
           //     onPressed: () {

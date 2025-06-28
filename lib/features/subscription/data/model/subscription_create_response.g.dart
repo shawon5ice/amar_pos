@@ -26,8 +26,8 @@ Map<String, dynamic> _$SubscriptionCreateResponseToJson(
 SubscriptionCreateData _$SubscriptionCreateDataFromJson(
         Map<String, dynamic> json) =>
     SubscriptionCreateData(
-      packageId: json['package_id'] as int,
-      paymentMethod: json['payment_method'] as int,
+      packageId: (json['package_id'] as num).toInt(),
+      paymentMethod: (json['payment_method'] as num).toInt(),
       packagePrice: (json['package_price'] as num).toInt(),
       packageDetails: json['package_details'] as String,
       maxSlNo: (json['max_sl_no'] as num).toInt(),
