@@ -27,7 +27,7 @@ class SalesSummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(24.w),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       decoration: BoxDecoration(
         color: context.theme.cardColor,
         borderRadius: BorderRadius.circular(12.r),
@@ -53,12 +53,13 @@ class SalesSummaryCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Expanded(
+                flex: 3,
                 child: Stack(
                         alignment: Alignment.center,
                         children: [
                           Align(
                             alignment: Alignment.topCenter,
-                            heightFactor: .5,
+                            heightFactor: .55,
                             child: Transform.rotate(
                               angle: -pi / 2,
                               child: SizedBox(
@@ -79,9 +80,10 @@ class SalesSummaryCard extends StatelessWidget {
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text("Total Sales",
-                                    style: TextStyle(
-                                        fontSize: 12, color: Colors.grey[700])),
+                                AutoSizeText("Total Sales",
+                                    minFontSize: 8,
+                                    maxFontSize: 16,
+                                    style: TextStyle( color: Colors.grey[700])),
                                 const SizedBox(height: 4),
                                 AutoSizeText(
                                     isLoading
@@ -104,6 +106,7 @@ class SalesSummaryCard extends StatelessWidget {
                 margin: const EdgeInsets.symmetric(horizontal: 12),
               ),
               Expanded(
+                flex: 2,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

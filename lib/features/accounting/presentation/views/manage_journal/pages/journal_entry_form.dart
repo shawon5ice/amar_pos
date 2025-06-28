@@ -135,7 +135,9 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
     }else{
       _addEntry();
     }
-    await controller.getLastLevelChartOfAccounts().then((value) {
+    await controller.getLastLevelChartOfAccounts(
+      isContraVoucher: voucherType == VoucherType.Contra
+    ).then((value) {
       // if(initialJournalEntry != null && controller.journalVoucherResponseModel != null){
       //   logger.d(controller.journalVoucherResponseModel!.data!.details.first.account.id);
       //   entries.first.chartOfAccount = controller.lastLevelChartOfAccountList.singleWhere((e) {
@@ -215,6 +217,7 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
                                   setState(() {
                                     voucherType = val;
                                     entries.clear();
+                                    controller.getLastLevelChartOfAccounts(isContraVoucher: false);
                                     _addEntry();
                                   });
                                 },
@@ -229,6 +232,7 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
                                   setState(() {
                                     voucherType = val;
                                     entries.clear();
+                                    controller.getLastLevelChartOfAccounts(isContraVoucher: false);
                                     _addEntry();
                                   });
                                 },
@@ -247,6 +251,7 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
                                 onChanged: (val) {
                                   setState(() {
                                     voucherType = val;
+                                    controller.getLastLevelChartOfAccounts(isContraVoucher: false);
                                     entries.clear();
                                     _addEntry();
                                   });
@@ -261,6 +266,7 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
                                 onChanged: (val) {
                                   setState(() {
                                     voucherType = val;
+                                    controller.getLastLevelChartOfAccounts(isContraVoucher:true);
                                     entries.clear();
                                     _addEntry();
                                   });
@@ -332,8 +338,7 @@ class _JournalEntryFormState extends State<JournalEntryForm> {
                                         children: [
                                           Expanded(
                                             flex: 3,
-                                            child: GetBuilder<
-                                                ManageJournalController>(
+                                            child: GetBuilder<ManageJournalController>(
                                               id: 'outlet_list_for_money_transfer',
                                               builder: (controller) => Column(
                                                 crossAxisAlignment:

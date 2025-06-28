@@ -1,6 +1,7 @@
 import 'package:amar_pos/features/home/data/models/dashboard_response_model.dart';
 import 'package:amar_pos/features/home/presentation/home_screen_service.dart';
 import 'package:amar_pos/features/permission/permissions.dart';
+import 'package:amar_pos/features/subscription/presentation/subscription_controller.dart';
 import 'package:amar_pos/permission_manager.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
@@ -14,6 +15,7 @@ import '../../auth/data/model/hive/login_data_helper.dart';
 import '../../drawer/drawer_menu_controller.dart';
 import '../../drawer/model/drawer_items.dart';
 import '../../drawer/model/menu_selection.dart';
+import '../../subscription/presentation/subscription_screen.dart';
 import '../data/models/quick_access_item_model.dart';
 
 class HomeScreenController extends GetxController{

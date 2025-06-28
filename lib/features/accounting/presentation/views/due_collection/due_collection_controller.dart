@@ -485,9 +485,14 @@ class DueCollectionController extends GetxController{
     }
   }
 
+  bool isDownloadProcessing = false;
+
   Future<void> downloadList({required bool isPdf, required bool clientLedger, bool? shouldPrint}) async {
     hasError.value = false;
-
+    if(isDownloadProcessing){
+      return;
+    }
+    isDownloadProcessing = true;
     if((clientLedger && clientLedgerList.isEmpty) || dueCollectionList.isEmpty){
       ErrorExtractor.showSingleErrorDialog(Get.context!, "File should not be ${shouldPrint != null? "printed": "downloaded"} with empty data.");
       return;
@@ -511,7 +516,7 @@ class DueCollectionController extends GetxController{
     } catch (e) {
       logger.e(e);
     } finally {
-
+      isDownloadProcessing = false;
     }
   }
 

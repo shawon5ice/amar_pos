@@ -201,13 +201,13 @@ class _ManageJournalScreenState extends State<ManageJournalScreen> {
                                 return Center(
                                   child: RandomLottieLoader.lottieLoader(),
                                 );
+                              } else if (controller.journalEntryList.isEmpty) {
+                                return const Center(
+                                    child: Text("No data found"));
                               } else if (controller.journalListResponseModel ==
                                   null) {
                                 return const Center(
                                     child: Text("Something went wrong"));
-                              } else if (controller.journalEntryList.isEmpty) {
-                                return const Center(
-                                    child: Text("No data found"));
                               }
                               return PagerListView<JournalEntryData>(
                                 // scrollController: _scrollController,

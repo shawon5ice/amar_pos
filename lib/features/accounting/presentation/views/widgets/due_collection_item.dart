@@ -113,6 +113,10 @@ class DueCollectionItem extends StatelessWidget {
             child: Column(
               children: [
                 StatementItemTitleValueWidget(
+                  title: "Client Name",
+                  value: dueCollectionData.client?.name ?? 'N/A',
+                ),
+                StatementItemTitleValueWidget(
                   title: "Invoice No.",
                   value: dueCollectionData.slNo,
                 ),

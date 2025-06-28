@@ -152,7 +152,9 @@ class BaseClient {
       );
       logger.i('POST Response: ${response.statusCode}');
       logger.i('POST Response: ${response.data}');
-      if((response.data['success'] || (!response.data['success'] && response.data['errors'] == null )|| shouldExtractErros != null)){
+      if (response.data is String) {
+        return response.data;
+      } else if(response.data is Map<String, dynamic> && (response.data['success'] || (!response.data['success'] && response.data['errors'] == null )|| shouldExtractErros != null)){
         return response.data;
       }else if(shouldExtractErros == null){
         ErrorExtractor.showErrorDialog(Get.context!, response.data);

@@ -218,72 +218,83 @@ class _LedgerScreenState extends State<LedgerScreen>
                     } else if (controller.ledgerList.isEmpty) {
                       return const Center(child: Text("No data found"));
                     }
-                    return DataTable2(
-                      fixedColumnsColor: const Color(0xffEFEFEF),
-                      sortColumnIndex: 1,
-                      fixedLeftColumns: 1,
-                      columnSpacing: 12,
-                      horizontalMargin: 12,
-                      // minWidth: 800,
-                      empty: const Center(
-                        child: Text("No Data Found"),
+
+                    return ClipRRect(
+                      borderRadius: BorderRadius.only(topLeft: Radius.circular(8), topRight: Radius.circular(8)),
+                      child: DataTable2(
+                        fixedColumnsColor: const Color(0xffEFEFEF),
+                        sortColumnIndex: 1,
+                        fixedLeftColumns: 1,
+                        columnSpacing: 12,
+                        horizontalMargin: 12,
+                        // minWidth: 800,
+                        empty: const Center(
+                          child: Text("No Data Found"),
+                        ),
+                        headingRowColor: WidgetStatePropertyAll(AppColors.primary),
+                        dividerThickness: .5,
+                        headingRowHeight: 40,
+                        minWidth: context.width * 1.2,
+                        headingTextStyle: const TextStyle(
+                            fontWeight: FontWeight.bold, color: Colors.white),
+                        border: TableBorder(
+                          horizontalInside: BorderSide(
+                            color: Colors.grey.shade200, // Color between rows
+                            width: .5,
+                          ),
+                          verticalInside: BorderSide(
+                            color: Colors.grey,
+                            width: .5,
+                          ),
+                        ),
+                        columns: const [
+                          DataColumn2(
+                            label: Center(child: Text('Date', textAlign: TextAlign.center)),
+                            size: ColumnSize.M,
+                          ),
+                          DataColumn2(
+                            label: Center(child: Text('ID', textAlign: TextAlign.center)),
+                            size: ColumnSize.M,
+                          ),
+                          DataColumn2(
+                            label: Center(child: Text('Particular', textAlign: TextAlign.center)),
+                            size: ColumnSize.M,
+                          ),
+                          DataColumn2(
+                            label: Center(child: Text('Debit', textAlign: TextAlign.center)),
+                            numeric: true,
+                            size: ColumnSize.M,
+                          ),
+                          DataColumn2(
+                            label: Center(child: Text('Credit', textAlign: TextAlign.center)),
+                            numeric: true,
+                            size: ColumnSize.M,
+                          ),
+                          DataColumn2(
+                            label: Center(child: Text('Balance', textAlign: TextAlign.center)),
+                            numeric: true,
+                            size: ColumnSize.L,
+                          ),
+                        ],
+                        rows: [
+                          ...controller.ledgerList.map((e) {
+                            final index = controller.ledgerList.indexOf(e);
+                            return DataRow(
+                              color: WidgetStatePropertyAll(
+                                index % 2 == 0 ? Colors.white : Colors.yellow.withOpacity(.03),
+                              ),
+                              cells: [
+                                _buildDataCell(e.date, maxLines: 2),
+                                _buildDataCell(e.slNo, maxLines: 2),
+                                _buildDataCell(e.accountName ?? 'N/A', maxLines: 2),
+                                _buildDataCell(_format(e.debit), maxLines: 2),
+                                _buildDataCell(_format(e.credit), maxLines: 2),
+                                _buildDataCell(_format(e.balance), maxLines: 2),
+                              ],
+                            );
+                          }).toList(),
+                        ],
                       ),
-                      headingRowColor: const WidgetStatePropertyAll(Color(0xffEFEFEF)),
-                      dividerThickness: .5,
-                      headingRowHeight: 40,
-                      minWidth: context.width * 1.2,
-                      headingTextStyle: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                      border: TableBorder.all(color: Colors.black, width: .5),
-                      columns: const [
-                        DataColumn2(
-                          label: Center(child: Text('Date', textAlign: TextAlign.center)),
-                          size: ColumnSize.S,
-                        ),
-                        DataColumn2(
-                          label: Center(child: Text('ID', textAlign: TextAlign.center)),
-                          size: ColumnSize.M,
-                        ),
-                        DataColumn2(
-                          label: Center(child: Text('Particular', textAlign: TextAlign.center)),
-                          size: ColumnSize.M,
-                        ),
-                        DataColumn2(
-                          label: Center(child: Text('Debit', textAlign: TextAlign.center)),
-                          numeric: true,
-                          size: ColumnSize.M,
-                        ),
-                        DataColumn2(
-                          label: Center(child: Text('Credit', textAlign: TextAlign.center)),
-                          numeric: true,
-                          size: ColumnSize.M,
-                        ),
-                        DataColumn2(
-                          label: Center(child: Text('Balance', textAlign: TextAlign.center)),
-                          numeric: true,
-                          size: ColumnSize.L,
-                        ),
-                      ],
-                      rows: [
-                        ...controller.ledgerList.map((e) {
-                          final index = controller.ledgerList.indexOf(e);
-                          return DataRow(
-                            color: WidgetStatePropertyAll(
-                              index % 2 == 0 ? Colors.white : Colors.yellow.withOpacity(.03),
-                            ),
-                            cells: [
-                              _buildDataCell(e.date, maxLines: 2),
-                              _buildDataCell(e.slNo, maxLines: 2),
-                              _buildDataCell(e.accountName ?? 'N/A', maxLines: 2),
-                              _buildDataCell(_format(e.debit), maxLines: 2),
-                              _buildDataCell(_format(e.credit), maxLines: 2),
-                              _buildDataCell(_format(e.balance), maxLines: 2),
-                            ],
-                          );
-                        }).toList(),
-                      ],
                     );
                   },
                 ),

@@ -421,7 +421,7 @@ class SupplierPaymentController extends GetxController{
   Future<void> downloadStatement({required bool isPdf, required int clientID, bool? shouldPrint}) async {
     hasError.value = false;
 
-    String fileName = "Supplier Payment Statement'-${DateTime
+    String fileName = "Supplier Ledger Statement'-${DateTime
         .now()
         .microsecondsSinceEpoch
         .toString()}${isPdf ? ".pdf" : ".xlsx"}";
@@ -434,6 +434,7 @@ class SupplierPaymentController extends GetxController{
         endDate: selectedDateTimeRange.value?.end,
         fileName: fileName,
         clientID: clientID,
+        shouldPrint: shouldPrint,
       );
     } catch (e) {
       logger.e(e);

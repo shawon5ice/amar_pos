@@ -28,9 +28,12 @@ import 'package:amar_pos/features/purchase/presentation/pages/purchase_history_d
 import 'package:amar_pos/features/return/presentation/page/return_summary.dart';
 import 'package:amar_pos/features/sales/presentation/sales_screen.dart';
 import 'package:amar_pos/features/splash/splash_screen.dart';
+import 'package:amar_pos/features/subscription/presentation/change_plan_screen.dart';
+import 'package:amar_pos/features/subscription/presentation/subscription_screen.dart';
 import 'package:get/get.dart';
 import '../../features/accounting/presentation/views/money_transfer/money_transfer.dart';
 import '../../features/auth/presentation/ui/forget_password/forgot_password.dart';
+import '../../features/subscription/presentation/subscription_details_screen.dart';
 
 class AppRoutes {
   static List<GetPage<dynamic>> allRoutes = [
@@ -71,7 +74,7 @@ class AppRoutes {
     GetPage(
       name: HomeScreen.routeName,
       page: () => const HomeScreen(),
-      // binding: InitialBinding(),
+      // binding: HomeScreenBindings(),
     ),
 
     GetPage(
@@ -227,6 +230,27 @@ class AppRoutes {
       name: SalesScreen.routeName,
       page: () => const SalesScreen(),
       binding: SalesScreenBindings(),
+    ),
+
+    //Subscription
+    GetPage(
+      name: SubscriptionScreen.routeName,
+      page: () => const SubscriptionScreen(),
+      binding: SubscriptionBindings(),
+    ),
+
+    GetPage(
+      name: ChangePlanScreen.routeName,
+      page: () => const ChangePlanScreen(),
+      binding: SubscriptionBindings(),
+      transition: Transition.rightToLeft,
+    ),
+
+    GetPage(
+      name: SubscriptionDetailsScreen.routeName,
+      page: () => const SubscriptionDetailsScreen(),
+      binding: SubscriptionBindings(),
+      transition: Transition.rightToLeft,
     ),
   ];
 }

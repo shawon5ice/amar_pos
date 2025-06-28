@@ -4,6 +4,7 @@ import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:amar_pos/features/accounting/data/models/client_ledger/client_ledger_list_response_model.dart';
 import 'package:amar_pos/features/accounting/presentation/views/due_collection/due_collection_controller.dart';
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -92,9 +93,11 @@ class _ClientLedgerStatementScreenState
                       // noInputBorder: true,
                       brdrRadius: 40,
                       prefixWidget: Icon(Icons.search),
-                      onChanged: (value){
+                      onChanged: (value) {
                         i = 1;
-                        controller.getClientLedgerStatement(id: clientLedgerData.id,);
+                        controller.getClientLedgerStatement(
+                          id: clientLedgerData.id,
+                        );
                       },
                     ),
                   ),
@@ -102,7 +105,8 @@ class _ClientLedgerStatementScreenState
                   CustomSvgIconButton(
                     bgColor: const Color(0xffEBFFDF),
                     onTap: () {
-                      controller.downloadStatement(isPdf: false, clientID: clientLedgerData.id);
+                      controller.downloadStatement(
+                          isPdf: false, clientID: clientLedgerData.id);
                     },
                     assetPath: AppAssets.excelIcon,
                   ),
@@ -110,7 +114,8 @@ class _ClientLedgerStatementScreenState
                   CustomSvgIconButton(
                     bgColor: const Color(0xffE1F2FF),
                     onTap: () {
-                      controller.downloadStatement(isPdf: true, clientID: clientLedgerData.id);
+                      controller.downloadStatement(
+                          isPdf: true, clientID: clientLedgerData.id);
                     },
                     assetPath: AppAssets.downloadIcon,
                   ),
@@ -118,27 +123,42 @@ class _ClientLedgerStatementScreenState
                   CustomSvgIconButton(
                     bgColor: const Color(0xffFFFCF8),
                     onTap: () {
-                      controller.downloadStatement(isPdf: false, clientID: clientLedgerData.id, shouldPrint: true);
+                      controller.downloadStatement(
+                          isPdf: false,
+                          clientID: clientLedgerData.id,
+                          shouldPrint: true);
                     },
                     assetPath: AppAssets.printIcon,
                   )
                 ],
               ),
-
+              addH(8),
               Obx(() {
-                return controller.selectedDateTimeRange.value == null ? addH(0): Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text("${formatDate(controller.selectedDateTimeRange.value!.start)} - ${formatDate(controller.selectedDateTimeRange.value!.end)}", style:const TextStyle(fontSize: 14, color: AppColors.error),),
-                    addW(16),
-                    IconButton(onPressed: (){
-                      controller.selectedDateTimeRange.value = null;
-                      controller.getClientLedgerStatement(id: clientLedgerData.id);
-                    }, icon: const Icon(Icons.cancel_outlined, size: 18, color: AppColors.error,))
-                  ],
-                );
+                return controller.selectedDateTimeRange.value == null
+                    ? addH(0)
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "${formatDate(controller.selectedDateTimeRange.value!.start)} - ${formatDate(controller.selectedDateTimeRange.value!.end)}",
+                            style: const TextStyle(
+                                fontSize: 14, color: AppColors.error),
+                          ),
+                          addW(16),
+                          IconButton(
+                              onPressed: () {
+                                controller.selectedDateTimeRange.value = null;
+                                controller.getClientLedgerStatement(
+                                    id: clientLedgerData.id);
+                              },
+                              icon: const Icon(
+                                Icons.cancel_outlined,
+                                size: 18,
+                                color: AppColors.error,
+                              ))
+                        ],
+                      );
               }),
-
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: const BoxDecoration(
@@ -171,7 +191,8 @@ class _ClientLedgerStatementScreenState
                     // ),
                     StatementItemTitleValueWidget(
                       title: "Due Amount",
-                      value: Methods.getFormatedPrice(clientLedgerData.due.toDouble()),
+                      value: Methods.getFormatedPrice(
+                          clientLedgerData.due.toDouble()),
                       valueColor: Color(0xffFF0000),
                     ),
                     StatementItemTitleValueWidget(
@@ -197,204 +218,139 @@ class _ClientLedgerStatementScreenState
                         ),
                       );
                     }
-                    return Table(
-                      border: TableBorder.all(
-                        color: Colors.grey,
-                      ),
-                      columnWidths: {
-                        0: FixedColumnWidth(40.w),
-                        1: FlexColumnWidth(80.w),
-                        2: FlexColumnWidth(80.w),
-                        3: FixedColumnWidth(60.w),
-                        4: FixedColumnWidth(60.w),
-                        5: FixedColumnWidth(60.w),
-                      },
-                      children: [
-                        TableRow(
-                          decoration: BoxDecoration(color: Colors.grey[200]),
-                          children: const [
-                            Padding(
 
-                                padding: EdgeInsets.all(8),
-                                child: AutoSizeText(
-                                  "SL.",
-                                  maxLines: 1,
-                                  minFontSize: 2,
-                                  maxFontSize: 12,
-                                  textAlign: TextAlign.center,
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.bold),
-                                )),
-                            Padding(
-                                padding: EdgeInsets.all(8),
-                                child: AutoSizeText(
-                                  "Date",
-                                  maxLines: 1,
-                                  minFontSize: 2,
-                                  maxFontSize: 12,
-                                  textAlign: TextAlign.center,
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.bold),
-                                )),
-                            Padding(
-                                padding: EdgeInsets.all(8),
-                                child: AutoSizeText(
-                                  "Invoice No.",
-                                  maxLines: 1,
-                                  minFontSize: 2,
-                                  maxFontSize: 12,
-                                  textAlign: TextAlign.center,
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.bold),
-                                )),
-                            Padding(
-                                padding: EdgeInsets.all(8),
-                                child: AutoSizeText(
-                                  "Debit",
-                                  maxLines: 1,
-                                  minFontSize: 2,
-                                  maxFontSize: 12,
-                                  textAlign: TextAlign.center,
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.bold),
-                                )),
-                            Padding(
-                                padding: EdgeInsets.all(8),
-                                child: AutoSizeText(
-                                  "Credit",
-                                  maxLines: 1,
-                                  minFontSize: 2,
-                                  maxFontSize: 12,
-                                  textAlign: TextAlign.center,
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.bold),
-                                )),
-                            Padding(
-                                padding: EdgeInsets.all(8),
-                                child: AutoSizeText(
-                                  "Balance",
-                                  maxLines: 1,
-                                  minFontSize: 2,
-                                  maxFontSize: 12,
-                                  textAlign: TextAlign.center,
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.bold),
-                                )),
-                          ],
+                    return ClipRRect(
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(8),
+                          topRight: Radius.circular(8)),
+                      child: DataTable2(
+                        fixedColumnsColor: const Color(0xffEFEFEF),
+                        // sortColumnIndex: 1,
+                        fixedLeftColumns: 1,
+                        columnSpacing: 12,
+                        horizontalMargin: 12,
+                        // minWidth: 800,
+                        empty: const Center(
+                          child: Text("No Data Found"),
                         ),
-                        ...controller
-                            .clientLedgerStatementResponseModel!.data!.data!
-                            .map((statement) {
-                          return TableRow(
-                            children: [
-                              Padding(
-                                  padding: EdgeInsets.all(8),
-                                  child: AutoSizeText("${i++}",
-                                      maxLines: 1,
-                                      minFontSize: 2,
-                                      maxFontSize: 10,
-                                      overflow: TextOverflow.visible,
-                                      textAlign: TextAlign.center)),
-                              Padding(
-                                  padding: EdgeInsets.all(8),
-                                  child: AutoSizeText("${statement.date}",
-                                      maxLines: 2,
-                                      minFontSize: 2,
-                                      maxFontSize: 10,
-                                      overflow: TextOverflow.visible,
-                                      textAlign: TextAlign.center)),
-                              Padding(
-                                  padding: EdgeInsets.all(8),
-                                  child: AutoSizeText("${statement.slNo}",
-                                      maxLines: 2,
-                                      minFontSize: 2,
-                                      maxFontSize: 10,
-                                      overflow: TextOverflow.visible,
-                                      textAlign: TextAlign.center)),
-                              Padding(
-                                  padding: EdgeInsets.all(8),
-                                  child: AutoSizeText(
-                                      "${Methods.getFormattedNumber(statement.debit.toDouble())}",
-                                      maxLines: 1,
-                                      minFontSize: 2,
-                                      maxFontSize: 10,
-                                      overflow: TextOverflow.visible,
-                                      textAlign: TextAlign.center)),
-                              Padding(
-                                  padding: EdgeInsets.all(8),
-                                  child: AutoSizeText(
-                                      "${Methods.getFormattedNumber(statement.credit.toDouble())}",
-                                      maxLines: 1,
-                                      minFontSize: 2,
-                                      maxFontSize: 10,
-                                      overflow: TextOverflow.visible,
-                                      textAlign: TextAlign.center)),
-                              Padding(
-                                  padding: EdgeInsets.all(8),
-                                  child: AutoSizeText(
-                                      "${Methods.getFormattedNumber(statement.balance.toDouble())}",
-                                      minFontSize: 2,
-                                      maxFontSize: 10,
-                                      overflow: TextOverflow.visible,
-                                      maxLines: 1,
-                                      textAlign: TextAlign.center)),
+                        headingRowColor:
+                            WidgetStatePropertyAll(AppColors.primary),
+                        dividerThickness: .5,
+                        headingRowHeight: 40,
+
+                        headingTextStyle: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            fontSize: 12),
+                        border: TableBorder(
+                          horizontalInside: BorderSide(
+                            color: Colors.grey.shade200, // Color between rows
+                            width: .5,
+                          ),
+                          verticalInside: BorderSide(
+                            color: Colors.grey,
+                            width: .5,
+                          ),
+                        ),
+                        columns: const [
+                          DataColumn2(
+                            label: _HeaderCell("SL"),
+                            size: ColumnSize.S,
+                            fixedWidth: 32,
+                          ),
+                          DataColumn2(
+                            size: ColumnSize.M,
+                            label: _HeaderCell("Date"),
+                          ),
+                          DataColumn2(
+                            label: _HeaderCell("Invoice No."),
+                            size: ColumnSize.M,
+                          ),
+                          DataColumn2(
+                            size: ColumnSize.S,
+                            label: _HeaderCell("Debit"),
+                            numeric: true,
+                          ),
+                          DataColumn2(
+                            size: ColumnSize.S,
+                            label: _HeaderCell("Credit"),
+                            numeric: true,
+                          ),
+                          DataColumn2(
+                            size: ColumnSize.S,
+                            label: _HeaderCell("Balance"),
+                            numeric: true,
+                          ),
+                        ],
+                        rows: [
+                          ...controller
+                              .clientLedgerStatementResponseModel!.data!.data!
+                              .map((e) {
+                            int index = controller
+                                .clientLedgerStatementResponseModel!.data!.data!
+                                .indexOf(e);
+
+                            return DataRow(
+                              color: index % 2 == 0
+                                  ? const WidgetStatePropertyAll(Colors.white)
+                                  : WidgetStatePropertyAll(
+                                      Colors.yellow.withOpacity(.03)),
+                              cells: [
+                                _buildDataCell((index + 1).toString()),
+                                _buildDataCell(e.date, maxLines: 3),
+                                _buildDataCell(e.slNo, maxLines: 2),
+                                _buildDataCell(
+                                  Methods.getFormattedNumber(
+                                    e.debit.toDouble() ?? 0,
+                                  ),
+                                ),
+                                _buildDataCell(
+                                  Methods.getFormattedNumber(
+                                    e.credit.toDouble() ?? 0,
+                                  ),
+                                ),
+                                _buildDataCell(
+                                  Methods.getFormattedNumber(
+                                    e.balance.toDouble() ?? 0,
+                                  ),
+                                ),
+                              ],
+                            );
+                          }),
+                          DataRow(
+                            color: WidgetStatePropertyAll(Color(0xffEFEFEF)),
+                            cells: [
+                              _buildDataCell(""),
+                              _buildDataCell(""),
+                              _buildDataCell("Total", isBold: true),
+                              _buildDataCell(
+                                Methods.getFormattedNumber(controller
+                                    .clientLedgerStatementResponseModel!
+                                    .data!
+                                    .debit!
+                                    .toDouble()),
+                                isBold: true,
+                              ),
+                              _buildDataCell(
+                                Methods.getFormattedNumber(controller
+                                    .clientLedgerStatementResponseModel!
+                                    .data!
+                                    .credit!
+                                    .toDouble()),
+                                isBold: true,
+                              ),
+                              _buildDataCell(
+                                Methods.getFormattedNumber(controller
+                                    .clientLedgerStatementResponseModel!
+                                    .data!
+                                    .balance!
+                                    .toDouble()),
+                                isBold: true,
+                              ),
                             ],
-                          );
-                        }),
-                        TableRow(
-                          decoration: BoxDecoration(color: Colors.green[900]),
-                          children: [
-                            SizedBox.shrink(),
-                            SizedBox.shrink(),
-                            Padding(
-                                padding: EdgeInsets.all(8),
-                                child: AutoSizeText("Total",
-                                    maxLines: 1,
-                                    maxFontSize: 10,
-                                    minFontSize: 2,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white))),
-                            Padding(
-                                padding: EdgeInsets.all(8),
-                                child: AutoSizeText(
-                                    "${Methods.getFormattedNumber(controller.clientLedgerStatementResponseModel!.data!.debit!.toDouble())}",
-                                    minFontSize: 2,
-                                    maxFontSize: 10,
-                                    overflow: TextOverflow.visible,
-                                    maxLines: 1,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white))),
-                            Padding(
-                                padding: EdgeInsets.all(8),
-                                child: AutoSizeText(
-                                    "${Methods.getFormattedNumber(controller.clientLedgerStatementResponseModel!.data!.credit!.toDouble())}",
-                                    maxLines: 1,
-                                    minFontSize: 2,
-                                    maxFontSize: 10,
-                                    overflow: TextOverflow.visible,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white))),
-                            Padding(
-                                padding: EdgeInsets.all(8),
-                                child: AutoSizeText(
-                                    "${Methods.getFormattedNumber(controller.clientLedgerStatementResponseModel!.data!.balance!.toDouble())}",
-                                    maxLines: 1,
-                                    minFontSize: 2,
-                                    maxFontSize: 10,
-                                    overflow: TextOverflow.visible,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white))),
-                          ],
-                        ),
-                      ],
+                          )
+                        ],
+                      ),
                     );
                   },
                 ),
@@ -402,6 +358,42 @@ class _ClientLedgerStatementScreenState
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  DataCell _buildDataCell(String data, {int maxLines = 1, bool? isBold}) {
+    return DataCell(
+      Center(
+        child: AutoSizeText(
+          minFontSize: 5,
+          maxFontSize: 10,
+          maxLines: maxLines,
+          data,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+              fontWeight: isBold != null ? FontWeight.bold : FontWeight.normal),
+        ),
+      ),
+    );
+  }
+}
+
+class _HeaderCell extends StatelessWidget {
+  final String text;
+
+  const _HeaderCell(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: AutoSizeText(
+        text,
+        maxLines: 1,
+        minFontSize: 2,
+        maxFontSize: 12,
+        textAlign: TextAlign.center,
+        style: const TextStyle(fontWeight: FontWeight.bold),
       ),
     );
   }

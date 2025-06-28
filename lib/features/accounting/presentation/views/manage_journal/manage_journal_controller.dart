@@ -245,14 +245,15 @@ class ManageJournalController extends GetxController{
   LastLevelChartOfAccountListResponseModel? lastLevelChartOfAccountListResponseModel;
   List<ChartOfAccount> lastLevelChartOfAccountList = [];
 
-  Future<void> getLastLevelChartOfAccounts() async {
+  Future<void> getLastLevelChartOfAccounts({required bool isContraVoucher}) async {
     isLastLevelChartOfAccounts = true;
     hasError.value = false;
-    update(['last_level_chart_of_account_list']);
+    update(['last_level_chart_of_account_list','outlet_list_for_money_transfer','payment_method']);
 
     try {
       var response = await ManageJournalService.getLastLevelChartOfAccounts(
         usrToken: loginData!.token,
+        isContraVoucher: isContraVoucher
       );
 
       if (response != null) {
@@ -275,7 +276,7 @@ class ManageJournalController extends GetxController{
       logger.e(e);
     } finally {
       isLastLevelChartOfAccounts = false;
-      update(['last_level_chart_of_account_list']);
+      update(['last_level_chart_of_account_list','outlet_list_for_money_transfer','payment_method']);
     }
   }
 

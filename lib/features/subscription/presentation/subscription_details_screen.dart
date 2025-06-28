@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:amar_pos/core/constants/app_colors.dart';
 import 'package:amar_pos/core/constants/logger/logger.dart';
 import 'package:amar_pos/core/responsive/pixel_perfect.dart';
@@ -8,9 +6,6 @@ import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-
-import '../../drawer/drawer_menu_controller.dart';
-import '../data/model/subscription_list_response_model.dart';
 import 'subscription_controller.dart';
 
 class SubscriptionDetailsScreen extends StatefulWidget {
@@ -22,7 +17,7 @@ class SubscriptionDetailsScreen extends StatefulWidget {
 }
 
 class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
-  final SubscriptionController controller = Get.put(SubscriptionController());
+  final SubscriptionController controller = Get.find();
 
   String title = '';
 
@@ -35,12 +30,11 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
   }
 
   String selectedPaymentMethodCode = 'BKASH';
-
+  int selectedPaymentMethod = -1;
 
 
   @override
   Widget build(BuildContext context) {
-    final DrawerMenuController drawerMenuController = Get.find();
     return Scaffold(
       appBar: AppBar(
         title: Text(title),
@@ -122,7 +116,9 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
                           padding: const EdgeInsets.only(bottom: 8),
                           child: Row(
                             children: [
-                              const Text("✅ ", style: TextStyle(fontSize: 16)),
+                              const Icon(Icons.check_circle,
+                                  color: AppColors.primary, size: 20),
+                              addW(8),
                               Expanded(
                                 child: Text(item.title ?? '',
                                     style: const TextStyle(fontSize: 14)),
@@ -147,6 +143,7 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
                               return const Text("No payment methods found.");
                             }
 
+                            selectedPaymentMethod = controller.paymentMethods.first.id ?? 0;
 
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -163,6 +160,7 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
                                   onChanged: (val) {
                                     setState(() {
                                       selectedPaymentMethodCode = val!;
+                                      selectedPaymentMethod = method.id!;
                                     });
                                   },
                                 );
@@ -171,14 +169,15 @@ class _SubscriptionDetailsScreenState extends State<SubscriptionDetailsScreen> {
                           },
                         ),
                         const SizedBox(height: 12),
-                        SizedBox(
-                          width: double.infinity,
-                          child: CustomBtn(
-                            btnTxt: "Subscribe Now",
-                            onPressedFn: (){
-                              logger.i(selectedPaymentMethodCode);
-                            },
-                          ),
+                        CustomBtn(
+                          btnTxt: "Subscribe Now",
+                          onPressedFn: (){
+                            controller.createSubscriptionOrder(
+                                packageId: Get.arguments[0],
+                                paymentMethod: selectedPaymentMethod,
+                                paymentMethodShortCode:
+                                    selectedPaymentMethodCode);
+                          },
                         ),
                       ],
                     ),

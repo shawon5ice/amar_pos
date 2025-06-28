@@ -132,7 +132,7 @@ class _SupplierPaymentInvoiceDetailsViewWidgetState extends State<SupplierPaymen
                                       flex: 3,
                                       child: Text(
                                         textAlign: TextAlign.center,
-                                        'DUE PAYMENT INVOICE',
+                                        'DUE PAYMENT VOUCHER',
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 16),

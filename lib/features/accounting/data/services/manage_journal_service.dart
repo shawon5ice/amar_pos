@@ -21,7 +21,7 @@ class ManageJournalService {
 
     var response = await BaseClient.getData(
         token: usrToken,
-        api: "chart_of_accounts/get-all-accounts-list",
+        api: "chart_of_accounts/get-last-level-account-list",
         parameter: query);
     return response;
   }
@@ -105,10 +105,11 @@ class ManageJournalService {
 
   static Future<dynamic> getLastLevelChartOfAccounts({
     required String usrToken,
+    required bool isContraVoucher,
   }) async {
     var response = await BaseClient.getData(
         token: usrToken,
-        api: "chart_of_accounts/get-last-level-account-list",);
+        api: isContraVoucher ? "chart_of_accounts/get-payment-methods" : "chart_of_accounts/get-last-level-account-list",);
     return response;
   }
 

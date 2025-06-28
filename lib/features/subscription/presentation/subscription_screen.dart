@@ -1,16 +1,12 @@
-import 'dart:ui';
-
 import 'package:amar_pos/core/constants/app_colors.dart';
-import 'package:amar_pos/core/responsive/pixel_perfect.dart';
 import 'package:amar_pos/core/widgets/custom_btn.dart';
 import 'package:amar_pos/core/widgets/loading/random_lottie_loader.dart';
-import 'package:amar_pos/features/subscription/data/service/subscription_service.dart';
-import 'package:amar_pos/features/subscription/presentation/subscription_details_screen.dart';
+import 'package:amar_pos/features/subscription/presentation/change_plan_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../drawer/drawer_menu_controller.dart';
-import '../data/model/subscription_list_response_model.dart';
+import '../data/model/subscription_model.dart';
 import 'subscription_controller.dart';
 
 class SubscriptionScreen extends StatefulWidget {
@@ -23,244 +19,83 @@ class SubscriptionScreen extends StatefulWidget {
 }
 
 class _SubscriptionScreenState extends State<SubscriptionScreen> {
-  final Duration animationDuration = const Duration(milliseconds: 300);
-  late PageController _pageController;
-
   SubscriptionController controller = Get.put(SubscriptionController());
 
-  int? _calculateDiscount(int original, int discounted) {
-    if (original <= discounted) return null;
-    final diff = original - discounted;
-    final percent = (diff / original * 100).round();
-    return percent;
-  }
-
-  int selectedIndex = 0;
 
   @override
   void initState() {
-    _pageController = PageController();
+    controller.fetchSubscriptionDetails();
     super.initState();
   }
-
   @override
   Widget build(BuildContext context) {
     final DrawerMenuController drawerMenuController = Get.find();
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Subscription"),
-        centerTitle: true,
-        leading: DrawerButton(
-          onPressed: () async {
-            drawerMenuController.openDrawer();
-            // if(controller.isEditing){
-            //   bool openDrawer = await showDiscardDialog(context);
-            //   if(openDrawer){
-            //     controller.clearEditing();
-            //     drawerMenuController.openDrawer();
-            //   }
-            // }else{
-            //   drawerMenuController.openDrawer();
-            // }
-          },
-        ),
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: GetBuilder<SubscriptionController>(
-            id: SubscriptionController.subscriptionUIID,
-            builder: (controller) {
-              if (controller.isLoading) {
-                return Center(child: RandomLottieLoader.lottieLoader());
-              }
+    return GetBuilder<SubscriptionController>(
+      id: SubscriptionController.subscriptionUIID,
+      builder: (controller) {
+        if (controller.isSubscriptionLoading) {
+          return Scaffold(
+            appBar: AppBar(
+              title: const Text("Subscription"),
+              centerTitle: true,
+              leading: DrawerButton(
+                onPressed: () {
+                  drawerMenuController.openDrawer();
+                },
+              ),
+            ),
+            body: Center(child: RandomLottieLoader.lottieLoader()),
+          );
+        }
 
-              if (controller.packages.isEmpty) {
-                return const Center(child: Text("No subscriptions available"));
-              }
+        final isValid = controller.subscription != null && controller.isSubscriptionValid(controller.subscription!);
 
-              return Column(
+        return isValid
+            ? Scaffold(
+          appBar: AppBar(
+            title: const Text("Subscription"),
+            centerTitle: true,
+            leading: DrawerButton(
+              onPressed: () {
+                drawerMenuController.openDrawer();
+              },
+            ),
+          ),
+          body: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Features + Header in scrollable view
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          const SizedBox(height: 16),
-                          RichText(
-                            textAlign: TextAlign.center,
-                            text: const TextSpan(
-                              style: TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black),
-                              children: [
-                                TextSpan(text: "Unlock "),
-                                TextSpan(
-                                    text: "Pro",
-                                    style: TextStyle(
-                                        color: AppColors.error,
-                                        fontSize: 38,
-                                        fontWeight: FontWeight.bold)),
-                                TextSpan(text: " Features!"),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-
-                          // Sliding Feature Section
-                          Expanded(
-                            child: PageView.builder(
-                              controller: _pageController,
-                              itemCount: controller.packages.length,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemBuilder: (context, index) {
-                                final pkg = controller.packages[index];
-                                return ListView(
-                                  children: pkg.details.map((feature) {
-                                    return Padding(
-                                      padding: const EdgeInsets.only(bottom: 8),
-                                      child: Row(
-                                        children: [
-                                          const Icon(Icons.check_circle,
-                                              color: AppColors.primary,
-                                              size: 20),
-                                          const SizedBox(width: 8),
-                                          Expanded(
-                                            child: Text(feature.title,
-                                                style: const TextStyle(
-                                                    fontSize: 14)),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  }).toList(),
-                                );
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
+                  const Icon(Icons.verified, color: Colors.green, size: 64),
+                  const SizedBox(height: 12),
+                  const Text(
+                    "You're Subscribed",
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primary,
                     ),
                   ),
-                ],
-              );
-            },
-          ),
-        ),
-      ),
-      bottomNavigationBar: Container(
-        padding:
-            const EdgeInsets.only(top: 20, bottom: 40, left: 20, right: 20),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            RichText(
-              textAlign: TextAlign.center,
-              text: const TextSpan(
-                style: TextStyle(fontSize: 16, color: Colors.black),
-                children: [
-                  TextSpan(text: "Choose your"),
-                  TextSpan(text: " "),
-                  TextSpan(
-                      text: "plan",
-                      style: TextStyle(
-                          color: AppColors.primary,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
+                  Text("Plan: ${controller.subscription!.packageDetails}",
+                      style: const TextStyle(fontSize: 16)),
+                  Text("Valid until: ${controller.subscription!.endDate}",
+                      style: const TextStyle(fontSize: 16, color: Colors.grey)),
+                  const SizedBox(height: 24),
+                  CustomBtn(
+                    onPressedFn: () {
+                      Get.toNamed(ChangePlanScreen.routeName, arguments: true);
+                    },
+                    btnTxt: "Manage Plan",
+                  ),
                 ],
               ),
             ),
-            addH(16),
-            // Tabbar-style package selector
-            ...controller.packages.asMap().entries.map((entry) {
-              final index = entry.key;
-              final pkg = entry.value;
-              final isSelected = index ==
-                  selectedIndex; // mark first selected, or use your own state
-
-              final discountPercent =
-                  _calculateDiscount(pkg.price, pkg.discountPrice);
-
-              return GestureDetector(
-                onTap: () {
-                  setState(() {
-                    selectedIndex = index;
-                    _pageController.animateToPage(
-                      index,
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                    );
-                  });
-                },
-                child: Container(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: isSelected ? Colors.black : Colors.blue.shade100,
-                      width: isSelected ? 2 : 1,
-                    ),
-                    color: Colors.white,
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                          child: Text(pkg.name,
-                              style: const TextStyle(fontSize: 16))),
-                      if (discountPercent != null)
-                        Container(
-                          margin: const EdgeInsets.only(right: 8),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.redAccent,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Text(
-                            "-$discountPercent%",
-                            style: const TextStyle(
-                                color: Colors.white, fontSize: 12),
-                          ),
-                        ),
-                      Text(
-                        "৳${pkg.discountPrice}",
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 16),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        "৳${pkg.price}",
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey,
-                          decoration: TextDecoration.lineThrough,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }),
-            const SizedBox(height: 12),
-            CustomBtn(
-                onPressedFn: () {
-                  final selectedPkg = controller.packages[selectedIndex];
-                  Get.to(() => const SubscriptionDetailsScreen(),
-                      arguments: [selectedPkg.id, selectedPkg.name]);
-                },
-                btnTxt: "Get Started")
-          ],
-        ),
-      ),
+          ),
+        )
+            : const ChangePlanScreen();
+      },
     );
   }
 }

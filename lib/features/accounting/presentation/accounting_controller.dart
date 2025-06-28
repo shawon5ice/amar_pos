@@ -68,7 +68,7 @@ class AccountingController extends GetxController {
           Get.toNamed(DueCollection.routeName);
         }));
     accounting.addIf(duePaymentAccess,AccountingMenuItem(
-        title: "Due Payment",
+        title: "Supplier Payment",
         onPress: () {
           Get.toNamed(SupplierPayment.routeName);
         }));

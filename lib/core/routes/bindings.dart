@@ -16,9 +16,11 @@ import 'package:amar_pos/features/accounting/presentation/views/supplier_payment
 import 'package:amar_pos/features/accounting/presentation/views/trial_balance/trial_balance_controller.dart';
 import 'package:amar_pos/features/auth/presentation/controller/auth_controller.dart';
 import 'package:amar_pos/features/drawer/drawer_menu_controller.dart';
+import 'package:amar_pos/features/home/presentation/home_screen_controller.dart';
 import 'package:amar_pos/features/inventory/presentation/products/product_controller.dart';
 import 'package:amar_pos/features/return/presentation/controller/return_controller.dart';
 import 'package:amar_pos/features/sales/presentation/controller/sales_controller.dart';
+import 'package:amar_pos/features/subscription/presentation/subscription_controller.dart';
 import 'package:get/get.dart';
 
 import '../../features/config/presentation/category/category_controller.dart';
@@ -27,11 +29,20 @@ import '../../features/inventory/presentation/stock_transfer/stock_transfer_cont
 class MainBinding extends Bindings{
   @override
   void dependencies() {
-    Get.lazyPut(()=> DrawerMenuController());
+    Get.put(()=> DrawerMenuController(), permanent: true);
   }
 
 }
 
+
+class HomeScreenBindings extends Bindings{
+  @override
+  void dependencies() {
+    Get.lazyPut(()=> HomeScreenController());
+    Get.lazyPut(()=> SubscriptionController());
+  }
+
+}
 
 class AuthBinding extends Bindings{
   @override
@@ -198,5 +209,12 @@ class SalesScreenBindings extends Bindings{
   @override
   void dependencies() {
     Get.lazyPut(()=> SalesController());
+  }
+}
+
+class SubscriptionBindings extends Bindings{
+  @override
+  void dependencies() {
+    Get.lazyPut(()=> SubscriptionController());
   }
 }

@@ -353,7 +353,7 @@ class MoneyTransferController extends GetxController{
       api: "chart_of_accounts/get-payment-methods",
     );
 
-    if (response != null) {
+    if (response != null && response['success']) {
       logger.d(response);
       ChartOfAccountPaymentMethodsResponseModel chartOfAccountPaymentMethodsResponseModel =
       ChartOfAccountPaymentMethodsResponseModel.fromJson(response);

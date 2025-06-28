@@ -60,10 +60,9 @@ class ChartOfAccountOpeningHistoryItemWidget extends StatelessWidget {
                   ],
                 ),
               ),
-              Spacer(),
               addW(8),
               CustomSvgSmallIconButton(
-                borderColor: Color(0xff03346E),
+                borderColor: const Color(0xff03346E),
                 bgColor: const Color(0xffE1F2FF),
                 onTap: () {
                   _controller.downloadAccountOpeningHistory(

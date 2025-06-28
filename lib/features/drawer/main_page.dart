@@ -83,32 +83,7 @@ class MainPage extends StatelessWidget {
     );
   }
 
-  Widget buildDrawer() => DrawerWidget(
-        // onSelectedItem: (value) {
-        //   bool isSameItemSelected =
-        //       value?.parent == menuController.selectedMenuItem.value?.parent &&
-        //           value?.child == menuController.selectedMenuItem.value?.child;
-        //
-        //   if (isSameItemSelected) {
-        //     menuController.closeDrawer();
-        //   } else {
-        //     bool isParentWithChildren = (value?.parent == DrawerItems.inventory) &&
-        //         value?.child == null || (value?.parent == DrawerItems.returnAndExchange) &&
-        //         value?.child == null || (value?.parent == DrawerItems.purchase) &&
-        //         value?.child == null
-        //     ;
-        //     if (!isParentWithChildren) {
-        //       menuController.selectParent(value!.parent);
-        //       if (value.child != null) {
-        //         menuController.selectChild(value.parent, value.child!);
-        //       }
-        //     }
-        //     if (!isParentWithChildren || value?.child != null) {
-        //       menuController.closeDrawer();
-        //     }
-        //   }
-        // },
-      );
+  Widget buildDrawer() => DrawerWidget();
 
   Future<bool> showExitConfirmation(BuildContext context) async {
     return await showDialog<bool>(

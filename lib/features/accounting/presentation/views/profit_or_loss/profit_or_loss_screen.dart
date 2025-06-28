@@ -71,7 +71,7 @@ class _ProfitOrLossScreenState extends State<ProfitOrLossScreen>
                       Expanded(
                         child: Text(
                           textAlign: TextAlign.center,
-                          controller.selectedDateTimeRange.value != null ? '${formatDate(controller.selectedDateTimeRange.value!.start)} \nto \n${formatDate(controller.selectedDateTimeRange.value!.end)}' : '${formatDate(DateTime.now())} \nto \n${formatDate(DateTime.now())}',
+                          controller.selectedDateTimeRange.value != null ? '${formatDate(controller.selectedDateTimeRange.value!.start)} \nto \n${formatDate(controller.selectedDateTimeRange.value!.end)}' : '${formatDate(DateTime(DateTime.now().year,DateTime.now().month,))} \nto \n${formatDate(DateTime(DateTime.now().year,DateTime.now().month+1,).subtract(Duration(days: 1)))}',
                           style: const TextStyle(fontSize: 14),
                           overflow: TextOverflow.visible,
                           softWrap: false,
@@ -137,86 +137,95 @@ class _ProfitOrLossScreenState extends State<ProfitOrLossScreen>
                     } else if (controller.profitOrLossList.isEmpty) {
                       return const Center(child: Text("No data found"));
                     }
-                    return DataTable2(
-                      fixedColumnsColor: const Color(0xffEFEFEF),
-                      // sortColumnIndex: 1,
-                      // fixedLeftColumns: 1,
-                      columnSpacing: 12,
-                      horizontalMargin: 12,
-                      // minWidth: 800,
-                      empty: const Center(
-                        child: Text("No Data Found"),
-                      ),
-                      headingRowColor:
-                          const WidgetStatePropertyAll(Color(0xffEFEFEF)),
-                      dividerThickness: .5,
-                      headingRowHeight: 40,
-                      headingTextStyle: const TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.black),
-                      border: TableBorder.all(color: Colors.black, width: .5),
-                      columns: [
-                        DataColumn2(
-                          label: Center(
-                              child: Text(
-                            'Account Title',
-                            textAlign: TextAlign.center,
-                          )),
-                          size: ColumnSize.L,
+                    return ClipRRect(
+                      borderRadius: BorderRadius.only(topLeft: Radius.circular(8), topRight: Radius.circular(8)),
+                      child: DataTable2(
+                        columnSpacing: 12,
+                        horizontalMargin: 12,
+                        // minWidth: 800,
+                        empty: const Center(
+                          child: Text("No Data Found"),
                         ),
-                        DataColumn2(
-                          label: Center(
-                              child: Text(
-                            'Amount',
-                            textAlign: TextAlign.center,
-                          )),
-                          numeric: true,
-                          size: ColumnSize.S,
-                        ),
-                        DataColumn2(
-                          label: Center(
-                              child: Text(
-                            'Amount',
-                            textAlign: TextAlign.center,
-                          )),
-                          size: ColumnSize.S,
-                          numeric: true,
-                        ),
-                      ],
-                      rows: [
-                        ...controller.profitOrLossList.map((e) {
-                          int index = controller.profitOrLossList.indexOf(e);
+                        headingRowColor: WidgetStatePropertyAll(AppColors.primary),
+                        dividerThickness: .5,
+                        headingRowHeight: 40,
 
-                          return DataRow(
-                            color: index % 2 == 0
-                                ? const WidgetStatePropertyAll(Colors.white)
-                                : WidgetStatePropertyAll(
-                                    Colors.yellow.withOpacity(.03)),
-                            cells: [
-                              _buildDataCell(
-                                  isNumber: false,
-                                  e.name ?? 'N/A',
-                                  maxLines: 3,
-                                  alignLeft: e.align?.toLowerCase() == "left",
-                                  alignRight: e.align?.toLowerCase() == "right",
-                                  isMinus: e.isMinus == 1),
-                              _buildDataCell(
-                                  Methods.getFormattedNumber(
-                                    e.debit?.toDouble() ?? 0,
-                                  ),
-                                  maxLines: 2,
-                                  isMinus: e.isMinus == 1,
-                                  isNumber: true),
-                              _buildDataCell(
-                                  Methods.getFormattedNumber(
-                                    e.credit?.toDouble() ?? 0,
-                                  ),
-                                  maxLines: 2,
-                                  isMinus: e.isMinus == 1,
-                                  isNumber: true),
-                            ],
-                          );
-                        })
-                      ],
+                        headingTextStyle: const TextStyle(
+                            fontWeight: FontWeight.bold, color: Colors.white),
+                        border: TableBorder(
+                          horizontalInside: BorderSide(
+                            color: Colors.grey.shade200, // Color between rows
+                            width: .5,
+                          ),
+                          verticalInside: BorderSide(
+                            color: Colors.grey,
+                            width: .5,
+                          ),
+                        ),
+                        columns: [
+                          DataColumn2(
+                            label: Center(
+                                child: Text(
+                              'Account Title',
+                              textAlign: TextAlign.center,
+                            )),
+                            size: ColumnSize.L,
+                          ),
+                          DataColumn2(
+                            label: Center(
+                                child: Text(
+                              'Amount',
+                              textAlign: TextAlign.center,
+                            )),
+                            numeric: true,
+                            size: ColumnSize.S,
+                          ),
+                          DataColumn2(
+                            label: Center(
+                                child: Text(
+                              'Amount',
+                              textAlign: TextAlign.center,
+                            )),
+                            size: ColumnSize.S,
+                            numeric: true,
+                          ),
+                        ],
+                        rows: [
+                          ...controller.profitOrLossList.map((e) {
+                            int index = controller.profitOrLossList.indexOf(e);
+
+                            return DataRow(
+                              color: index % 2 == 0
+                                  ? const WidgetStatePropertyAll(Colors.white)
+                                  : WidgetStatePropertyAll(
+                                      Colors.yellow.withOpacity(.03)),
+                              cells: [
+                                _buildDataCell(
+                                    isNumber: false,
+                                    e.name ?? 'N/A',
+                                    maxLines: 3,
+                                    alignLeft: e.align?.toLowerCase() == "left",
+                                    alignRight: e.align?.toLowerCase() == "right",
+                                    isMinus: e.isMinus == 1),
+                                _buildDataCell(
+                                    Methods.getFormattedNumber(
+                                      e.debit?.toDouble() ?? 0,
+                                    ),
+                                    maxLines: 2,
+                                    isMinus: e.isMinus == 1,
+                                    isNumber: true),
+                                _buildDataCell(
+                                    Methods.getFormattedNumber(
+                                      e.credit?.toDouble() ?? 0,
+                                    ),
+                                    maxLines: 2,
+                                    isMinus: e.isMinus == 1,
+                                    isNumber: true),
+                              ],
+                            );
+                          })
+                        ],
+                      ),
                     );
                   },
                 ),

@@ -111,7 +111,9 @@ class _CollectionPageState extends State<CollectionPage> {
                   addW(4),
                   CustomSvgIconButton(
                     bgColor: const Color(0xffFFFCF8),
-                    onTap: () {},
+                    onTap: () {
+                      controller.downloadList(isPdf: true, clientLedger: false, shouldPrint: true);
+                    },
                     assetPath: AppAssets.printIcon,
                   )
                 ],

@@ -40,9 +40,12 @@ class _CreateExpenseVoucherBottomSheetState
 
   @override
   void initState() {
-
-    selectedPaymentMethod = widget.transactionData!.paymentMethod;
     paymentDDController = Get.put(CAPaymentMethodDDController());
+    if(widget.transactionData != null){
+      selectedPaymentMethod = widget.transactionData!.paymentMethod;
+    }
+
+
     _textEditingController = TextEditingController();
     _remarksEditingController = TextEditingController();
 

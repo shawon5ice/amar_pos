@@ -7,7 +7,6 @@ import 'package:amar_pos/features/accounting/presentation/views/daily_statement/
 import 'package:amar_pos/features/drawer/drawer_menu_controller.dart';
 import 'package:amar_pos/features/home/data/models/quick_access_item_model.dart';
 import 'package:amar_pos/features/home/presentation/home_screen_controller.dart';
-import 'package:amar_pos/features/inventory/data/stock_report/stock_report_list_response_model.dart';
 import 'package:amar_pos/features/profile/presentation/profile_screen.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
@@ -17,7 +16,7 @@ import 'package:get/get.dart';
 
 import '../../../permission_manager.dart';
 import '../../auth/data/model/hive/login_data_helper.dart';
-import '../data/models/bottom_nav_item.dart';
+import 'widget/bottom_nav_item.dart';
 import '../data/models/dashboard_response_model.dart';
 import 'widget/sales_summary_card.dart';
 
@@ -144,10 +143,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                               ? (dashboardResponseData.wholeSale +
                                       dashboardResponseData.retailSale)
                                   .toDouble()
-                              : 0),
-                      addH(8),
+                              : 0,
+                      ),
+                      addH(12),
                       Container(
-                        padding: EdgeInsets.all(24.w),
+                        padding: EdgeInsets.symmetric(horizontal: 16,vertical: 16),
                         decoration: BoxDecoration(
                           color: context.theme.cardColor,
                           borderRadius: BorderRadius.circular(12.r),
@@ -206,9 +206,9 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                           ],
                         ),
                       ),
-                      addH(8),
+                      addH(12),
                       Container(
-                        padding: EdgeInsets.all(24.w),
+                        padding:  const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                         decoration: BoxDecoration(
                           color: context.theme.cardColor,
                           borderRadius: BorderRadius.circular(12.r),
@@ -259,10 +259,10 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                           ],
                         ),
                       ),
-                      addH(8),
+                      addH(12),
                       if (rows.isNotEmpty)
                         Container(
-                          padding: EdgeInsets.all(24.w),
+                          padding:  const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                           decoration: BoxDecoration(
                             color: context.theme.cardColor,
                             borderRadius: BorderRadius.circular(12.r),
@@ -298,11 +298,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                             ],
                           ),
                         ),
-                      addH(8),
+                      addH(12),
                       if (dashboardResponseData != null &&
                           dashboardResponseData.products.isNotEmpty)
                         Container(
-                          padding: EdgeInsets.all(24.w),
+                          padding:  const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                           decoration: BoxDecoration(
                             color: context.theme.cardColor,
                             borderRadius: BorderRadius.circular(12.r),

@@ -113,7 +113,7 @@ class _SupplierLedgerPageState extends State<SupplierLedgerPage> {
                   CustomSvgIconButton(
                     bgColor: const Color(0xffFFFCF8),
                     onTap: () {
-                      controller.downloadList(isPdf: false, supplierLedger: true, shouldPrint: true);
+                      controller.downloadList(isPdf: true, supplierLedger: true, shouldPrint: true);
                     },
                     assetPath: AppAssets.printIcon,
                   )

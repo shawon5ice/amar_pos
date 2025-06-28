@@ -127,85 +127,95 @@ class _BalanceSheetScreenState extends State<BalanceSheetScreen>
                     } else if (controller.balanceSheetList.isEmpty) {
                       return const Center(child: Text("No data found"));
                     }
-                    return DataTable2(
-                      fixedColumnsColor: const Color(0xffEFEFEF),
-                      // sortColumnIndex: 1,
-                      // fixedLeftColumns: 1,
-                      columnSpacing: 12,
-                      horizontalMargin: 12,
-                      empty: const Center(
-                        child: Text("No Data Found"),
-                      ),
-                      headingRowColor:
-                          const WidgetStatePropertyAll(Color(0xffEFEFEF)),
-                      dividerThickness: .5,
-                      headingRowHeight: 40,
-                      headingTextStyle: const TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.black),
-                      border: TableBorder.all(color: Colors.black, width: .5),
-                      columns: [
-                        DataColumn2(
-                          label: Center(
-                              child: Text(
-                            'Account Title',
-                            textAlign: TextAlign.center,
-                          )),
-                          size: ColumnSize.L
+                    return ClipRRect(
+                      borderRadius: BorderRadius.only(topLeft: Radius.circular(8), topRight: Radius.circular(8)),
+                      child: DataTable2(
+                        columnSpacing: 12,
+                        horizontalMargin: 12,
+                        // minWidth: 800,
+                        empty: const Center(
+                          child: Text("No Data Found"),
                         ),
-                        DataColumn2(
+                        headingRowColor: WidgetStatePropertyAll(AppColors.primary),
+                        dividerThickness: .5,
+                        headingRowHeight: 40,
+
+                        headingTextStyle: const TextStyle(
+                            fontWeight: FontWeight.bold, color: Colors.white),
+                        border: TableBorder(
+                          horizontalInside: BorderSide(
+                            color: Colors.grey.shade200, // Color between rows
+                            width: .5,
+                          ),
+                          verticalInside: BorderSide(
+                            color: Colors.grey,
+                            width: .5,
+                          ),
+                        ),
+                        columns: [
+                          DataColumn2(
+                            label: Center(
+                                child: Text(
+                              'Account Title',
+                              textAlign: TextAlign.center,
+                            )),
+                            size: ColumnSize.L
+                          ),
+                          DataColumn2(
+                              label: Center(
+                                  child: Text(
+                                'Amount',
+                                textAlign: TextAlign.center,
+                              )),
+                            numeric: true,
+                            size: ColumnSize.S,
+                          ),
+                          DataColumn2(
                             label: Center(
                                 child: Text(
                               'Amount',
                               textAlign: TextAlign.center,
                             )),
-                          numeric: true,
-                          size: ColumnSize.S,
-                        ),
-                        DataColumn2(
-                          label: Center(
-                              child: Text(
-                            'Amount',
-                            textAlign: TextAlign.center,
-                          )),
-                          size: ColumnSize.S,
-                          numeric: true,
-                        ),
-                      ],
-                      rows: [
-                        ...controller.balanceSheetList.map((e) {
-                          int index = controller.balanceSheetList.indexOf(e);
+                            size: ColumnSize.S,
+                            numeric: true,
+                          ),
+                        ],
+                        rows: [
+                          ...controller.balanceSheetList.map((e) {
+                            int index = controller.balanceSheetList.indexOf(e);
 
-                          return DataRow(
-                            color: index % 2 == 0
-                                ? const WidgetStatePropertyAll(Colors.white)
-                                : WidgetStatePropertyAll(
-                                    Colors.yellow.withOpacity(.03)),
-                            cells: [
-                              DataCell(
-                                AutoSizeText(
-                                  minFontSize: 2,
-                                  maxFontSize: 10,
-                                  maxLines:2,
-                                  e.name??'N/A',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color:  Colors.black,
-                                    fontWeight: FontWeight.normal,
+                            return DataRow(
+                              color: index % 2 == 0
+                                  ? const WidgetStatePropertyAll(Colors.white)
+                                  : WidgetStatePropertyAll(
+                                      Colors.yellow.withOpacity(.03)),
+                              cells: [
+                                DataCell(
+                                  AutoSizeText(
+                                    minFontSize: 2,
+                                    maxFontSize: 10,
+                                    maxLines:2,
+                                    e.name??'N/A',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color:  Colors.black,
+                                      fontWeight: FontWeight.normal,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              // _buildDataCell(isNumber: false ,e.name??'N/A', maxLines: 2,),
-                              _buildDataCell(Methods.getFormattedNumber(
-                              e.debit?.toDouble() ?? 0,
-                              ), maxLines: 2, isNumber: true),
+                                // _buildDataCell(isNumber: false ,e.name??'N/A', maxLines: 2,),
+                                _buildDataCell(Methods.getFormattedNumber(
+                                e.debit?.toDouble() ?? 0,
+                                ), maxLines: 2, isNumber: true),
 
-                              _buildDataCell(Methods.getFormattedNumber(
-                                e.credit?.toDouble() ?? 0,
-                              ), maxLines: 2,isNumber: true),
-                            ],
-                          );
-                        })
-                      ],
+                                _buildDataCell(Methods.getFormattedNumber(
+                                  e.credit?.toDouble() ?? 0,
+                                ), maxLines: 2,isNumber: true),
+                              ],
+                            );
+                          })
+                        ],
+                      ),
                     );
                   },
                 ),
